@@ -82,7 +82,6 @@ a:hover {
     padding: 0;
     display: flex;
     justify-content: space-between;
-    line-height: 18px;
 }
 
 .status-el .media-heading .heading-name-row .name-and-account-name {
@@ -115,8 +114,12 @@ a:hover {
     border-radius: 50%;
     display: inline-block;
     text-align: center;
+    vertical-align: middle;
     margin-left: 4px;
-    width: 18px;
+    height: 14px;
+    width: 14px;
+    font-size: 10px;
+    margin-bottom: 2px;
 }
 
 .status-el .media-heading .heading-right {
@@ -399,10 +402,6 @@ nav {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-}
-
-.profile-card-name span {
-    width: 22px;
 }
 
 .profile-card-username {
