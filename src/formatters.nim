@@ -69,13 +69,12 @@ proc getGifSrc*(tweet: Tweet): string =
 proc getGifThumb*(tweet: Tweet): string =
   fmt"https://pbs.twimg.com/tweet_video_thumb/{tweet.gif}.jpg"
 
-proc formatName(profile: Profile): string =
-  result = profile.fullname
+proc formatName*(profile: Profile): string =
+  result = xmltree.escape(profile.fullname)
   if profile.verified:
-    result &= " 🔹"
+    result &= htmlgen.span("✔", class="verified-icon")
   elif profile.protected:
     result &= " 🔒"
-  result = xmltree.escape(result)
 
 proc linkUser*(profile: Profile; h: string; username=true; class=""): string =
   let text =
