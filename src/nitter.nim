@@ -1,13 +1,13 @@
 import asyncdispatch, httpclient, times, strutils, hashes, random, uri
 import jester, regex
 
-import api, utils, types
+import api, utils, types, cache
 import views/[user, general, conversation]
 
 proc showTimeline(name: string; num=""): Future[string] {.async.} =
   let
     username = name.strip(chars={'/'})
-    profileFut = getProfile(username)
+    profileFut = getCachedProfile(username)
     tweetsFut = getTimeline(username, after=num)
 
   let profile = await profileFut
