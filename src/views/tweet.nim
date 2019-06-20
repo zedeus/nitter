@@ -55,6 +55,19 @@
 </div>
 #end proc
 #
+#proc renderVideo(tweet: Tweet): string =
+<div class="attachments media-body">
+  <div class="gallery-row" style="max-height: unset;">
+    <div class="attachment image">
+    <video poster=${tweet.videoThumb} style="width: 100%; height: 100%;" autoplay muted loop></video>
+    <div class="video-overlay">
+      <p>Video playback not supported</p>
+    </div>
+    </div>
+  </div>
+</div>
+#end proc
+#
 #proc renderGif(tweet: Tweet): string =
 #let thumbUrl = getGifThumb(tweet).getSigUrl("pic")
 #let videoUrl = getGifSrc(tweet).getSigUrl("video")
@@ -89,6 +102,8 @@
       </div>
       #if tweet.photos.len > 0:
         ${renderMediaGroup(tweet)}
+      #elif tweet.videoThumb.len > 0:
+        ${renderVideo(tweet)}
       #elif tweet.gif.len > 0:
         ${renderGif(tweet)}
       #end if

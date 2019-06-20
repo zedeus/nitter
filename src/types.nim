@@ -27,6 +27,8 @@ type
     pinned*: bool
     photos*: seq[string]
     gif*: string
+    video*: string
+    videoThumb*: string
 
   Tweets* = seq[Tweet]
 
