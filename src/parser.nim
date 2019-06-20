@@ -47,7 +47,6 @@ proc parseTweet*(tweet: XmlNode): Tweet =
   result.id = tweet.getAttr("data-item-id")
   result.link = tweet.getAttr("data-permalink-path")
   result.text = tweet.selectText(".tweet-text").stripTwitterUrls()
-  result.retweetBy = tweet.selectText(".js-retweet-text > a > b")
   result.pinned = "pinned" in tweet.getAttr("class")
   result.profile = parseTweetProfile(tweet)
 
@@ -70,6 +69,10 @@ proc parseTweet*(tweet: XmlNode): Tweet =
     of "retweets": result.retweets = num
     else: discard
 
+  let by = tweet.selectText(".js-retweet-text > a > b")
+  if by.len > 0:
+    result.retweetBy = some(by)
+
   for photo in tweet.querySelectorAll(".AdaptiveMedia-photoContainer"):
     result.photos.add photo.attrs["data-image-url"]
 
@@ -77,9 +80,9 @@ proc parseTweet*(tweet: XmlNode): Tweet =
   if player.len > 0:
     let thumb = player.replace(re".+:url\('([^']+)'\)", "$1")
     if "tweet_video" in thumb:
-      result.gif = thumb.replace(re".+thumb/([^\.']+)\.jpg.+", "$1")
+      result.gif = some(thumb.replace(re".+thumb/([^\.']+)\.jpg.+", "$1"))
     else:
-      result.videoThumb = thumb
+      result.videoThumb = some(thumb)
 
 proc parseTweets*(node: XmlNode): Tweets =
   if node.isNil: return

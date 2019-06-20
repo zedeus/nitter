@@ -73,7 +73,7 @@
   #for tweet in tweets:
     #if tweet in retweets: continue
     #end if
-    #if tweet.retweetBy.len > 0: retweets.add tweet
+    #if tweet.retweetBy.isSome: retweets.add tweet
     #end if
     ${renderTweet(tweet, "timeline-tweet")}
   #end for

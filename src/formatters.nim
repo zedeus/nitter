@@ -64,10 +64,10 @@ proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
 proc getGifSrc*(tweet: Tweet): string =
-  fmt"https://video.twimg.com/tweet_video/{tweet.gif}.mp4"
+  fmt"https://video.twimg.com/tweet_video/{tweet.gif.get()}.mp4"
 
 proc getGifThumb*(tweet: Tweet): string =
-  fmt"https://pbs.twimg.com/tweet_video_thumb/{tweet.gif}.jpg"
+  fmt"https://pbs.twimg.com/tweet_video_thumb/{tweet.gif.get()}.jpg"
 
 proc formatName*(profile: Profile): string =
   result = xmltree.escape(profile.fullname)

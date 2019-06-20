@@ -3,9 +3,9 @@
 #import ../types, ../formatters, ../utils
 #
 #proc renderHeading(tweet: Tweet): string =
-#if tweet.retweetBy != "":
+#if tweet.retweetBy.isSome:
   <div class="retweet">
-    <span>🔄 ${tweet.retweetBy} retweeted</span>
+    <span>🔄 ${tweet.retweetBy.get()} retweeted</span>
   </div>
 #end if
 #if tweet.pinned:
@@ -59,7 +59,7 @@
 <div class="attachments media-body">
   <div class="gallery-row" style="max-height: unset;">
     <div class="attachment image">
-    <video poster=${tweet.videoThumb} style="width: 100%; height: 100%;" autoplay muted loop></video>
+    <video poster=${tweet.videoThumb.get()} style="width: 100%; height: 100%;" autoplay muted loop></video>
     <div class="video-overlay">
       <p>Video playback not supported</p>
     </div>
@@ -102,9 +102,9 @@
       </div>
       #if tweet.photos.len > 0:
         ${renderMediaGroup(tweet)}
-      #elif tweet.videoThumb.len > 0:
+      #elif tweet.videoThumb.isSome:
         ${renderVideo(tweet)}
-      #elif tweet.gif.len > 0:
+      #elif tweet.gif.isSome:
         ${renderGif(tweet)}
       #end if
       ${renderStats(tweet)}
