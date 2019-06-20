@@ -80,7 +80,7 @@ proc parseTweet*(tweet: XmlNode): Tweet =
   if player.len > 0:
     let thumb = player.replace(re".+:url\('([^']+)'\)", "$1")
     if "tweet_video" in thumb:
-      result.gif = some(thumb.replace(re".+thumb/([^\.']+)\.jpg.+", "$1"))
+      result.gif = some(thumb.replace(re".+thumb/([^\.']+)\.jpg.*", "$1"))
     else:
       result.videoThumb = some(thumb)
 
