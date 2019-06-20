@@ -559,3 +559,22 @@ nav {
     font-size: 21px;
     font-weight: bold;
 }
+
+.video-overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background-color: #000000bd;
+}
+
+.video-overlay p {
+    position: relative;
+    z-index: 0;
+    color: #dcdcdc;
+    text-align: center;
+    top: calc(50% - 20px);
+    font-size: 20px;
+}

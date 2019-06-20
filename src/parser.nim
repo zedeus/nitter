@@ -9,7 +9,7 @@ proc getAttr(node: XmlNode; attr: string; default=""): string =
 
 proc selectAttr(node: XmlNode; selector: string; attr: string; default=""): string =
   let res = node.querySelector(selector)
-  return res.getAttr(attr, default)
+  if res == nil: "" else: res.getAttr(attr, default)
 
 proc selectText(node: XmlNode; selector: string): string =
   let res = node.querySelector(selector)
@@ -63,9 +63,8 @@ proc parseTweet*(tweet: XmlNode): Tweet =
     let
       text = action.innerText.split()
       num = text[0]
-      act = text[1]
 
-    case act
+    case text[1]
     of "replies": result.replies = num
     of "likes": result.likes = num
     of "retweets": result.retweets = num
@@ -74,9 +73,13 @@ proc parseTweet*(tweet: XmlNode): Tweet =
   for photo in tweet.querySelectorAll(".AdaptiveMedia-photoContainer"):
     result.photos.add photo.attrs["data-image-url"]
 
-  let gif = tweet.selectAttr(".PlayableMedia-player", "style")
-  if gif != "":
-    result.gif = gif.replace(re".+thumb/([^\.']+)\.jpg.+", "$1")
+  let player = tweet.selectAttr(".PlayableMedia-player", "style")
+  if player.len > 0:
+    let thumb = player.replace(re".+:url\('([^']+)'\)", "$1")
+    if "tweet_video" in thumb:
+      result.gif = thumb.replace(re".+thumb/([^\.']+)\.jpg.+", "$1")
+    else:
+      result.videoThumb = thumb
 
 proc parseTweets*(node: XmlNode): Tweets =
   if node.isNil: return
