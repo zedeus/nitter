@@ -14,7 +14,7 @@
     <nav id="nav" class="nav-bar container">
       <div class="inner-nav">
         <div class="item">
-          <a href="/" class="site-name">twatter</a>
+          <a href="/" class="site-name">nitter</a>
         </div>
       </div>
     </nav>
