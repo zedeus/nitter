@@ -109,6 +109,16 @@ a:hover {
     color: #f8f8f2;
 }
 
+.verified-icon {
+    color: #fff;
+    background-color: #1da1f2;
+    border-radius: 50%;
+    display: inline-block;
+    text-align: center;
+    margin-left: 4px;
+    width: 18px;
+}
+
 .status-el .media-heading .heading-right {
     display: flex;
     flex-shrink: 0;
@@ -389,6 +399,10 @@ nav {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.profile-card-name span {
+    width: 22px;
 }
 
 .profile-card-username {

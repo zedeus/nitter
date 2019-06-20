@@ -17,10 +17,10 @@ proc selectText(node: XmlNode; selector: string): string =
 
 proc parseProfile*(node: XmlNode): Profile =
   let profile = node.querySelector(".profile-card")
-  result.fullname = profile.selectText(".fullname")
+  result.fullname = profile.selectText(".fullname").strip()
   result.username = profile.selectText(".username").strip(chars={'@', ' '})
   result.description = profile.selectText(".bio")
-  result.verified = profile.selectText("li.verified").len > 0
+  result.verified = profile.selectText(".Icon.Icon--verified").len > 0
   result.protected = profile.selectText(".Icon.Icon--protected").len > 0
   result.userpic = profile.selectAttr(".ProfileCard-avatarImage", "src").getUserpic()
   result.banner = profile.selectAttr("svg > image", "xlink:href").replace("600x200", "1500x500")
