@@ -4,15 +4,20 @@ import nimquery, regex
 
 import ./types, ./parser
 
-const base = parseUri("https://twitter.com/")
-const agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+const
+  base = parseUri("https://twitter.com/")
+  agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+  timelineUrl = "i/profiles/show/$1/timeline/tweets?include_available_features=1&include_entities=1&include_new_items_bar=true"
+  profilePopupUrl = "i/profiles/popup"
+  profileIntentUrl = "intent/user"
+  tweetUrl = "i/status/"
 
-const timelineUrl = "i/profiles/show/$1/timeline/tweets?include_available_features=1&include_entities=1&include_new_items_bar=true"
-const profilePopupUrl = "i/profiles/popup"
-const profileIntentUrl = "intent/user"
-const tweetUrl = "i/status/"
+proc fetchHtml(url: Uri; headers: HttpHeaders; jsonKey = ""): Future[XmlNode] {.async.} =
+  var client = newAsyncHttpClient()
+  defer: client.close()
 
-proc fetchHtml(client: AsyncHttpClient; url: Uri; jsonKey = ""): Future[XmlNode] {.async.} =
+  client.headers = headers
+
   var resp = ""
   try:
     resp = await client.getContent($url)
@@ -25,19 +30,15 @@ proc fetchHtml(client: AsyncHttpClient; url: Uri; jsonKey = ""): Future[XmlNode]
   else:
     return parseHtml(resp)
 
-proc getProfileFallback(username: string; client: AsyncHttpClient): Future[Profile] {.async.} =
+proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile] {.async.} =
   let
-    params = {"screen_name": username}
-    url = base / profileIntentUrl ? params
-    html = await client.fetchHtml(url)
+    url = base / profileIntentUrl ? {"screen_name": username}
+    html = await fetchHtml(url, headers)
 
   result = parseIntentProfile(html)
 
 proc getProfile*(username: string): Future[Profile] {.async.} =
-  let client = newAsyncHttpClient()
-  defer: client.close()
-
-  client.headers = newHttpHeaders({
+  let headers = newHttpHeaders({
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
     "Referer": $(base / username),
     "User-Agent": agent,
@@ -53,18 +54,15 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
       "_": $(epochTime().int)
     }
     url = base / profilePopupUrl ? params
-    html = await client.fetchHtml(url, jsonKey="html")
+    html = await fetchHtml(url, headers, jsonKey="html")
 
   if not html.querySelector(".ProfileCard-sensitiveWarningContainer").isNil:
-    return await getProfileFallback(username, client)
+    return await getProfileFallback(username, headers)
 
   result = parsePopupProfile(html)
 
 proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
-  let client = newAsyncHttpClient()
-  defer: client.close()
-
-  client.headers = newHttpHeaders({
+  let headers = newHttpHeaders({
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "Referer": $(base / username),
     "User-Agent": agent,
@@ -77,15 +75,12 @@ proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
   if after.len > 0:
     url &= "&max_position=" & after
 
-  let html = await client.fetchHtml(base / url, jsonKey="items_html")
+  let html = await fetchHtml(base / url, headers, jsonKey="items_html")
 
   result = parseTweets(html)
 
 proc getTweet*(id: string): Future[Conversation] {.async.} =
-  let client = newAsyncHttpClient()
-  defer: client.close()
-
-  client.headers = newHttpHeaders({
+  let headers = newHttpHeaders({
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "Referer": $base,
     "User-Agent": agent,
@@ -98,6 +93,6 @@ proc getTweet*(id: string): Future[Conversation] {.async.} =
 
   let
     url = base / tweetUrl / id
-    html = await client.fetchHtml(url)
+    html = await fetchHtml(url, headers)
 
   result = parseConversation(html)
