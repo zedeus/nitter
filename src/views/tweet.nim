@@ -91,7 +91,9 @@
 #end proc
 #
 #proc renderTweet*(tweet: Tweet; class=""): string =
+#if class.len > 0:
 <div class="${class}">
+#end if
 <div class="status-el">
   <div class="status-body">
     ${renderHeading(tweet)}
@@ -110,4 +112,7 @@
     ${renderStats(tweet)}
   </div>
 </div>
+#if class.len > 0:
+</div>
+#end if
 #end proc
