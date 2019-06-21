@@ -11,4 +11,4 @@ bin           = @["nitter"]
 # Dependencies
 
 requires "nim >= 0.19.9"
-requires "regex", "nimquery", "nimcrypto", "norm", "jester"
+requires "regex", "nimcrypto", "norm", "jester", "nimquery#head"
