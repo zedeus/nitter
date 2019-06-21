@@ -4,7 +4,7 @@ import nimquery, regex
 import ./types, ./formatters
 
 proc getAttr(node: XmlNode; attr: string; default=""): string =
-  if node.isNIl or node.attrs.isNil: return default
+  if node.isNil or node.attrs.isNil: return default
   return node.attrs.getOrDefault(attr)
 
 proc selectAttr(node: XmlNode; selector: string; attr: string; default=""): string =
@@ -15,16 +15,21 @@ proc selectText(node: XmlNode; selector: string): string =
   let res = node.querySelector(selector)
   result = if res == nil: "" else: res.innerText()
 
-proc parseProfile*(node: XmlNode): Profile =
+proc parsePopupProfile*(node: XmlNode): Profile =
   let profile = node.querySelector(".profile-card")
-  result.fullname = profile.selectText(".fullname").strip()
-  result.username = profile.selectText(".username").strip(chars={'@', ' '})
-  result.description = profile.selectText(".bio")
-  result.verified = profile.selectText(".Icon.Icon--verified").len > 0
-  result.protected = profile.selectText(".Icon.Icon--protected").len > 0
-  result.userpic = profile.selectAttr(".ProfileCard-avatarImage", "src").getUserpic()
-  result.banner = profile.selectAttr("svg > image", "xlink:href").replace("600x200", "1500x500")
-  if result.banner == "":
+  if profile.isNil: return
+
+  result = Profile(
+     fullname: profile.selectText(".fullname").strip(),
+     username: profile.selectText(".username").strip(chars={'@', ' '}),
+     description: profile.selectText(".bio"),
+     verified: profile.selectText(".Icon.Icon--verified").len > 0,
+     protected: profile.selectText(".Icon.Icon--protected").len > 0,
+     userpic: profile.selectAttr(".ProfileCard-avatarImage", "src").getUserpic(),
+     banner: profile.selectAttr("svg > image", "xlink:href").replace("600x200", "1500x500")
+  )
+
+  if result.banner.len == 0:
       result.banner = profile.selectAttr(".ProfileCard-bg", "style")
 
   let stats = profile.querySelectorAll(".ProfileCardStats-statLink")
@@ -35,12 +40,29 @@ proc parseProfile*(node: XmlNode): Profile =
     of "following": result.following = text
     else: result.tweets = text
 
-proc parseTweetProfile*(tweet: XmlNode): Profile =
+proc parseIntentProfile*(profile: XmlNode): Profile =
   result = Profile(
-    fullname: tweet.getAttr("data-name"),
-    username: tweet.getAttr("data-screen-name"),
-    userpic: tweet.selectAttr(".avatar", "src").getUserpic(),
-    verified: tweet.selectText(".Icon.Icon--verified").len > 0
+    fullname: profile.selectText("a.fn.url.alternate-context").strip(),
+    username: profile.selectText(".nickname").strip(chars={'@', ' '}),
+    userpic: profile.querySelector(".profile.summary").selectAttr("img.photo", "src").getUserPic(),
+    description: profile.selectText("p.note").strip(),
+    verified: not profile.querySelector("li.verified").isNil,
+    protected: not profile.querySelector("li.protected").isNil,
+    banner: "background-color: #161616",
+    tweets: "?"
+  )
+
+  for stat in profile.querySelectorAll("dd.count > a"):
+    case stat.getAttr("href").split("/")[^1]
+    of "followers": result.followers = stat.innerText()
+    of "following": result.following = stat.innerText()
+
+proc parseTweetProfile*(profile: XmlNode): Profile =
+  result = Profile(
+    fullname: profile.getAttr("data-name"),
+    username: profile.getAttr("data-screen-name"),
+    userpic: profile.selectAttr(".avatar", "src").getUserpic(),
+    verified: profile.selectText(".Icon.Icon--verified").len > 0
   )
 
 proc parseTweet*(tweet: XmlNode): Tweet =
