@@ -11,10 +11,10 @@ proc showTimeline(name: string; num=""): Future[string] {.async.} =
     tweetsFut = getTimeline(username, after=num)
 
   let profile = await profileFut
-  if profile.username == "":
+  if profile.username.len == 0:
     return ""
 
-  return renderMain(renderProfile(profile, await tweetsFut, num == ""))
+  return renderMain(renderProfile(profile, await tweetsFut, num.len == 0))
 
 routes:
   get "/":
@@ -29,7 +29,7 @@ routes:
   get "/@name/?":
     cond '.' notin @"name"
     let timeline = await showTimeline(@"name", @"after")
-    if timeline == "":
+    if timeline.len == 0:
       resp Http404, showError("User \"" & @"name" & "\" not found")
 
     resp timeline
@@ -37,7 +37,7 @@ routes:
   get "/@name/status/@id":
     cond '.' notin @"name"
     let conversation = await getTweet(@"id")
-    if conversation.tweet.id == "":
+    if conversation.tweet.id.len == 0:
       resp Http404, showError("Tweet not found")
 
     resp renderMain(renderConversation(conversation))

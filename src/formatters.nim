@@ -81,7 +81,7 @@ proc linkUser*(profile: Profile; h: string; username=true; class=""): string =
     if username: "@" & profile.username
     else: formatName(profile)
 
-  if h == "":
+  if h.len == 0:
     return htmlgen.a(text, href = &"/{profile.username}", class=class)
 
   let element = &"<{h} class=\"{class}\">{text}</{h}>"
