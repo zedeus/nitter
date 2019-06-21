@@ -74,7 +74,7 @@ proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
   })
 
   var url = timelineUrl % username
-  if after != "":
+  if after.len > 0:
     url &= "&max_position=" & after
 
   let html = await client.fetchHtml(base / url, jsonKey="items_html")
