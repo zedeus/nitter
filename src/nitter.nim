@@ -54,7 +54,8 @@ routes:
       client = newAsyncHttpClient()
       pic = await client.getContent(url)
 
-    defer: client.close()
+    client.close()
+
     resp pic, mimetype(url)
 
   get "/video/@sig/@url":
