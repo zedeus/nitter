@@ -8,8 +8,30 @@ const base = parseUri("https://twitter.com/")
 const agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
 
 const timelineUrl = "i/profiles/show/$1/timeline/tweets?include_available_features=1&include_entities=1&include_new_items_bar=true"
-const profileUrl = "i/profiles/popup"
+const profilePopupUrl = "i/profiles/popup"
+const profileIntentUrl = "intent/user"
 const tweetUrl = "i/status/"
+
+proc fetchHtml(client: AsyncHttpClient; url: Uri; jsonKey = ""): Future[XmlNode] {.async.} =
+  var resp = ""
+  try:
+    resp = await client.getContent($url)
+  except:
+    return nil
+
+  if jsonKey.len > 0:
+    let json = parseJson(resp)[jsonKey].str
+    return parseHtml(json)
+  else:
+    return parseHtml(resp)
+
+proc getProfileFallback(username: string; client: AsyncHttpClient): Future[Profile] {.async.} =
+  let
+    params = {"screen_name": username}
+    url = base / profileIntentUrl ? params
+    html = await client.fetchHtml(url)
+
+  result = parseIntentProfile(html)
 
 proc getProfile*(username: string): Future[Profile] {.async.} =
   let client = newAsyncHttpClient()
@@ -24,25 +46,19 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
     "Accept-Language": "en-US,en;q=0.9"
   })
 
-  let params = {
-    "screen_name": username,
-    "wants_hovercard": "true",
-    "_": $(epochTime().int)
-  }
-
-  let url = base / profileUrl ? params
-  var resp = ""
-
-  try:
-    resp = await client.getContent($url)
-  except:
-    return Profile()
-
   let
-    json = parseJson(resp)["html"].str
-    html = parseHtml(json)
+    params = {
+      "screen_name": username,
+      "wants_hovercard": "true",
+      "_": $(epochTime().int)
+    }
+    url = base / profilePopupUrl ? params
+    html = await client.fetchHtml(url, jsonKey="html")
 
-  result = parseProfile(html)
+  if not html.querySelector(".ProfileCard-sensitiveWarningContainer").isNil:
+    return await getProfileFallback(username, client)
+
+  result = parsePopupProfile(html)
 
 proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
   let client = newAsyncHttpClient()
@@ -61,18 +77,7 @@ proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
   if after != "":
     url &= "&max_position=" & after
 
-  var resp = ""
-  try:
-    resp = await client.getContent($(base / url))
-  except:
-    return
-
-  var json: string = ""
-  var html: XmlNode
-  json = parseJson(resp)["items_html"].str
-  html = parseHtml(json)
-
-  writeFile("epic.html", $html)
+  let html = await client.fetchHtml(base / url, jsonKey="items_html")
 
   result = parseTweets(html)
 
@@ -91,15 +96,8 @@ proc getTweet*(id: string): Future[Conversation] {.async.} =
     "x-previous-page-name": "profile"
   })
 
-  let url = base / tweetUrl / id
-
-  var resp: string = ""
-  try:
-    resp = await client.getContent($url)
-  except:
-    return Conversation()
-
-  var html: XmlNode
-  html = parseHtml(resp)
+  let
+    url = base / tweetUrl / id
+    html = await client.fetchHtml(url)
 
   result = parseConversation(html)
