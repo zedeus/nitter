@@ -92,23 +92,22 @@
 #
 #proc renderTweet*(tweet: Tweet; class=""): string =
 <div class="${class}">
-  <div class="status-el">
-    <div class="status-body">
-      ${renderHeading(tweet)}
-      <div class="status-content-wrapper">
-        <div class="status-content media-body">
-          ${linkifyText(tweet.text)}
-        </div>
+<div class="status-el">
+  <div class="status-body">
+    ${renderHeading(tweet)}
+    <div class="status-content-wrapper">
+      <div class="status-content media-body">
+        ${linkifyText(xmltree.escape(tweet.text))}
       </div>
-      #if tweet.photos.len > 0:
-        ${renderMediaGroup(tweet)}
-      #elif tweet.videoThumb.isSome:
-        ${renderVideo(tweet)}
-      #elif tweet.gif.isSome:
-        ${renderGif(tweet)}
-      #end if
-      ${renderStats(tweet)}
     </div>
+    #if tweet.photos.len > 0:
+    ${renderMediaGroup(tweet)}
+    #elif tweet.videoThumb.isSome:
+    ${renderVideo(tweet)}
+    #elif tweet.gif.isSome:
+    ${renderGif(tweet)}
+    #end if
+    ${renderStats(tweet)}
   </div>
 </div>
 #end proc
