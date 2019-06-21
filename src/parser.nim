@@ -66,34 +66,27 @@ proc parseTweetProfile*(profile: XmlNode): Profile =
   )
 
 proc parseTweet*(tweet: XmlNode): Tweet =
-  result.id = tweet.getAttr("data-item-id")
-  result.link = tweet.getAttr("data-permalink-path")
-  result.text = tweet.selectText(".tweet-text").stripTwitterUrls()
-  result.pinned = "pinned" in tweet.getAttr("class")
-  result.profile = parseTweetProfile(tweet)
-
   let time = tweet.querySelector(".js-short-timestamp")
-  result.time = fromUnix(parseInt(time.getAttr("data-time", "0")))
-  result.shortTime = time.innerText()
-
-  result.replies = "0"
-  result.likes = "0"
-  result.retweets = "0"
+  result = Tweet(
+    id: tweet.getAttr("data-item-id"),
+    link: tweet.getAttr("data-permalink-path"),
+    text: tweet.selectText(".tweet-text").stripTwitterUrls(),
+    pinned: "pinned" in tweet.getAttr("class"),
+    profile: parseTweetProfile(tweet),
+    time: fromUnix(parseInt(time.getAttr("data-time", "0"))),
+    shortTime: time.innerText(),
+    replies: "0",
+    likes: "0",
+    retweets: "0"
+  )
 
   for action in tweet.querySelectorAll(".ProfileTweet-actionCountForAria"):
-    let
-      text = action.innerText.split()
-      num = text[0]
-
+    let text = action.innerText.split()
     case text[1]
-    of "replies": result.replies = num
-    of "likes": result.likes = num
-    of "retweets": result.retweets = num
+    of "replies": result.replies = text[0]
+    of "likes": result.likes = text[0]
+    of "retweets": result.retweets = text[0]
     else: discard
-
-  let by = tweet.selectText(".js-retweet-text > a > b")
-  if by.len > 0:
-    result.retweetBy = some(by)
 
   for photo in tweet.querySelectorAll(".AdaptiveMedia-photoContainer"):
     result.photos.add photo.attrs["data-image-url"]
@@ -106,21 +99,22 @@ proc parseTweet*(tweet: XmlNode): Tweet =
     else:
       result.videoThumb = some(thumb)
 
+  let by = tweet.selectText(".js-retweet-text > a > b")
+  if by.len > 0:
+    result.retweetBy = some(by)
+
 proc parseTweets*(node: XmlNode): Tweets =
   if node.isNil: return
   node.querySelectorAll(".tweet").map(parseTweet)
 
-template selectTweets*(node: XmlNode; class: string): untyped =
-  parseTweets(node.querySelector(class))
-
 proc parseConversation*(node: XmlNode): Conversation =
   result.tweet = parseTweet(node.querySelector(".permalink-tweet-container > .tweet"))
-  result.before = node.selectTweets(".in-reply-to")
+  result.before = parseTweets(node.querySelector(".in-reply-to"))
 
   let replies = node.querySelector(".replies-to")
   if replies.isNil: return
 
-  result.after = replies.selectTweets(".ThreadedConversation--selfThread")
+  result.after = parseTweets(replies.querySelector(".ThreadedConversation--selfThread"))
 
   for reply in replies.querySelectorAll("li > .stream-items"):
     let thread = parseTweets(reply)
