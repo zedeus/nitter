@@ -23,17 +23,19 @@ like the title, this will change as the project matures a bit. For now the focus
 is on implementing missing features.
 
 ## Todo (roughly in this order)
-- Search
-- Simple account system with feed (excludes retweets)
 - Twitter "Cards" (link previews)
 - Nitter link previews
-- Server configuration
-- Video support with hls.js
-- Json API endpoints
-- Hiding retweets from timelines
-- Themes
+- Search (+ hashtag search)
 - Emoji support
+- Twitter polls
+- Server configuration
+- Simple account system with feed (excludes retweets)
+- Hiding retweets from timelines
+- Video support with hls.js
+- Media-only view
+- Themes
 - File caching
+- Json API endpoints
 - Nitter logo
 
 ## Why?

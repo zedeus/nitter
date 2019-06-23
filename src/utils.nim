@@ -5,13 +5,13 @@ const key = "supersecretkey"
 
 proc mimetype*(filename: string): string =
   if ".png" in filename:
-    return "image/" & "png"
+    "image/" & "png"
   elif ".jpg" in filename or ".jpeg" in filename:
-    return "image/" & "jpg"
+    "image/" & "jpg"
   elif ".mp4" in filename:
-    return "video/" & "mp4"
+    "video/" & "mp4"
   else:
-    return "text/plain"
+    "text/plain"
 
 proc getHmac*(data: string): string =
   ($hmac(sha256, key, data))[0 .. 12]
