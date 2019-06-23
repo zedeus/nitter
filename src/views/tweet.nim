@@ -31,9 +31,8 @@
 #
 #proc renderMediaGroup(tweet: Tweet): string =
 #let groups = if tweet.photos.len > 2: tweet.photos.distribute(2) else: @[tweet.photos]
-#let groupStyle = if groups.len == 1 and groups[0].len < 2: "" else: "background-color: #0f0f0f;"
 #var first = true
-<div class="attachments media-body" style="${groupStyle}">
+<div class="attachments media-body">
 #for photos in groups:
   #let style = if first: "" else: "margin-top: .25em;"
   <div class="gallery-row cover-fit" style="${style}">

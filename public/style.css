@@ -211,6 +211,8 @@ nav {
     border-radius: 7px;
     overflow: hidden;
     flex-flow: column;
+    background-color: #0f0f0f;
+    align-items: center;
 }
 
 .gallery-row {
