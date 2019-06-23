@@ -39,7 +39,7 @@
     #for photo in photos:
     <div class="attachment image">
       ##TODO: why doesn't this work?
-      <a href=${getSigUrl(photo & ":large", "pic")} target="_blank" class="image-attachment">
+      <a href=${getSigUrl(photo & "?name=orig", "pic")} target="_blank" class="image-attachment">
         #let style = if photos.len > 1 or groups.len > 1: "display: flex;" else: ""
         #let istyle = if photos.len > 1 or groups.len > 1: "" else: "border-radius: 7px;"
         <div class="still-image" style="${style}">
