@@ -34,16 +34,15 @@
 #var first = true
 <div class="attachments media-body">
 #for photos in groups:
-  #let style = if first: "" else: "margin-top: .25em;"
-  <div class="gallery-row cover-fit" style="${style}">
+  #let margin = if not first: "margin-top: .25em;" else: ""
+  #let flex = if photos.len > 1 or groups.len > 1: "display: flex;" else: ""
+  <div class="gallery-row cover-fit" style="${margin}">
     #for photo in photos:
     <div class="attachment image">
       ##TODO: why doesn't this work?
       <a href=${getSigUrl(photo & "?name=orig", "pic")} target="_blank" class="image-attachment">
-        #let style = if photos.len > 1 or groups.len > 1: "display: flex;" else: ""
-        #let istyle = if photos.len > 1 or groups.len > 1: "" else: "border-radius: 7px;"
-        <div class="still-image" style="${style}">
-          <img src=${getSigUrl(photo, "pic")} referrerpolicy="" style="${istyle}">
+        <div class="still-image" style="${flex}">
+          <img src=${getSigUrl(photo, "pic")} referrerpolicy="">
         </div>
       </a>
     </div>
