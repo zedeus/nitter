@@ -51,11 +51,11 @@ routes:
     cond "twimg" in @"url"
 
     let
-      url = decodeUrl(@"url")
-      path = parseUri(url).path.split("/")[2 .. ^1].join("/")
-      filename = cacheDir / cleanFilename(path)
+      uri = parseUri(decodeUrl(@"url"))
+      path = uri.path.split("/")[2 .. ^1].join("/")
+      filename = cacheDir / cleanFilename(path & uri.query)
 
-    if getHmac(url) != @"sig":
+    if getHmac($uri) != @"sig":
       resp showError("Failed to verify signature")
 
     if not existsDir(cacheDir):
@@ -63,7 +63,7 @@ routes:
 
     if not existsFile(filename):
       let client = newAsyncHttpClient()
-      await client.downloadFile(url, filename)
+      await client.downloadFile($uri, filename)
       client.close()
 
     sendFile(filename)
