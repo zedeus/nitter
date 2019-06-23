@@ -1,8 +1,10 @@
-import asyncdispatch, httpclient, times, strutils, hashes, random, uri
-import jester, regex
+import asyncdispatch, asyncfile, httpclient, strutils, uri, os
+import jester
 
 import api, utils, types, cache
 import views/[user, general, conversation]
+
+const cacheDir {.strdefine.} = "/tmp/nitter"
 
 proc showTimeline(name: string; num=""): Future[string] {.async.} =
   let
@@ -28,6 +30,7 @@ routes:
 
   get "/@name/?":
     cond '.' notin @"name"
+
     let timeline = await showTimeline(@"name", @"after")
     if timeline.len == 0:
       resp Http404, showError("User \"" & @"name" & "\" not found")
@@ -36,6 +39,7 @@ routes:
 
   get "/@name/status/@id":
     cond '.' notin @"name"
+
     let conversation = await getTweet(@"id")
     if conversation.tweet.id.len == 0:
       resp Http404, showError("Tweet not found")
@@ -45,18 +49,24 @@ routes:
   get "/pic/@sig/@url":
     cond "http" in @"url"
     cond "twimg" in @"url"
-    let url = decodeUrl(@"url")
+
+    let
+      url = decodeUrl(@"url")
+      path = parseUri(url).path.split("/")[2 .. ^1].join("/")
+      filename = cacheDir / cleanFilename(path)
 
     if getHmac(url) != @"sig":
       resp showError("Failed to verify signature")
 
-    let
-      client = newAsyncHttpClient()
-      pic = await client.getContent(url)
+    if not existsDir(cacheDir):
+      createDir(cacheDir)
 
-    client.close()
+    if not existsFile(filename):
+      let client = newAsyncHttpClient()
+      await client.downloadFile(url, filename)
+      client.close()
 
-    resp pic, mimetype(url)
+    sendFile(filename)
 
   get "/video/@sig/@url":
     cond "http" in @"url"
@@ -68,9 +78,9 @@ routes:
 
     let
       client = newAsyncHttpClient()
-      pic = await client.getContent(url)
+      video = await client.getContent(url)
 
     defer: client.close()
-    resp pic, mimetype(url)
+    resp video, mimetype(url)
 
 runForever()

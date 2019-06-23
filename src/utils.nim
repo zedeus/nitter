@@ -1,5 +1,5 @@
 import strutils, strformat, uri
-import nimcrypto
+import nimcrypto, regex
 
 const key = "supersecretkey"
 
@@ -21,3 +21,7 @@ proc getSigUrl*(link: string; path: string): string =
     sig = getHmac(link)
     url = encodeUrl(link)
   &"/{path}/{sig}/{url}"
+
+proc cleanFilename*(filename: string): string =
+  const reg = re"[^A-Za-z0-9._-]"
+  filename.replace(reg, "_")
