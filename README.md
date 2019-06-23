@@ -12,6 +12,7 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - Dark theme
 
 ## Installation
+
 ```bash
 git clone https://github.com/zedeus/nitter
 cd nitter
@@ -23,6 +24,9 @@ like the title, this will change as the project matures a bit. For now the focus
 is on implementing missing features.
 
 ## Todo (roughly in this order)
+
+- Line connecting posts in threads
+- "Show Thread" button
 - Twitter "Cards" (link previews)
 - Nitter link previews
 - Search (+ hashtag search)
@@ -39,6 +43,7 @@ is on implementing missing features.
 - Nitter logo
 
 ## Why?
+
 It's basically impossible to use Twitter without JavaScript enabled. If you try,
 you're redirected to the legacy mobile version which is awful both functionally
 and aesthetically. For privacy-minded folks, preventing JavaScript analytics and
