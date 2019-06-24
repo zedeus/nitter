@@ -118,6 +118,9 @@ proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile]
     url = base / profileIntentUrl ? {"screen_name": username}
     html = await fetchHtml(url, headers)
 
+  if html.isNil:
+    return Profile()
+
   result = parseIntentProfile(html)
 
 proc getProfile*(username: string): Future[Profile] {.async.} =
@@ -138,6 +141,9 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
     }
     url = base / profilePopupUrl ? params
     html = await fetchHtml(url, headers, jsonKey="html")
+
+  if html.isNil:
+    return Profile()
 
   if not html.querySelector(".ProfileCard-sensitiveWarningContainer").isNil:
     return await getProfileFallback(username, headers)

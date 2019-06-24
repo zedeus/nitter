@@ -16,15 +16,13 @@ proc getCachedProfile*(username: string; force=false): Future[Profile] {.async.}
   withDb:
     try:
       result.getOne("username = ?", username)
-      doAssert(not result.outdated())
-    except:
-      if result.id == 0:
-        result = await getProfile(username)
+      doAssert not result.outdated()
+    except AssertionError:
+      var profile = await getProfile(username)
+      profile.id = result.id
+      result = profile
+      result.update()
+    except KeyError:
+      result = await getProfile(username)
+      if result.username.len > 0:
         result.insert()
-      elif result.outdated():
-        let
-          profile = await getProfile(username)
-          oldId = result.id
-        result = profile
-        result.id = oldId
-        result.update()

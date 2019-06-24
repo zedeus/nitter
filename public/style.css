@@ -539,7 +539,7 @@ nav {
     box-sizing: border-box;
     display: flex;
     margin: 0;
-    padding: 0;
+    padding: 0 2px;
     width: 100%;
 }
 
