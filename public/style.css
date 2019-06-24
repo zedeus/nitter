@@ -109,34 +109,28 @@ a:hover {
     text-overflow: ellipsis;
 }
 
-.verified-icon {
+.icon {
     color: #fff;
-    background-color: #1da1f2;
     border-radius: 50%;
     display: inline-block;
     text-align: center;
     vertical-align: middle;
+    flex-shrink: 0;
+    margin: 2px 0 3px 3px;
+}
+
+.verified-icon {
+    background-color: #1da1f2;
     height: 14px;
     width: 14px;
     font-size: 10px;
-    flex-shrink: 0;
-    margin: 3px;
-    margin-top: 2px;
 }
 
 .protected-icon {
-    color: #fff;
     background-color: #353535;
-    border-radius: 50%;
-    display: inline-block;
-    text-align: center;
-    vertical-align: middle;
     height: 18px;
     width: 18px;
     font-size: 12px;
-    flex-shrink: 0;
-    margin: 3px;
-    margin-top: 2px;
     font-weight: bold;
 }
 
@@ -616,7 +610,6 @@ video {
     margin-top: 10px;
     border: solid 1px #404040;
     border-radius: 10px;
-    padding: 6px;
     background-color: #121212;
 }
 
@@ -627,6 +620,7 @@ video {
 .quote-container {
     position: relative;
     overflow: auto;
+    padding: 6px;
 }
 
 .quote-link {

@@ -76,9 +76,9 @@ proc linkUser*(profile: Profile; class=""): string =
   result = a(text, href = href, class = class, title = text)
 
   if not username and profile.verified:
-    result &= span("✔", class="verified-icon", title="Verified account")
+    result &= span("✔", class="icon verified-icon", title="Verified account")
   if not username and profile.protected:
-    result &= span("🔒", class="protected-icon", title="Protected account")
+    result &= span("🔒", class="icon protected-icon", title="Protected account")
 
 proc pageTitle*(profile: Profile): string =
   &"{profile.fullname} (@{profile.username}) | Nitter"
