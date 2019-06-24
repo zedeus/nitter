@@ -17,7 +17,7 @@ proc shortLink*(text: string; length=28): string =
     result = result[0 ..< length] & "…"
 
 proc toLink*(url, text: string; class="timeline-link"): string =
-  htmlgen.a(text, class=class, href=url)
+  a(text, class=class, href=url)
 
 proc reUrlToLink*(m: RegexMatch; s: string): string =
   let url = s[m.group(0)[0]]
@@ -66,20 +66,16 @@ proc getUserpic*(userpic: string; style=""): string =
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
-proc formatName*(profile: Profile): string =
-  result = xmltree.escape(profile.fullname)
-  if profile.verified:
-    result &= htmlgen.span("✔", class="verified-icon")
-  elif profile.protected:
-    result &= " 🔒"
+proc linkUser*(profile: Profile; class=""): string =
+  let
+    username = "username" in class
+    href = &"/{profile.username}"
+    text = if username: "@" & profile.username
+           else: xmltree.escape(profile.fullname)
 
-proc linkUser*(profile: Profile; h: string; username=true; class=""): string =
-  let text =
-    if username: "@" & profile.username
-    else: formatName(profile)
+  result = a(text, href = href, class = class, title = text)
 
-  if h.len == 0:
-    return htmlgen.a(text, href = &"/{profile.username}", class=class)
-
-  let element = &"<{h} class=\"{class}\">{text}</{h}>"
-  htmlgen.a(element, href = &"/{profile.username}")
+  if not username and profile.verified:
+    result &= span("✔", class="verified-icon", title="Verified account")
+  if not username and profile.protected:
+    result &= span("🔒", class="protected-icon", title="Protected account")

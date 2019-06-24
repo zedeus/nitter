@@ -67,46 +67,48 @@ a:hover {
     min-width: 0;
 }
 
-.media-heading a {
-    display: inline-block;
-    word-break: break-all;
-}
-
-.status-el .media-heading {
+.media-heading {
     padding: 0;
     vertical-align: bottom;
     flex-basis: 100%;
     margin-bottom: .2em;
 }
 
-.status-el .media-heading .heading-name-row {
+.media-heading a {
+    display: inline-block;
+    word-break: break-all;
+    max-width: 100%;
+}
+
+.heading-name-row {
     padding: 0;
     display: flex;
     justify-content: space-between;
 }
 
-.status-el .media-heading .heading-name-row .name-and-account-name {
+.fullname-and-username {
     display: flex;
     min-width: 0;
 }
 
-.status-el .media-heading .heading-name-row .username {
-    flex-shrink: 1;
-    margin-right: .4em;
+.fullname {
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.status-el .username {
+    flex-shrink: 2;
+    max-width: 80%;
     white-space: nowrap;
     font-size: 14px;
-    overflow: hidden;
-    flex-shrink: 0;
     font-weight: 700;
+    color: #f8f8f2;
 }
 
 .username {
-    color: #f8f8f2;
+    min-width: 1.6em;
+    margin-left: .4em;
+    white-space: nowrap;
+    word-wrap: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .verified-icon {
@@ -116,31 +118,34 @@ a:hover {
     display: inline-block;
     text-align: center;
     vertical-align: middle;
-    margin-left: 4px;
     height: 14px;
     width: 14px;
     font-size: 10px;
-    margin-bottom: 2px;
+    flex-shrink: 0;
+    margin: 3px;
+    margin-top: 2px;
 }
 
-.status-el .media-heading .heading-right {
+.protected-icon {
+    color: #fff;
+    background-color: #353535;
+    border-radius: 50%;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    height: 18px;
+    width: 18px;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin: 3px;
+    margin-top: 2px;
+    font-weight: bold;
+}
+
+.heading-right {
     display: flex;
     flex-shrink: 0;
-}
-
-.status-el .media-heading .heading-name-row .account-name {
-    min-width: 1.6em;
-    margin-right: .4em;
-    flex: 1 1 0;
-    white-space: nowrap;
-    word-wrap: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.status-el .media-heading a {
-    display: inline-block;
-    word-break: break-all;
+    margin-left: 4px;
 }
 
 .status-el .status-content {
@@ -380,6 +385,7 @@ nav {
     position: relative;
     display: flex;
     justify-content: flex-start;
+    max-width: 90%;
 }
 
 .profile-card-tabs {
@@ -387,28 +393,30 @@ nav {
     justify-content: space-between;
     align-items: center;
     flex: 1 1 auto;
+    max-width: 100%;
 }
 
 .profile-card-tabs-name {
-    padding-top: 0;
-    padding-bottom: 0;
+    max-width: 100%;
 }
 
-.profile-card-name, .profile-card-username {
+.profile-card-username, .profile-card-fullname {
     color: #f8f8f2;
 }
 
-.profile-card-name {
+.profile-card-fullname {
     font-size: 16px;
-    word-wrap: break-word;
     text-shadow: none;
-    overflow: hidden;
-    white-space: nowrap;
     text-overflow: ellipsis;
+    max-width: 100%;
+    font-weight: bold;
 }
 
 .profile-card-username {
     font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .profile-card-avatar {

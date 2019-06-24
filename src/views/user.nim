@@ -12,8 +12,8 @@
   </a>
   <div class="profile-card-tabs">
     <div class="profile-card-tabs-name">
-      ${linkUser(profile, "h1", class="profile-card-name", username=false)}
-      ${linkUser(profile, "h2", class="profile-card-username")}
+      ${linkUser(profile, class="profile-card-fullname")}
+      ${linkUser(profile, class="profile-card-username")}
     </div>
   </div>
   <div class="profile-card-extra">

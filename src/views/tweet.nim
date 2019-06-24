@@ -16,9 +16,9 @@
 <div class="media-heading">
   <div class="heading-name-row">
     <img class="avatar" src=${tweet.profile.getUserpic("_bigger").getSigUrl("pic")}>
-    <div class="name-and-account-name">
-      ${linkUser(tweet.profile, "h4", class="username", username=false)}
-      ${linkUser(tweet.profile, "", class="account-name")}
+    <div class="fullname-and-username">
+      ${linkUser(tweet.profile, class="fullname")}
+      ${linkUser(tweet.profile, class="username")}
     </div>
     <span class="heading-right">
       <a href="${tweet.link}" class="timeago faint-link">
@@ -46,9 +46,9 @@
       </div>
     </div>
     #end if
-    <div class="profile-card-name">
-      ${linkUser(quote.profile, "b", class="username", username=false)}
-      ${linkUser(quote.profile, "span", class="account-name")}
+    <div class="fullname-and-username">
+      ${linkUser(quote.profile, class="fullname")}
+      ${linkUser(quote.profile, class="username")}
     </div>
     <div class="quote-text">${linkifyText(xmltree.escape(quote.text))}</div>
   </div>
