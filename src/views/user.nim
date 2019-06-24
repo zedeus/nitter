@@ -72,14 +72,15 @@
   #var retweets: Tweets
   #for tweet in tweets:
     #if tweet in retweets: continue
-    #end if
-    #if tweet.retweetBy.isSome: retweets.add tweet
+    #elif tweet.retweetBy.isSome: retweets.add tweet
     #end if
     ${renderTweet(tweet, "timeline-tweet")}
   #end for
   #if tweets.len > 0:
   <div class="show-more">
-    <a href="/${profile.username}?after=${$tweets[^1].id}">Load older tweets</a>
+    #let retweet = tweets[^1].retweetId.get("")
+    #let id = if retweet.len > 0: retweet else: tweets[^1].id
+    <a href="/${profile.username}?after=${$id}">Load older tweets</a>
   </div>
   #end if
 </div>

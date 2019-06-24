@@ -70,6 +70,7 @@ proc parseTweet*(tweet: XmlNode): Tweet =
   let by = tweet.selectText(".js-retweet-text > a > b")
   if by.len > 0:
     result.retweetBy = some(by)
+    result.retweetId = some(tweet.getAttr("data-retweet-id"))
 
 proc parseTweets*(node: XmlNode): Tweets =
   if node.isNil: return

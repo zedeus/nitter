@@ -47,6 +47,7 @@ type
     gif*: Option[string]
     video*: Option[string]
     videoThumb*: Option[string]
+    retweetId*: Option[string]
 
   Tweets* = seq[Tweet]
 
