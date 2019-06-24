@@ -34,7 +34,7 @@ proc parseIntentProfile*(profile: XmlNode): Profile =
 
 proc parseTweetProfile*(profile: XmlNode): Profile =
   result = Profile(
-    fullname: profile.getAttr("data-name"),
+    fullname: profile.getAttr("data-name").stripNbsp(),
     username: profile.getAttr("data-screen-name"),
     userpic:  profile.getAvatar(".avatar"),
     verified: isVerified(profile)
@@ -48,7 +48,7 @@ proc parseQuote*(quote: XmlNode): Quote =
   )
 
   result.profile = Profile(
-    fullname: quote.selectText(".QuoteTweet-fullname"),
+    fullname: quote.selectText(".QuoteTweet-fullname").stripNbsp(),
     username: quote.getAttr("data-screen-name"),
     verified: isVerified(quote)
   )

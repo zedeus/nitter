@@ -3,6 +3,9 @@ import nimquery, regex
 
 import ./types, ./formatters, ./api
 
+from unicode import Rune, `$`
+const nbsp = $Rune(0x000A0)
+
 const
   thumbRegex = re".+:url\('([^']+)'\)"
   gifRegex = re".+thumb/([^\.']+)\.jpg.*"
@@ -26,6 +29,9 @@ proc getHeader(profile: XmlNode): XmlNode =
   if result.isNil:
     result = profile.querySelector(".ProfileCard-userFields")
 
+proc stripNbsp*(text: string): string =
+  text.replace(nbsp, "")
+
 proc isVerified*(profile: XmlNode): bool =
   getHeader(profile).selectText(".Icon.Icon--verified").len > 0
 
@@ -33,7 +39,7 @@ proc isProtected*(profile: XmlNode): bool =
   getHeader(profile).selectText(".Icon.Icon--protected").len > 0
 
 proc getName*(profile: XmlNode; selector: string): string =
-  profile.selectText(selector).strip()
+  profile.selectText(selector).strip().stripNbsp()
 
 proc getUsername*(profile: XmlNode; selector: string): string =
   profile.selectText(selector).strip(chars={'@', ' '})
