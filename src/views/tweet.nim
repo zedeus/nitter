@@ -39,7 +39,9 @@
       <div class="quote-media">
         <img src=${quote.thumb.get().getSigUrl("pic")}>
         #if quote.badge.isSome:
-        <div class="quote-badge">${quote.badge.get()}</div>
+        <div class="quote-badge">
+          <div class="quote-badge-text">${quote.badge.get()}</div>
+        </div>
         #end if
       </div>
     </div>
