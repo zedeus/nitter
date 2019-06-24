@@ -61,7 +61,7 @@
   #if profile.protected:
   <div class="timeline-protected">
     <h2 class="timeline-protected-header">This account's Tweets are protected.</h2>
-    <p class="timeline-protected-explanation">Only confirmed followers have access to @${profile.username}'s Tweets.
+    <p class="timeline-protected-explanation">Only confirmed followers have access to @${profile.username}'s Tweets.</p>
   </div>
   #end if
   #if not beginning:
@@ -81,6 +81,10 @@
     #let retweet = tweets[^1].retweetId.get("")
     #let id = if retweet.len > 0: retweet else: tweets[^1].id
     <a href="/${profile.username}?after=${$id}">Load older tweets</a>
+  </div>
+  #else:
+  <div class="timeline-protected">
+    <h2 class="timeline-protected-header" style="text-align: center;">No tweets found.</h2>
   </div>
   #end if
 </div>
