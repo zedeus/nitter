@@ -31,7 +31,26 @@ db("cache.db", "", "", ""):
         .}: Time
 
 type
-  Tweet* = object
+  Video* = object
+    id*: string
+    url*: string
+    thumb*: string
+    length*: int
+    views*: string
+    available*: bool
+
+  Gif* = object
+    url*: string
+    thumb*: string
+
+  Quote* = ref object
+    id*: string
+    profile*: Profile
+    link*: string
+    text*: string
+    video*: Option[Video]
+
+  Tweet* = ref object
     id*: string
     profile*: Profile
     link*: string
@@ -42,16 +61,16 @@ type
     retweets*: string
     likes*: string
     pinned*: bool
-    photos*: seq[string]
+    quote*: Option[Quote]
     retweetBy*: Option[string]
-    gif*: Option[string]
-    video*: Option[string]
-    videoThumb*: Option[string]
     retweetId*: Option[string]
+    gif*: Option[Gif]
+    video*: Option[Video]
+    photos*: seq[string]
 
   Tweets* = seq[Tweet]
 
-  Conversation* = object
+  Conversation* = ref object
     tweet*: Tweet
     before*: Tweets
     after*: Tweets

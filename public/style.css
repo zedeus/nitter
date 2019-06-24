@@ -593,3 +593,8 @@ nav {
     top: calc(50% - 20px);
     font-size: 20px;
 }
+
+video {
+    height: 100%;
+    width: 100%;
+}

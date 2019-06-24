@@ -5,12 +5,18 @@ import nimquery, regex
 import ./types, ./parser
 
 const
-  base = parseUri("https://twitter.com/")
   agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+  auth = "Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"
+
+  base = parseUri("https://twitter.com/")
+  apiBase = parseUri("https://api.twitter.com/1.1/")
+
   timelineUrl = "i/profiles/show/$1/timeline/tweets?include_available_features=1&include_entities=1&include_new_items_bar=true"
   profilePopupUrl = "i/profiles/popup"
   profileIntentUrl = "intent/user"
   tweetUrl = "i/status/"
+  videoUrl = "videos/tweet/config/$1.json"
+  tokenUrl = "guest/activate.json"
 
 proc fetchHtml(url: Uri; headers: HttpHeaders; jsonKey = ""): Future[XmlNode] {.async.} =
   var client = newAsyncHttpClient()
@@ -29,6 +35,20 @@ proc fetchHtml(url: Uri; headers: HttpHeaders; jsonKey = ""): Future[XmlNode] {.
     return parseHtml(json)
   else:
     return parseHtml(resp)
+
+proc fetchJson(url: Uri; headers: HttpHeaders): Future[JsonNode] {.async.} =
+  var client = newAsyncHttpClient()
+  defer: client.close()
+
+  client.headers = headers
+
+  var resp = ""
+  try:
+    resp = await client.getContent($url)
+  except:
+    return nil
+
+  return parseJson(resp)
 
 proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile] {.async.} =
   let
@@ -61,6 +81,63 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
 
   result = parsePopupProfile(html)
 
+proc getGuestToken(): Future[string] {.async.} =
+  let headers = newHttpHeaders({
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Referer": $base,
+    "User-Agent": agent,
+    "Authorization": auth
+  })
+
+  let client = newAsyncHttpClient()
+  client.headers = headers
+
+  let
+    url = apibase / tokenUrl
+    json = parseJson(await client.postContent($url))
+
+  result = json["guest_token"].to(string)
+
+proc getVideo*(tweet: Tweet; token: string) {.async.} =
+  let headers = newHttpHeaders({
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Referer": tweet.link,
+    "User-Agent": agent,
+    "Authorization": auth,
+    "x-guest-token": token
+  })
+
+  let
+    url = apiBase / (videoUrl % tweet.id)
+    json = await fetchJson(url, headers)
+
+
+  tweet.video = some(parseVideo(json))
+
+proc getVideos*(tweets: Tweets; token="") {.async.} =
+  if not tweets.anyIt(it.video.isSome): return
+
+  var
+    token = if token.len > 0: token else: await getGuestToken()
+    videoFuts: seq[Future[void]]
+
+  for tweet in tweets:
+    if tweet.video.isSome:
+      videoFuts.add getVideo(tweet, token)
+
+  await all(videoFuts)
+
+proc getConversationVideos*(convo: Conversation) {.async.} =
+  var token = await getGuestToken()
+  var futs: seq[Future[void]]
+
+  futs.add getVideo(convo.tweet, token)
+  futs.add getVideos(convo.before, token=token)
+  futs.add getVideos(convo.after, token=token)
+  futs.add convo.replies.mapIt(getVideos(it, token=token))
+
+  await all(futs)
+
 proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
   let headers = newHttpHeaders({
     "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -78,6 +155,7 @@ proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
   let html = await fetchHtml(base / url, headers, jsonKey="items_html")
 
   result = parseTweets(html)
+  await getVideos(result)
 
 proc getTweet*(id: string): Future[Conversation] {.async.} =
   let headers = newHttpHeaders({
@@ -96,3 +174,4 @@ proc getTweet*(id: string): Future[Conversation] {.async.} =
     html = await fetchHtml(url, headers)
 
   result = parseConversation(html)
+  await getConversationVideos(result)

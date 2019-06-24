@@ -54,11 +54,11 @@
 </div>
 #end proc
 #
-#proc renderVideo(tweet: Tweet): string =
+#proc renderVideo(video: Video): string =
 <div class="attachments media-body">
   <div class="gallery-row" style="max-height: unset;">
     <div class="attachment image">
-    <video poster=${tweet.videoThumb.get()} style="width: 100%; height: 100%;" autoplay muted loop></video>
+    <video poster=${video.thumb.getSigUrl("pic")} autoplay muted loop></video>
     <div class="video-overlay">
       <p>Video playback not supported</p>
     </div>
@@ -67,14 +67,12 @@
 </div>
 #end proc
 #
-#proc renderGif(tweet: Tweet): string =
-#let thumbUrl = getGifThumb(tweet).getSigUrl("pic")
-#let videoUrl = getGifSrc(tweet).getSigUrl("video")
-<div class="attachments media-body">
+#proc renderGif(gif: Gif): string =
+<div class="attachments media-body" style="display: table-cell;">
   <div class="gallery-row" style="max-height: unset;">
     <div class="attachment image">
-      <video poster=${thumbUrl} style="width: 100%; height: 100%;" autoplay muted loop>
-        <source src=${videoUrl} type="video/mp4">
+      <video class="gif" poster=${gif.thumb.getSigUrl("pic")} autoplay muted loop>
+        <source src=${gif.url.getSigUrl("video")} type="video/mp4">
       </video>
     </div>
   </div>
@@ -103,10 +101,10 @@
     </div>
     #if tweet.photos.len > 0:
     ${renderMediaGroup(tweet)}
-    #elif tweet.videoThumb.isSome:
-    ${renderVideo(tweet)}
+    #elif tweet.video.isSome:
+    ${renderVideo(tweet.video.get())}
     #elif tweet.gif.isSome:
-    ${renderGif(tweet)}
+    ${renderGif(tweet.gif.get())}
     #end if
     ${renderStats(tweet)}
   </div>

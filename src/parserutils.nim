@@ -1,7 +1,7 @@
-import xmltree, strtabs, times
+import xmltree, strtabs, strformat, times
 import nimquery, regex
 
-import ./types, ./formatters
+import ./types, ./formatters, ./api
 
 const
   thumbRegex = re".+:url\('([^']+)'\)"
@@ -84,11 +84,10 @@ proc getIntentStats*(profile: var Profile; node: XmlNode) =
     of "followers": profile.followers = text
     of "following": profile.following = text
 
-proc getTweetStats*(tweet: var Tweet; node: XmlNode) =
+proc getTweetStats*(tweet: Tweet; node: XmlNode) =
   tweet.replies = "0"
   tweet.retweets = "0"
   tweet.likes = "0"
-
   for action in node.querySelectorAll(".ProfileTweet-actionCountForAria"):
     let text = action.innerText.split()
     case text[1]
@@ -96,16 +95,22 @@ proc getTweetStats*(tweet: var Tweet; node: XmlNode) =
     of "likes":    tweet.likes = text[0]
     of "retweets": tweet.retweets = text[0]
 
-proc getTweetMedia*(tweet: var Tweet; node: XmlNode) =
+proc getGif(player: XmlNode): Gif =
+  let
+    thumb = player.getAttr("style").replace(thumbRegex, "$1")
+    id = thumb.replace(gifRegex, "$1")
+    url = fmt"https://video.twimg.com/tweet_video/{id}.mp4"
+  Gif(url: url, thumb: thumb)
+
+proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
   for photo in node.querySelectorAll(".AdaptiveMedia-photoContainer"):
     tweet.photos.add photo.attrs["data-image-url"]
 
-  let player = node.selectAttr(".PlayableMedia-player", "style")
-  if player.len == 0:
+  let player = node.querySelector(".PlayableMedia")
+  if player.isNil:
     return
 
-  let thumb = player.replace(thumbRegex, "$1")
-  if "tweet_video" in thumb:
-    tweet.gif = some(thumb.replace(gifRegex, "$1"))
+  if "gif" in player.getAttr("class"):
+    tweet.gif = some(getGif(player.querySelector(".PlayableMedia-player")))
   else:
-    tweet.videoThumb = some(thumb)
+    tweet.video = some(Video())

@@ -1,4 +1,4 @@
-import xmltree, sequtils, strtabs, strutils, strformat
+import xmltree, sequtils, strtabs, strutils, strformat, json
 import nimquery
 
 import ./types, ./parserutils
@@ -40,7 +40,6 @@ proc parseTweetProfile*(profile: XmlNode): Profile =
 
 proc parseQuote*(tweet: XmlNode): Tweet =
   let tweet = tweet.querySelector(".QuoteTweet-innerContainer")
-
   result = Tweet(
     id:   tweet.getAttr("data-item-id"),
     link: tweet.getAttr("href"),
@@ -77,8 +76,10 @@ proc parseTweets*(node: XmlNode): Tweets =
   node.querySelectorAll(".tweet").map(parseTweet)
 
 proc parseConversation*(node: XmlNode): Conversation =
-  result.tweet = parseTweet(node.querySelector(".permalink-tweet-container > .tweet"))
-  result.before = parseTweets(node.querySelector(".in-reply-to"))
+  result = Conversation(
+    tweet: parseTweet(node.querySelector(".permalink-tweet-container > .tweet")),
+    before: parseTweets(node.querySelector(".in-reply-to"))
+  )
 
   let replies = node.querySelector(".replies-to")
   if replies.isNil: return
@@ -89,3 +90,14 @@ proc parseConversation*(node: XmlNode): Conversation =
     let thread = parseTweets(reply)
     if not thread.anyIt(it in result.after):
       result.replies.add thread
+
+proc parseVideo*(node: JsonNode): Video =
+  let track = node{"track"}
+  result = Video(
+    thumb: node["posterImage"].to(string),
+    id: track["contentId"].to(string),
+    length: track["durationMs"].to(int),
+    views: track["viewCount"].to(string),
+    url: track["playbackUrl"].to(string),
+    available: track{"mediaAvailability"}["status"].to(string) == "available"
+  )
