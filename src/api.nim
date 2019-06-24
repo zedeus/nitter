@@ -21,7 +21,7 @@ const
 var
   token = ""
   tokenUpdated: Time
-  tokenLifetime = initDuration(minutes=10)
+  tokenLifetime = initDuration(hours=2)
 
 template newClient() {.dirty.} =
   var client = newAsyncHttpClient()

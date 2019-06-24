@@ -7,7 +7,7 @@ withDb:
   except DbError:
     discard
 
-var profileCacheTime = initDuration(seconds=60)
+var profileCacheTime = initDuration(minutes=10)
 
 proc outdated(profile: Profile): bool =
   getTime() - profile.updated > profileCacheTime
