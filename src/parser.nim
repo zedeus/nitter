@@ -8,25 +8,25 @@ proc parsePopupProfile*(node: XmlNode): Profile =
   if profile.isNil: return
 
   result = Profile(
-    fullname:    profile.getName(".fullname"),
-    username:    profile.getUsername(".username"),
-    description: profile.getBio(".bio"),
-    userpic:     profile.getAvatar(".ProfileCard-avatarImage"),
-    verified:    isVerified(profile),
-    protected:   isProtected(profile),
-    banner:      getBanner(profile)
+    fullname:  profile.getName(".fullname"),
+    username:  profile.getUsername(".username"),
+    bio:       profile.getBio(".bio"),
+    userpic:   profile.getAvatar(".ProfileCard-avatarImage"),
+    verified:  isVerified(profile),
+    protected: isProtected(profile),
+    banner:    getBanner(profile)
   )
   result.getPopupStats(profile)
 
 proc parseIntentProfile*(profile: XmlNode): Profile =
   result = Profile(
-    fullname:    profile.getName("a.fn.url.alternate-context"),
-    username:    profile.getUsername(".nickname"),
-    description: profile.getBio("p.note"),
-    userpic:     profile.querySelector(".profile.summary").getAvatar("img.photo"),
-    verified:    not profile.querySelector("li.verified").isNil,
-    protected:   not profile.querySelector("li.protected").isNil,
-    banner:      getBanner(profile)
+    fullname:  profile.getName("a.fn.url.alternate-context"),
+    username:  profile.getUsername(".nickname"),
+    bio:       profile.getBio("p.note"),
+    userpic:   profile.querySelector(".profile.summary").getAvatar("img.photo"),
+    verified:  not profile.querySelector("li.verified").isNil,
+    protected: not profile.querySelector("li.protected").isNil,
+    banner:    getBanner(profile)
   )
   result.getIntentStats(profile)
 

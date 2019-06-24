@@ -8,7 +8,7 @@ db("cache.db", "", "", ""):
     Profile* = object
       username*: string
       fullname*: string
-      description*: string
+      bio*: string
       userpic*: string
       banner*: string
       following*: string

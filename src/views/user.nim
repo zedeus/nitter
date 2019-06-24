@@ -18,9 +18,9 @@
   </div>
   <div class="profile-card-extra">
     <div class="profile-bio">
-      #if profile.description.len > 0:
-      <div class="profile-description">
-        <p>${linkifyText(xmltree.escape(profile.description))}</p>
+      #if profile.bio.len > 0:
+      <div class="profile-bio">
+        <p>${linkifyText(xmltree.escape(profile.bio))}</p>
       </div>
       #end if
     </div>
