@@ -50,7 +50,7 @@ proc linkifyText*(text: string): string =
   result = result.replace(usernameRegex, reUsernameToLink)
   result = result.replace(emailRegex, reEmailToLink)
   result = result.replace(urlRegex, reUrlToLink)
-  result = result.replace(re"([A-z0-9])<a>", "$1 <a>")
+  result = result.replace(re"([A-z0-9\):.])<a", "$1 <a")
   result = result.replace(re"</a> ([.,\)])", "</a>$1")
 
 proc stripTwitterUrls*(text: string): string =
