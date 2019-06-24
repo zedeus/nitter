@@ -50,8 +50,6 @@ a:hover {
 
 .status-el {
     overflow-wrap: break-word;
-    word-wrap: break-word;
-    word-break: break-word;
     border-left-width: 0;
     min-width: 0;
     padding: .75em;
@@ -647,6 +645,7 @@ video {
 
 .quote-media-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
     overflow: hidden;
     max-height: 102px;
@@ -664,6 +663,7 @@ video {
 .quote-media img {
     width: 100%;
     height: 100%;
+    align-self: center;
 }
 
 .quote-badge {
