@@ -21,7 +21,7 @@ proc toLink*(url, text: string; class="timeline-link"): string =
 
 proc reUrlToLink*(m: RegexMatch; s: string): string =
   let url = s[m.group(0)[0]]
-  toLink(url, " " & shortLink(url))
+  toLink(url, shortLink(url))
 
 proc reEmailToLink*(m: RegexMatch; s: string): string =
   let url = s[m.group(0)[0]]
@@ -44,12 +44,13 @@ proc reUsernameToLink*(m: RegexMatch; s: string): string =
   pretext & toLink("/" & username, "@" & username)
 
 proc linkifyText*(text: string): string =
-  result = text.replace("\n", "<br>")
+  result = text.strip()
+  result = result.replace("\n", "<br>")
   result = result.replace(ellipsisRegex, "")
   result = result.replace(usernameRegex, reUsernameToLink)
   result = result.replace(emailRegex, reEmailToLink)
   result = result.replace(urlRegex, reUrlToLink)
-  result = result.replace(re"</a>\s+", "</a> ")
+  result = result.replace(re"([A-z0-9])<a>", "$1 <a>")
   result = result.replace(re"</a> ([.,\)])", "</a>$1")
 
 proc stripTwitterUrls*(text: string): string =

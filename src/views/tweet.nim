@@ -29,6 +29,30 @@
 </div>
 #end proc
 #
+#proc renderQuote(quote: Quote): string =
+#let hasMedia = quote.thumb.isSome()
+<div class="quote">
+  <div class="quote-container" href="${quote.link}">
+    <a class="quote-link" href="${quote.link}"></a>
+    #if hasMedia:
+    <div class="quote-media-container">
+      <div class="quote-media">
+        <img src=${quote.thumb.get().getSigUrl("pic")}>
+        #if quote.badge.isSome:
+        <div class="quote-badge">${quote.badge.get()}</div>
+        #end if
+      </div>
+    </div>
+    #end if
+    <div class="profile-card-name">
+      ${linkUser(quote.profile, "b", class="username", username=false)}
+      ${linkUser(quote.profile, "span", class="account-name")}
+    </div>
+    <div class="quote-text">${linkifyText(xmltree.escape(quote.text))}</div>
+  </div>
+</div>
+#end proc
+#
 #proc renderMediaGroup(tweet: Tweet): string =
 #let groups = if tweet.photos.len > 2: tweet.photos.distribute(2) else: @[tweet.photos]
 #let display = if groups.len == 1 and groups[0].len == 1: "display: table-caption;" else: ""
@@ -105,6 +129,8 @@
     ${renderVideo(tweet.video.get())}
     #elif tweet.gif.isSome:
     ${renderGif(tweet.gif.get())}
+    #elif tweet.quote.isSome:
+    ${renderQuote(tweet.quote.get())}
     #end if
     ${renderStats(tweet)}
   </div>

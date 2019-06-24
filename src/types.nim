@@ -43,12 +43,13 @@ type
     url*: string
     thumb*: string
 
-  Quote* = ref object
+  Quote* = object
     id*: string
     profile*: Profile
     link*: string
     text*: string
-    video*: Option[Video]
+    thumb*: Option[string]
+    badge*: Option[string]
 
   Tweet* = ref object
     id*: string

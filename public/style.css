@@ -3,6 +3,7 @@ body {
     color: #f8f8f2;
     margin: 0;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
 }
 
 #tweets {
@@ -575,6 +576,11 @@ nav {
     font-weight: bold;
 }
 
+video {
+    height: 100%;
+    width: 100%;
+}
+
 .video-overlay {
     width: 100%;
     height: 100%;
@@ -594,7 +600,67 @@ nav {
     font-size: 20px;
 }
 
-video {
+.quote {
+    margin-top: 10px;
+    border: solid 1px #404040;
+    border-radius: 10px;
+    padding: 6px;
+    background-color: #121212;
+}
+
+.quote:hover {
+    border-color: #808080;
+}
+
+.quote-container {
+    position: relative;
+    overflow: auto;
+}
+
+.quote-link {
     height: 100%;
     width: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+}
+
+.quote-text {
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.quote-media-container {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    max-height: 102px;
+    width: 102px;
+    float: left;
+    margin-right: 7px;
+    border-radius: 7px;
+}
+
+.quote-media {
+    display: flex;
+    justify-content: center;
+}
+
+.quote-media img {
+    width: 100%;
+    height: 100%;
+}
+
+.quote-badge {
+    background: rgba(0,0,0,0.25);
+    border-radius: 4px;
+    bottom: 8px;
+    box-sizing: border-box;
+    color: #fffffff0;
+    left: 8px;
+    position: absolute;
+    z-index: 1;
+    line-height: 16px;
+    padding: 2px;
 }

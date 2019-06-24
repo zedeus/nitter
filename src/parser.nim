@@ -1,7 +1,7 @@
 import xmltree, sequtils, strtabs, strutils, strformat, json
 import nimquery
 
-import ./types, ./parserutils
+import ./types, ./parserutils, ./formatters
 
 proc parsePopupProfile*(node: XmlNode): Profile =
   let profile = node.querySelector(".profile-card")
@@ -16,6 +16,7 @@ proc parsePopupProfile*(node: XmlNode): Profile =
     protected: isProtected(profile),
     banner:    getBanner(profile)
   )
+
   result.getPopupStats(profile)
 
 proc parseIntentProfile*(profile: XmlNode): Profile =
@@ -28,6 +29,7 @@ proc parseIntentProfile*(profile: XmlNode): Profile =
     protected: not profile.querySelector("li.protected").isNil,
     banner:    getBanner(profile)
   )
+
   result.getIntentStats(profile)
 
 proc parseTweetProfile*(profile: XmlNode): Profile =
@@ -38,19 +40,20 @@ proc parseTweetProfile*(profile: XmlNode): Profile =
     verified: isVerified(profile)
   )
 
-proc parseQuote*(tweet: XmlNode): Tweet =
-  let tweet = tweet.querySelector(".QuoteTweet-innerContainer")
-  result = Tweet(
-    id:   tweet.getAttr("data-item-id"),
-    link: tweet.getAttr("href"),
-    text: tweet.selectText(".QuoteTweet-text")
+proc parseQuote*(quote: XmlNode): Quote =
+  result = Quote(
+    id:   quote.getAttr("data-item-id"),
+    link: quote.getAttr("href"),
+    text: quote.selectText(".QuoteTweet-text").stripTwitterUrls()
   )
 
   result.profile = Profile(
-    fullname: tweet.getAttr("data-screen-name"),
-    username: tweet.selectText(".QuteTweet-fullname"),
-    verified: isVerified(tweet)
+    fullname: quote.selectText(".QuoteTweet-fullname"),
+    username: quote.getAttr("data-screen-name"),
+    verified: isVerified(quote)
   )
+
+  result.getQuoteMedia(quote)
 
 proc parseTweet*(tweet: XmlNode): Tweet =
   result = Tweet(
@@ -70,6 +73,10 @@ proc parseTweet*(tweet: XmlNode): Tweet =
   if by.len > 0:
     result.retweetBy = some(by)
     result.retweetId = some(tweet.getAttr("data-retweet-id"))
+
+  let quote = tweet.querySelector(".QuoteTweet-innerContainer")
+  if not quote.isNil:
+    result.quote = some(parseQuote(quote))
 
 proc parseTweets*(node: XmlNode): Tweets =
   if node.isNil: return

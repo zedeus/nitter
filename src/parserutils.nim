@@ -34,10 +34,10 @@ proc getUsername*(profile: XmlNode; selector: string): string =
 proc getTweetText*(tweet: XmlNode): string =
   let selector = ".tweet-text > a.twitter-timeline-link.u-hidden"
   let link = tweet.selectAttr(selector, "data-expanded-url")
-  var text =tweet.selectText(".tweet-text")
+  var text = tweet.selectText(".tweet-text")
 
   if link.len > 0 and link in text:
-    text = text.replace(link, " " & link)
+    text = text.replace(link, "")
 
   stripTwitterUrls(text)
 
@@ -114,3 +114,12 @@ proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
     tweet.gif = some(getGif(player.querySelector(".PlayableMedia-player")))
   elif "video" in player.getAttr("class"):
     tweet.video = some(Video())
+
+proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
+  let media = node.querySelector(".QuoteMedia")
+  if not media.isNil:
+    quote.thumb = some(media.selectAttr("img", "src"))
+
+  let badge = node.querySelector(".AdaptiveMedia-badgeText")
+  if not badge.isNil:
+    quote.badge = some(badge.innerText())
