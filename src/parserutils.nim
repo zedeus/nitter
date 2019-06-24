@@ -19,11 +19,18 @@ proc selectText*(node: XmlNode; selector: string): string =
   let res = node.querySelector(selector)
   result = if res == nil: "" else: res.innerText()
 
+proc getHeader(profile: XmlNode): XmlNode =
+  result = profile.querySelector(".permalink-header")
+  if result.isNil:
+    result = profile.querySelector(".stream-item-header")
+  if result.isNil:
+    result = profile.querySelector(".ProfileCard-userFields")
+
 proc isVerified*(profile: XmlNode): bool =
-  profile.selectText(".Icon.Icon--verified").len > 0
+  getHeader(profile).selectText(".Icon.Icon--verified").len > 0
 
 proc isProtected*(profile: XmlNode): bool =
-  profile.selectText(".Icon.Icon--protected").len > 0
+  getHeader(profile).selectText(".Icon.Icon--protected").len > 0
 
 proc getName*(profile: XmlNode; selector: string): string =
   profile.selectText(selector).strip()
