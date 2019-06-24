@@ -136,5 +136,9 @@ proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
     quote.thumb = some(media.selectAttr("img", "src"))
 
   let badge = node.querySelector(".AdaptiveMedia-badgeText")
+  let gifBadge = node.querySelector(".Icon--gifBadge")
+
   if not badge.isNil:
     quote.badge = some(badge.innerText())
+  elif not gifBadge.isNil:
+    quote.badge = some("GIF")

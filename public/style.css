@@ -661,7 +661,7 @@ video {
 }
 
 .quote-badge {
-    left: 0px;
+    left: 6px;
     position: absolute;
     z-index: 1;
     align-self: flex-end;
@@ -673,4 +673,6 @@ video {
     border-radius: 4px;
     color: #fffffff0;
     padding: 0px 2px;
+    font-size: 12px;
+    font-weight: bold;
 }
