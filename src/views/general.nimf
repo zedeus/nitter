@@ -1,5 +1,4 @@
 #? stdtmpl(subsChar = '$', metaChar = '#')
-#import user
 #import xmltree
 #
 #proc renderMain*(body: string; title="Nitter"): string =

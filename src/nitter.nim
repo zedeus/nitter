@@ -2,7 +2,9 @@ import asyncdispatch, asyncfile, httpclient, strutils, strformat, uri, os
 import jester
 
 import api, utils, types, cache, formatters
-import views/[user, general, conversation]
+
+include views/"user.nimf"
+include views/"general.nimf"
 
 const cacheDir {.strdefine.} = "/tmp/nitter"
 
