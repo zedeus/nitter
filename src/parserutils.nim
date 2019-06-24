@@ -39,11 +39,13 @@ proc getUsername*(profile: XmlNode; selector: string): string =
   profile.selectText(selector).strip(chars={'@', ' '})
 
 proc getTweetText*(tweet: XmlNode): string =
-  let selector = ".tweet-text > a.twitter-timeline-link.u-hidden"
-  let link = tweet.selectAttr(selector, "data-expanded-url")
   var text = tweet.selectText(".tweet-text")
+  let
+    selector = ".tweet-text > a.twitter-timeline-link.u-hidden"
+    link = tweet.selectAttr(selector, "data-expanded-url")
+    quote = tweet.querySelector(".QuoteTweet")
 
-  if link.len > 0 and link in text:
+  if not quote.isNil and link.len > 0:
     text = text.replace(link, "")
 
   stripTwitterUrls(text)
