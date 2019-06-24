@@ -18,11 +18,18 @@ const
   videoUrl = "videos/tweet/config/$1.json"
   tokenUrl = "guest/activate.json"
 
-proc fetchHtml(url: Uri; headers: HttpHeaders; jsonKey = ""): Future[XmlNode] {.async.} =
+var
+  token = ""
+  tokenUpdated: Time
+  tokenLifetime = initDuration(minutes=10)
+
+template newClient() {.dirty.} =
   var client = newAsyncHttpClient()
   defer: client.close()
-
   client.headers = headers
+
+proc fetchHtml(url: Uri; headers: HttpHeaders; jsonKey = ""): Future[XmlNode] {.async.} =
+  newClient()
 
   var resp = ""
   try:
@@ -37,10 +44,7 @@ proc fetchHtml(url: Uri; headers: HttpHeaders; jsonKey = ""): Future[XmlNode] {.
     return parseHtml(resp)
 
 proc fetchJson(url: Uri; headers: HttpHeaders): Future[JsonNode] {.async.} =
-  var client = newAsyncHttpClient()
-  defer: client.close()
-
-  client.headers = headers
+  newClient()
 
   var resp = ""
   try:
@@ -49,6 +53,65 @@ proc fetchJson(url: Uri; headers: HttpHeaders): Future[JsonNode] {.async.} =
     return nil
 
   return parseJson(resp)
+
+proc getGuestToken(): Future[string] {.async.} =
+  if getTime() - tokenUpdated < tokenLifetime:
+    return token
+
+  tokenUpdated = getTime()
+
+  let headers = newHttpHeaders({
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Referer": $base,
+    "User-Agent": agent,
+    "Authorization": auth
+  })
+
+  newClient()
+
+  let
+    url = apibase / tokenUrl
+    json = parseJson(await client.postContent($url))
+
+  result = json["guest_token"].to(string)
+  token = result
+
+proc getVideo*(tweet: Tweet; token: string) {.async.} =
+  if not tweet.video.isSome: return
+
+  let headers = newHttpHeaders({
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Referer": tweet.link,
+    "User-Agent": agent,
+    "Authorization": auth,
+    "x-guest-token": token
+  })
+
+  let
+    url = apiBase / (videoUrl % tweet.id)
+    json = await fetchJson(url, headers)
+
+  tweet.video = some(parseVideo(json))
+
+proc getVideos*(tweets: Tweets) {.async.} =
+  var token = await getGuestToken()
+  var videoFuts: seq[Future[void]]
+
+  for tweet in tweets.filterIt(it.video.isSome):
+    videoFuts.add getVideo(tweet, token)
+
+  await all(videoFuts)
+
+proc getConversationVideos*(convo: Conversation) {.async.} =
+  var token = await getGuestToken()
+  var futs: seq[Future[void]]
+
+  futs.add getVideo(convo.tweet, token)
+  futs.add getVideos(convo.before)
+  futs.add getVideos(convo.after)
+  futs.add convo.replies.mapIt(getVideos(it))
+
+  await all(futs)
 
 proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile] {.async.} =
   let
@@ -80,63 +143,6 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
     return await getProfileFallback(username, headers)
 
   result = parsePopupProfile(html)
-
-proc getGuestToken(): Future[string] {.async.} =
-  let headers = newHttpHeaders({
-    "Accept": "application/json, text/javascript, */*; q=0.01",
-    "Referer": $base,
-    "User-Agent": agent,
-    "Authorization": auth
-  })
-
-  let client = newAsyncHttpClient()
-  client.headers = headers
-
-  let
-    url = apibase / tokenUrl
-    json = parseJson(await client.postContent($url))
-
-  result = json["guest_token"].to(string)
-
-proc getVideo*(tweet: Tweet; token: string) {.async.} =
-  let headers = newHttpHeaders({
-    "Accept": "application/json, text/javascript, */*; q=0.01",
-    "Referer": tweet.link,
-    "User-Agent": agent,
-    "Authorization": auth,
-    "x-guest-token": token
-  })
-
-  let
-    url = apiBase / (videoUrl % tweet.id)
-    json = await fetchJson(url, headers)
-
-
-  tweet.video = some(parseVideo(json))
-
-proc getVideos*(tweets: Tweets; token="") {.async.} =
-  if not tweets.anyIt(it.video.isSome): return
-
-  var
-    token = if token.len > 0: token else: await getGuestToken()
-    videoFuts: seq[Future[void]]
-
-  for tweet in tweets:
-    if tweet.video.isSome:
-      videoFuts.add getVideo(tweet, token)
-
-  await all(videoFuts)
-
-proc getConversationVideos*(convo: Conversation) {.async.} =
-  var token = await getGuestToken()
-  var futs: seq[Future[void]]
-
-  futs.add getVideo(convo.tweet, token)
-  futs.add getVideos(convo.before, token=token)
-  futs.add getVideos(convo.after, token=token)
-  futs.add convo.replies.mapIt(getVideos(it, token=token))
-
-  await all(futs)
 
 proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
   let headers = newHttpHeaders({

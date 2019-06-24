@@ -112,5 +112,5 @@ proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
 
   if "gif" in player.getAttr("class"):
     tweet.gif = some(getGif(player.querySelector(".PlayableMedia-player")))
-  else:
+  elif "video" in player.getAttr("class"):
     tweet.video = some(Video())
