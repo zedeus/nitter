@@ -2,11 +2,11 @@
 #import user
 #import xmltree
 #
-#proc renderMain*(body: string): string =
+#proc renderMain*(body: string; title="Nitter"): string =
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Nitter</title>
+    <title>${xmltree.escape(title)}</title>
     <link rel="stylesheet" type="text/css" href="/style.css">
   </head>
 
@@ -46,5 +46,5 @@
 #end proc
 #
 #proc showError*(error: string): string =
-${renderMain(renderError(error))}
+${renderMain(renderError(error), title="Error | Nitter")}
 #end proc

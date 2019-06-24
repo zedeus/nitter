@@ -1,7 +1,7 @@
-import asyncdispatch, asyncfile, httpclient, strutils, uri, os
+import asyncdispatch, asyncfile, httpclient, strutils, strformat, uri, os
 import jester
 
-import api, utils, types, cache
+import api, utils, types, cache, formatters
 import views/[user, general, conversation]
 
 const cacheDir {.strdefine.} = "/tmp/nitter"
@@ -16,11 +16,12 @@ proc showTimeline(name: string; num=""): Future[string] {.async.} =
   if profile.username.len == 0:
     return ""
 
-  return renderMain(renderProfile(profile, await tweetsFut, num.len == 0))
+  let profileHtml = renderProfile(profile, await tweetsFut, num.len == 0)
+  return renderMain(profileHtml, title=pageTitle(profile))
 
 routes:
   get "/":
-    resp renderMain(renderSearchPanel())
+    resp renderMain(renderSearchPanel(), title=pageTitle("Search"))
 
   post "/search":
     if @"query".len == 0:
@@ -44,7 +45,8 @@ routes:
     if conversation.tweet.id.len == 0:
       resp Http404, showError("Tweet not found")
 
-    resp renderMain(renderConversation(conversation))
+    let title = pageTitle(conversation.tweet.profile)
+    resp renderMain(renderConversation(conversation), title=title)
 
   get "/pic/@sig/@url":
     cond "http" in @"url"

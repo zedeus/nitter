@@ -7,9 +7,9 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - All requests go through the backend, client never talks to Twitter
 - Prevents Twitter from tracking your IP or JavaScript fingerprint
 - Unofficial API (no rate limits or developer account required)
-- Lightweight (for [@nim_lang](https://twitter.com/nim_lang), 32KB vs 552KB from twitter.com)
 - AGPLv3 licensed, no proprietary instances permitted
 - Dark theme
+- Lightweight (for [@nim_lang](https://twitter.com/nim_lang), 36KB vs 580KB from twitter.com)
 
 ## Installation
 
