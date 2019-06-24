@@ -576,6 +576,12 @@ nav {
     font-weight: bold;
 }
 
+.media-gif {
+    display: table-cell;
+    padding-top: 5px !important;
+    background-color: unset;
+}
+
 video {
     height: 100%;
     width: 100%;

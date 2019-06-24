@@ -92,7 +92,7 @@
 #end proc
 #
 #proc renderGif(gif: Gif): string =
-<div class="attachments media-body" style="display: table-cell;">
+<div class="attachments media-body media-gif">
   <div class="gallery-row" style="max-height: unset;">
     <div class="attachment image">
       <video class="gif" poster=${gif.thumb.getSigUrl("pic")} autoplay muted loop>
