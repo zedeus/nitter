@@ -77,7 +77,7 @@ proc getGuestToken(): Future[string] {.async.} =
   token = result
 
 proc getVideo*(tweet: Tweet; token: string) {.async.} =
-  if not tweet.video.isSome: return
+  if tweet.video.isNone(): return
 
   let headers = newHttpHeaders({
     "Accept": "application/json, text/javascript, */*; q=0.01",

@@ -1,10 +1,7 @@
-import xmltree, strtabs, strformat, times
+import xmltree, htmlparser, strtabs, strformat, times
 import nimquery, regex
 
 import ./types, ./formatters, ./api
-
-from unicode import Rune, `$`
-const nbsp = $Rune(0x000A0)
 
 const
   thumbRegex = re".+:url\('([^']+)'\)"
@@ -29,9 +26,6 @@ proc getHeader(profile: XmlNode): XmlNode =
   if result.isNil:
     result = profile.querySelector(".ProfileCard-userFields")
 
-proc stripNbsp*(text: string): string =
-  text.replace(nbsp, "")
-
 proc isVerified*(profile: XmlNode): bool =
   getHeader(profile).selectText(".Icon.Icon--verified").len > 0
 
@@ -39,22 +33,32 @@ proc isProtected*(profile: XmlNode): bool =
   getHeader(profile).selectText(".Icon.Icon--protected").len > 0
 
 proc getName*(profile: XmlNode; selector: string): string =
-  profile.selectText(selector).strip().stripNbsp()
+  profile.selectText(selector).stripText()
 
 proc getUsername*(profile: XmlNode; selector: string): string =
   profile.selectText(selector).strip(chars={'@', ' '})
 
+proc emojify*(node: XmlNode) =
+  for i in node.querySelectorAll(".Emoji"):
+    i.add newText(i.getAttr("alt"))
+
 proc getTweetText*(tweet: XmlNode): string =
-  var text = tweet.selectText(".tweet-text")
   let
     selector = ".tweet-text > a.twitter-timeline-link.u-hidden"
     link = tweet.selectAttr(selector, "data-expanded-url")
     quote = tweet.querySelector(".QuoteTweet")
+    text = tweet.querySelector(".tweet-text")
+    hasEmojis = not text.querySelector(".Emoji").isNil
+
+  if hasEmojis:
+    emojify(text)
+
+  result = stripText(selectText(text, ".tweet-text"))
 
   if not quote.isNil and link.len > 0:
-    text = text.replace(link, "")
+    result = result.replace(link, "")
 
-  stripTwitterUrls(text)
+  result = stripTwitterUrls(result)
 
 proc getTime(tweet: XmlNode): XmlNode =
   tweet.querySelector(".js-short-timestamp")
@@ -67,7 +71,7 @@ proc getShortTime*(tweet: XmlNode): string =
   getTime(tweet).innerText()
 
 proc getBio*(profile: XmlNode; selector: string): string =
-  profile.selectText(selector).strip()
+  profile.selectText(selector).stripText()
 
 proc getAvatar*(profile: XmlNode; selector: string): string =
   profile.selectAttr(selector, "src").getUserpic()

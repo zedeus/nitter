@@ -3,6 +3,8 @@ import regex
 
 import ./types, ./utils
 
+from unicode import Rune, `$`
+
 const
   urlRegex = re"((https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?)"
   emailRegex = re"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
@@ -10,6 +12,10 @@ const
   picRegex = re"pic.twitter.com/[^ ]+"
   cardRegex = re"(https?://)?cards.twitter.com/[^ ]+"
   ellipsisRegex = re" ?…"
+  nbsp = $Rune(0x000A0)
+
+proc stripText*(text: string): string =
+  text.replace(nbsp, " ").strip()
 
 proc shortLink*(text: string; length=28): string =
   result = text.replace(re"https?://(www.)?", "")
@@ -44,7 +50,7 @@ proc reUsernameToLink*(m: RegexMatch; s: string): string =
   pretext & toLink("/" & username, "@" & username)
 
 proc linkifyText*(text: string): string =
-  result = text.strip()
+  result = text.stripText()
   result = result.replace("\n", "<br>")
   result = result.replace(ellipsisRegex, "")
   result = result.replace(usernameRegex, reUsernameToLink)

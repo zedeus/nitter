@@ -34,7 +34,7 @@ proc parseIntentProfile*(profile: XmlNode): Profile =
 
 proc parseTweetProfile*(profile: XmlNode): Profile =
   result = Profile(
-    fullname: profile.getAttr("data-name").stripNbsp(),
+    fullname: profile.getAttr("data-name").stripText(),
     username: profile.getAttr("data-screen-name"),
     userpic:  profile.getAvatar(".avatar"),
     verified: isVerified(profile)
@@ -48,7 +48,7 @@ proc parseQuote*(quote: XmlNode): Quote =
   )
 
   result.profile = Profile(
-    fullname: quote.selectText(".QuoteTweet-fullname").stripNbsp(),
+    fullname: quote.selectText(".QuoteTweet-fullname").stripText(),
     username: quote.getAttr("data-screen-name"),
     verified: isVerified(quote)
   )
@@ -71,7 +71,7 @@ proc parseTweet*(tweet: XmlNode): Tweet =
 
   let by = tweet.selectText(".js-retweet-text > a > b")
   if by.len > 0:
-    result.retweetBy = some(by)
+    result.retweetBy = some(by.stripText())
     result.retweetId = some(tweet.getAttr("data-retweet-id"))
 
   let quote = tweet.querySelector(".QuoteTweet-innerContainer")
