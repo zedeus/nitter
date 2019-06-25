@@ -19,9 +19,11 @@ const
   tokenUrl = "guest/activate.json"
 
 var
-  token = ""
+  guestToken = ""
+  tokenUses = 0
+  tokenMaxUses = 230
   tokenUpdated: Time
-  tokenLifetime = initDuration(hours=2)
+  tokenLifetime = initDuration(minutes=20)
 
 template newClient() {.dirty.} =
   var client = newAsyncHttpClient()
@@ -53,11 +55,13 @@ proc fetchJson(url: Uri; headers: HttpHeaders): Future[JsonNode] {.async.} =
   except:
     return nil
 
-proc getGuestToken(): Future[string] {.async.} =
-  if getTime() - tokenUpdated < tokenLifetime:
-    return token
+proc getGuestToken(force=false): Future[string] {.async.} =
+  if getTime() - tokenUpdated < tokenLifetime and
+     not force and tokenUses < tokenMaxUses:
+    return guestToken
 
   tokenUpdated = getTime()
+  tokenUses = 0
 
   let headers = newHttpHeaders({
     "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -73,7 +77,7 @@ proc getGuestToken(): Future[string] {.async.} =
     json = parseJson(await client.postContent($url))
 
   result = json["guest_token"].to(string)
-  token = result
+  guestToken = result
 
 proc getVideo*(tweet: Tweet; token: string) {.async.} =
   if tweet.video.isNone(): return
@@ -90,11 +94,22 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
     url = apiBase / (videoUrl % tweet.id)
     json = await fetchJson(url, headers)
 
-  tweet.video = some(parseVideo(json))
+  if json.isNil:
+    if getTime() - tokenUpdated > initDuration(seconds=1):
+      tokenUpdated = getTime()
+      guestToken = await getGuestToken(force=true)
+    await getVideo(tweet, guestToken)
+    return
 
-proc getVideos*(tweets: Tweets) {.async.} =
-  var token = await getGuestToken()
+  tweet.video = some(parseVideo(json))
+  tokenUses.inc
+
+proc getVideos*(tweets: Tweets; token="") {.async.} =
+  var gToken = token
   var videoFuts: seq[Future[void]]
+
+  if gToken.len == 0:
+    gToken = await getGuestToken()
 
   for tweet in tweets.filterIt(it.video.isSome):
     videoFuts.add getVideo(tweet, token)
@@ -108,7 +123,7 @@ proc getConversationVideos*(convo: Conversation) {.async.} =
   futs.add getVideo(convo.tweet, token)
   futs.add getVideos(convo.before)
   futs.add getVideos(convo.after)
-  futs.add convo.replies.mapIt(getVideos(it))
+  futs.add convo.replies.mapIt(getVideos(it, token))
 
   await all(futs)
 
