@@ -43,13 +43,9 @@ proc emojify*(node: XmlNode) =
     i.add newText(i.getAttr("alt"))
 
 proc getQuoteText*(tweet: XmlNode): string =
-  let
-    text = tweet.querySelector(".QuoteTweet-text")
-    hasEmojis = not text.querySelector(".Emoji").isNil
+  let text = tweet.querySelector(".QuoteTweet-text")
 
-  if hasEmojis:
-    emojify(text)
-
+  emojify(text)
   result = stripText(selectText(text, ".tweet-text"))
   result = stripTwitterUrls(result)
 
@@ -59,11 +55,8 @@ proc getTweetText*(tweet: XmlNode): string =
     link = tweet.selectAttr(selector, "data-expanded-url")
     quote = tweet.querySelector(".QuoteTweet")
     text = tweet.querySelector(".tweet-text")
-    hasEmojis = not text.querySelector(".Emoji").isNil
 
-  if hasEmojis:
-    emojify(text)
-
+  emojify(text)
   result = stripText(selectText(text, ".tweet-text"))
 
   if not quote.isNil and link.len > 0:
