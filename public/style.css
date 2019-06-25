@@ -652,6 +652,7 @@ video {
 .quote-media {
     display: flex;
     justify-content: center;
+    pointer-events: none;
 }
 
 .quote-media img {
@@ -675,4 +676,23 @@ video {
     padding: 0px 2px;
     font-size: 12px;
     font-weight: bold;
+}
+
+.quote-sensitive {
+    background: #353535;
+    width: 102px;
+    height: 102px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.quote-sensitive-icon {
+    font-size: 25px;
+    width: 37px;
+    height: 32px;
+    background-color: #4e4e4e;
+    padding-bottom: 5px;
+    margin: 0;
 }

@@ -30,17 +30,23 @@
 #end proc
 #
 #proc renderQuote(quote: Quote): string =
-#let hasMedia = quote.thumb.isSome()
+#let hasMedia = quote.thumb.isSome() or quote.sensitive
 <div class="quote">
   <div class="quote-container" href="${quote.link}">
     <a class="quote-link" href="${quote.link}"></a>
     #if hasMedia:
     <div class="quote-media-container">
       <div class="quote-media">
+        #if quote.thumb.isSome():
         <img src=${quote.thumb.get().getSigUrl("pic")}>
-        #if quote.badge.isSome:
+        #if quote.badge.isSome():
         <div class="quote-badge">
           <div class="quote-badge-text">${quote.badge.get()}</div>
+        </div>
+        #end if
+        #elif quote.sensitive:
+        <div class="quote-sensitive">
+          <span class="icon quote-sensitive-icon">❗</span>
         </div>
         #end if
       </div>

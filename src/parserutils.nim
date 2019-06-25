@@ -135,6 +135,11 @@ proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
     tweet.video = some(Video())
 
 proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
+  let sensitive = node.querySelector(".QuoteTweet--sensitive")
+  if not sensitive.isNil:
+    quote.sensitive = true
+    return
+
   let media = node.querySelector(".QuoteMedia")
   if not media.isNil:
     quote.thumb = some(media.selectAttr("img", "src"))

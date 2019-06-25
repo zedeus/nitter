@@ -48,6 +48,7 @@ type
     profile*: Profile
     link*: string
     text*: string
+    sensitive*: bool
     thumb*: Option[string]
     badge*: Option[string]
 
