@@ -49,10 +49,9 @@ proc fetchJson(url: Uri; headers: HttpHeaders): Future[JsonNode] {.async.} =
   var resp = ""
   try:
     resp = await client.getContent($url)
+    result = parseJson(resp)
   except:
     return nil
-
-  return parseJson(resp)
 
 proc getGuestToken(): Future[string] {.async.} =
   if getTime() - tokenUpdated < tokenLifetime:
@@ -166,7 +165,7 @@ proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
     url &= "&max_position=" & cleanAfter
 
   let json = await fetchJson(base / url, headers)
-  let html = parseHtml(json["items_html"].to(string))
+  if json.isNil: return Timeline()
 
   result = Timeline(
     hasMore: json["has_more_items"].to(bool),
@@ -177,6 +176,7 @@ proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
   if json["new_latent_count"].to(int) == 0:
     return
 
+  let html = parseHtml(json["items_html"].to(string))
   result.tweets = parseTweets(html)
   await getVideos(result.tweets)
 
