@@ -25,7 +25,6 @@ is on implementing missing features.
 
 ## Todo (roughly in this order)
 
-- Line connecting posts in threads
 - "Show Thread" button
 - Twitter "Cards" (link previews)
 - Nitter link previews

@@ -472,9 +472,27 @@ nav {
     letter-spacing: .01em;
 }
 
-.thread {
+.reply {
     background-color: #161616;
     margin-bottom: 10px;
+}
+
+.after-tweet .status-el::before, .before-tweet .status-el::before, .thread .status-el::before {
+    background: #8a3731;
+    content: '';
+    position: relative;
+    width: 3px;
+    left: 26px;
+    top: 56px;
+    margin-bottom: 37px;
+    margin-left: -3px;
+    border-radius: 2px;
+}
+
+.thread-last .status-el::before {
+    background: unset;
+    width: 0;
+    margin: 0;
 }
 
 .panel {
