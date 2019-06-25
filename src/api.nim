@@ -161,21 +161,23 @@ proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
   })
 
   var url = timelineUrl % username
-  if after.len > 0:
-    url &= "&max_position=" & after
+  let cleanAfter = after.replace(re"[^\d]*(\d+)[^\d]*", "$1")
+  if cleanAfter.len > 0:
+    url &= "&max_position=" & cleanAfter
 
   let json = await fetchJson(base / url, headers)
   let html = parseHtml(json["items_html"].to(string))
 
   result = Timeline(
-    tweets: parseTweets(html),
-    minId: json["min_position"].to(string),
     hasMore: json["has_more_items"].to(bool),
+    maxId: json.getOrDefault("max_position").getStr(""),
+    minId: json.getOrDefault("min_position").getStr(""),
   )
 
-  if json.hasKey("max_position"):
-    result.maxId = json["max_position"].to(string)
+  if json["new_latent_count"].to(int) == 0:
+    return
 
+  result.tweets = parseTweets(html)
   await getVideos(result.tweets)
 
 proc getTweet*(id: string): Future[Conversation] {.async.} =
@@ -193,6 +195,9 @@ proc getTweet*(id: string): Future[Conversation] {.async.} =
   let
     url = base / tweetUrl / id
     html = await fetchHtml(url, headers)
+
+  if html.isNil:
+    return
 
   result = parseConversation(html)
   await getConversationVideos(result)
