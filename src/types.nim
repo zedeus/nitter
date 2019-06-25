@@ -78,5 +78,11 @@ type
     after*: Tweets
     replies*: seq[Tweets]
 
+  Timeline* = ref object
+    tweets*: Tweets
+    minId*: string
+    maxId*: string
+    hasMore*: bool
+
 proc contains*(thread: Tweets; tweet: Tweet): bool =
   thread.anyIt(it.id == tweet.id)

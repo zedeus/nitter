@@ -575,7 +575,14 @@ nav {
 .timeline-protected-header {
     color: #d0564c;
     font-size: 21px;
-    font-weight: bold;
+    font-weight: 600;
+}
+
+.timeline-end {
+    text-align: center;
+    font-size: 16px;
+    color: #ff6c60;
+    font-weight: 600;
 }
 
 .media-gif {

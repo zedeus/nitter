@@ -150,7 +150,7 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
 
   result = parsePopupProfile(html)
 
-proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
+proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
   let headers = newHttpHeaders({
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "Referer": $(base / username),
@@ -164,10 +164,19 @@ proc getTimeline*(username: string; after=""): Future[Tweets] {.async.} =
   if after.len > 0:
     url &= "&max_position=" & after
 
-  let html = await fetchHtml(base / url, headers, jsonKey="items_html")
+  let json = await fetchJson(base / url, headers)
+  let html = parseHtml(json["items_html"].to(string))
 
-  result = parseTweets(html)
-  await getVideos(result)
+  result = Timeline(
+    tweets: parseTweets(html),
+    minId: json["min_position"].to(string),
+    hasMore: json["has_more_items"].to(bool),
+  )
+
+  if json.hasKey("max_position"):
+    result.maxId = json["max_position"].to(string)
+
+  await getVideos(result.tweets)
 
 proc getTweet*(id: string): Future[Conversation] {.async.} =
   let headers = newHttpHeaders({

@@ -52,7 +52,7 @@
 #end if
 #end proc
 #
-#proc renderTimeline*(tweets: Tweets; profile: Profile; beginning: bool): string =
+#proc renderTimeline*(timeline: Timeline; profile: Profile; beginning: bool): string =
 <div id="tweets">
   #if profile.protected:
   <div class="timeline-protected">
@@ -66,19 +66,22 @@
   </div>
   #end if
   #var retweets: Tweets
-  #for tweet in tweets:
+  #for tweet in timeline.tweets:
     #if tweet in retweets: continue
     #elif tweet.retweetBy.isSome: retweets.add tweet
     #end if
     ${renderTweet(tweet, "timeline-tweet")}
   #end for
-  #if tweets.len > 0:
+  #if timeline.hasMore:
   <div class="show-more">
-    #let retweet = tweets[^1].retweetId.get("")
-    #let id = if retweet.len > 0: retweet else: tweets[^1].id
-    <a href="/${profile.username}?after=${$id}">Load older tweets</a>
+    <a href="/${profile.username}?after=${timeline.minId}">Load older tweets</a>
   </div>
   #else:
+  <div class="timeline-protected">
+    <h2 class="timeline-end" style="text-align: center;">No more tweets.</h2>
+  </div>
+  #end if
+  #if timeline.tweets.len == 0:
   <div class="timeline-protected">
     <h2 class="timeline-protected-header" style="text-align: center;">No tweets found.</h2>
   </div>
@@ -86,7 +89,7 @@
 </div>
 #end proc
 #
-#proc renderProfile*(profile: Profile; tweets: Tweets; beginning: bool): string =
+#proc renderProfile*(profile: Profile; timeline: Timeline; beginning: bool): string =
 <div class="profile-tabs">
   <div class="profile-banner">
     ${renderBanner(profile)}
@@ -95,7 +98,7 @@
     ${renderProfileCard(profile)}
   </div>
   <div class="timeline-tab">
-    ${renderTimeline(tweets, profile, beginning)}
+    ${renderTimeline(timeline, profile, beginning)}
   </div>
 </div>
 #end proc
