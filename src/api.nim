@@ -11,7 +11,10 @@ const
   base = parseUri("https://twitter.com/")
   apiBase = parseUri("https://api.twitter.com/1.1/")
 
-  timelineUrl = "i/profiles/show/$1/timeline/tweets?include_available_features=1&include_entities=1&include_new_items_bar=true"
+  timelineParams = "?include_available_features=1&include_entities=1&include_new_items_bar=false&reset_error_state=false"
+  showUrl = "i/profiles/show/$1" & timelineParams
+  timelineUrl = showUrl % "$1/timeline/tweets"
+  timelineMediaUrl = showUrl % "$1/media_timeline"
   profilePopupUrl = "i/profiles/popup"
   profileIntentUrl = "intent/user"
   tweetUrl = "i/status/"
