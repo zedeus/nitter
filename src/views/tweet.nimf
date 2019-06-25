@@ -21,9 +21,7 @@
       ${linkUser(tweet.profile, class="username")}
     </div>
     <span class="heading-right">
-      <a href="${tweet.link}" class="timeago faint-link">
-        <time title="${tweet.time.format("d/M/yyyy', ' HH:mm:ss")}">${tweet.shortTime}</time>
-      </a>
+      <a href="${tweet.link}" title="${tweet.getTime()}">${tweet.shortTime}</a>
     </span>
   </div>
 </div>
@@ -32,7 +30,7 @@
 #proc renderQuote(quote: Quote): string =
 #let hasMedia = quote.thumb.isSome() or quote.sensitive
 <div class="quote">
-  <div class="quote-container" href="${quote.link}">
+  <div class="quote-container">
     <a class="quote-link" href="${quote.link}"></a>
     #if hasMedia:
     <div class="quote-media-container">
@@ -56,7 +54,7 @@
       ${linkUser(quote.profile, class="fullname")}
       ${linkUser(quote.profile, class="username")}
     </div>
-    <div class="quote-text">${linkifyText(xmltree.escape(quote.text))}</div>
+    <div class="quote-text">${linkifyText(quote.text)}</div>
   </div>
 </div>
 #end proc
@@ -65,7 +63,7 @@
 #let groups = if tweet.photos.len > 2: tweet.photos.distribute(2) else: @[tweet.photos]
 #let display = if groups.len == 1 and groups[0].len == 1: "display: table-caption;" else: ""
 #var first = true
-<div class="attachments media-body" style="${display}">
+<div class="attachments" style="${display}">
 #for photos in groups:
   #let margin = if not first: "margin-top: .25em;" else: ""
   #let flex = if photos.len > 1 or groups.len > 1: "display: flex;" else: ""
@@ -87,7 +85,7 @@
 #end proc
 #
 #proc renderVideo(video: Video): string =
-<div class="attachments media-body">
+<div class="attachments">
   <div class="gallery-row" style="max-height: unset;">
     <div class="attachment image">
     <video poster=${video.thumb.getSigUrl("pic")} autoplay muted loop></video>
@@ -100,7 +98,7 @@
 #end proc
 #
 #proc renderGif(gif: Gif): string =
-<div class="attachments media-body media-gif">
+<div class="attachments media-gif">
   <div class="gallery-row" style="max-height: unset;">
     <div class="attachment image">
       <video class="gif" poster=${gif.thumb.getSigUrl("pic")} autoplay muted loop>
@@ -127,9 +125,7 @@
   <div class="status-body">
     ${renderHeading(tweet)}
     <div class="status-content-wrapper">
-      <div class="status-content media-body">
-        ${linkifyText(xmltree.escape(tweet.text))}
-      </div>
+      <div class="status-content media-body">${linkifyText(tweet.text)}</div>
     </div>
     #if tweet.photos.len > 0:
     ${renderMediaGroup(tweet)}

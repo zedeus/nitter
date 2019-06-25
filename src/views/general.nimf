@@ -3,7 +3,7 @@
 #
 #proc renderMain*(body: string; title="Nitter"): string =
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>${xmltree.escape(title)}</title>
     <link rel="stylesheet" type="text/css" href="/style.css">

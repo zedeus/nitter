@@ -1,4 +1,4 @@
-import strutils, strformat, htmlgen, xmltree
+import strutils, strformat, htmlgen, xmltree, times
 import regex
 
 import ./types, ./utils
@@ -8,7 +8,7 @@ from unicode import Rune, `$`
 const
   urlRegex = re"((https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+(/[^\s]*)?)"
   emailRegex = re"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
-  usernameRegex = re"(^|[^\S\n]|\.)@([A-z0-9_]+)"
+  usernameRegex = re"(^|[^\S\n]|\.|>)@([A-z0-9_]+)"
   picRegex = re"pic.twitter.com/[^ ]+"
   cardRegex = re"(https?://)?cards.twitter.com/[^ ]+"
   ellipsisRegex = re" ?…"
@@ -48,14 +48,14 @@ proc reUsernameToLink*(m: RegexMatch; s: string): string =
   pretext & toLink("/" & username, "@" & username)
 
 proc linkifyText*(text: string): string =
-  result = text.stripText()
-  result = result.replace("\n", "<br>")
+  result = xmltree.escape(stripText(text))
   result = result.replace(ellipsisRegex, "")
-  result = result.replace(usernameRegex, reUsernameToLink)
   result = result.replace(emailRegex, reEmailToLink)
   result = result.replace(urlRegex, reUrlToLink)
-  result = result.replace(re"([A-z0-9\):;.])<a", "$1 <a")
-  result = result.replace(re"</a>\s+([;.,\)])", "</a>$1")
+  result = result.replace("\n", "<br>")
+  result = result.replace(usernameRegex, reUsernameToLink)
+  result = result.replace(re"([^\s\(\n])<a", "$1 <a")
+  result = result.replace(re"</a>\s+([;.,!\)']|&apos;)", "</a>$1")
 
 proc stripTwitterUrls*(text: string): string =
   result = text
@@ -92,3 +92,6 @@ proc pageTitle*(profile: Profile): string =
 
 proc pageTitle*(page: string): string =
   &"{page} | Nitter"
+
+proc getTime*(tweet: Tweet): string =
+  tweet.time.format("d/M/yyyy', ' HH:mm:ss")

@@ -18,7 +18,7 @@
     <div class="profile-bio">
       #if profile.bio.len > 0:
       <div class="profile-bio">
-        <p>${linkifyText(xmltree.escape(profile.bio))}</p>
+        <p>${linkifyText(profile.bio)}</p>
       </div>
       #end if
     </div>

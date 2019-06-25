@@ -44,7 +44,7 @@ proc parseQuote*(quote: XmlNode): Quote =
   result = Quote(
     id:   quote.getAttr("data-item-id"),
     link: quote.getAttr("href"),
-    text: quote.selectText(".QuoteTweet-text").stripTwitterUrls()
+    text: getQuoteText(quote)
   )
 
   result.profile = Profile(

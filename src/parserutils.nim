@@ -42,6 +42,17 @@ proc emojify*(node: XmlNode) =
   for i in node.querySelectorAll(".Emoji"):
     i.add newText(i.getAttr("alt"))
 
+proc getQuoteText*(tweet: XmlNode): string =
+  let
+    text = tweet.querySelector(".QuoteTweet-text")
+    hasEmojis = not text.querySelector(".Emoji").isNil
+
+  if hasEmojis:
+    emojify(text)
+
+  result = stripText(selectText(text, ".tweet-text"))
+  result = stripTwitterUrls(result)
+
 proc getTweetText*(tweet: XmlNode): string =
   let
     selector = ".tweet-text > a.twitter-timeline-link.u-hidden"
