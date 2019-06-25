@@ -70,7 +70,12 @@ routes:
       await client.downloadFile($uri, filename)
       client.close()
 
-    sendFile(filename)
+    if not existsFile(filename):
+      resp Http404
+
+    let file = openAsync(filename)
+    defer: file.close()
+    resp await readAll(file), mimetype(filename)
 
   get "/video/@sig/@url":
     cond "http" in @"url"
