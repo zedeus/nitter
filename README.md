@@ -29,7 +29,7 @@ is on implementing missing features.
 - Twitter "Cards" (link previews)
 - Nitter link previews
 - Search (+ hashtag search)
-- Emoji support
+- Emoji support (WIP, needs font)
 - Twitter polls
 - Server configuration
 - Simple account system with feed (excludes retweets)

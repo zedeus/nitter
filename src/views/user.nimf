@@ -113,15 +113,14 @@
       #end for
     </div>
     #end if
-    #let afterClass = if conversation.after.len > 0: "thread" else: ""
     <div class="main-tweet">
+      #let afterClass = if conversation.after.len > 0: "thread" else: ""
       ${renderTweet(conversation.tweet, class=afterClass)}
     </div>
     #if conversation.after.len > 0:
     <div class="after-tweet">
       #for i, tweet in conversation.after:
-      #let class = if i == conversation.after.high: "thread-last" else: ""
-      ${renderTweet(tweet, class=class)}
+      ${renderTweet(tweet, last=(i == conversation.after.high))}
       #end for
     </div>
     #end if
@@ -131,8 +130,7 @@
     #for thread in conversation.replies:
     <div class="reply thread">
       #for i, tweet in thread:
-      #let class = if i == thread.high: "thread-last" else: ""
-      ${renderTweet(tweet, class=class)}
+      ${renderTweet(tweet, last=(i == thread.high))}
       #end for
     </div>
     #end for

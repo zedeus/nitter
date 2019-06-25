@@ -117,9 +117,10 @@
 </div>
 #end proc
 #
-#proc renderTweet*(tweet: Tweet; class=""): string =
-#if class.len > 0:
-<div class="${class}">
+#proc renderTweet*(tweet: Tweet; class=""; last=false): string =
+#var divClass = if last: "thread-last " & class else: class
+#if divClass.len > 0:
+<div class="${divClass}">
 #end if
 <div class="status-el">
   <div class="status-body">
@@ -139,7 +140,7 @@
     ${renderStats(tweet)}
   </div>
 </div>
-#if class.len > 0:
+#if divClass.len > 0:
 </div>
 #end if
 #end proc
