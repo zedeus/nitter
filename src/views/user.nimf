@@ -4,11 +4,9 @@
 #include "tweet.nimf"
 #
 #proc renderProfileCard*(profile: Profile): string =
-#let pic = profile.getUserpic().getSigUrl("pic")
-#let smallPic = profile.getUserpic("_200x200").getSigUrl("pic")
 <div class="profile-card">
-  <a class="profile-card-avatar" href="${pic}">
-    <img src="${smallPic}">
+  <a class="profile-card-avatar" href="${profile.getUserPic().getSigUrl("pic")}">
+    ${genImg(profile.getUserpic("_200x200"))}
   </a>
   <div class="profile-card-tabs">
     <div class="profile-card-tabs-name">
@@ -50,9 +48,7 @@
 <div style="${profile.banner}" class="profile-banner-color"></div>
 #else:
 #let url = getSigUrl(profile.banner, "pic")
-<a href="${url}">
-  <img src="${url}">
-</a>
+<a href="${url}">${genImg(profile.banner)}</a>
 #end if
 #end proc
 #

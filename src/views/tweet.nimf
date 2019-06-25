@@ -15,7 +15,7 @@
 #end if
 <div class="media-heading">
   <div class="heading-name-row">
-    <img class="avatar" src=${tweet.profile.getUserpic("_bigger").getSigUrl("pic")}>
+    ${genImg(tweet.profile.getUserpic("_bigger"), "avatar")}
     <div class="fullname-and-username">
       ${linkUser(tweet.profile, class="fullname")}
       ${linkUser(tweet.profile, class="username")}
@@ -38,7 +38,7 @@
     <div class="quote-media-container">
       <div class="quote-media">
         #if quote.thumb.isSome():
-        <img src=${quote.thumb.get().getSigUrl("pic")}>
+        ${genImg(quote.thumb.get())}
         #if quote.badge.isSome():
         <div class="quote-badge">
           <div class="quote-badge-text">${quote.badge.get()}</div>
@@ -75,7 +75,7 @@
       ##TODO: why doesn't this work?
       <a href=${getSigUrl(photo & "?name=orig", "pic")} target="_blank" class="image-attachment">
         <div class="still-image" style="${flex}">
-          <img src=${getSigUrl(photo, "pic")} referrerpolicy="">
+          ${genImg(photo)}
         </div>
       </a>
     </div>

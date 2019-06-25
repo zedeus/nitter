@@ -34,13 +34,11 @@ proc reEmailToLink*(m: RegexMatch; s: string): string =
   toLink("mailto://" & url, url)
 
 proc reUsernameToLink*(m: RegexMatch; s: string): string =
-  var
-    username = ""
-    pretext = ""
+  var username = ""
+  var pretext = ""
 
-  let
-    pre = m.group(0)
-    match = m.group(1)
+  let pre = m.group(0)
+  let match = m.group(1)
 
   username = s[match[0]]
 
@@ -56,8 +54,8 @@ proc linkifyText*(text: string): string =
   result = result.replace(usernameRegex, reUsernameToLink)
   result = result.replace(emailRegex, reEmailToLink)
   result = result.replace(urlRegex, reUrlToLink)
-  result = result.replace(re"([A-z0-9\):.])<a", "$1 <a")
-  result = result.replace(re"</a> ([.,\)])", "</a>$1")
+  result = result.replace(re"([A-z0-9\):;.])<a", "$1 <a")
+  result = result.replace(re"</a>\s+([;.,\)])", "</a>$1")
 
 proc stripTwitterUrls*(text: string): string =
   result = text
@@ -71,6 +69,9 @@ proc getUserpic*(userpic: string; style=""): string =
 
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
+
+proc genImg*(url: string; class=""): string =
+  result = img(src = url.getSigUrl("pic"), class = class, alt = "Image")
 
 proc linkUser*(profile: Profile; class=""): string =
   let
