@@ -1,8 +1,8 @@
 import httpclient, asyncdispatch, htmlparser, times
 import sequtils, strutils, strformat, json, xmltree, uri
-import nimquery, regex
+import regex
 
-import ./types, ./parser
+import ./types, ./parser, ./parserutils
 
 const
   agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
@@ -162,7 +162,7 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
   if html.isNil:
     return Profile()
 
-  if not html.querySelector(".ProfileCard-sensitiveWarningContainer").isNil:
+  if not html.select(".ProfileCard-sensitiveWarningContainer").isNil:
     return await getProfileFallback(username, headers)
 
   result = parsePopupProfile(html)

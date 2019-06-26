@@ -1,10 +1,9 @@
 import xmltree, sequtils, strtabs, strutils, strformat, json
-import nimquery
 
 import ./types, ./parserutils, ./formatters
 
 proc parsePopupProfile*(node: XmlNode): Profile =
-  let profile = node.querySelector(".profile-card")
+  let profile = node.select(".profile-card")
   if profile.isNil: return
 
   result = Profile(
@@ -24,9 +23,9 @@ proc parseIntentProfile*(profile: XmlNode): Profile =
     fullname:  profile.getName("a.fn.url.alternate-context"),
     username:  profile.getUsername(".nickname"),
     bio:       profile.getBio("p.note"),
-    userpic:   profile.querySelector(".profile.summary").getAvatar("img.photo"),
-    verified:  not profile.querySelector("li.verified").isNil,
-    protected: not profile.querySelector("li.protected").isNil,
+    userpic:   profile.select(".profile.summary").getAvatar("img.photo"),
+    verified:  not profile.select("li.verified").isNil,
+    protected: not profile.select("li.protected").isNil,
     banner:    getBanner(profile)
   )
 
@@ -55,7 +54,11 @@ proc parseQuote*(quote: XmlNode): Quote =
 
   result.getQuoteMedia(quote)
 
-proc parseTweet*(tweet: XmlNode): Tweet =
+proc parseTweet*(node: XmlNode): Tweet =
+  let tweet = node.select(".tweet")
+  if tweet.isNil():
+    return Tweet()
+
   result = Tweet(
     id:        tweet.getAttr("data-item-id"),
     link:      tweet.getAttr("data-permalink-path"),
@@ -74,29 +77,28 @@ proc parseTweet*(tweet: XmlNode): Tweet =
     result.retweetBy = some(by.stripText())
     result.retweetId = some(tweet.getAttr("data-retweet-id"))
 
-  let quote = tweet.querySelector(".QuoteTweet-innerContainer")
+  let quote = tweet.select(".QuoteTweet-innerContainer")
   if not quote.isNil:
     result.quote = some(parseQuote(quote))
 
 proc parseTweets*(node: XmlNode): Tweets =
-  if node.isNil: return
-  node.querySelectorAll(".tweet").map(parseTweet)
+  if node.isNil or node.kind == xnText: return
+  for n in node.selectAll(".stream-item"):
+    result.add parseTweet(n)
 
 proc parseConversation*(node: XmlNode): Conversation =
   result = Conversation(
-    tweet: parseTweet(node.querySelector(".permalink-tweet-container > .tweet")),
-    before: parseTweets(node.querySelector(".in-reply-to"))
+    tweet:  parseTweet(node.select(".permalink-tweet-container")),
+    before: parseTweets(node.select(".in-reply-to"))
   )
 
-  let replies = node.querySelector(".replies-to")
+  let replies = node.select(".replies-to")
   if replies.isNil: return
 
-  result.after = parseTweets(replies.querySelector(".ThreadedConversation--selfThread"))
+  result.after = parseTweets(replies.select(".ThreadedConversation--selfThread"))
 
-  for reply in replies.querySelectorAll("li > .stream-items"):
-    let thread = parseTweets(reply)
-    if not thread.anyIt(it in result.after):
-      result.replies.add thread
+  for reply in replies.select(".stream-items"):
+    result.replies.add parseTweets(reply)
 
 proc parseVideo*(node: JsonNode): Video =
   let track = node{"track"}
