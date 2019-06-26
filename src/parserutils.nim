@@ -125,10 +125,10 @@ proc getTweetStats*(tweet: Tweet; node: XmlNode) =
   tweet.likes = "0"
   for action in node.selectAll(".ProfileTweet-actionCountForAria"):
     let text = action.innerText.split()
-    case text[1]
-    of "replies":  tweet.replies = text[0]
-    of "likes":    tweet.likes = text[0]
-    of "retweets": tweet.retweets = text[0]
+    case text[1][0 .. 2]
+    of "ret": tweet.retweets = text[0]
+    of "rep": tweet.replies = text[0]
+    of "lik": tweet.likes = text[0]
 
 proc getGif(player: XmlNode): Gif =
   let
