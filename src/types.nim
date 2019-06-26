@@ -73,6 +73,7 @@ type
     gif*: Option[Gif]
     video*: Option[Video]
     photos*: seq[string]
+    available*: bool
 
   Tweets* = seq[Tweet]
 

@@ -122,6 +122,7 @@
 #if divClass.len > 0:
 <div class="${divClass}">
 #end if
+#if tweet.available:
 <div class="status-el">
   <div class="status-body">
     ${renderHeading(tweet)}
@@ -140,6 +141,11 @@
     ${renderStats(tweet)}
   </div>
 </div>
+#else:
+<div class="status-el unavailable">
+  <div class="unavailable-box">This tweet is unavailable</div>
+</div>
+#end if
 #if divClass.len > 0:
 </div>
 #end if

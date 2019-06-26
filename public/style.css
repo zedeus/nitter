@@ -64,6 +64,7 @@ a:hover {
 .status-body {
     flex: 1;
     min-width: 0;
+    margin-left: 58px;
 }
 
 .media-heading {
@@ -264,10 +265,6 @@ nav {
     max-height: 379.5px;
     border-color: #222;
     flex-basis: 300px;
-}
-
-.status-body {
-    margin-left: 58px;
 }
 
 .avatar {
@@ -477,16 +474,22 @@ nav {
     margin-bottom: 10px;
 }
 
-.after-tweet .status-el::before, .before-tweet .status-el::before, .thread .status-el::before {
+.thread-line .status-el::before {
     background: #8a3731;
     content: '';
     position: relative;
     width: 3px;
+    min-width: 3px;
     left: 26px;
+    border-radius: 2px;
+    margin-left: -3px;
     top: 56px;
     margin-bottom: 37px;
-    margin-left: -3px;
-    border-radius: 2px;
+}
+
+.thread-line .unavailable::before {
+    top: 40px;
+    margin-bottom: 19px;
 }
 
 .thread-last .status-el::before {
@@ -631,6 +634,15 @@ video {
     text-align: center;
     top: calc(50% - 20px);
     font-size: 20px;
+}
+
+.unavailable-box {
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    border: solid 1px #404040;
+    border-radius: 10px;
+    background-color: #121212;
 }
 
 .quote {
