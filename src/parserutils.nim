@@ -16,6 +16,11 @@ proc select*(node: XmlNode; selector: string): XmlNode =
   let nodes = node.selectAll(selector)
   if nodes.len > 0: nodes[0] else: nil
 
+proc select*(node: XmlNode; parent, child: string): XmlNode =
+  let parentNode = node.select(parent)
+  if parentNode.isNil(): return
+  result = parentNode.select(child)
+
 proc getAttr*(node: XmlNode; attr: string; default=""): string =
   if node.isNil or node.attrs.isNil: return default
   return node.attrs.getOrDefault(attr)

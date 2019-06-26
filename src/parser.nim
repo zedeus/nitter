@@ -83,8 +83,7 @@ proc parseTweet*(node: XmlNode): Tweet =
 
 proc parseTweets*(node: XmlNode): Tweets =
   if node.isNil or node.kind == xnText: return
-  for n in node.selectAll(".stream-item"):
-    result.add parseTweet(n)
+  node.selectAll(".stream-item").map(parseTweet)
 
 proc parseConversation*(node: XmlNode): Conversation =
   result = Conversation(
@@ -92,13 +91,14 @@ proc parseConversation*(node: XmlNode): Conversation =
     before: parseTweets(node.select(".in-reply-to"))
   )
 
-  let replies = node.select(".replies-to")
+  let replies = node.select(".replies-to", ".stream-items")
   if replies.isNil: return
 
-  result.after = parseTweets(replies.select(".ThreadedConversation--selfThread"))
-
-  for reply in replies.select(".stream-items"):
-    result.replies.add parseTweets(reply)
+  for reply in replies.filterIt(it.kind != xnText):
+    if "selfThread" in reply.attr("class"):
+      result.after = parseTweets(reply.select(".stream-items"))
+    else:
+      result.replies.add parseTweets(reply)
 
 proc parseVideo*(node: JsonNode): Video =
   let track = node{"track"}
