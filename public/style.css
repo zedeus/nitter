@@ -277,6 +277,10 @@ nav {
     border-radius: 50%;
 }
 
+.tweet-avatar {
+    display: contents !important;
+}
+
 .retweet, .pinned, .tweet-stats {
     align-content: center;
     color: hsla(240,1%,73%,.7);

@@ -15,7 +15,9 @@
 #end if
 <div class="media-heading">
   <div class="heading-name-row">
-    ${genImg(tweet.profile.getUserpic("_bigger"), "avatar")}
+    <a class="tweet-avatar" href="/${tweet.profile.username}">
+      ${genImg(tweet.profile.getUserpic("_bigger"), "avatar")}
+    </a>
     <div class="fullname-and-username">
       ${linkUser(tweet.profile, class="fullname")}
       ${linkUser(tweet.profile, class="username")}
