@@ -188,10 +188,11 @@ proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
     minId: json.getOrDefault("min_position").getStr(""),
   )
 
-  if json["new_latent_count"].to(int) == 0:
-    return
+  if json["new_latent_count"].to(int) == 0: return
+  if not json.hasKey("items_html"): return
 
   let html = parseHtml(json["items_html"].to(string))
+
   result.tweets = parseTweets(html)
   await getVideos(result.tweets)
 

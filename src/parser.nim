@@ -83,7 +83,9 @@ proc parseTweet*(node: XmlNode): Tweet =
 
 proc parseTweets*(node: XmlNode): Tweets =
   if node == nil or node.kind == xnText: return
-  node.selectAll(".stream-item").map(parseTweet)
+  for n in node.selectAll(".stream-item"):
+    if "account" notin n.child("div").attr("class"):
+      result.add parseTweet(n)
 
 proc parseConversation*(node: XmlNode): Conversation =
   result = Conversation(

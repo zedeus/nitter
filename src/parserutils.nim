@@ -140,8 +140,7 @@ proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
     tweet.photos.add photo.attrs["data-image-url"]
 
   let player = node.select(".PlayableMedia")
-  if player == nil:
-    return
+  if player == nil: return
 
   if "gif" in player.attr("class"):
     tweet.gif = some(getGif(player.select(".PlayableMedia-player")))
@@ -149,8 +148,7 @@ proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
     tweet.video = some(Video())
 
 proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
-  let sensitive = node.select(".QuoteTweet--sensitive")
-  if sensitive != nil:
+  if node.select(".QuoteTweet--sensitive") != nil:
     quote.sensitive = true
     return
 
