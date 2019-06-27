@@ -14,10 +14,9 @@ const
   timelineParams = "?include_available_features=1&include_entities=1&include_new_items_bar=false&reset_error_state=false"
   showUrl = "i/profiles/show/$1" & timelineParams
   timelineUrl = showUrl % "$1/timeline/tweets"
-  timelineMediaUrl = showUrl % "$1/media_timeline"
   profilePopupUrl = "i/profiles/popup"
   profileIntentUrl = "intent/user"
-  tweetUrl = "i/status/"
+  tweetUrl = "status"
   videoUrl = "videos/tweet/config/$1.json"
   tokenUrl = "guest/activate.json"
 
@@ -198,7 +197,7 @@ proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
   result.tweets = parseTweets(html)
   await getVideos(result.tweets)
 
-proc getTweet*(id: string): Future[Conversation] {.async.} =
+proc getTweet*(username: string; id: string): Future[Conversation] {.async.} =
   let headers = newHttpHeaders({
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "Referer": $base,
@@ -211,7 +210,7 @@ proc getTweet*(id: string): Future[Conversation] {.async.} =
   })
 
   let
-    url = base / tweetUrl / id
+    url = base / username / tweetUrl / id
     html = await fetchHtml(url, headers)
 
   if html.isNil:

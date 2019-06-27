@@ -43,7 +43,7 @@ routes:
   get "/@name/status/@id":
     cond '.' notin @"name"
 
-    let conversation = await getTweet(@"id")
+    let conversation = await getTweet(@"name", @"id")
     if conversation.isNil or conversation.tweet.id.len == 0:
       resp Http404, showError("Tweet not found")
 
