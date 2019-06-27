@@ -6,7 +6,7 @@ import ./types, ./utils
 from unicode import Rune, `$`
 
 const
-  urlRegex = re"((https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+(/[^\s\)]*)?)"
+  urlRegex = re"((https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+([/\?][^\s\)]*)?)"
   emailRegex = re"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
   usernameRegex = re"(^|[\s\.,>])@([A-z0-9_]+)"
   picRegex = re"pic.twitter.com/[^ ]+"
