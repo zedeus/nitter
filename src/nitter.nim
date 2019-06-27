@@ -44,7 +44,7 @@ routes:
     cond '.' notin @"name"
 
     let conversation = await getTweet(@"name", @"id")
-    if conversation.isNil or conversation.tweet.id.len == 0:
+    if conversation == nil or conversation.tweet.id.len == 0:
       resp Http404, showError("Tweet not found")
 
     let title = pageTitle(conversation.tweet.profile)

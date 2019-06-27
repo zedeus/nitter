@@ -96,7 +96,7 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
     url = apiBase / (videoUrl % tweet.id)
     json = await fetchJson(url, headers)
 
-  if json.isNil:
+  if json == nil:
     if getTime() - tokenUpdated > initDuration(seconds=1):
       tokenUpdated = getTime()
       guestToken = await getGuestToken(force=true)
@@ -134,8 +134,7 @@ proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile]
     url = base / profileIntentUrl ? {"screen_name": username}
     html = await fetchHtml(url, headers)
 
-  if html.isNil:
-    return Profile()
+  if html == nil: return Profile()
 
   result = parseIntentProfile(html)
 
@@ -158,10 +157,9 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
     url = base / profilePopupUrl ? params
     html = await fetchHtml(url, headers, jsonKey="html")
 
-  if html.isNil:
-    return Profile()
+  if html == nil: return Profile()
 
-  if not html.select(".ProfileCard-sensitiveWarningContainer").isNil:
+  if html.select(".ProfileCard-sensitiveWarningContainer") != nil:
     return await getProfileFallback(username, headers)
 
   result = parsePopupProfile(html)
@@ -182,7 +180,7 @@ proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
     url &= "&max_position=" & cleanAfter
 
   let json = await fetchJson(base / url, headers)
-  if json.isNil: return Timeline()
+  if json == nil: return Timeline()
 
   result = Timeline(
     hasMore: json["has_more_items"].to(bool),
@@ -213,8 +211,7 @@ proc getTweet*(username: string; id: string): Future[Conversation] {.async.} =
     url = base / username / tweetUrl / id
     html = await fetchHtml(url, headers)
 
-  if html.isNil:
-    return
+  if html == nil: return
 
   result = parseConversation(html)
   await getConversationVideos(result)

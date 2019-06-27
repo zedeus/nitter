@@ -498,6 +498,7 @@ nav {
 
 .thread-last .status-el::before {
     background: unset;
+    min-width: unset;
     width: 0;
     margin: 0;
 }

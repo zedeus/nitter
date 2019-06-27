@@ -4,7 +4,7 @@ import ./types, ./parserutils, ./formatters
 
 proc parsePopupProfile*(node: XmlNode): Profile =
   let profile = node.select(".profile-card")
-  if profile.isNil: return
+  if profile == nil: return
 
   result = Profile(
     fullname:  profile.getName(".fullname"),
@@ -24,8 +24,8 @@ proc parseIntentProfile*(profile: XmlNode): Profile =
     username:  profile.getUsername(".nickname"),
     bio:       profile.getBio("p.note"),
     userpic:   profile.select(".profile.summary").getAvatar("img.photo"),
-    verified:  not profile.select("li.verified").isNil,
-    protected: not profile.select("li.protected").isNil,
+    verified:  profile.select("li.verified") != nil,
+    protected: profile.select("li.protected") != nil,
     banner:    getBanner(profile)
   )
 
@@ -33,22 +33,22 @@ proc parseIntentProfile*(profile: XmlNode): Profile =
 
 proc parseTweetProfile*(profile: XmlNode): Profile =
   result = Profile(
-    fullname: profile.getAttr("data-name").stripText(),
-    username: profile.getAttr("data-screen-name"),
+    fullname: profile.attr("data-name").stripText(),
+    username: profile.attr("data-screen-name"),
     userpic:  profile.getAvatar(".avatar"),
     verified: isVerified(profile)
   )
 
 proc parseQuote*(quote: XmlNode): Quote =
   result = Quote(
-    id:   quote.getAttr("data-item-id"),
-    link: quote.getAttr("href"),
+    id:   quote.attr("data-item-id"),
+    link: quote.attr("href"),
     text: getQuoteText(quote)
   )
 
   result.profile = Profile(
     fullname: quote.selectText(".QuoteTweet-fullname").stripText(),
-    username: quote.getAttr("data-screen-name"),
+    username: quote.attr("data-screen-name"),
     verified: isVerified(quote)
   )
 
@@ -56,17 +56,17 @@ proc parseQuote*(quote: XmlNode): Quote =
 
 proc parseTweet*(node: XmlNode): Tweet =
   let tweet = node.select(".tweet")
-  if tweet.isNil():
-    return Tweet()
+  if tweet == nil: return Tweet()
 
   result = Tweet(
-    id:        tweet.getAttr("data-item-id"),
-    link:      tweet.getAttr("data-permalink-path"),
-    profile:   parseTweetProfile(tweet),
+    id:        tweet.attr("data-item-id"),
+    link:      tweet.attr("data-permalink-path"),
     text:      getTweetText(tweet),
     time:      getTimestamp(tweet),
     shortTime: getShortTime(tweet),
-    pinned:    "pinned" in tweet.getAttr("class")
+    profile:   parseTweetProfile(tweet),
+    pinned:    "pinned" in tweet.attr("class"),
+    available: true
   )
 
   result.getTweetStats(tweet)
@@ -75,14 +75,14 @@ proc parseTweet*(node: XmlNode): Tweet =
   let by = tweet.selectText(".js-retweet-text > a > b")
   if by.len > 0:
     result.retweetBy = some(by.stripText())
-    result.retweetId = some(tweet.getAttr("data-retweet-id"))
+    result.retweetId = some(tweet.attr("data-retweet-id"))
 
   let quote = tweet.select(".QuoteTweet-innerContainer")
-  if not quote.isNil:
+  if quote != nil:
     result.quote = some(parseQuote(quote))
 
 proc parseTweets*(node: XmlNode): Tweets =
-  if node.isNil or node.kind == xnText: return
+  if node == nil or node.kind == xnText: return
   node.selectAll(".stream-item").map(parseTweet)
 
 proc parseConversation*(node: XmlNode): Conversation =
@@ -92,7 +92,7 @@ proc parseConversation*(node: XmlNode): Conversation =
   )
 
   let replies = node.select(".replies-to", ".stream-items")
-  if replies.isNil: return
+  if replies == nil: return
 
   for reply in replies.filterIt(it.kind != xnText):
     if "selfThread" in reply.attr("class"):

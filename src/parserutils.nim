@@ -10,24 +10,22 @@ const
   gifRegex = re".+thumb/([^\.']+)\.jpg.*"
 
 proc selectAll*(node: XmlNode; selector: string): seq[XmlNode] =
+  if node == nil: return
   q.select(node, selector)
 
 proc select*(node: XmlNode; selector: string): XmlNode =
+  if node == nil: return
   let nodes = node.selectAll(selector)
   if nodes.len > 0: nodes[0] else: nil
 
 proc select*(node: XmlNode; parent, child: string): XmlNode =
   let parentNode = node.select(parent)
-  if parentNode.isNil(): return
+  if parentNode == nil: return
   result = parentNode.select(child)
 
-proc getAttr*(node: XmlNode; attr: string; default=""): string =
-  if node.isNil or node.attrs.isNil: return default
-  return node.attrs.getOrDefault(attr)
-
-proc selectAttr*(node: XmlNode; selector: string; attr: string; default=""): string =
+proc selectAttr*(node: XmlNode; selector: string; attr: string): string =
   let res = node.select(selector)
-  if res == nil: "" else: res.getAttr(attr, default)
+  if res == nil: "" else: res.attr(attr)
 
 proc selectText*(node: XmlNode; selector: string): string =
   let res = node.select(selector)
@@ -35,9 +33,9 @@ proc selectText*(node: XmlNode; selector: string): string =
 
 proc getHeader(profile: XmlNode): XmlNode =
   result = profile.select(".permalink-header")
-  if result.isNil:
+  if result == nil:
     result = profile.select(".stream-item-header")
-  if result.isNil:
+  if result == nil:
     result = profile.select(".ProfileCard-userFields")
 
 proc isVerified*(profile: XmlNode): bool =
@@ -54,7 +52,7 @@ proc getUsername*(profile: XmlNode; selector: string): string =
 
 proc emojify*(node: XmlNode) =
   for i in node.selectAll(".Emoji"):
-    i.add newText(i.getAttr("alt"))
+    i.add newText(i.attr("alt"))
 
 proc getQuoteText*(tweet: XmlNode): string =
   let text = tweet.select(".QuoteTweet-text")
@@ -71,7 +69,7 @@ proc getTweetText*(tweet: XmlNode): string =
   emojify(text)
   result = stripText(text.innerText())
 
-  if not quote.isNil and link.len > 0:
+  if quote != nil and link.len > 0:
     result = result.replace(link, "")
 
   result = stripTwitterUrls(result)
@@ -80,8 +78,8 @@ proc getTime(tweet: XmlNode): XmlNode =
   tweet.select(".js-short-timestamp")
 
 proc getTimestamp*(tweet: XmlNode): Time =
-  let time = getTime(tweet).getAttr("data-time", "0")
-  fromUnix(parseInt(time))
+  let time = getTime(tweet).attr("data-time")
+  fromUnix(if time.len > 0: parseInt(time) else: 0)
 
 proc getShortTime*(tweet: XmlNode): string =
   getTime(tweet).innerText()
@@ -105,8 +103,8 @@ proc getBanner*(tweet: XmlNode): string =
 
 proc getPopupStats*(profile: var Profile; node: XmlNode) =
   for s in node.selectAll( ".ProfileCardStats-statLink"):
-    let text = s.getAttr("title").split(" ")[0]
-    case s.getAttr("href").split("/")[^1]
+    let text = s.attr("title").split(" ")[0]
+    case s.attr("href").split("/")[^1]
     of "followers": profile.followers = text
     of "following": profile.following = text
     else: profile.tweets = text
@@ -115,7 +113,7 @@ proc getIntentStats*(profile: var Profile; node: XmlNode) =
   profile.tweets = "?"
   for s in node.selectAll( "dd.count > a"):
     let text = s.innerText()
-    case s.getAttr("href").split("/")[^1]
+    case s.attr("href").split("/")[^1]
     of "followers": profile.followers = text
     of "following": profile.following = text
 
@@ -132,7 +130,7 @@ proc getTweetStats*(tweet: Tweet; node: XmlNode) =
 
 proc getGif(player: XmlNode): Gif =
   let
-    thumb = player.getAttr("style").replace(thumbRegex, "$1")
+    thumb = player.attr("style").replace(thumbRegex, "$1")
     id = thumb.replace(gifRegex, "$1")
     url = fmt"https://video.twimg.com/tweet_video/{id}.mp4"
   Gif(url: url, thumb: thumb)
@@ -142,28 +140,28 @@ proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
     tweet.photos.add photo.attrs["data-image-url"]
 
   let player = node.select(".PlayableMedia")
-  if player.isNil:
+  if player == nil:
     return
 
-  if "gif" in player.getAttr("class"):
+  if "gif" in player.attr("class"):
     tweet.gif = some(getGif(player.select(".PlayableMedia-player")))
-  elif "video" in player.getAttr("class"):
+  elif "video" in player.attr("class"):
     tweet.video = some(Video())
 
 proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
   let sensitive = node.select(".QuoteTweet--sensitive")
-  if not sensitive.isNil:
+  if sensitive != nil:
     quote.sensitive = true
     return
 
   let media = node.select(".QuoteMedia")
-  if not media.isNil:
+  if media != nil:
     quote.thumb = some(media.selectAttr("img", "src"))
 
   let badge = node.select(".AdaptiveMedia-badgeText")
   let gifBadge = node.select(".Icon--gifBadge")
 
-  if not badge.isNil:
+  if badge != nil:
     quote.badge = some(badge.innerText())
-  elif not gifBadge.isNil:
+  elif gifBadge != nil:
     quote.badge = some("GIF")
