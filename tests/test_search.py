@@ -1,10 +1,9 @@
 from base import BaseTestCase
+from parameterized import parameterized
 
 
 class TestSearch(BaseTestCase):
-    def test_username_search(self):
-        self.search_username('mobile_test')
-        self.assert_text('@mobile_test')
-
-        self.search_username('mobile_test_2')
-        self.assert_text('@mobile_test_2')
+    @parameterized.expand([['mobile_test'], ['mobile_test_2']])
+    def test_username_search(self, username):
+        self.search_username(username)
+        self.assert_text(f'@{username}')
