@@ -15,13 +15,11 @@
     </div>
   </div>
   <div class="profile-card-extra">
+    #if profile.bio.len > 0:
     <div class="profile-bio">
-      #if profile.bio.len > 0:
-      <div class="profile-bio">
-        <p>${linkifyText(profile.bio)}</p>
-      </div>
-      #end if
+      <p>${linkifyText(profile.bio)}</p>
     </div>
+    #end if
 
     <div class="profile-card-extra-links">
       <ul class="profile-statlist">
