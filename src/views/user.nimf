@@ -53,13 +53,6 @@
 #proc renderTimeline*(timeline: Timeline; profile: Profile; beginning: bool): string =
 #var retweets: Tweets
 <div id="tweets">
-  #if profile.protected:
-  <div class="timeline-protected">
-    <h2 class="timeline-protected-header">This account's Tweets are protected.</h2>
-    <p class="timeline-protected-explanation">Only confirmed followers have access to @${profile.username}'s Tweets.</p>
-  </div>
-  #end if
-  #
   #if not beginning:
   <div class="show-more status-el">
     <a href="/${profile.username}">Load newest tweets</a>
@@ -77,15 +70,18 @@
   <div class="show-more">
     <a href="/${profile.username}?after=${timeline.minId}">Load older tweets</a>
   </div>
-  #else:
-  <div class="timeline-protected">
+  #elif timeline.tweets.len > 0:
+  <div class="timeline-footer">
     <h2 class="timeline-end" style="text-align: center;">No more tweets.</h2>
   </div>
-  #end if
-  #
-  #if timeline.tweets.len == 0:
-  <div class="timeline-protected">
-    <h2 class="timeline-protected-header" style="text-align: center;">No tweets found.</h2>
+  #else:
+  <div class="timeline-header">
+    #if profile.protected:
+    <h2 class="timeline-protected">This account's tweets are protected.</h2>
+    <p>Only confirmed followers have access to @${profile.username}'s tweets.</p>
+    #else:
+    <h2 class="timeline-none" style="text-align: center;">No tweets found.</h2>
+    #end if
   </div>
   #end if
 </div>

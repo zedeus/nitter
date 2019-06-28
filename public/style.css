@@ -57,10 +57,6 @@ a:hover {
     display: flex;
 }
 
-.timeline-tweet {
-    border-bottom: 1px solid #3e3e35;
-}
-
 .status-body {
     flex: 1;
     min-width: 0;
@@ -592,14 +588,18 @@ nav {
     font-weight: bold;
 }
 
-.timeline-protected {
+.timeline-tweet {
+    border-bottom: 1px solid #3e3e35;
+}
+
+.timeline-footer, .timeline-header {
     max-width: 550px;
     margin: 0 auto;
     padding: 6px 0px;
 }
 
-.timeline-protected-header {
-    color: #d0564c;
+.timeline-none, .timeline-protected {
+    color: #ff6c60;
     font-size: 21px;
     font-weight: 600;
 }
