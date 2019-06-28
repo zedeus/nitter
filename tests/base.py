@@ -3,19 +3,21 @@ from seleniumbase import BaseCase
 
 class Tweet(object):
     def __init__(self, tweet=''):
-        namerow = tweet + 'div.media-heading > div > .fullname-and-username > '
+        namerow = tweet + 'div.media-heading '
         self.fullname = namerow + '.fullname'
         self.username = namerow + '.username'
-        self.date = tweet + 'div.media-heading > div > .heading-right'
-        self.text = tweet + '.status-content-wrapper > .status-content.media-body'
+        self.date = tweet + 'div.media-heading .heading-right'
+        self.text = tweet + '.status-content-wrapper .status-content.media-body'
+        self.retweet = tweet = '.retweet'
 
 
 class Profile(object):
     fullname = '.profile-card-fullname'
     username = '.profile-card-username'
-    bio = '.profile-bio'
     protected = '.protected-icon'
     verified = '.verified-icon'
+    banner = '.profile-banner'
+    bio = '.profile-bio'
 
 
 class BaseTestCase(BaseCase):
@@ -35,4 +37,4 @@ class BaseTestCase(BaseCase):
 
 
 def get_timeline_tweet(num=1):
-    return Tweet(f'#tweets > div:nth-child({num}) > div > div ')
+    return Tweet(f'#tweets > div:nth-child({num}) ')
