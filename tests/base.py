@@ -20,6 +20,14 @@ class Profile(object):
     bio = '.profile-bio'
 
 
+class Timeline(object):
+    newest = 'div[class="show-more status-el"]'
+    older = 'div[class="show-more"]'
+    end = '.timeline-end'
+    none = '.timeline-none'
+    protected = '.timeline-protected'
+
+
 class BaseTestCase(BaseCase):
     def setUp(self):
         super(BaseTestCase, self).setUp()
