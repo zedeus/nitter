@@ -1,3 +1,4 @@
 nitter
 *.html
 *.db
+tests/__pycache__
