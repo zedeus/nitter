@@ -27,18 +27,17 @@ is on implementing missing features.
 
 - "Show Thread" button
 - Twitter "Cards" (link previews)
-- Nitter link previews
 - Search (+ hashtag search)
+- Hiding retweets, showing replies, etc.
 - Emoji support (WIP, needs font)
-- Twitter polls
+- Nitter link previews
 - Server configuration
+- Caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
 - Simple account system with feed (excludes retweets)
-- Hiding retweets from timelines
+- Media-only/gallery view
 - Video support with hls.js
-- Media-only view
-- Themes
-- File caching
 - Json API endpoints
+- Themes
 - Nitter logo
 
 ## Why?

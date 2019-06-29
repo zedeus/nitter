@@ -71,6 +71,7 @@ proc parseTweet*(node: XmlNode): Tweet =
 
   result.getTweetStats(tweet)
   result.getTweetMedia(tweet)
+  result.getTweetCards(tweet)
 
   let by = tweet.selectText(".js-retweet-text > a > b")
   if by.len > 0:
@@ -136,3 +137,24 @@ proc parseVideo*(node: JsonNode): Video =
     echo "Can't parse video of type ", cType
 
   result.thumb = node["posterImage"].to(string)
+
+proc parsePoll*(node: XmlNode): Poll =
+  let
+    choices = node.selectAll(".PollXChoice-choice")
+    votes = node.selectText(".PollXChoice-footer--total")
+
+  result.votes = votes.strip().split(" ")[0]
+  result.status = node.selectText(".PollXChoice-footer--time")
+
+  for choice in choices:
+    for span in choice.select(".PollXChoice-choice--text").filterIt(it.kind != xnText):
+      if span.attr("class").len == 0:
+        result.options.add span.innerText()
+      elif "progress" in span.attr("class"):
+        result.values.add parseInt(span.innerText()[0 .. ^2])
+
+  var highest = 0
+  for i, n in result.values:
+    if n > highest:
+      highest = n
+      result.leader = i

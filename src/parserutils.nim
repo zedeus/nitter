@@ -157,3 +157,8 @@ proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
     quote.badge = some(badge.innerText())
   elif gifBadge != nil:
     quote.badge = some("GIF")
+
+proc getTweetCards*(tweet: Tweet; node: XmlNode) =
+  if node.attr("data-has-cards") == "false": return
+  if "poll" in node.attr("data-card2-type"):
+    tweet.poll = some(Poll())

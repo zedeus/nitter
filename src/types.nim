@@ -47,6 +47,13 @@ type
     url*: string
     thumb*: string
 
+  Poll* = object
+    options*: seq[string]
+    values*: seq[int]
+    votes*: string
+    status*: string
+    leader*: int
+
   Quote* = object
     id*: string
     profile*: Profile
@@ -73,6 +80,7 @@ type
     gif*: Option[Gif]
     video*: Option[Video]
     photos*: seq[string]
+    poll*: Option[Poll]
     available*: bool
 
   Tweets* = seq[Tweet]

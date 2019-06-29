@@ -6,7 +6,9 @@ import ./types, ./parser, ./parserutils
 
 const
   agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+  lang = "en-US,en;q=0.9"
   auth = "Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"
+  cardAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
 
   base = parseUri("https://twitter.com/")
   apiBase = parseUri("https://api.twitter.com/1.1/")
@@ -19,6 +21,8 @@ const
   tweetUrl = "status"
   videoUrl = "videos/tweet/config/$1.json"
   tokenUrl = "guest/activate.json"
+  cardUrl = "i/cards/tfw/v1/$1"
+  pollUrl = cardUrl & "?cardname=poll2choice_text_only&lang=en"
 
 var
   guestToken = ""
@@ -75,7 +79,7 @@ proc getGuestToken(force=false): Future[string] {.async.} =
   newClient()
 
   let
-    url = apibase / tokenUrl
+    url = apiBase / tokenUrl
     json = parseJson(await client.postContent($url))
 
   result = json["guest_token"].to(string)
@@ -86,7 +90,7 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
 
   let headers = newHttpHeaders({
     "Accept": "application/json, text/javascript, */*; q=0.01",
-    "Referer": tweet.link,
+    "Referer": $(base / tweet.link),
     "User-Agent": agent,
     "Authorization": auth,
     "x-guest-token": token
@@ -129,11 +133,38 @@ proc getConversationVideos*(convo: Conversation) {.async.} =
 
   await all(futs)
 
-proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile] {.async.} =
-  let
-    url = base / profileIntentUrl ? {"screen_name": username}
-    html = await fetchHtml(url, headers)
+proc getPoll*(tweet: Tweet) {.async.} =
+  if tweet.poll.isNone(): return
 
+  let headers = newHttpHeaders({
+    "Accept": cardAccept,
+    "Referer": $(base / tweet.link),
+    "User-Agent": agent,
+    "Authority": "twitter.com",
+    "Accept-Language": lang,
+  })
+
+  let url = base / (pollUrl % tweet.id)
+  let html = await fetchHtml(url, headers)
+  if html == nil: return
+
+  tweet.poll = some(parsePoll(html))
+
+proc getPolls*(tweets: Tweets) {.async.} =
+  var polls = tweets.filterIt(it.poll.isSome)
+  await all(polls.map(getPoll))
+
+proc getConversationPolls*(convo: Conversation) {.async.} =
+  var futs: seq[Future[void]]
+  futs.add getPoll(convo.tweet)
+  futs.add getPolls(convo.before)
+  futs.add getPolls(convo.after)
+  futs.add convo.replies.map(getPolls)
+  await all(futs)
+
+proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile] {.async.} =
+  let url = base / profileIntentUrl ? {"screen_name": username}
+  let html = await fetchHtml(url, headers)
   if html == nil: return Profile()
 
   result = parseIntentProfile(html)
@@ -145,7 +176,7 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
     "User-Agent": agent,
     "X-Twitter-Active-User": "yes",
     "X-Requested-With": "XMLHttpRequest",
-    "Accept-Language": "en-US,en;q=0.9"
+    "Accept-Language": lang
   })
 
   let
@@ -171,7 +202,7 @@ proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
     "User-Agent": agent,
     "X-Twitter-Active-User": "yes",
     "X-Requested-With": "XMLHttpRequest",
-    "Accept-Language": "en-US,en;q=0.9"
+    "Accept-Language": lang
   })
 
   var url = timelineUrl % username
@@ -194,7 +225,10 @@ proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
   let html = parseHtml(json["items_html"].to(string))
 
   result.tweets = parseTweets(html)
-  await getVideos(result.tweets)
+
+  let vidsFut = getVideos(result.tweets)
+  let pollFut = getPolls(result.tweets)
+  await all(vidsFut, pollFut)
 
 proc getTweet*(username: string; id: string): Future[Conversation] {.async.} =
   let headers = newHttpHeaders({
@@ -203,7 +237,7 @@ proc getTweet*(username: string; id: string): Future[Conversation] {.async.} =
     "User-Agent": agent,
     "X-Twitter-Active-User": "yes",
     "X-Requested-With": "XMLHttpRequest",
-    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Language": lang,
     "pragma": "no-cache",
     "x-previous-page-name": "profile"
   })
@@ -215,4 +249,7 @@ proc getTweet*(username: string; id: string): Future[Conversation] {.async.} =
   if html == nil: return
 
   result = parseConversation(html)
-  await getConversationVideos(result)
+
+  let vidsFut = getConversationVideos(result)
+  let pollFut = getConversationPolls(result)
+  await all(vidsFut, pollFut)

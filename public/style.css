@@ -742,3 +742,39 @@ video {
     padding-bottom: 5px;
     margin: 0;
 }
+
+.poll-meter {
+    overflow: hidden;
+    position: relative;
+    margin: 6px 0;
+    height: 26px;
+    background: #0f0f0f;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.poll-choice-bar {
+    height: 100%;
+    position: absolute;
+    background: #383838;
+}
+
+.leader .poll-choice-bar {
+    background: #8a3731;
+}
+
+.poll-choice-value {
+    position: relative;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-right: 6px;
+}
+
+.poll-choice-option {
+    position: relative;
+}
+
+.poll-info {
+    color: #868687;
+}

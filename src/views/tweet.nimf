@@ -118,6 +118,20 @@
 </div>
 #end proc
 #
+#proc renderPoll(poll: Poll): string =
+<div class="poll">
+  #for i in 0 ..< poll.options.len:
+  #let leader = if poll.leader == i: " leader" else: ""
+  <div class="poll-meter${leader}">
+    <span class="poll-choice-bar" style="width: ${poll.values[i]}%"></span>
+    <span class="poll-choice-value">${poll.values[i]}%</span>
+    <span class="poll-choice-option">${poll.options[i]}</span>
+  </div>
+  #end for
+  <span class="poll-info">${poll.votes} votes • ${poll.status}</span>
+</div>
+#end proc
+#
 #proc renderStats(tweet: Tweet): string =
 <div class="tweet-stats">
   <span class="tweet-stat">💬 ${$tweet.replies}</span>
@@ -146,6 +160,8 @@
     ${renderGif(tweet.gif.get())}
     #elif tweet.quote.isSome:
     ${renderQuote(tweet.quote.get())}
+    #elif tweet.poll.isSome:
+     ${renderPoll(tweet.poll.get())}
     #end if
     ${renderStats(tweet)}
   </div>
