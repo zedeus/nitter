@@ -28,6 +28,14 @@ class Timeline(object):
     protected = '.timeline-protected'
 
 
+class Poll(object):
+    votes = '.poll-info'
+    choice = '.poll-meter'
+    value = 'poll-choice-value'
+    option = 'poll-choice-option'
+    leader = 'leader'
+
+
 class BaseTestCase(BaseCase):
     def setUp(self):
         super(BaseTestCase, self).setUp()

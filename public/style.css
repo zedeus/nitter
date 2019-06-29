@@ -769,6 +769,8 @@ video {
     font-weight: bold;
     margin-left: 5px;
     margin-right: 6px;
+    min-width: 30px;
+    text-align: right;
 }
 
 .poll-choice-option {
