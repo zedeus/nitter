@@ -32,15 +32,15 @@ db("cache.db", "", "", ""):
 
 type
   VideoType* = enum
-    vmap, m3u8
+    vmap, m3u8, mp4
 
   Video* = object
-    contentType*: VideoType
+    contentId*: string
+    playbackType*: VideoType
+    durationMs*: int
     url*: string
     thumb*: string
-    id*: string
     views*: string
-    length*: int
     available*: bool
 
   Gif* = object

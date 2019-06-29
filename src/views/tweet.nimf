@@ -88,12 +88,19 @@
 #
 #proc renderVideo(video: Video): string =
 <div class="attachments">
-  <div class="gallery-row" style="max-height: unset;">
-    <div class="attachment image">
+  <div class="gallery-video">
+    <div class="attachment video-container">
+    #case video.playbackType
+    #of mp4:
+    <video poster=${video.thumb.getSigUrl("pic")} controls>
+      <source src=${video.url.getSigUrl("video")} type="video/mp4">
+    </video>
+    #of m3u8, vmap:
     <video poster=${video.thumb.getSigUrl("pic")} autoplay muted loop></video>
     <div class="video-overlay">
       <p>Video playback not supported</p>
     </div>
+    #end case
     </div>
   </div>
 </div>

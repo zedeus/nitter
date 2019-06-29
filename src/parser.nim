@@ -111,26 +111,28 @@ proc parseConversation*(node: XmlNode): Conversation =
       result.replies.add parseTweets(thread)
 
 proc parseVideo*(node: JsonNode): Video =
-  let track = node{"track"}
-  let contentType = track["contentType"].to(string)
+  let
+    track = node{"track"}
+    cType = track["contentType"].to(string)
+    pType = track["playbackType"].to(string)
 
-  case contentType
+  case cType
   of "media_entity":
     result = Video(
-      contentType: m3u8,
-      thumb: node["posterImage"].to(string),
-      id: track["contentId"].to(string),
-      length: track["durationMs"].to(int),
+      playbackType: if "mp4" in pType: mp4 else: m3u8,
+      contentId: track["contentId"].to(string),
+      durationMs: track["durationMs"].to(int),
       views: track["viewCount"].to(string),
       url: track["playbackUrl"].to(string),
       available: track{"mediaAvailability"}["status"].to(string) == "available"
     )
   of "vmap":
     result = Video(
-      contentType: vmap,
-      thumb: node["posterImage"].to(string),
-      url: track["vmapUrl"].to(string),
-      length: track["durationMs"].to(int),
+      playbackType: vmap,
+      durationMs: track["durationMs"].to(int),
+      url: track["vmapUrl"].to(string)
     )
   else:
-    echo "Can't parse video of type ", contentType
+    echo "Can't parse video of type ", cType
+
+  result.thumb = node["posterImage"].to(string)
