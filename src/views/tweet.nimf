@@ -108,8 +108,8 @@
 #
 #proc renderGif(gif: Gif): string =
 <div class="attachments media-gif">
-  <div class="gallery-row" style="max-height: unset;">
-    <div class="attachment image">
+  <div class="gallery-gif" style="max-height: unset;">
+    <div class="attachment">
       <video class="gif" poster=${gif.thumb.getSigUrl("pic")} autoplay muted loop>
         <source src=${gif.url.getSigUrl("video")} type="video/mp4">
       </video>
