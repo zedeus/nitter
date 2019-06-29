@@ -18,11 +18,6 @@ proc select*(node: XmlNode; selector: string): XmlNode =
   let nodes = node.selectAll(selector)
   if nodes.len > 0: nodes[0] else: nil
 
-proc select*(node: XmlNode; parent, child: string): XmlNode =
-  let parentNode = node.select(parent)
-  if parentNode == nil: return
-  result = parentNode.select(child)
-
 proc selectAttr*(node: XmlNode; selector: string; attr: string): string =
   let res = node.select(selector)
   if res == nil: "" else: res.attr(attr)
@@ -39,10 +34,10 @@ proc getHeader(profile: XmlNode): XmlNode =
     result = profile.select(".ProfileCard-userFields")
 
 proc isVerified*(profile: XmlNode): bool =
-  getHeader(profile).selectText(".Icon.Icon--verified").len > 0
+  getHeader(profile).select(".Icon.Icon--verified") != nil
 
 proc isProtected*(profile: XmlNode): bool =
-  getHeader(profile).selectText(".Icon.Icon--protected").len > 0
+  getHeader(profile).select(".Icon.Icon--protected") != nil
 
 proc getName*(profile: XmlNode; selector: string): string =
   profile.selectText(selector).stripText()
@@ -92,7 +87,6 @@ proc getAvatar*(profile: XmlNode; selector: string): string =
 
 proc getBanner*(tweet: XmlNode): string =
   let url = tweet.selectAttr("svg > image", "xlink:href")
-
   if url.len > 0:
     result = url.replace("600x200", "1500x500")
   else:

@@ -81,26 +81,34 @@ proc parseTweet*(node: XmlNode): Tweet =
   if quote != nil:
     result.quote = some(parseQuote(quote))
 
-proc parseTweets*(node: XmlNode): Tweets =
-  if node == nil or node.kind == xnText: return
-  for n in node.selectAll(".stream-item"):
-    if "account" notin n.child("div").attr("class"):
+proc parseTweets*(nodes: XmlNode): Tweets =
+  if nodes == nil: return
+  for n in nodes.filterIt(it.kind != xnText):
+    let class = n.attr("class").toLower()
+    if "tombstone" in class or "unavailable" in class:
+      result.add Tweet()
+    elif "morereplies" notin class:
       result.add parseTweet(n)
 
 proc parseConversation*(node: XmlNode): Conversation =
   result = Conversation(
     tweet:  parseTweet(node.select(".permalink-tweet-container")),
-    before: parseTweets(node.select(".in-reply-to"))
+    before: parseTweets(node.select(".in-reply-to .stream-items"))
   )
 
-  let replies = node.select(".replies-to", ".stream-items")
+  let replies = node.select(".replies-to .stream-items")
   if replies == nil: return
 
   for reply in replies.filterIt(it.kind != xnText):
-    if "selfThread" in reply.attr("class"):
-      result.after = parseTweets(reply.select(".stream-items"))
-    else:
+    let class = reply.attr("class").toLower()
+    let thread = reply.select(".stream-items")
+
+    if "self" in class:
+      result.after = parseTweets(thread)
+    elif "lone" in class:
       result.replies.add parseTweets(reply)
+    else:
+      result.replies.add parseTweets(thread)
 
 proc parseVideo*(node: JsonNode): Video =
   let track = node{"track"}
