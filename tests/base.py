@@ -36,6 +36,14 @@ class Poll(object):
     leader = 'leader'
 
 
+class Media(object):
+    container = '.attachments'
+    row = '.gallery-row'
+    image = '.still-image'
+    video = '.gallery-video'
+    gif = '.gallery-gif'
+
+
 class BaseTestCase(BaseCase):
     def setUp(self):
         super(BaseTestCase, self).setUp()
