@@ -28,6 +28,16 @@ class Timeline(object):
     protected = '.timeline-protected'
 
 
+class Conversation(object):
+    main = '.main-tweet'
+    before = '.before-tweet'
+    after = '.after-tweet'
+    replies = '.replies'
+    thread = '.reply'
+    tweet = '.status-el'
+    tweet_text = '.status-content'
+
+
 class Poll(object):
     votes = '.poll-info'
     choice = '.poll-meter'
