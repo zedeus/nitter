@@ -123,8 +123,12 @@ proc parseTweetStats*(node: XmlNode): TweetStats =
 proc parseTweetReply*(node: XmlNode): seq[string] =
   let reply = node.select(".ReplyingToContextBelowAuthor")
   if reply == nil: return
-  for username in reply.selectAll("a"):
-    result.add username.selectText("b")
+
+  let selector = if "Quote" in node.attr("class"): "b"
+                 else: "a b"
+
+  for username in reply.selectAll(selector):
+    result.add username.innerText()
 
 proc getGif(player: XmlNode): Gif =
   let
