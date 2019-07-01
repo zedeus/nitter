@@ -73,8 +73,10 @@ proc parseTweet*(node: XmlNode): Tweet =
 
   let by = tweet.selectText(".js-retweet-text > a > b")
   if by.len > 0:
-    result.retweetBy = some(by.stripText())
-    result.retweetId = some(tweet.attr("data-retweet-id"))
+    result.retweet = some(Retweet(
+      by: stripText(by),
+      id: tweet.attr("data-retweet-id")
+    ))
 
   let quote = tweet.select(".QuoteTweet-innerContainer")
   if quote != nil:

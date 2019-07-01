@@ -3,9 +3,9 @@
 #import ../types, ../formatters, ../utils
 #
 #proc renderHeading(tweet: Tweet): string =
-#if tweet.retweetBy.isSome:
+#if tweet.retweet.isSome:
   <div class="retweet">
-    <span>🔄 ${tweet.retweetBy.get()} retweeted</span>
+    <span>🔄 ${get(tweet.retweet).by} retweeted</span>
   </div>
 #end if
 #if tweet.pinned:

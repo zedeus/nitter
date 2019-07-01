@@ -61,7 +61,7 @@
   #
   #for tweet in timeline.tweets:
   #if tweet.id in retweets: continue
-  #elif tweet.retweetBy.isSome: retweets.add tweet.id
+  #elif tweet.retweet.isSome: retweets.add tweet.id
   #end if
   ${renderTweet(tweet, "timeline-tweet")}
   #end for

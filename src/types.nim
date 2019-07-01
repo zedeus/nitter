@@ -62,6 +62,10 @@ type
     thumb*: Option[string]
     badge*: Option[string]
 
+  Retweet* = object
+    by*: string
+    id*: string
+
   Tweet* = ref object
     id*: string
     profile*: Profile
@@ -72,9 +76,8 @@ type
     retweets*: string
     likes*: string
     pinned*: bool
+    retweet*: Option[Retweet]
     quote*: Option[Quote]
-    retweetBy*: Option[string]
-    retweetId*: Option[string]
     gif*: Option[Gif]
     video*: Option[Video]
     photos*: seq[string]
