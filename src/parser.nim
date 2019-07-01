@@ -63,11 +63,11 @@ proc parseTweet*(node: XmlNode): Tweet =
     time:      getTimestamp(tweet),
     shortTime: getShortTime(tweet),
     profile:   parseTweetProfile(tweet),
+    stats:     parseTweetStats(tweet),
     pinned:    "pinned" in tweet.attr("class"),
     available: true
   )
 
-  result.getTweetStats(tweet)
   result.getTweetMedia(tweet)
   result.getTweetCards(tweet)
 

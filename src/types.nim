@@ -66,23 +66,26 @@ type
     by*: string
     id*: string
 
+  TweetStats* = object
+    replies*: string
+    retweets*: string
+    likes*: string
+
   Tweet* = ref object
     id*: string
     profile*: Profile
     text*: string
     time*: Time
     shortTime*: string
-    replies*: string
-    retweets*: string
-    likes*: string
+    available*: bool
     pinned*: bool
+    stats*: TweetStats
     retweet*: Option[Retweet]
     quote*: Option[Quote]
     gif*: Option[Gif]
     video*: Option[Video]
     photos*: seq[string]
     poll*: Option[Poll]
-    available*: bool
 
   Thread* = object
     tweets*: seq[Tweet]

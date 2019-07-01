@@ -132,11 +132,11 @@
 </div>
 #end proc
 #
-#proc renderStats(tweet: Tweet): string =
+#proc renderStats(stats: TweetStats): string =
 <div class="tweet-stats">
-  <span class="tweet-stat">💬 ${$tweet.replies}</span>
-  <span class="tweet-stat">🔄 ${$tweet.retweets}</span>
-  <span class="tweet-stat">👍 ${$tweet.likes}</span>
+  <span class="tweet-stat">💬 ${$stats.replies}</span>
+  <span class="tweet-stat">🔄 ${$stats.retweets}</span>
+  <span class="tweet-stat">👍 ${$stats.likes}</span>
 </div>
 #end proc
 #
@@ -163,7 +163,7 @@
     #elif tweet.poll.isSome:
      ${renderPoll(tweet.poll.get())}
     #end if
-    ${renderStats(tweet)}
+    ${renderStats(tweet.stats)}
   </div>
 </div>
 #else:

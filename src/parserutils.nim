@@ -111,16 +111,14 @@ proc getIntentStats*(profile: var Profile; node: XmlNode) =
     of "followers": profile.followers = text
     of "following": profile.following = text
 
-proc getTweetStats*(tweet: Tweet; node: XmlNode) =
-  tweet.replies = "0"
-  tweet.retweets = "0"
-  tweet.likes = "0"
+proc parseTweetStats*(node: XmlNode): TweetStats =
+  result = TweetStats(replies: "0", retweets: "0", likes: "0")
   for action in node.selectAll(".ProfileTweet-actionCountForAria"):
     let text = action.innerText.split()
     case text[1][0 .. 2]
-    of "ret": tweet.retweets = text[0]
-    of "rep": tweet.replies = text[0]
-    of "lik": tweet.likes = text[0]
+    of "ret": result.retweets = text[0]
+    of "rep": result.replies = text[0]
+    of "lik": result.likes = text[0]
 
 proc getGif(player: XmlNode): Gif =
   let
