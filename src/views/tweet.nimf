@@ -1,5 +1,5 @@
 #? stdtmpl(subsChar = '$', metaChar = '#')
-#import xmltree, strutils, times, sequtils, uri
+#import xmltree, strutils, strformat, sequtils, times, uri
 #import ../types, ../formatters, ../utils
 #
 #proc renderHeading(tweet: Tweet): string =
@@ -25,38 +25,6 @@
     <span class="heading-right">
       <a href="${getLink(tweet)}" title="${tweet.getTime()}">${tweet.shortTime}</a>
     </span>
-  </div>
-</div>
-#end proc
-#
-#proc renderQuote(quote: Quote): string =
-#let hasMedia = quote.thumb.isSome() or quote.sensitive
-<div class="quote">
-  <div class="quote-container">
-    <a class="quote-link" href="${getLink(quote)}"></a>
-    #if hasMedia:
-    <div class="quote-media-container">
-      <div class="quote-media">
-        #if quote.thumb.isSome():
-        ${genImg(quote.thumb.get())}
-        #if quote.badge.isSome():
-        <div class="quote-badge">
-          <div class="quote-badge-text">${quote.badge.get()}</div>
-        </div>
-        #end if
-        #elif quote.sensitive:
-        <div class="quote-sensitive">
-          <span class="icon quote-sensitive-icon">❗</span>
-        </div>
-        #end if
-      </div>
-    </div>
-    #end if
-    <div class="fullname-and-username">
-      ${linkUser(quote.profile, class="fullname")}
-      ${linkUser(quote.profile, class="username")}
-    </div>
-    <div class="quote-text">${linkifyText(quote.text)}</div>
   </div>
 </div>
 #end proc
@@ -140,6 +108,53 @@
 </div>
 #end proc
 #
+#proc renderShowThread(tweet: Tweet | Quote): string =
+<a href="${getLink(tweet)}">Show this thread</a>
+#end proc
+#
+#proc renderReply(tweet: Tweet | Quote): string =
+#let usernames = tweet.reply.mapIt(&"""<a href="{it}">@{it}</a>""")
+<div class="replying-to">Replying to ${usernames.join(" ")}</div>
+#end proc
+#
+#proc renderQuote(quote: Quote): string =
+#let hasMedia = quote.thumb.len > 0 or quote.sensitive
+<div class="quote">
+  <div class="quote-container">
+    <a class="quote-link" href="${getLink(quote)}"></a>
+    #if hasMedia:
+    <div class="quote-media-container">
+      <div class="quote-media">
+        #if quote.thumb.len > 0:
+        ${genImg(quote.thumb)}
+        #if quote.badge.len > 0:
+        <div class="quote-badge">
+          <div class="quote-badge-text">${quote.badge}</div>
+        </div>
+        #end if
+        #elif quote.sensitive:
+        <div class="quote-sensitive">
+          <span class="icon quote-sensitive-icon">❗</span>
+        </div>
+        #end if
+      </div>
+    </div>
+    #end if
+    <div class="fullname-and-username">
+      ${linkUser(quote.profile, class="fullname")}
+      ${linkUser(quote.profile, class="username")}
+    </div>
+    #if quote.reply.len > 0:
+    ${renderReply(quote)}
+    #end if
+    <div class="quote-text">${linkifyText(quote.text)}</div>
+    #if quote.hasThread:
+    ${renderShowThread(quote)}
+    #end if
+  </div>
+</div>
+#end proc
+#
 #proc renderTweet*(tweet: Tweet; class=""; last=false): string =
 #var divClass = if last: "thread-last " & class else: class
 #if divClass.len > 0:
@@ -149,6 +164,9 @@
 <div class="status-el">
   <div class="status-body">
     ${renderHeading(tweet)}
+    #if tweet.reply.len > 0:
+    ${renderReply(tweet)}
+    #end if
     <div class="status-content-wrapper">
       <div class="status-content media-body">${linkifyText(tweet.text)}</div>
     </div>
@@ -161,9 +179,12 @@
     #elif tweet.quote.isSome:
     ${renderQuote(tweet.quote.get())}
     #elif tweet.poll.isSome:
-     ${renderPoll(tweet.poll.get())}
+    ${renderPoll(tweet.poll.get())}
     #end if
     ${renderStats(tweet.stats)}
+    #if tweet.hasThread and "timeline" in class:
+    ${renderShowThread(tweet)}
+    #end if
   </div>
 </div>
 #else:

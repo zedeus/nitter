@@ -58,9 +58,11 @@ type
     id*: string
     profile*: Profile
     text*: string
+    reply*: seq[string]
+    hasThread*: bool
     sensitive*: bool
-    thumb*: Option[string]
-    badge*: Option[string]
+    thumb*: string
+    badge*: string
 
   Retweet* = object
     by*: string
@@ -77,8 +79,10 @@ type
     text*: string
     time*: Time
     shortTime*: string
-    available*: bool
+    reply*: seq[string]
     pinned*: bool
+    available*: bool
+    hasThread*: bool
     stats*: TweetStats
     retweet*: Option[Retweet]
     quote*: Option[Quote]

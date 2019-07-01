@@ -120,11 +120,17 @@ proc parseTweetStats*(node: XmlNode): TweetStats =
     of "rep": result.replies = text[0]
     of "lik": result.likes = text[0]
 
+proc parseTweetReply*(node: XmlNode): seq[string] =
+  let reply = node.select(".ReplyingToContextBelowAuthor")
+  if reply == nil: return
+  for username in reply.selectAll("a"):
+    result.add username.selectText("b")
+
 proc getGif(player: XmlNode): Gif =
   let
     thumb = player.attr("style").replace(thumbRegex, "$1")
     id = thumb.replace(gifRegex, "$1")
-    url = fmt"https://video.twimg.com/tweet_video/{id}.mp4"
+    url = &"https://video.twimg.com/tweet_video/{id}.mp4"
   Gif(url: url, thumb: thumb)
 
 proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
@@ -146,15 +152,15 @@ proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
 
   let media = node.select(".QuoteMedia")
   if media != nil:
-    quote.thumb = some(media.selectAttr("img", "src"))
+    quote.thumb = media.selectAttr("img", "src")
 
   let badge = node.select(".AdaptiveMedia-badgeText")
   let gifBadge = node.select(".Icon--gifBadge")
 
   if badge != nil:
-    quote.badge = some(badge.innerText())
+    quote.badge = badge.innerText()
   elif gifBadge != nil:
-    quote.badge = some("GIF")
+    quote.badge = "GIF"
 
 proc getTweetCards*(tweet: Tweet; node: XmlNode) =
   if node.attr("data-has-cards") == "false": return

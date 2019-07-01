@@ -138,6 +138,11 @@ a:hover {
     margin-left: 4px;
 }
 
+.replying-to {
+    color: hsla(240,1%,73%,.7);
+    margin: 4px 0;
+}
+
 .status-el .status-content {
     font-family: sans-serif;
     line-height: 1.4em;

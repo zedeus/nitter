@@ -41,8 +41,10 @@ proc parseTweetProfile*(profile: XmlNode): Profile =
 
 proc parseQuote*(quote: XmlNode): Quote =
   result = Quote(
-    id:   quote.attr("data-item-id"),
-    text: getQuoteText(quote)
+    id:    quote.attr("data-item-id"),
+    text:  getQuoteText(quote),
+    reply: parseTweetReply(quote),
+    hasThread: quote.select(".self-thread-context") != nil,
   )
 
   result.profile = Profile(
@@ -64,6 +66,8 @@ proc parseTweet*(node: XmlNode): Tweet =
     shortTime: getShortTime(tweet),
     profile:   parseTweetProfile(tweet),
     stats:     parseTweetStats(tweet),
+    reply:     parseTweetReply(tweet),
+    hasThread: tweet.select(".self-thread-context") != nil,
     pinned:    "pinned" in tweet.attr("class"),
     available: true
   )
