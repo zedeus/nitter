@@ -23,7 +23,7 @@
       ${linkUser(tweet.profile, class="username")}
     </div>
     <span class="heading-right">
-      <a href="${tweet.link}" title="${tweet.getTime()}">${tweet.shortTime}</a>
+      <a href="${getLink(tweet)}" title="${tweet.getTime()}">${tweet.shortTime}</a>
     </span>
   </div>
 </div>
@@ -33,7 +33,7 @@
 #let hasMedia = quote.thumb.isSome() or quote.sensitive
 <div class="quote">
   <div class="quote-container">
-    <a class="quote-link" href="${quote.link}"></a>
+    <a class="quote-link" href="${getLink(quote)}"></a>
     #if hasMedia:
     <div class="quote-media-container">
       <div class="quote-media">

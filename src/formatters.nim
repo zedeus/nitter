@@ -94,3 +94,6 @@ proc pageTitle*(page: string): string =
 
 proc getTime*(tweet: Tweet): string =
   tweet.time.format("d/M/yyyy', ' HH:mm:ss")
+
+proc getLink*(tweet: Tweet | Quote): string =
+  &"{tweet.profile.username}/status/{tweet.id}"

@@ -42,7 +42,6 @@ proc parseTweetProfile*(profile: XmlNode): Profile =
 proc parseQuote*(quote: XmlNode): Quote =
   result = Quote(
     id:   quote.attr("data-item-id"),
-    link: quote.attr("href"),
     text: getQuoteText(quote)
   )
 
@@ -60,7 +59,6 @@ proc parseTweet*(node: XmlNode): Tweet =
 
   result = Tweet(
     id:        tweet.attr("data-item-id"),
-    link:      tweet.attr("data-permalink-path"),
     text:      getTweetText(tweet),
     time:      getTimestamp(tweet),
     shortTime: getShortTime(tweet),

@@ -2,7 +2,7 @@ import httpclient, asyncdispatch, htmlparser, times
 import sequtils, strutils, strformat, json, xmltree, uri
 import regex
 
-import ./types, ./parser, ./parserutils
+import ./types, ./parser, ./parserutils, ./formatters
 
 const
   agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
@@ -90,7 +90,7 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
 
   let headers = newHttpHeaders({
     "Accept": "application/json, text/javascript, */*; q=0.01",
-    "Referer": $(base / tweet.link),
+    "Referer": $(base / getLink(tweet)),
     "User-Agent": agent,
     "Authorization": auth,
     "x-guest-token": token
@@ -138,7 +138,7 @@ proc getPoll*(tweet: Tweet) {.async.} =
 
   let headers = newHttpHeaders({
     "Accept": cardAccept,
-    "Referer": $(base / tweet.link),
+    "Referer": $(base / getLink(tweet)),
     "User-Agent": agent,
     "Authority": "twitter.com",
     "Accept-Language": lang,

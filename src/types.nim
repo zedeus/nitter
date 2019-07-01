@@ -57,7 +57,6 @@ type
   Quote* = object
     id*: string
     profile*: Profile
-    link*: string
     text*: string
     sensitive*: bool
     thumb*: Option[string]
@@ -66,7 +65,6 @@ type
   Tweet* = ref object
     id*: string
     profile*: Profile
-    link*: string
     text*: string
     time*: Time
     shortTime*: string
