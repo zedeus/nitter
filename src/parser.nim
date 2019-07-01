@@ -102,11 +102,11 @@ proc parseConversation*(node: XmlNode): Conversation =
   let replies = node.select(".replies-to .stream-items")
   if replies == nil: return
 
-  for reply in replies.filterIt(it.kind != xnText):
+  for i, reply in replies.filterIt(it.kind != xnText):
     let class = reply.attr("class").toLower()
     let thread = reply.select(".stream-items")
 
-    if "self" in class:
+    if i == 0 and "self" in class:
       result.after = parseThread(thread)
     elif "lone" in class:
       result.replies.add parseThread(reply)
