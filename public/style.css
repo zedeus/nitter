@@ -67,7 +67,7 @@ a:hover {
     padding: 0;
     vertical-align: bottom;
     flex-basis: 100%;
-    margin-bottom: .5em;
+    margin-bottom: .2em;
 }
 
 .media-heading a {
@@ -200,7 +200,7 @@ nav {
 }
 
 .attachments {
-    margin-top: .5em;
+    margin-top: .35em;
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -257,7 +257,7 @@ video {
 }
 
 .media-gif {
-    display: table-cell;
+    display: inline-block;
     background-color: unset;
 }
 
@@ -292,6 +292,15 @@ video {
     max-height: 379.5px;
     border-color: #222;
     flex-basis: 300px;
+}
+
+.image {
+    display: inline-block;
+}
+
+.single-image {
+    display: inline-block;
+    width: unset;
 }
 
 .avatar {

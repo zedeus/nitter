@@ -63,9 +63,9 @@
 #
 #proc renderMediaGroup(tweet: Tweet): string =
 #let groups = if tweet.photos.len > 2: tweet.photos.distribute(2) else: @[tweet.photos]
-#let display = if groups.len == 1 and groups[0].len == 1: "display: table-cell;" else: ""
+#let class = if groups.len == 1 and groups[0].len == 1: "single-image" else: ""
 #var first = true
-<div class="attachments" style="${display}">
+<div class="attachments ${class}">
 #for photos in groups:
   #let margin = if not first: "margin-top: .25em;" else: ""
   #let flex = if photos.len > 1 or groups.len > 1: "display: flex;" else: ""
