@@ -27,13 +27,13 @@ is on implementing missing features.
 
 - "Show Thread" button
 - Twitter "Cards" (link previews)
-- Search (+ hashtag search)
+- Search (images/videos, hashtags, etc.)
 - Hiding retweets, showing replies, etc.
 - Emoji support (WIP, needs font)
 - Nitter link previews
 - Server configuration
 - Caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
-- Simple account system with feed (excludes retweets)
+- Simple account system with customizable feed
 - Media-only/gallery view
 - Video support with hls.js
 - Json API endpoints
@@ -48,9 +48,11 @@ and aesthetically. For privacy-minded folks, preventing JavaScript analytics and
 potential IP-based tracking is important, but apart from using the legacy mobile
 version and a VPN, it's impossible. Using an instance of Nitter (hosted on a VPS
 for example), you can essentially browse Twitter without JavaScript, while
-retaining your privacy. In the future a simple account system will be added that
-lets you follow Twitter users, allowing you to have a clean chronological
-timeline without needing a Twitter account.
+retaining your privacy. In addition to respecting your privacy, Nitter is on
+average around 15 times lighter than Twitter, and in some cases serves pages
+faster. In the future a simple account system will be added that lets you follow
+Twitter users, allowing you to have a clean chronological timeline without
+needing a Twitter account.
 
 ## Screenshot
 
