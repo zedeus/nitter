@@ -51,7 +51,7 @@
 #end proc
 #
 #proc renderTimeline*(timeline: Timeline; profile: Profile; beginning: bool): string =
-#var retweets: seq[Tweet]
+#var retweets: seq[string]
 <div id="tweets">
   #if not beginning:
   <div class="show-more status-el">
@@ -60,8 +60,8 @@
   #end if
   #
   #for tweet in timeline.tweets:
-  #if tweet in retweets: continue
-  #elif tweet.retweetBy.isSome: retweets.add tweet
+  #if tweet.id in retweets: continue
+  #elif tweet.retweetBy.isSome: retweets.add tweet.id
   #end if
   ${renderTweet(tweet, "timeline-tweet")}
   #end for
