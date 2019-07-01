@@ -106,8 +106,8 @@
   <div class="main-thread">
     #if conversation.before.tweets.len > 0:
     <div class="before-tweet thread-line">
-      #for tweet in conversation.before.tweets:
-      ${renderTweet(tweet)}
+      #for i, tweet in conversation.before.tweets:
+        ${renderTweet(tweet, first=(i == 0))}
       #end for
     </div>
     #end if
@@ -118,7 +118,7 @@
     #if conversation.after.tweets.len > 0:
     <div class="after-tweet thread-line">
       #for i, tweet in conversation.after.tweets:
-      ${renderTweet(tweet, last=(i == conversation.after.tweets.high))}
+      ${renderTweet(tweet, first=(i == 0), last=(i == conversation.after.tweets.high))}
       #end for
     </div>
     #end if
@@ -128,7 +128,8 @@
     #for thread in conversation.replies:
     <div class="reply thread thread-line">
       #for i, tweet in thread.tweets:
-      ${renderTweet(tweet, last=(i == thread.tweets.high and thread.more == 0))}
+      #let last = (i == thread.tweets.high and thread.more == 0)
+      ${renderTweet(tweet, first=(i == 0), last=last)}
       #end for
       #if thread.more != 0:
       #let num = if thread.more != -1: $thread.more & " " else: ""

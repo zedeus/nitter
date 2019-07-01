@@ -155,7 +155,7 @@
 </div>
 #end proc
 #
-#proc renderTweet*(tweet: Tweet; class=""; last=false): string =
+#proc renderTweet*(tweet: Tweet; class=""; first=true; last=false): string =
 #var divClass = if last: "thread-last " & class else: class
 #if divClass.len > 0:
 <div class="${divClass}">
@@ -164,7 +164,7 @@
 <div class="status-el">
   <div class="status-body">
     ${renderHeading(tweet)}
-    #if tweet.reply.len > 0:
+    #if first and tweet.reply.len > 0:
     ${renderReply(tweet)}
     #end if
     <div class="status-content-wrapper">
