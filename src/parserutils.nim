@@ -162,3 +162,10 @@ proc getTweetCards*(tweet: Tweet; node: XmlNode) =
   if node.attr("data-has-cards") == "false": return
   if "poll" in node.attr("data-card2-type"):
     tweet.poll = some(Poll())
+
+proc getMoreReplies*(node: XmlNode): int =
+  let text = node.innerText().strip()
+  try:
+    result = parseInt(text.split(" ")[0])
+  except:
+    result = -1

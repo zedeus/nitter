@@ -83,19 +83,21 @@ type
     poll*: Option[Poll]
     available*: bool
 
-  Tweets* = seq[Tweet]
+  Thread* = object
+    tweets*: seq[Tweet]
+    more*: int
 
   Conversation* = ref object
     tweet*: Tweet
-    before*: Tweets
-    after*: Tweets
-    replies*: seq[Tweets]
+    before*: Thread
+    after*: Thread
+    replies*: seq[Thread]
 
   Timeline* = ref object
-    tweets*: Tweets
+    tweets*: seq[Tweet]
     minId*: string
     maxId*: string
     hasMore*: bool
 
-proc contains*(thread: Tweets; tweet: Tweet): bool =
-  thread.anyIt(it.id == tweet.id)
+proc contains*(thread: Thread; tweet: Tweet): bool =
+  thread.tweets.anyIt(it.id == tweet.id)

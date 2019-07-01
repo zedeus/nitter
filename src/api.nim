@@ -110,14 +110,14 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
   tweet.video = some(parseVideo(json))
   tokenUses.inc
 
-proc getVideos*(tweets: Tweets; token="") {.async.} =
+proc getVideos*(thread: Thread; token="") {.async.} =
   var gToken = token
   var videoFuts: seq[Future[void]]
 
   if gToken.len == 0:
     gToken = await getGuestToken()
 
-  for tweet in tweets.filterIt(it.video.isSome):
+  for tweet in thread.tweets.filterIt(it.video.isSome):
     videoFuts.add getVideo(tweet, token)
 
   await all(videoFuts)
@@ -150,8 +150,8 @@ proc getPoll*(tweet: Tweet) {.async.} =
 
   tweet.poll = some(parsePoll(html))
 
-proc getPolls*(tweets: Tweets) {.async.} =
-  var polls = tweets.filterIt(it.poll.isSome)
+proc getPolls*(thread: Thread) {.async.} =
+  var polls = thread.tweets.filterIt(it.poll.isSome)
   await all(polls.map(getPoll))
 
 proc getConversationPolls*(convo: Conversation) {.async.} =
@@ -222,13 +222,14 @@ proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
   if json["new_latent_count"].to(int) == 0: return
   if not json.hasKey("items_html"): return
 
-  let html = parseHtml(json["items_html"].to(string))
+  let
+    html = parseHtml(json["items_html"].to(string))
+    thread = parseThread(html)
+    vidsFut = getVideos(thread)
+    pollFut = getPolls(thread)
 
-  result.tweets = parseTweets(html)
-
-  let vidsFut = getVideos(result.tweets)
-  let pollFut = getPolls(result.tweets)
   await all(vidsFut, pollFut)
+  result.tweets = thread.tweets
 
 proc getTweet*(username: string; id: string): Future[Conversation] {.async.} =
   let headers = newHttpHeaders({

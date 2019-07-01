@@ -82,19 +82,21 @@ proc parseTweet*(node: XmlNode): Tweet =
   if quote != nil:
     result.quote = some(parseQuote(quote))
 
-proc parseTweets*(nodes: XmlNode): Tweets =
+proc parseThread*(nodes: XmlNode): Thread =
   if nodes == nil: return
   for n in nodes.filterIt(it.kind != xnText):
     let class = n.attr("class").toLower()
     if "tombstone" in class or "unavailable" in class:
-      result.add Tweet()
-    elif "morereplies" notin class:
-      result.add parseTweet(n)
+      result.tweets.add Tweet()
+    elif "morereplies" in class:
+      result.more = getMoreReplies(n)
+    else:
+      result.tweets.add parseTweet(n)
 
 proc parseConversation*(node: XmlNode): Conversation =
   result = Conversation(
     tweet:  parseTweet(node.select(".permalink-tweet-container")),
-    before: parseTweets(node.select(".in-reply-to .stream-items"))
+    before: parseThread(node.select(".in-reply-to .stream-items"))
   )
 
   let replies = node.select(".replies-to .stream-items")
@@ -105,11 +107,11 @@ proc parseConversation*(node: XmlNode): Conversation =
     let thread = reply.select(".stream-items")
 
     if "self" in class:
-      result.after = parseTweets(thread)
+      result.after = parseThread(thread)
     elif "lone" in class:
-      result.replies.add parseTweets(reply)
+      result.replies.add parseThread(reply)
     else:
-      result.replies.add parseTweets(thread)
+      result.replies.add parseThread(thread)
 
 proc parseVideo*(node: JsonNode): Video =
   let

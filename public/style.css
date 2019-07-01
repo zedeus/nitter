@@ -505,6 +505,18 @@ video {
     margin-bottom: 10px;
 }
 
+.more-replies {
+    padding-top: 0.3em;
+}
+
+.more-replies-text {
+    display: block;
+    margin-left: 58px;
+    padding: 7px 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .thread-line .status-el::before {
     background: #8a3731;
     content: '';
@@ -528,6 +540,20 @@ video {
     min-width: unset;
     width: 0;
     margin: 0;
+}
+
+.thread-line .more-replies::before {
+    content: '...';
+    background: unset;
+    color: #b94e46;
+    font-weight: bold;
+    font-size: 22px;
+    line-height: 0.25em;
+    left: 1.2em;
+    width: 5px;
+    top: 2px;
+    margin-bottom: 0px;
+    margin-left: -5px;
 }
 
 .panel {
