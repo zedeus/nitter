@@ -25,16 +25,16 @@ is on implementing missing features.
 
 ## Todo (roughly in this order)
 
-- "Show Thread" button
-- Twitter "Cards" (link previews)
 - Search (images/videos, hashtags, etc.)
 - Hiding retweets, showing replies, etc.
-- Emoji support (WIP, needs font)
+- Media carousel below profile
+- Media-only/gallery view
 - Nitter link previews
 - Server configuration
 - Caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
+- Twitter "Cards" (link previews)
 - Simple account system with customizable feed
-- Media-only/gallery view
+- Emoji support (WIP, needs font)
 - Video support with hls.js
 - Json API endpoints
 - Themes
