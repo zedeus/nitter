@@ -96,14 +96,13 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
     "x-guest-token": token
   })
 
-  let
-    url = apiBase / (videoUrl % tweet.id)
-    json = await fetchJson(url, headers)
+  let url = apiBase / (videoUrl % tweet.id)
+  let json = await fetchJson(url, headers)
 
   if json == nil:
     if getTime() - tokenUpdated > initDuration(seconds=1):
       tokenUpdated = getTime()
-      guestToken = await getGuestToken(force=true)
+      discard await getGuestToken(force=true)
     await getVideo(tweet, guestToken)
     return
 
@@ -111,14 +110,14 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
   tokenUses.inc
 
 proc getVideos*(thread: Thread; token="") {.async.} =
-  var gToken = token
-  var videoFuts: seq[Future[void]]
 
+  var gToken = token
   if gToken.len == 0:
     gToken = await getGuestToken()
 
+  var videoFuts: seq[Future[void]]
   for tweet in thread.tweets.filterIt(it.video.isSome):
-    videoFuts.add getVideo(tweet, token)
+    videoFuts.add getVideo(tweet, gToken)
 
   await all(videoFuts)
 
@@ -127,9 +126,9 @@ proc getConversationVideos*(convo: Conversation) {.async.} =
   var futs: seq[Future[void]]
 
   futs.add getVideo(convo.tweet, token)
-  futs.add getVideos(convo.before)
-  futs.add getVideos(convo.after)
   futs.add convo.replies.mapIt(getVideos(it, token))
+  futs.add getVideos(convo.before, token)
+  futs.add getVideos(convo.after, token)
 
   await all(futs)
 
