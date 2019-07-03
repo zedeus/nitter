@@ -144,7 +144,8 @@
       #if thread.more != 0:
       #let num = if thread.more != -1: $thread.more & " " else: ""
       <div class="status-el more-replies">
-        <a class="more-replies-text" title="Not implemented yet">${num}more replies</a>
+        #let reply = if thread.more == 1: "reply" else: "replies"
+        <a class="more-replies-text" title="Not implemented yet">${num}more ${reply}</a>
       </div>
       #end if
     </div>
