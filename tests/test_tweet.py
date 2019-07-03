@@ -55,6 +55,14 @@ link = [
     ]],
     ['hiankun_taioan/status/1086916335215341570', [
         '(hackernoon.com/interview-wit…)'
+    ]],
+    ['archillinks/status/1146302618223951873', [
+        'flickr.com/photos/87101284@N…',
+        'hisafoto.tumblr.com/post/176…'
+    ]],
+    ['archillinks/status/1146292551936335873', [
+        'flickr.com/photos/michaelrye…',
+        'furtho.tumblr.com/post/16618…'
     ]]
 ]
 
