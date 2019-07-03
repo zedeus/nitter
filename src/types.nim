@@ -91,7 +91,7 @@ type
     photos*: seq[string]
     poll*: Option[Poll]
 
-  Thread* = object
+  Thread* = ref object
     tweets*: seq[Tweet]
     more*: int
 

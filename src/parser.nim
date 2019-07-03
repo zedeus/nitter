@@ -88,6 +88,7 @@ proc parseTweet*(node: XmlNode): Tweet =
 
 proc parseThread*(nodes: XmlNode): Thread =
   if nodes == nil: return
+  result = Thread()
   for n in nodes.filterIt(it.kind != xnText):
     let class = n.attr("class").toLower()
     if "tombstone" in class or "unavailable" in class:

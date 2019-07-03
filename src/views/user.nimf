@@ -104,7 +104,7 @@
 #proc renderConversation*(conversation: Conversation): string =
 <div class="conversation" id="tweets">
   <div class="main-thread">
-    #if conversation.before.tweets.len > 0:
+    #if conversation.before != nil:
     <div class="before-tweet thread-line">
       #for i, tweet in conversation.before.tweets:
         ${renderTweet(tweet, first=(i == 0))}
@@ -112,10 +112,10 @@
     </div>
     #end if
     <div class="main-tweet">
-      #let afterClass = if conversation.after.tweets.len > 0: "thread thread-line" else: ""
+      #let afterClass = if conversation.after != nil: "thread thread-line" else: ""
       ${renderTweet(conversation.tweet, class=afterClass)}
     </div>
-    #if conversation.after.tweets.len > 0:
+    #if conversation.after != nil:
     <div class="after-tweet thread-line">
       #for i, tweet in conversation.after.tweets:
       ${renderTweet(tweet, first=(i == 0), last=(i == conversation.after.tweets.high))}

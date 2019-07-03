@@ -110,6 +110,7 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
   tokenUses.inc
 
 proc getVideos*(thread: Thread; token="") {.async.} =
+  if thread == nil: return
 
   var gToken = token
   if gToken.len == 0:
@@ -150,6 +151,7 @@ proc getPoll*(tweet: Tweet) {.async.} =
   tweet.poll = some(parsePoll(html))
 
 proc getPolls*(thread: Thread) {.async.} =
+  if thread == nil: return
   var polls = thread.tweets.filterIt(it.poll.isSome)
   await all(polls.map(getPoll))
 
