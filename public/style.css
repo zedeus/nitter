@@ -375,7 +375,7 @@ video {
 
 .timeline-tab {
     float: right;
-    padding: 0 4px;
+    padding: 0;
     box-sizing: border-box;
     display: inline-block;
     font-size: 14px;
@@ -386,7 +386,7 @@ video {
 }
 
 .profile-tab {
-    padding: 0 4px;
+    padding: 0 4px 0 0;
     box-sizing: border-box;
     display: inline-block;
     font-size: 14px;
@@ -397,12 +397,16 @@ video {
 }
 
 .profile-banner {
-    padding: 0 4px;
+    padding-bottom: 4px;
+}
+
+.profile-banner a {
+    display: inherit;
+    line-height: 0;
 }
 
 .profile-banner img {
     width: 100%;
-    padding-bottom: 3px;
 }
 
 .profile-banner-color {
