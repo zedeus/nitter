@@ -31,6 +31,16 @@ db("cache.db", "", "", ""):
         .}: Time
 
 type
+  QueryType* = enum
+    replies, media, custom = "search"
+
+  Query* = object
+    filter*: seq[string]
+    exclude*: seq[string]
+    sep*: string
+    fromUser*: string
+    queryType*: QueryType
+
   VideoType* = enum
     vmap, m3u8, mp4
 
@@ -106,6 +116,7 @@ type
     minId*: string
     maxId*: string
     hasMore*: bool
+    query*: Option[Query]
 
 proc contains*(thread: Thread; tweet: Tweet): bool =
   thread.tweets.anyIt(it.id == tweet.id)

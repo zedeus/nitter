@@ -1,6 +1,6 @@
 import xmltree, sequtils, strtabs, strutils, strformat, json
 
-import ./types, ./parserutils, ./formatters
+import types, parserutils, formatters
 
 proc parsePopupProfile*(node: XmlNode): Profile =
   let profile = node.select(".profile-card")

@@ -497,6 +497,39 @@ video {
     word-wrap: break-word;
 }
 
+.tab {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0 0 5px 0;
+    background-color: #161616;
+    padding: 0;
+}
+
+.tab .tab-item {
+    margin-top: 0;
+}
+
+.tab-item {
+    flex: 1 1 0;
+    text-align: center;
+}
+
+.tab .tab-item a.active, .tab .tab-item.active a {
+    border-bottom-color: #ff6c60;
+    color: #ff6c60;
+}
+
+.tab .tab-item a {
+    border-bottom: .1rem solid transparent;
+    color: inherit;
+    display: block;
+    padding: 8px 0;
+    text-decoration: none;
+    font-weight: bold;
+}
+
 .conversation {
     max-width: 580px;
     margin: 0 auto;

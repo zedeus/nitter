@@ -45,5 +45,5 @@
 #end proc
 #
 #proc showError*(error: string): string =
-${renderMain(renderError(error), title="Error | Nitter")}
+#renderMain(renderError(error), title="Error | Nitter")
 #end proc

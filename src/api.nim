@@ -1,21 +1,20 @@
 import httpclient, asyncdispatch, htmlparser, times
-import sequtils, strutils, strformat, json, xmltree, uri
-import regex
+import sequtils, strutils, json, xmltree, uri
 
-import ./types, ./parser, ./parserutils, ./formatters
+import types, parser, parserutils, formatters, search
 
 const
   agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
   lang = "en-US,en;q=0.9"
   auth = "Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"
   cardAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
+  jsonAccept = "application/json, text/javascript, */*; q=0.01"
 
   base = parseUri("https://twitter.com/")
   apiBase = parseUri("https://api.twitter.com/1.1/")
 
-  timelineParams = "?include_available_features=1&include_entities=1&include_new_items_bar=false&reset_error_state=false"
-  showUrl = "i/profiles/show/$1" & timelineParams
-  timelineUrl = showUrl % "$1/timeline/tweets"
+  timelineUrl = "i/profiles/show/$1/timeline/tweets"
+  timelineSearchUrl = "i/search/timeline"
   profilePopupUrl = "i/profiles/popup"
   profileIntentUrl = "intent/user"
   tweetUrl = "status"
@@ -70,7 +69,7 @@ proc getGuestToken(force=false): Future[string] {.async.} =
   tokenUses = 0
 
   let headers = newHttpHeaders({
-    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept": jsonAccept,
     "Referer": $base,
     "User-Agent": agent,
     "Authorization": auth
@@ -89,7 +88,7 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
   if tweet.video.isNone(): return
 
   let headers = newHttpHeaders({
-    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept": jsonAccept,
     "Referer": $(base / getLink(tweet)),
     "User-Agent": agent,
     "Authorization": auth,
@@ -196,45 +195,9 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
 
   result = parsePopupProfile(html)
 
-proc getTimeline*(username: string; after=""): Future[Timeline] {.async.} =
+proc getTweet*(username, id: string): Future[Conversation] {.async.} =
   let headers = newHttpHeaders({
-    "Accept": "application/json, text/javascript, */*; q=0.01",
-    "Referer": $(base / username),
-    "User-Agent": agent,
-    "X-Twitter-Active-User": "yes",
-    "X-Requested-With": "XMLHttpRequest",
-    "Accept-Language": lang
-  })
-
-  var url = timelineUrl % username
-  let cleanAfter = after.replace(re"[^\d]*(\d+)[^\d]*", "$1")
-  if cleanAfter.len > 0:
-    url &= "&max_position=" & cleanAfter
-
-  let json = await fetchJson(base / url, headers)
-  if json == nil: return Timeline()
-
-  result = Timeline(
-    hasMore: json["has_more_items"].to(bool),
-    maxId: json.getOrDefault("max_position").getStr(""),
-    minId: json.getOrDefault("min_position").getStr(""),
-  )
-
-  if json["new_latent_count"].to(int) == 0: return
-  if not json.hasKey("items_html"): return
-
-  let
-    html = parseHtml(json["items_html"].to(string))
-    thread = parseThread(html)
-    vidsFut = getVideos(thread)
-    pollFut = getPolls(thread)
-
-  await all(vidsFut, pollFut)
-  result.tweets = thread.tweets
-
-proc getTweet*(username: string; id: string): Future[Conversation] {.async.} =
-  let headers = newHttpHeaders({
-    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept": jsonAccept,
     "Referer": $base,
     "User-Agent": agent,
     "X-Twitter-Active-User": "yes",
@@ -255,3 +218,72 @@ proc getTweet*(username: string; id: string): Future[Conversation] {.async.} =
   let vidsFut = getConversationVideos(result)
   let pollFut = getConversationPolls(result)
   await all(vidsFut, pollFut)
+
+proc finishTimeline(json: JsonNode; query: Option[Query]): Future[Timeline] {.async.} =
+  if json == nil: return Timeline()
+
+  result = Timeline(
+    hasMore: json["has_more_items"].to(bool),
+    maxId: json.getOrDefault("max_position").getStr(""),
+    minId: json.getOrDefault("min_position").getStr("").cleanPos(),
+  )
+
+  if json["new_latent_count"].to(int) == 0: return
+  if not json.hasKey("items_html"): return
+
+  let
+    html = parseHtml(json["items_html"].to(string))
+    thread = parseThread(html)
+    vidsFut = getVideos(thread)
+    pollFut = getPolls(thread)
+
+  await all(vidsFut, pollFut)
+  result.tweets = thread.tweets
+  result.query = query
+
+proc getTimeline*(username, after: string): Future[Timeline] {.async.} =
+  let headers = newHttpHeaders({
+    "Accept": jsonAccept,
+    "Referer": $(base / username),
+    "User-Agent": agent,
+    "X-Twitter-Active-User": "yes",
+    "X-Requested-With": "XMLHttpRequest",
+    "Accept-Language": lang
+  })
+
+  var params = toSeq({
+    "include_available_features": "1",
+    "include_entities": "1",
+    "include_new_items_bar": "false",
+    "reset_error_state": "false"
+  })
+
+  if after.len > 0:
+    params.add {"max_position": after}
+
+  let json = await fetchJson(base / (timelineUrl % username) ? params, headers)
+  result = await finishTimeline(json, none(Query))
+
+proc getTimelineSearch*(username, after: string; query: Query): Future[Timeline] {.async.} =
+  let headers = newHttpHeaders({
+    "Accept": jsonAccept,
+    "Referer": $(base / ("search?f=tweets&q=from%3A$1&src=typd" % username)),
+    "User-Agent": agent,
+    "X-Requested-With": "XMLHttpRequest",
+    "Authority": "twitter.com",
+    "Accept-Language": lang
+  })
+
+  let params = {
+    "f": "tweets",
+    "vertical": "default",
+    "q": genQueryParam(query),
+    "src": "typd",
+    "include_available_features": "1",
+    "include_entities": "1",
+    "max_position": if after.len > 0: genPos(after) else: "0",
+    "reset_error_state": "false"
+  }
+
+  let json = await fetchJson(base / timelineSearchUrl ? params, headers)
+  result = await finishTimeline(json, some(query))

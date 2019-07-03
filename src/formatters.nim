@@ -1,7 +1,7 @@
 import strutils, strformat, htmlgen, xmltree, times
 import regex
 
-import ./types, ./utils
+import types, utils
 
 from unicode import Rune, `$`
 

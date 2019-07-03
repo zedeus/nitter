@@ -1,6 +1,6 @@
 #? stdtmpl(subsChar = '$', metaChar = '#')
 #import xmltree, strutils, uri
-#import ../types, ../formatters, ../utils
+#import ../types, ../formatters, ../utils, ../search
 #include "tweet.nimf"
 #
 #proc renderProfileCard*(profile: Profile): string =
@@ -52,10 +52,13 @@
 #
 #proc renderTimeline*(timeline: Timeline; profile: Profile; beginning: bool): string =
 #var retweets: seq[string]
+#var query = "?"
+#if timeline.query.isSome: query = genQueryUrl(get(timeline.query))
+#end if
 <div id="tweets">
   #if not beginning:
   <div class="show-more status-el">
-    <a href="/${profile.username}">Load newest tweets</a>
+    <a href="/${profile.username}${query.strip(chars={'?'})}">Load newest tweets</a>
   </div>
   #end if
   #
@@ -66,9 +69,9 @@
   ${renderTweet(tweet, "timeline-tweet")}
   #end for
   #
-  #if timeline.hasMore:
+  #if timeline.hasMore or timeline.query.isSome and timeline.tweets.len > 0:
   <div class="show-more">
-    <a href="/${profile.username}?after=${timeline.minId}">Load older tweets</a>
+    <a href="/${profile.username}${query}after=${timeline.minId}">Load older tweets</a>
   </div>
   #elif timeline.tweets.len > 0:
   <div class="timeline-footer">
@@ -96,6 +99,13 @@
     ${renderProfileCard(profile)}
   </div>
   <div class="timeline-tab">
+    #let link = "/" & profile.username
+    <ul class="tab">
+      <li class=${timeline.tabClass("tweets")}><a href="${link}">Tweets</a></li>
+      <li class=${timeline.tabClass("replies")}><a href="${link}/replies">Tweets & Replies</a></li>
+      <li class=${timeline.tabClass("media")}><a href="${link}/media">Media</a></li>
+      #discard "<li class=tab-item><a href=${link}/search>Custom</a></li>"
+    </ul>
     ${renderTimeline(timeline, profile, beginning)}
   </div>
 </div>

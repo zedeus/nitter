@@ -26,7 +26,7 @@ is on implementing missing features.
 ## Todo (roughly in this order)
 
 - Search (images/videos, hashtags, etc.)
-- Hiding retweets, showing replies, etc.
+- Custom timeline filter
 - Media carousel below profile
 - Media-only/gallery view
 - Nitter link previews

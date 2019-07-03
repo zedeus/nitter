@@ -1,25 +1,35 @@
 import asyncdispatch, asyncfile, httpclient, strutils, strformat, uri, os
-import jester
+import jester, regex
 
-import api, utils, types, cache, formatters
+import api, utils, types, cache, formatters, search
 
 include views/"user.nimf"
 include views/"general.nimf"
 
 const cacheDir {.strdefine.} = "/tmp/nitter"
 
-proc showTimeline(name: string; num=""): Future[string] {.async.} =
+proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.async.} =
   let
     username = name.strip(chars={'/'})
     profileFut = getCachedProfile(username)
-    tweetsFut = getTimeline(username, after=num)
+
+  var timelineFut: Future[Timeline]
+  if query.isNone:
+     timelineFut = getTimeline(username, after)
+  else:
+    timelineFut = getTimelineSearch(username, after, get(query))
 
   let profile = await profileFut
   if profile.username.len == 0:
     return ""
 
-  let profileHtml = renderProfile(profile, await tweetsFut, num.len == 0)
+  let profileHtml = renderProfile(profile, await timelineFut, after.len == 0)
   return renderMain(profileHtml, title=pageTitle(profile))
+
+template respTimeline(timeline: typed) =
+  if timeline.len == 0:
+    resp Http404, showError("User \"" & @"name" & "\" not found")
+  resp timeline
 
 routes:
   get "/":
@@ -28,17 +38,24 @@ routes:
   post "/search":
     if @"query".len == 0:
       resp Http404, showError("Please enter a username.")
-
     redirect("/" & @"query")
 
   get "/@name/?":
     cond '.' notin @"name"
+    respTimeline(await showTimeline(@"name", @"after", none(Query)))
 
-    let timeline = await showTimeline(@"name", @"after")
-    if timeline.len == 0:
-      resp Http404, showError("User \"" & @"name" & "\" not found")
+  get "/@name/search/?":
+    cond '.' notin @"name"
+    let query = initQuery(@"filter", @"sep", @"name")
+    respTimeline(await showTimeline(@"name", @"after", some(query)))
 
-    resp timeline
+  get "/@name/replies":
+    cond '.' notin @"name"
+    respTimeline(await showTimeline(@"name", @"after", some(getReplyQuery(@"name"))))
+
+  get "/@name/media":
+    cond '.' notin @"name"
+    respTimeline(await showTimeline(@"name", @"after", some(getMediaQuery(@"name"))))
 
   get "/@name/status/@id":
     cond '.' notin @"name"
