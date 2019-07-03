@@ -8,7 +8,7 @@ from unicode import Rune, `$`
 const
   urlRegex = re"((https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+([/\?][^\s\)]*)?)"
   emailRegex = re"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
-  usernameRegex = re"(^|[^A-z])@([A-z0-9_]+)"
+  usernameRegex = re"(^|[^A-z0-9_?])@([A-z0-9_]+)"
   picRegex = re"pic.twitter.com/[^ ]+"
   cardRegex = re"(https?://)?cards.twitter.com/[^ ]+"
   ellipsisRegex = re" ?…"
@@ -55,6 +55,7 @@ proc linkifyText*(text: string): string =
   result = result.replace(usernameRegex, reUsernameToLink)
   result = result.replace(re"([^\s\(\n%])<a", "$1 <a")
   result = result.replace(re"</a>\s+([;.,!\)'%]|&apos;)", "</a>$1")
+  result = result.replace(re"^\. <a", ".<a")
 
 proc stripTwitterUrls*(text: string): string =
   result = text
