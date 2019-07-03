@@ -113,7 +113,7 @@
 #end proc
 #
 #proc renderReply(tweet: Tweet | Quote): string =
-#let usernames = tweet.reply.mapIt(&"""<a href="{it}">@{it}</a>""")
+#let usernames = tweet.reply.mapIt(&"""<a href="/{it}">@{it}</a>""")
 <div class="replying-to">Replying to ${usernames.join(" ")}</div>
 #end proc
 #
