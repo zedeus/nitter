@@ -7,7 +7,7 @@ from q import nil
 
 const
   thumbRegex = re".+:url\('([^']+)'\)"
-  gifRegex = re".+thumb/([^\.']+)\.jpg.*"
+  gifRegex = re".+thumb/([^\.']+)\.[jpng].*"
 
 proc selectAll*(node: XmlNode; selector: string): seq[XmlNode] =
   if node == nil: return
