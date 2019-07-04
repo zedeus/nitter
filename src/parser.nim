@@ -45,6 +45,7 @@ proc parseQuote*(quote: XmlNode): Quote =
     text:  getQuoteText(quote),
     reply: parseTweetReply(quote),
     hasThread: quote.select(".self-thread-context") != nil,
+    available: true
   )
 
   result.profile = Profile(
@@ -85,6 +86,8 @@ proc parseTweet*(node: XmlNode): Tweet =
   let quote = tweet.select(".QuoteTweet-innerContainer")
   if quote != nil:
     result.quote = some(parseQuote(quote))
+  elif tweet.select(".Tombstone") != nil:
+    result.quote = some(Quote())
 
 proc parseThread*(nodes: XmlNode): Thread =
   if nodes == nil: return

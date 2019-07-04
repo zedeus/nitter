@@ -76,6 +76,7 @@ type
     reply*: seq[string]
     hasThread*: bool
     sensitive*: bool
+    available*: bool
     thumb*: string
     badge*: string
 

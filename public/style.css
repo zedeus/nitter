@@ -770,6 +770,10 @@ video {
     background-color: #121212;
 }
 
+.unavailable-quote {
+    padding: 8px;
+}
+
 .quote {
     margin-top: 10px;
     border: solid 1px #404040;

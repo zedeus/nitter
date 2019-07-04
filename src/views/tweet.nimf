@@ -119,6 +119,12 @@
 #
 #proc renderQuote(quote: Quote): string =
 #let hasMedia = quote.thumb.len > 0 or quote.sensitive
+#if not quote.available:
+<div class="quote unavailable">
+  <div class="unavailable-quote">This tweet is unavailable</div>
+</div>
+#return
+#end if
 <div class="quote">
   <div class="quote-container">
     <a class="quote-link" href="${getLink(quote)}"></a>
