@@ -527,6 +527,7 @@ video {
 .photo-rail-grid img {
     height: 100%;
     width: 100%;
+    border-radius: 4px;
     object-fit: cover;
     position: absolute;
     top: 0;
@@ -841,7 +842,7 @@ video {
     background: rgba(0, 0, 0, 0.66);
     border-radius: 4px;
     color: #fffffff0;
-    padding: 0px 2px;
+    padding: 1px 3px;
     font-size: 12px;
     font-weight: bold;
 }
