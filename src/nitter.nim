@@ -45,9 +45,9 @@ routes:
     cond '.' notin @"name"
     respTimeline(await showTimeline(@"name", @"after", none(Query)))
 
-  get "/@name/search/?":
+  get "/@name/search":
     cond '.' notin @"name"
-    let query = initQuery(@"filter", @"sep", @"name")
+    let query = initQuery(@"filter", @"include", @"not", @"sep", @"name")
     respTimeline(await showTimeline(@"name", @"after", some(query)))
 
   get "/@name/replies":

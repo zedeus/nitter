@@ -5,9 +5,11 @@ import types
 const
   separators = @["AND", "OR"]
   validFilters = @[
-    "media", "images", "videos", "native_video", "twimg",
-    "links", "quote", "replies", "mentions",
-    "news", "verified", "safe"
+    "media", "images", "twimg",
+    "native_video", "consumer_video", "pro_video",
+    "links", "news", "quote", "mentions",
+    "replies", "retweets", "nativeretweets",
+    "verified", "safe"
   ]
 
 # Experimental, this might break in the future
@@ -16,25 +18,31 @@ const
   posPrefix = "thGAVUV0VFVBa"
   posSuffix = "EjUAFQAlAFUAFQAA"
 
-proc initQuery*(filter, separator: string; name=""): Query =
+proc initQuery*(filters, includes, excludes, separator: string; name=""): Query =
   var sep = separator.strip().toUpper()
   Query(
-    filter: filter.split(",").filterIt(it in validFilters),
-    sep: if sep in separators: sep else: "AND",
+    queryType: custom,
+    filters: filters.split(",").filterIt(it in validFilters),
+    includes: includes.split(",").filterIt(it in validFilters),
+    excludes: excludes.split(",").filterIt(it in validFilters),
     fromUser: name,
-    queryType: custom
+    sep: if sep in separators: sep else: ""
   )
 
 proc getMediaQuery*(name: string): Query =
   Query(
-    filter: @["twimg", "native_video"],
-    sep: "OR",
+    queryType: media,
+    filters: @["twimg", "native_video"],
     fromUser: name,
-    queryType: media
+    sep: "OR"
   )
 
 proc getReplyQuery*(name: string): Query =
-  Query(fromUser: name, queryType: replies)
+  Query(
+    queryType: replies,
+    includes: @["nativeretweets"],
+    fromUser: name
+  )
 
 proc genQueryParam*(query: Query): string =
   var filters: seq[string]
@@ -43,9 +51,11 @@ proc genQueryParam*(query: Query): string =
   if query.fromUser.len > 0:
     param = &"from:{query.fromUser} "
 
-  for f in query.filter:
+  for f in query.filters:
     filters.add "filter:" & f
-  for e in query.exclude:
+  for i in query.includes:
+    filters.add "include:" & i
+  for e in query.excludes:
     filters.add "-filter:" & e
 
   return strip(param & filters.join(&" {query.sep} "))
@@ -55,10 +65,12 @@ proc genQueryUrl*(query: Query): string =
   if query.queryType != custom: return
 
   var params: seq[string]
-  if query.filter.len > 0:
-    params &= "filter=" & query.filter.join(",")
-  if query.exclude.len > 0:
-    params &= "not=" & query.exclude.join(",")
+  if query.filters.len > 0:
+    params &= "filter=" & query.filters.join(",")
+  if query.includes.len > 0:
+    params &= "include=" & query.includes.join(",")
+  if query.excludes.len > 0:
+    params &= "not=" & query.excludes.join(",")
   if query.sep.len > 0:
     params &= "sep=" & query.sep
   if params.len > 0:

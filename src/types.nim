@@ -35,11 +35,12 @@ type
     replies, media, custom = "search"
 
   Query* = object
-    filter*: seq[string]
-    exclude*: seq[string]
-    sep*: string
-    fromUser*: string
     queryType*: QueryType
+    filters*: seq[string]
+    includes*: seq[string]
+    excludes*: seq[string]
+    fromUser*: string
+    sep*: string
 
   VideoType* = enum
     vmap, m3u8, mp4
