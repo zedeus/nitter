@@ -27,7 +27,6 @@ is on implementing missing features.
 
 - Search (images/videos, hashtags, etc.)
 - Custom timeline filter
-- Media carousel below profile
 - Media-only/gallery view
 - Nitter link previews
 - Server configuration

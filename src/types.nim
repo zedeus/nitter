@@ -57,6 +57,11 @@ type
     url*: string
     thumb*: string
 
+  GalleryPhoto* = object
+    url*: string
+    tweetId*: string
+    color*: string
+
   Poll* = object
     options*: seq[string]
     values*: seq[int]

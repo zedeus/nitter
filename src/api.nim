@@ -15,6 +15,7 @@ const
 
   timelineUrl = "i/profiles/show/$1/timeline/tweets"
   timelineSearchUrl = "i/search/timeline"
+  timelineMediaUrl = "i/profiles/show/$1/media_timeline"
   profilePopupUrl = "i/profiles/popup"
   profileIntentUrl = "intent/user"
   tweetUrl = "status"
@@ -161,6 +162,24 @@ proc getConversationPolls*(convo: Conversation) {.async.} =
   futs.add getPolls(convo.after)
   futs.add convo.replies.map(getPolls)
   await all(futs)
+
+proc getPhotoRail*(username: string): Future[seq[GalleryPhoto]] {.async.} =
+  let headers = newHttpHeaders({
+    "Accept": jsonAccept,
+    "Referer": $(base / username),
+    "User-Agent": agent,
+    "X-Requested-With": "XMLHttpRequest"
+  })
+
+  let params = {
+    "for_photo_rail": "true",
+    "oldest_unread_id": "0"
+  }
+
+  let url = base / (timelineMediaUrl % username) ? params
+  let html = await fetchHtml(url, headers, jsonKey="items_html")
+
+  result = parsePhotoRail(html)
 
 proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile] {.async.} =
   let url = base / profileIntentUrl ? {"screen_name": username}

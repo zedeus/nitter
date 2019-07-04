@@ -12,10 +12,11 @@ proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.a
   let
     username = name.strip(chars={'/'})
     profileFut = getCachedProfile(username)
+    railFut = getPhotoRail(username)
 
   var timelineFut: Future[Timeline]
   if query.isNone:
-     timelineFut = getTimeline(username, after)
+    timelineFut = getTimeline(username, after)
   else:
     timelineFut = getTimelineSearch(username, after, get(query))
 
@@ -23,7 +24,7 @@ proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.a
   if profile.username.len == 0:
     return ""
 
-  let profileHtml = renderProfile(profile, await timelineFut, after.len == 0)
+  let profileHtml = renderProfile(profile, await timelineFut, await railFut, after.len == 0)
   return renderMain(profileHtml, title=pageTitle(profile))
 
 template respTimeline(timeline: typed) =

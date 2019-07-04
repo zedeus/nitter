@@ -477,9 +477,13 @@ video {
 
 .profile-bio {
     overflow: hidden;
-    margin-right: -6px;
     overflow-wrap: break-word;
     width: 100%;
+    margin: 10px -6px 0px 0px;
+}
+
+.profile-bio p {
+    margin: 0;
 }
 
 .profile-description {
@@ -488,6 +492,47 @@ video {
     overflow: hidden;
     word-break: normal;
     word-wrap: break-word;
+}
+
+.photo-rail-card {
+    float: left;
+    background: #161616;
+    border-radius: 0 0 4px 4px;
+    width: 100%;
+    margin-top: 5px;
+}
+
+.photo-rail-heading {
+    padding: 5px 12px 0px 12px;
+}
+
+.photo-rail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 3px 3px;
+    padding: 5px 12px 12px 12px;
+}
+
+.photo-rail-grid a {
+    position: relative;
+    border-radius: 5px;
+}
+
+.photo-rail-grid a:before {
+    content: "";
+    display: block;
+    padding-top: 100%;
+}
+
+.photo-rail-grid img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
 }
 
 .tab {

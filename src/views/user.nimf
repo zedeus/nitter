@@ -41,6 +41,23 @@
 </div>
 #end proc
 #
+#proc renderPhotoRail(username: string; photoRail: seq[GalleryPhoto]): string =
+<div class="photo-rail-card">
+  <div class="photo-rail-heading">
+    <a href="/${username}/media">🖼 Photos and videos</a>
+  </div>
+  <div class="photo-rail-grid">
+    #for i, photo in photoRail:
+    #if i == 20: break
+    #end if
+    <a href="/${username}/status/${photo.tweetId}" style="${photo.color}">
+      <img src=${getSigUrl(photo.url & ":thumb", "pic")}></img>
+    </a>
+    #end for
+  </div>
+</div>
+#end proc
+#
 #proc renderBanner(profile: Profile): string =
 #if "#" in profile.banner:
 <div style="${profile.banner}" class="profile-banner-color"></div>
@@ -90,13 +107,17 @@
 </div>
 #end proc
 #
-#proc renderProfile*(profile: Profile; timeline: Timeline; beginning: bool): string =
+#proc renderProfile*(profile: Profile; timeline: Timeline;
+#                    photoRail: seq[GalleryPhoto]; beginning: bool): string =
 <div class="profile-tabs">
   <div class="profile-banner">
     ${renderBanner(profile)}
   </div>
   <div class="profile-tab">
     ${renderProfileCard(profile)}
+    #if photoRail.len > 0:
+    ${renderPhotoRail(profile.username, photoRail)}
+    #end if
   </div>
   <div class="timeline-tab">
     #let link = "/" & profile.username

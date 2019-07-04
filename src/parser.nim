@@ -163,3 +163,11 @@ proc parsePoll*(node: XmlNode): Poll =
     if n > highest:
       highest = n
       result.leader = i
+
+proc parsePhotoRail*(node: XmlNode): seq[GalleryPhoto] =
+  for img in node.selectAll(".tweet-media-img-placeholder"):
+    result.add GalleryPhoto(
+      url: img.attr("data-image-url"),
+      tweetId: img.attr("data-tweet-id"),
+      color: img.attr("background-color").replace("style", "background-color")
+    )
