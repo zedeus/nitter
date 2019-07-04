@@ -322,6 +322,10 @@ video {
     display: contents !important;
 }
 
+.retweet {
+    margin-top: -5px !important;
+}
+
 .retweet, .pinned, .tweet-stats {
     align-content: center;
     color: hsla(240,1%,73%,.7);

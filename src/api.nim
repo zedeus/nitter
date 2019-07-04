@@ -284,9 +284,12 @@ proc getTimeline*(username, after: string): Future[Timeline] {.async.} =
   result = await finishTimeline(json, none(Query))
 
 proc getTimelineSearch*(username, after: string; query: Query): Future[Timeline] {.async.} =
+  let queryParam = genQueryParam(query)
+  let queryEncoded = encodeUrl(queryParam, usePlus=false)
+
   let headers = newHttpHeaders({
     "Accept": jsonAccept,
-    "Referer": $(base / ("search?f=tweets&q=from%3A$1&src=typd" % username)),
+    "Referer": $(base / ("search?f=tweets&vertical=default&q=$1&src=typd" % queryEncoded)),
     "User-Agent": agent,
     "X-Requested-With": "XMLHttpRequest",
     "Authority": "twitter.com",
@@ -296,7 +299,7 @@ proc getTimelineSearch*(username, after: string; query: Query): Future[Timeline]
   let params = {
     "f": "tweets",
     "vertical": "default",
-    "q": genQueryParam(query),
+    "q": queryParam,
     "src": "typd",
     "include_available_features": "1",
     "include_entities": "1",

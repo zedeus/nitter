@@ -92,6 +92,7 @@ type
 
   Tweet* = ref object
     id*: string
+    threadId*: string
     profile*: Profile
     text*: string
     time*: Time

@@ -62,6 +62,7 @@ proc parseTweet*(node: XmlNode): Tweet =
 
   result = Tweet(
     id:        tweet.attr("data-item-id"),
+    threadId:  tweet.attr("data-conversation-id"),
     text:      getTweetText(tweet),
     time:      getTimestamp(tweet),
     shortTime: getShortTime(tweet),

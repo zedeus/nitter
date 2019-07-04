@@ -1,5 +1,5 @@
 #? stdtmpl(subsChar = '$', metaChar = '#')
-#import xmltree, strutils, uri
+#import xmltree, strutils, uri, algorithm
 #import ../types, ../formatters, ../utils, ../search
 #include "tweet.nimf"
 #
@@ -68,7 +68,7 @@
 #end proc
 #
 #proc renderTimeline*(timeline: Timeline; profile: Profile; beginning: bool): string =
-#var retweets: seq[string]
+#var threads: seq[string]
 #var query = "?"
 #if timeline.query.isSome: query = genQueryUrl(get(timeline.query))
 #end if
@@ -80,10 +80,24 @@
   #end if
   #
   #for tweet in timeline.tweets:
-  #if tweet.id in retweets: continue
-  #elif tweet.retweet.isSome: retweets.add tweet.id
+  #if tweet.threadId in threads: continue
   #end if
+  #proc threadFilter(it: Tweet): bool =
+  #it.retweet.isNone and it.reply.len == 0 and it.threadId == tweet.threadId
+  #end proc
+  #let thread = timeline.tweets.filter(threadFilter)
+  #if thread.len < 2:
   ${renderTweet(tweet, "timeline-tweet")}
+  #else:
+  <div class="thread-line">
+    #for i, threadTweet in thread.sortedByIt(it.time):
+    #let last = (i == thread.high)
+    #let class = if last: "timeline-tweet" else: "thread"
+    ${renderTweet(threadTweet, class, first=(i == 0), last=last)}
+    #end for
+  </div>
+  #threads.add tweet.threadId
+  #end if
   #end for
   #
   #if timeline.hasMore or timeline.query.isSome and timeline.tweets.len > 0:
