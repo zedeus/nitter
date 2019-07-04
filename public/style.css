@@ -225,7 +225,7 @@ nav {
     overflow: hidden;
     flex-grow: 1;
     max-height: 379.5px;
-    max-width: 506px;
+    max-width: 533px;
 }
 
 .gallery-row .attachment, .gallery-row .attachments {
@@ -287,13 +287,13 @@ video {
 
 .still-image {
     max-height: 379.5px;
-    max-width: 506px;
+    max-width: 533px;
     justify-content: center;
 }
 
 .still-image img {
     object-fit: cover;
-    max-width: 506px;
+    max-width: 533px;
     max-height: 379.5px;
     border-color: #222;
     flex-basis: 300px;
@@ -365,7 +365,7 @@ video {
 }
 
 .profile-tabs {
-    max-width: 846px;
+    max-width: 900px;
     margin: 0 auto;
     float: none;
     border-radius: 0;
@@ -382,7 +382,7 @@ video {
     margin: 0;
     text-align: left;
     vertical-align: top;
-    width: 70% !important;
+    width: 68% !important;
 }
 
 .profile-tab {
@@ -393,7 +393,7 @@ video {
     margin: 0;
     text-align: left;
     vertical-align: top;
-    width: 30% !important;
+    max-width: 32%;
 }
 
 .profile-banner {
@@ -416,16 +416,10 @@ video {
 }
 
 .profile-card {
-    float: left;
     flex-wrap: wrap;
-    margin-top: 0;
     background: #161616;
-    border-radius: 0 0 4px 4px;
     padding: 12px;
-    position: relative;
     display: flex;
-    justify-content: flex-start;
-    max-width: 90%;
 }
 
 .profile-card-tabs {
@@ -476,17 +470,16 @@ video {
 }
 
 .profile-card-extra {
-    display: block;
+    display: contents;
     flex: 100%;
     margin-top: 4px;
- }
+}
 
 .profile-bio {
-    border-radius: 0;
-    box-shadow: none;
-    background: transparent;
     overflow: hidden;
-    margin-right: -5px
+    margin-right: -6px;
+    overflow-wrap: break-word;
+    width: 100%;
 }
 
 .profile-description {
@@ -666,12 +659,9 @@ video {
 }
 
 .profile-statlist {
-    vertical-align: bottom;
-    table-layout: fixed;
-    box-sizing: border-box;
     display: flex;
     margin: 0;
-    padding: 0 2px;
+    padding: 0;
     width: 100%;
 }
 
