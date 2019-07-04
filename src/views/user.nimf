@@ -25,15 +25,15 @@
       <ul class="profile-statlist">
         <li class="tweets">
           <span class="profile-stat-header">Tweets</span>
-          <span>${$profile.tweets}</span>
+          <span class="profile-stat-num">${$profile.tweets}</span>
         </li>
         <li class="followers">
           <span class="profile-stat-header">Followers</span>
-          <span>${$profile.followers}</span>
+          <span class="profile-stat-num">${$profile.followers}</span>
         </li>
         <li class="following">
           <span class="profile-stat-header">Following</span>
-          <span>${$profile.following}</span>
+          <span class="profile-stat-num">${$profile.following}</span>
         </li>
       </ul>
     </div>

@@ -701,10 +701,12 @@ video {
 .profile-card-extra-links {
     margin-top: 8px;
     font-size: 14px;
+    width: 100%;
 }
 
 .profile-statlist {
     display: flex;
+    flex-wrap: wrap;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -716,19 +718,24 @@ video {
 }
 
 .profile-statlist .tweets {
-    flex-shrink: 2;
+    flex: 0.4 1 0;
 }
 
 .profile-statlist .followers {
-    flex-grow: 2;
+    flex: 1 1 0;
+    padding: 0 3px;
 }
 
 .profile-statlist .following {
-    flex-shrink: 1.5;
+    flex: 0.5 1 0;
 }
 
 .profile-stat-header {
     font-weight: bold;
+}
+
+.profile-stat-num {
+    display: block;
 }
 
 .timeline-tweet {
