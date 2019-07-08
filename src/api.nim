@@ -245,6 +245,7 @@ proc finishTimeline(json: JsonNode; query: Option[Query]): Future[Timeline] {.as
     hasMore: json["has_more_items"].to(bool),
     maxId: json.getOrDefault("max_position").getStr(""),
     minId: json.getOrDefault("min_position").getStr("").cleanPos(),
+    query: query
   )
 
   if json["new_latent_count"].to(int) == 0: return
@@ -258,7 +259,6 @@ proc finishTimeline(json: JsonNode; query: Option[Query]): Future[Timeline] {.as
 
   await all(vidsFut, pollFut)
   result.tweets = thread.tweets
-  result.query = query
 
 proc getTimeline*(username, after: string): Future[Timeline] {.async.} =
   let headers = newHttpHeaders({
