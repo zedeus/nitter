@@ -3,8 +3,7 @@ import jester, regex
 
 import api, utils, types, cache, formatters, search
 
-include views/"user.nimf"
-include views/"general.nimf"
+import views/[general, profile, status]
 
 const cacheDir {.strdefine.} = "/tmp/nitter"
 
@@ -24,7 +23,7 @@ proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.a
   if profile.username.len == 0:
     return ""
 
-  let profileHtml = renderProfile(profile, await timelineFut, await railFut, after.len == 0)
+  let profileHtml = renderProfile(profile, await timelineFut, await railFut)
   return renderMain(profileHtml, title=pageTitle(profile))
 
 template respTimeline(timeline: typed) =
@@ -34,7 +33,7 @@ template respTimeline(timeline: typed) =
 
 routes:
   get "/":
-    resp renderMain(renderSearchPanel(), title=pageTitle("Search"))
+    resp renderMain(renderSearch(), title=pageTitle("Search"))
 
   post "/search":
     if @"query".len == 0:

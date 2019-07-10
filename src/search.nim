@@ -81,12 +81,3 @@ proc cleanPos*(pos: string): string =
 
 proc genPos*(pos: string): string =
   posPrefix & pos & posSuffix
-
-proc tabClass*(timeline: Timeline; tab: string): string =
-  result = '"' & "tab-item"
-  if timeline.query.isNone:
-    if tab == "tweets":
-      result &= " active"
-  elif $timeline.query.get().queryType == tab:
-    result &= " active"
-  result &= '"'

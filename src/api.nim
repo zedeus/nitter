@@ -238,14 +238,15 @@ proc getTweet*(username, id: string): Future[Conversation] {.async.} =
   let pollFut = getConversationPolls(result)
   await all(vidsFut, pollFut)
 
-proc finishTimeline(json: JsonNode; query: Option[Query]): Future[Timeline] {.async.} =
+proc finishTimeline(json: JsonNode; query: Option[Query]; after: string): Future[Timeline] {.async.} =
   if json == nil: return Timeline()
 
   result = Timeline(
     hasMore: json["has_more_items"].to(bool),
     maxId: json.getOrDefault("max_position").getStr(""),
     minId: json.getOrDefault("min_position").getStr("").cleanPos(),
-    query: query
+    query: query,
+    beginning: after.len == 0
   )
 
   if json["new_latent_count"].to(int) == 0: return
@@ -281,7 +282,7 @@ proc getTimeline*(username, after: string): Future[Timeline] {.async.} =
     params.add {"max_position": after}
 
   let json = await fetchJson(base / (timelineUrl % username) ? params, headers)
-  result = await finishTimeline(json, none(Query))
+  result = await finishTimeline(json, none(Query), after)
 
 proc getTimelineSearch*(username, after: string; query: Query): Future[Timeline] {.async.} =
   let queryParam = genQueryParam(query)
@@ -308,4 +309,4 @@ proc getTimelineSearch*(username, after: string; query: Query): Future[Timeline]
   }
 
   let json = await fetchJson(base / timelineSearchUrl ? params, headers)
-  result = await finishTimeline(json, some(query))
+  result = await finishTimeline(json, some(query), after)
