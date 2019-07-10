@@ -1,7 +1,7 @@
-import xmltree, strutils, strformat, uri, algorithm, times
+import strutils, strformat, algorithm, times
 import karax/[karaxdsl, vdom, vstyles]
 
-import ../types, ../utils, ../search
+import ../types, ../search
 import tweet, renderutils
 
 proc getQuery(timeline: Timeline): string =

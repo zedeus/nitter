@@ -1,5 +1,5 @@
-import xmltree, strutils, strformat, uri, algorithm, times
-import karax/[karaxdsl, vdom, vstyles]
+import strutils, strformat
+import karax/[karaxdsl, vdom]
 
 import ../types
 import tweet, renderutils

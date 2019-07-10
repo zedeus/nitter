@@ -1,4 +1,4 @@
-import xmltree, strutils, strformat, uri, algorithm, times
+import strutils
 import karax/[karaxdsl, vdom, vstyles]
 
 import ../types, ../utils, ../formatters
