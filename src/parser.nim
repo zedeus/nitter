@@ -176,5 +176,5 @@ proc parsePhotoRail*(node: XmlNode): seq[GalleryPhoto] =
     result.add GalleryPhoto(
       url: img.attr("data-image-url"),
       tweetId: img.attr("data-tweet-id"),
-      color: img.attr("background-color").replace("style", "background-color")
+      color: img.attr("background-color").replace("style: ", "")
     )

@@ -124,6 +124,7 @@ type
     minId*: string
     maxId*: string
     hasMore*: bool
+    beginning*: bool
     query*: Option[Query]
 
 proc contains*(thread: Thread; tweet: Tweet): bool =

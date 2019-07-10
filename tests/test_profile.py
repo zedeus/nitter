@@ -10,8 +10,8 @@ profiles = [
 verified = [['jack'], ['elonmusk']]
 
 protected = [
-    ['mobile_test_7', 'mobile test 7', ''],
-    ['Poop', 'Randy', 'Social media fanatic.']
+    ['mobile_test_7', 'mobile test 7🔒', ''],
+    ['Poop', 'Randy🔒', 'Social media fanatic.']
 ]
 
 invalid = [['thisprofiledoesntexist'], ['%']]

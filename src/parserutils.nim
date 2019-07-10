@@ -91,9 +91,10 @@ proc getBanner*(tweet: XmlNode): string =
     result = url.replace("600x200", "1500x500")
   else:
     result = tweet.selectAttr(".ProfileCard-bg", "style")
+    result = result.replace("background-color: ", "")
 
   if result.len == 0:
-    result = "background-color: #161616"
+    result = "#161616"
 
 proc getPopupStats*(profile: var Profile; node: XmlNode) =
   for s in node.selectAll( ".ProfileCardStats-statLink"):

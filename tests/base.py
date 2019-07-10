@@ -3,11 +3,11 @@ from seleniumbase import BaseCase
 
 class Tweet(object):
     def __init__(self, tweet=''):
-        namerow = tweet + 'div.media-heading '
+        namerow = tweet + '.tweet-header '
         self.fullname = namerow + '.fullname'
         self.username = namerow + '.username'
-        self.date = tweet + 'div.media-heading .heading-right'
-        self.text = tweet + '.status-content-wrapper .status-content.media-body'
+        self.date = namerow + '.tweet-date'
+        self.text = tweet + '.status-content.media-body'
         self.retweet = tweet = '.retweet'
 
 
@@ -21,7 +21,7 @@ class Profile(object):
 
 
 class Timeline(object):
-    newest = 'div[class="show-more status-el"]'
+    newest = 'div[class="status-el show-more"]'
     older = 'div[class="show-more"]'
     end = '.timeline-end'
     none = '.timeline-none'

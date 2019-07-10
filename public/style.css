@@ -63,20 +63,20 @@ a:hover {
     margin-left: 58px;
 }
 
-.media-heading {
+.tweet-header {
     padding: 0;
     vertical-align: bottom;
     flex-basis: 100%;
     margin-bottom: .2em;
 }
 
-.media-heading a {
+.tweet-header a {
     display: inline-block;
     word-break: break-all;
     max-width: 100%;
 }
 
-.heading-name-row {
+.tweet-name-row {
     padding: 0;
     display: flex;
     justify-content: space-between;
@@ -132,7 +132,7 @@ a:hover {
     font-weight: bold;
 }
 
-.heading-right {
+.tweet-date {
     display: flex;
     flex-shrink: 0;
     margin-left: 4px;
@@ -247,7 +247,7 @@ nav {
     overflow: hidden;
 }
 
-.gallery-row .image-attachment, .attachments .image-attachment {
+.gallery-row .still-image, .attachments .image-attachment {
     width: 100%;
 }
 
@@ -348,6 +348,7 @@ video {
 }
 
 .show-more {
+    background-color: #161616;
     text-align: center;
     padding: .75em 0;
     display: block;
@@ -508,7 +509,7 @@ video {
     margin-top: 5px;
 }
 
-.photo-rail-heading {
+.photo-rail-header {
     padding: 5px 12px 0px 12px;
 }
 
@@ -627,8 +628,8 @@ video {
 }
 
 .thread-line .unavailable::before {
-    top: 40px;
-    margin-bottom: 19px;
+    top: 48px;
+    margin-bottom: 28px;
 }
 
 .thread-last .status-el::before {
@@ -641,7 +642,7 @@ video {
 .thread-line .more-replies::before {
     content: '...';
     background: unset;
-    color: #b94e46;
+    color: #ad433b;
     font-weight: bold;
     font-size: 22px;
     line-height: 0.25em;
@@ -750,18 +751,26 @@ video {
 }
 
 .timeline-footer, .timeline-header {
-    max-width: 550px;
-    margin: 0 auto;
+    background-color: #161616;
     padding: 6px 0px;
 }
 
-.timeline-none, .timeline-protected {
+.timeline-protected {
+    padding-left: 12px;
+}
+
+.timeline-protected p {
+    margin: 8px 0px;
+}
+
+.timeline-none, .timeline-protected h2 {
     color: #ff6c60;
     font-size: 21px;
     font-weight: 600;
 }
 
 .timeline-end {
+    background-color: #161616;
     text-align: center;
     font-size: 16px;
     color: #ff6c60;
@@ -771,14 +780,14 @@ video {
 .unavailable-box {
     width: 100%;
     height: 100%;
-    padding: 8px;
+    padding: 12px;
     border: solid 1px #404040;
     border-radius: 10px;
     background-color: #121212;
 }
 
 .unavailable-quote {
-    padding: 8px;
+    padding: 6px;
 }
 
 .quote {
@@ -786,16 +795,17 @@ video {
     border: solid 1px #404040;
     border-radius: 10px;
     background-color: #121212;
+    overflow: auto;
+    padding: 6px;
+    position: relative;
 }
 
 .quote:hover {
     border-color: #808080;
 }
 
-.quote-container {
-    position: relative;
-    overflow: auto;
-    padding: 6px;
+.quote.unavailable:hover {
+    border-color: #404040;
 }
 
 .quote-link {

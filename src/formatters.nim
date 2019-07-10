@@ -70,23 +70,6 @@ proc getUserpic*(userpic: string; style=""): string =
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
-proc genImg*(url: string; class=""): string =
-  result = img(src = url.getSigUrl("pic"), class = class, alt = "Image")
-
-proc linkUser*(profile: Profile; class=""): string =
-  let
-    username = "username" in class
-    href = &"/{profile.username}"
-    text = if username: "@" & profile.username
-           else: xmltree.escape(profile.fullname)
-
-  result = a(text, href = href, class = class, title = text)
-
-  if not username and profile.verified:
-    result &= span("✔", class="icon verified-icon", title="Verified account")
-  if not username and profile.protected:
-    result &= span("🔒", class="icon protected-icon", title="Protected account")
-
 proc pageTitle*(profile: Profile): string =
   &"{profile.fullname} (@{profile.username}) | Nitter"
 
