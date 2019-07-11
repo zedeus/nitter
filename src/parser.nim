@@ -178,3 +178,32 @@ proc parsePhotoRail*(node: XmlNode): seq[GalleryPhoto] =
       tweetId: img.attr("data-tweet-id"),
       color: img.attr("background-color").replace("style: ", "")
     )
+
+proc parseCard*(card: var Card; node: XmlNode) =
+  let cardKind = node.select("head > meta[name*=card_name]").attr("content")
+
+  if "summary_large_image" in cardKind:
+    card.kind = summaryLarge
+  elif "summary" in cardKind:
+    card.kind = summary
+  elif "live_event" in cardKind:
+    card.kind = liveEvent
+  elif "player" in cardKind:
+    card.kind = player
+  elif "promo_website" in cardKind:
+    card.kind = promoWebsite
+
+  card.title = node.selectText("h2.TwitterCard-title")
+  card.text = node.selectText("p.tcu-resetMargin")
+  card.dest = node.selectText("span.SummaryCard-destination")
+
+  let image = node.select(".tcu-imageWrapper > img")
+  if image != nil:
+    # workaround for issue 11713
+    card.image = image.attr("data-src").replace("gname", "g&name")
+  else:
+    echo card.id
+
+  if card.kind == liveEvent:
+    card.text = card.title
+    card.title = node.selectText(".TwitterCard-attribution--category")

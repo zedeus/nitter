@@ -169,8 +169,26 @@ proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
 
 proc getTweetCards*(tweet: Tweet; node: XmlNode) =
   if node.attr("data-has-cards") == "false": return
-  if "poll" in node.attr("data-card2-type"):
+  let cardType = node.attr("data-card2-type")
+
+  if "poll" in cardType:
     tweet.poll = some(Poll())
+    return
+
+  let cardDiv = node.select(".card2 > div")
+  if cardDiv == nil: return
+
+  var card = Card(
+    id: tweet.id,
+    query: cardDiv.attr("data-src")
+  )
+
+  # temporary solution
+  let text = node.selectText(".tweet-text")
+  let urls = getUrls(text)
+  card.url = urls[0]
+
+  tweet.card = some(card)
 
 proc getMoreReplies*(node: XmlNode): int =
   let text = node.innerText().strip()

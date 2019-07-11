@@ -81,3 +81,7 @@ proc getTime*(tweet: Tweet): string =
 
 proc getLink*(tweet: Tweet | Quote): string =
   &"/{tweet.profile.username}/status/{tweet.id}"
+
+proc getUrls*(text: string): seq[string] =
+  # temporary
+  text.findAll(urlRegex).mapIt(text[it.group(0)[0]])

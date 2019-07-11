@@ -21,7 +21,7 @@ const
 proc initQuery*(filters, includes, excludes, separator: string; name=""): Query =
   var sep = separator.strip().toUpper()
   Query(
-    queryType: custom,
+    kind: custom,
     filters: filters.split(",").filterIt(it in validFilters),
     includes: includes.split(",").filterIt(it in validFilters),
     excludes: excludes.split(",").filterIt(it in validFilters),
@@ -31,7 +31,7 @@ proc initQuery*(filters, includes, excludes, separator: string; name=""): Query 
 
 proc getMediaQuery*(name: string): Query =
   Query(
-    queryType: media,
+    kind: media,
     filters: @["twimg", "native_video"],
     fromUser: name,
     sep: "OR"
@@ -39,7 +39,7 @@ proc getMediaQuery*(name: string): Query =
 
 proc getReplyQuery*(name: string): Query =
   Query(
-    queryType: replies,
+    kind: replies,
     includes: @["nativeretweets"],
     fromUser: name
   )
@@ -61,8 +61,8 @@ proc genQueryParam*(query: Query): string =
   return strip(param & filters.join(&" {query.sep} "))
 
 proc genQueryUrl*(query: Query): string =
-  result = &"/{query.queryType}?"
-  if query.queryType != custom: return
+  result = &"/{query.kind}?"
+  if query.kind != custom: return
 
   var params: seq[string]
   if query.filters.len > 0:
