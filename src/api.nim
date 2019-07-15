@@ -174,8 +174,8 @@ proc getCard*(tweet: Tweet) {.async.} =
     "Accept-Language": lang,
   })
 
-  let url = base / get(tweet.card).query
-  let html = await fetchHtml(url, headers)
+  let query = get(tweet.card).query.replace("sensitive=true", "sensitive=false")
+  let html = await fetchHtml(base / query, headers)
   if html == nil: return
 
   parseCard(get(tweet.card), html)
