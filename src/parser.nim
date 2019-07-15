@@ -75,7 +75,7 @@ proc parseTweet*(node: XmlNode): Tweet =
   )
 
   result.getTweetMedia(tweet)
-  result.getTweetCards(tweet)
+  result.getTweetCard(tweet)
 
   let by = tweet.selectText(".js-retweet-text > a > b")
   if by.len > 0:
@@ -197,7 +197,10 @@ proc parseCard*(card: var Card; node: XmlNode) =
   card.text = node.selectText("p.tcu-resetMargin")
   card.dest = node.selectText("span.SummaryCard-destination")
 
-  let image = node.select(".tcu-imageWrapper > img")
+  if card.url.len == 0:
+    card.url = node.select("a").attr("href")
+
+  let image = node.select(".tcu-imageWrapper img")
   if image != nil:
     # workaround for issue 11713
     card.image = image.attr("data-src").replace("gname", "g&name")

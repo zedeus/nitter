@@ -10,7 +10,6 @@ const
   emailRegex = re"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
   usernameRegex = re"(^|[^A-z0-9_?])@([A-z0-9_]+)"
   picRegex = re"pic.twitter.com/[^ ]+"
-  cardRegex = re"(https?://)?cards.twitter.com/[^ ]+"
   ellipsisRegex = re" ?…"
   nbsp = $Rune(0x000A0)
 
@@ -60,7 +59,6 @@ proc linkifyText*(text: string): string =
 proc stripTwitterUrls*(text: string): string =
   result = text
   result = result.replace(picRegex, "")
-  result = result.replace(cardRegex, "")
   result = result.replace(ellipsisRegex, "")
 
 proc getUserpic*(userpic: string; style=""): string =
@@ -81,7 +79,3 @@ proc getTime*(tweet: Tweet): string =
 
 proc getLink*(tweet: Tweet | Quote): string =
   &"/{tweet.profile.username}/status/{tweet.id}"
-
-proc getUrls*(text: string): seq[string] =
-  # temporary
-  text.findAll(urlRegex).mapIt(text[it.group(0)[0]])

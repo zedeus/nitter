@@ -167,7 +167,7 @@ proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
   elif gifBadge != nil:
     quote.badge = "GIF"
 
-proc getTweetCards*(tweet: Tweet; node: XmlNode) =
+proc getTweetCard*(tweet: Tweet; node: XmlNode) =
   if node.attr("data-has-cards") == "false": return
   let cardType = node.attr("data-card2-type")
 
@@ -183,10 +183,10 @@ proc getTweetCards*(tweet: Tweet; node: XmlNode) =
     query: cardDiv.attr("data-src")
   )
 
-  # temporary solution
-  let text = node.selectText(".tweet-text")
-  let urls = getUrls(text)
-  card.url = urls[0]
+  let cardUrl = cardDiv.attr("data-card-url")
+  for n in node.selectAll(".tweet-text a"):
+    if n.attr("href") == cardUrl:
+      card.url = n.attr("data-expanded-url")
 
   tweet.card = some(card)
 
