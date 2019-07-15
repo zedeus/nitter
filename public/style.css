@@ -237,7 +237,7 @@ nav {
 
 .gallery-row .attachment:last-child, .gallery-row .attachments:last-child, .video-container {
     margin: 0;
-    max-height: 500px;
+    max-height: 530px;
 }
 
 .attachments .attachment {
@@ -899,6 +899,11 @@ video {
 
 .card-container:hover {
     border-color: #808080;
+}
+
+.card-container .attachments {
+    margin: 0;
+    border-radius: 0;
 }
 
 .large .card-container {

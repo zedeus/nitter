@@ -106,7 +106,11 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
     await getVideo(tweet, guestToken)
     return
 
-  tweet.video = some(parseVideo(json))
+  if tweet.card.isNone:
+    tweet.video = some(parseVideo(json))
+  else:
+    get(tweet.card).video = some(parseVideo(json))
+    tweet.video = none(Video)
   tokenUses.inc
 
 proc getVideos*(thread: Thread; token="") {.async.} =

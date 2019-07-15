@@ -77,20 +77,25 @@ proc renderPoll(poll: Poll): VNode =
     span(class="poll-info"):
       text $poll.votes & " votes • " & poll.status
 
+proc renderCardImage(card: Card): VNode =
+  buildHtml(tdiv(class="card-image-container")):
+    tdiv(class="card-image"):
+      img(src=get(card.image).getSigUrl("pic"))
+      if card.kind == player:
+        tdiv(class="card-overlay"):
+          tdiv(class="card-overlay-circle"):
+            span(class="card-overlay-triangle")
+
 proc renderCard(card: Card): VNode =
-  const largeCards = {summaryLarge, liveEvent, promoWebsite}
+  const largeCards = {summaryLarge, liveEvent, promoWebsite, promoVideo}
   let large = if card.kind in largeCards: " large" else: ""
 
   buildHtml(tdiv(class=("card" & large))):
     a(class="card-container", href=card.url):
-      if card.image.len > 0:
-        tdiv(class="card-image-container"):
-          tdiv(class="card-image"):
-            img(src=card.image.getSigUrl("pic"))
-            if card.kind == player:
-              tdiv(class="card-overlay"):
-                tdiv(class="card-overlay-circle"):
-                  span(class="card-overlay-triangle")
+      if card.image.isSome:
+        renderCardImage(card)
+      elif card.video.isSome:
+        renderVideo(get(card.video))
 
       tdiv(class="card-content-container"):
         tdiv(class="card-content"):
@@ -181,7 +186,9 @@ proc renderTweet*(tweet: Tweet; class=""; index=0; total=(-1); last=false): VNod
         if tweet.quote.isSome:
           renderQuote(tweet.quote.get())
 
-        if tweet.photos.len > 0:
+        if tweet.card.isSome:
+          renderCard(tweet.card.get())
+        elif tweet.photos.len > 0:
           renderAlbum(tweet)
         elif tweet.video.isSome:
           renderVideo(tweet.video.get())
@@ -189,8 +196,6 @@ proc renderTweet*(tweet: Tweet; class=""; index=0; total=(-1); last=false): VNod
           renderGif(tweet.gif.get())
         elif tweet.poll.isSome:
           renderPoll(tweet.poll.get())
-        elif tweet.card.isSome:
-          renderCard(tweet.card.get())
 
         renderStats(tweet.stats)
 

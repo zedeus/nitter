@@ -71,7 +71,12 @@ type
     leader*: int
 
   CardKind* = enum
-    summary, summaryLarge, liveEvent, player, promoWebsite
+    summary = "summary"
+    summaryLarge = "summary_large_image"
+    promoWebsite = "promo_website"
+    promoVideo = "promo_video_website"
+    player = "player"
+    liveEvent = "live_event"
 
   Card* = object
     kind*: CardKind
@@ -81,7 +86,8 @@ type
     title*: string
     dest*: string
     text*: string
-    image*: string
+    image*: Option[string]
+    video*: Option[Video]
 
   Quote* = object
     id*: string
