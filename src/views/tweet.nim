@@ -77,6 +77,27 @@ proc renderPoll(poll: Poll): VNode =
     span(class="poll-info"):
       text $poll.votes & " votes • " & poll.status
 
+proc renderCard(card: Card): VNode =
+  const largeCards = {summaryLarge, liveEvent, promoWebsite}
+  let large = if card.kind in largeCards: " large" else: ""
+
+  buildHtml(tdiv(class=("card" & large))):
+    a(class="card-container", href=card.url):
+      if card.image.len > 0:
+        tdiv(class="card-image-container"):
+          tdiv(class="card-image"):
+            img(src=card.image.getSigUrl("pic"))
+            if card.kind == player:
+              tdiv(class="card-overlay"):
+                tdiv(class="card-overlay-circle"):
+                  span(class="card-overlay-triangle")
+
+      tdiv(class="card-content-container"):
+        tdiv(class="card-content"):
+          h2(class="card-title"): text card.title
+          p(class="card-description"): text card.text
+          span(class="card-destination"): text card.dest
+
 proc renderStats(stats: TweetStats): VNode =
   buildHtml(tdiv(class="tweet-stats")):
     span(class="tweet-stat"): text "💬 " & $stats.replies
@@ -168,6 +189,8 @@ proc renderTweet*(tweet: Tweet; class=""; index=0; total=(-1); last=false): VNod
           renderGif(tweet.gif.get())
         elif tweet.poll.isSome:
           renderPoll(tweet.poll.get())
+        elif tweet.card.isSome:
+          renderCard(tweet.card.get())
 
         renderStats(tweet.stats)
 

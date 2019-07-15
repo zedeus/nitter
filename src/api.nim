@@ -179,7 +179,6 @@ proc getCard*(tweet: Tweet) {.async.} =
   if html == nil: return
 
   parseCard(get(tweet.card), html)
-  # echo tweet.card.get()
 
 proc getCards*(thread: Thread) {.async.} =
   if thread == nil: return

@@ -419,7 +419,6 @@ video {
 .profile-banner-color {
     width: 100%;
     padding-bottom: 25%;
-    margin-bottom: 8px;
 }
 
 .profile-card {
@@ -880,6 +879,131 @@ video {
     background-color: #4e4e4e;
     padding-bottom: 5px;
     margin: 0;
+}
+
+.card {
+    margin: 5px 0;
+}
+
+.card-container {
+    border-radius: 10px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #404040;
+    background-color: #121212;
+    overflow: hidden;
+    color: inherit;
+    display: flex;
+    text-decoration: none !important;
+}
+
+.card-container:hover {
+    border-color: #808080;
+}
+
+.large .card-container {
+    display: block;
+}
+
+.card-content {
+    padding: 0.5em;
+}
+
+.card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+    font-size: 1.15em;
+}
+
+.card-description {
+    margin: 0.3em 0;
+}
+
+.card-destination {
+    color: hsla(240,1%,73%,.9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.card-image-container {
+    width: 98px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.large .card-image-container {
+    width: unset;
+}
+
+.card-image-container:before {
+    content: "";
+    display: block;
+    padding-top: 100%;
+}
+
+.large .card-image-container:before {
+    display: none;
+}
+
+.card-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: white;
+}
+
+.large .card-image {
+    position: unset;
+    border-style: solid;
+    border-color: #404040;
+    border-width: 0;
+    border-bottom-width: 1px;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.8;
+}
+
+.card-overlay-circle {
+    border-radius: 50%;
+    background-color: #404040;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    display: flex;
+    border-width: 5px;
+    border-color: #d8574d;
+    border-style: solid;
+}
+
+.card-overlay-triangle {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 0 12px 17px;
+    border-color: transparent transparent transparent #d8574d;
+    margin-left: 14px;
 }
 
 .poll-meter {
