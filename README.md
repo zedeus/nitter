@@ -27,17 +27,15 @@ is on implementing missing features.
 
 - Search (images/videos, hashtags, etc.)
 - Custom timeline filter
-- Media-only/gallery view
 - Nitter link previews
 - Server configuration
-- Caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
-- Twitter "Cards" (link previews)
+- More caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
 - Simple account system with customizable feed
-- Emoji support (WIP, needs font)
 - Video support with hls.js
 - Json API endpoints
 - Themes
 - Nitter logo
+- Emoji support (WIP, uses native font for now)
 
 ## Why?
 
