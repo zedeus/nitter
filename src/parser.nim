@@ -75,7 +75,7 @@ proc parseTweet*(node: XmlNode): Tweet =
   )
 
   result.getTweetMedia(tweet)
-  result.getTweetCards(tweet)
+  result.getTweetCard(tweet)
 
   let by = tweet.selectText(".js-retweet-text > a > b")
   if by.len > 0:
@@ -178,3 +178,20 @@ proc parsePhotoRail*(node: XmlNode): seq[GalleryPhoto] =
       tweetId: img.attr("data-tweet-id"),
       color: img.attr("background-color").replace("style: ", "")
     )
+
+proc parseCard*(card: var Card; node: XmlNode) =
+  card.title = node.selectText("h2.TwitterCard-title")
+  card.text = node.selectText("p.tcu-resetMargin")
+  card.dest = node.selectText("span.SummaryCard-destination")
+
+  if card.url.len == 0:
+    card.url = node.select("a").attr("href")
+
+  let image = node.select(".tcu-imageWrapper img")
+  if image != nil:
+    # workaround for issue 11713
+    card.image = some(image.attr("data-src").replace("gname", "g&name"))
+
+  if card.kind == liveEvent:
+    card.text = card.title
+    card.title = node.selectText(".TwitterCard-attribution--category")

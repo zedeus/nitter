@@ -106,7 +106,11 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
     await getVideo(tweet, guestToken)
     return
 
-  tweet.video = some(parseVideo(json))
+  if tweet.card.isNone:
+    tweet.video = some(parseVideo(json))
+  else:
+    get(tweet.card).video = some(parseVideo(json))
+    tweet.video = none(Video)
   tokenUses.inc
 
 proc getVideos*(thread: Thread; token="") {.async.} =
@@ -161,6 +165,36 @@ proc getConversationPolls*(convo: Conversation) {.async.} =
   futs.add getPolls(convo.before)
   futs.add getPolls(convo.after)
   futs.add convo.replies.map(getPolls)
+  await all(futs)
+
+proc getCard*(tweet: Tweet) {.async.} =
+  if tweet.card.isNone(): return
+
+  let headers = newHttpHeaders({
+    "Accept": cardAccept,
+    "Referer": $(base / getLink(tweet)),
+    "User-Agent": agent,
+    "Authority": "twitter.com",
+    "Accept-Language": lang,
+  })
+
+  let query = get(tweet.card).query.replace("sensitive=true", "sensitive=false")
+  let html = await fetchHtml(base / query, headers)
+  if html == nil: return
+
+  parseCard(get(tweet.card), html)
+
+proc getCards*(thread: Thread) {.async.} =
+  if thread == nil: return
+  var cards = thread.tweets.filterIt(it.card.isSome)
+  await all(cards.map(getCard))
+
+proc getConversationCards*(convo: Conversation) {.async.} =
+  var futs: seq[Future[void]]
+  futs.add getCard(convo.tweet)
+  futs.add getCards(convo.before)
+  futs.add getCards(convo.after)
+  futs.add convo.replies.map(getCards)
   await all(futs)
 
 proc getPhotoRail*(username: string): Future[seq[GalleryPhoto]] {.async.} =
@@ -234,9 +268,12 @@ proc getTweet*(username, id: string): Future[Conversation] {.async.} =
 
   result = parseConversation(html)
 
-  let vidsFut = getConversationVideos(result)
-  let pollFut = getConversationPolls(result)
-  await all(vidsFut, pollFut)
+  let
+    vidsFut = getConversationVideos(result)
+    pollFut = getConversationPolls(result)
+    cardFut = getConversationCards(result)
+
+  await all(vidsFut, pollFut, cardFut)
 
 proc finishTimeline(json: JsonNode; query: Option[Query]; after: string): Future[Timeline] {.async.} =
   if json == nil: return Timeline()
@@ -257,8 +294,9 @@ proc finishTimeline(json: JsonNode; query: Option[Query]; after: string): Future
     thread = parseThread(html)
     vidsFut = getVideos(thread)
     pollFut = getPolls(thread)
+    cardFut = getCards(thread)
 
-  await all(vidsFut, pollFut)
+  await all(vidsFut, pollFut, cardFut)
   result.tweets = thread.tweets
 
 proc getTimeline*(username, after: string): Future[Timeline] {.async.} =

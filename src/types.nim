@@ -31,11 +31,11 @@ db("cache.db", "", "", ""):
         .}: Time
 
 type
-  QueryType* = enum
+  QueryKind* = enum
     replies, media, custom = "search"
 
   Query* = object
-    queryType*: QueryType
+    kind*: QueryKind
     filters*: seq[string]
     includes*: seq[string]
     excludes*: seq[string]
@@ -69,6 +69,25 @@ type
     votes*: string
     status*: string
     leader*: int
+
+  CardKind* = enum
+    summary = "summary"
+    summaryLarge = "summary_large_image"
+    promoWebsite = "promo_website"
+    promoVideo = "promo_video_website"
+    player = "player"
+    liveEvent = "live_event"
+
+  Card* = object
+    kind*: CardKind
+    id*: string
+    query*: string
+    url*: string
+    title*: string
+    dest*: string
+    text*: string
+    image*: Option[string]
+    video*: Option[Video]
 
   Quote* = object
     id*: string
@@ -104,6 +123,7 @@ type
     stats*: TweetStats
     retweet*: Option[Retweet]
     quote*: Option[Quote]
+    card*: Option[Card]
     gif*: Option[Gif]
     video*: Option[Video]
     photos*: seq[string]

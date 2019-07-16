@@ -14,7 +14,7 @@ proc getTabClass(timeline: Timeline; tab: string): string =
   if timeline.query.isNone:
     if tab == "tweets":
       classes.add "active"
-  elif $timeline.query.get().queryType == tab:
+  elif $timeline.query.get().kind == tab:
     classes.add "active"
 
   return classes.join(" ")

@@ -1,4 +1,4 @@
-import xmltree, htmlparser, strtabs, strformat, times
+import xmltree, htmlparser, strtabs, strformat, strutils, times
 import regex
 
 import types, formatters, api
@@ -167,10 +167,36 @@ proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
   elif gifBadge != nil:
     quote.badge = "GIF"
 
-proc getTweetCards*(tweet: Tweet; node: XmlNode) =
+proc getTweetCard*(tweet: Tweet; node: XmlNode) =
   if node.attr("data-has-cards") == "false": return
-  if "poll" in node.attr("data-card2-type"):
+  var cardType = node.attr("data-card2-type")
+
+  if ":" in cardType:
+    cardType = cardType.split(":")[^1]
+
+  if "poll" in cardType:
     tweet.poll = some(Poll())
+    return
+
+  let cardDiv = node.select(".card2 > .js-macaw-cards-iframe-container")
+  if cardDiv == nil: return
+
+  var card = Card(
+    id: tweet.id,
+    query: cardDiv.attr("data-src")
+  )
+
+  try:
+    card.kind = parseEnum[CardKind](cardType)
+  except ValueError:
+    card.kind = summary
+
+  let cardUrl = cardDiv.attr("data-card-url")
+  for n in node.selectAll(".tweet-text a"):
+    if n.attr("href") == cardUrl:
+      card.url = n.attr("data-expanded-url")
+
+  tweet.card = some(card)
 
 proc getMoreReplies*(node: XmlNode): int =
   let text = node.innerText().strip()
