@@ -74,7 +74,7 @@ routes:
       resp Http404, showError("Tweet not found", cfg.title)
 
     let title = pageTitle(conversation.tweet.profile)
-    resp renderMain(renderConversation(conversation), title=title)
+    resp renderMain(renderConversation(conversation), title=cfg.title, titleText=title)
 
   get "/pic/@sig/@url":
     cond "http" in @"url"
