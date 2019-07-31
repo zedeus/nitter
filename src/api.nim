@@ -30,6 +30,39 @@ var
   tokenUpdated: Time
   tokenLifetime = initDuration(minutes=20)
 
+macro genMediaGet(media: untyped; token=false) =
+  let
+    mediaName = capitalizeAscii($media)
+    multi = ident("get" & mediaName & "s")
+    convo = ident("getConversation" & mediaName & "s")
+    single = ident("get" & mediaName)
+
+  quote do:
+    proc `multi`(thread: Thread; agent: string; token="") {.async.} =
+      if thread == nil: return
+      var `media` = thread.tweets.filterIt(it.`media`.isSome)
+      when `token`:
+        var gToken = token
+        if gToken.len == 0: gToken = await getGuestToken(agent)
+        await all(`media`.mapIt(`single`(it, token, agent)))
+      else:
+        await all(`media`.mapIt(`single`(it, agent)))
+
+    proc `convo`(convo: Conversation; agent: string) {.async.} =
+      var futs: seq[Future[void]]
+      when `token`:
+        var token = await getGuestToken(agent)
+        futs.add `single`(convo.tweet, token, agent)
+        futs.add `multi`(convo.before, token, agent)
+        futs.add `multi`(convo.after, token, agent)
+        futs.add convo.replies.mapIt(`multi`(it, token, agent))
+      else:
+        futs.add `single`(convo.tweet, agent)
+        futs.add `multi`(convo.before, agent)
+        futs.add `multi`(convo.after, agent)
+        futs.add convo.replies.mapIt(`multi`(it, agent))
+      await all(futs)
+
 template newClient() {.dirty.} =
   var client = newAsyncHttpClient()
   defer: client.close()
@@ -112,30 +145,6 @@ proc getVideo*(tweet: Tweet; token, agent: string) {.async.} =
     tweet.video = none(Video)
   tokenUses.inc
 
-proc getVideos*(thread: Thread; agent: string; token="") {.async.} =
-  if thread == nil: return
-
-  var gToken = token
-  if gToken.len == 0:
-    gToken = await getGuestToken(agent)
-
-  var videoFuts: seq[Future[void]]
-  for tweet in thread.tweets.filterIt(it.video.isSome):
-    videoFuts.add getVideo(tweet, gToken, agent)
-
-  await all(videoFuts)
-
-proc getConversationVideos*(convo: Conversation; agent: string) {.async.} =
-  var token = await getGuestToken(agent)
-  var futs: seq[Future[void]]
-
-  futs.add getVideo(convo.tweet, token, agent)
-  futs.add convo.replies.mapIt(getVideos(it, token, agent))
-  futs.add getVideos(convo.before, token, agent)
-  futs.add getVideos(convo.after, token, agent)
-
-  await all(futs)
-
 proc getPoll*(tweet: Tweet; agent: string) {.async.} =
   if tweet.poll.isNone(): return
 
@@ -152,19 +161,6 @@ proc getPoll*(tweet: Tweet; agent: string) {.async.} =
   if html == nil: return
 
   tweet.poll = some(parsePoll(html))
-
-proc getPolls*(thread: Thread; agent: string) {.async.} =
-  if thread == nil: return
-  var polls = thread.tweets.filterIt(it.poll.isSome)
-  await all(polls.mapIt(getPoll(it, agent)))
-
-proc getConversationPolls*(convo: Conversation; agent: string) {.async.} =
-  var futs: seq[Future[void]]
-  futs.add getPoll(convo.tweet, agent)
-  futs.add getPolls(convo.before, agent)
-  futs.add getPolls(convo.after, agent)
-  futs.add convo.replies.mapIt(getPolls(it, agent))
-  await all(futs)
 
 proc getCard*(tweet: Tweet; agent: string) {.async.} =
   if tweet.card.isNone(): return
@@ -183,18 +179,9 @@ proc getCard*(tweet: Tweet; agent: string) {.async.} =
 
   parseCard(get(tweet.card), html)
 
-proc getCards*(thread: Thread; agent: string) {.async.} =
-  if thread == nil: return
-  var cards = thread.tweets.filterIt(it.card.isSome)
-  await all(cards.mapIt(getCard(it, agent)))
-
-proc getConversationCards*(convo: Conversation; agent: string) {.async.} =
-  var futs: seq[Future[void]]
-  futs.add getCard(convo.tweet, agent)
-  futs.add getCards(convo.before, agent)
-  futs.add getCards(convo.after, agent)
-  futs.add convo.replies.mapIt(getCards(it, agent))
-  await all(futs)
+genMediaGet(video, token=true)
+genMediaGet(poll)
+genMediaGet(card)
 
 proc getPhotoRail*(username, agent: string): Future[seq[GalleryPhoto]] {.async.} =
   let headers = newHttpHeaders({
