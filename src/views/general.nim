@@ -2,17 +2,20 @@ import karax/[karaxdsl, vdom]
 
 const doctype = "<!DOCTYPE html>\n"
 
-proc renderMain*(body: VNode; title="Nitter"): string =
+proc renderMain*(body: VNode; title="Nitter"; titleText=""): string =
   let node = buildHtml(html(lang="en")):
     head:
-      title: text title
+      if titleText.len > 0:
+        title: text titleText & " | " & title
+      else:
+        title: text title
       link(rel="stylesheet", `type`="text/css", href="/style.css")
 
     body:
       nav(id="nav", class="nav-bar container"):
         tdiv(class="inner-nav"):
           tdiv(class="item"):
-            a(href="/", class="site-name"): text "nitter"
+            a(href="/", class="site-name"): text title
 
       tdiv(id="content", class="container"):
         body
@@ -31,5 +34,5 @@ proc renderError*(error: string): VNode =
     tdiv(class="error-panel"):
       span: text error
 
-proc showError*(error: string): string =
-  renderMain(renderError(error), title = "Error | Nitter")
+proc showError*(error: string; title: string): string =
+  renderMain(renderError(error), title=title, titleText="Error")

@@ -69,10 +69,7 @@ proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
 proc pageTitle*(profile: Profile): string =
-  &"{profile.fullname} (@{profile.username}) | Nitter"
-
-proc pageTitle*(page: string): string =
-  &"{page} | Nitter"
+  &"{profile.fullname} (@{profile.username})"
 
 proc getTime*(tweet: Tweet): string =
   tweet.time.format("d/M/yyyy', ' HH:mm:ss")

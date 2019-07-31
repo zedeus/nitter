@@ -450,6 +450,7 @@ video {
     text-overflow: ellipsis;
     max-width: 100%;
     font-weight: bold;
+    overflow-wrap: break-word;
 }
 
 .profile-card-username {

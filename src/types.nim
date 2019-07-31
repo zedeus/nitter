@@ -147,5 +147,13 @@ type
     beginning*: bool
     query*: Option[Query]
 
+  Config* = ref object
+    address*: string
+    port*: int
+    title*: string
+    staticDir*: string
+    cacheDir*: string
+    profileCacheTime*: int
+
 proc contains*(thread: Thread; tweet: Tweet): bool =
   thread.tweets.anyIt(it.id == tweet.id)

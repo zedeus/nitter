@@ -26,3 +26,6 @@ proc getCachedProfile*(username: string; force=false): Future[Profile] {.async.}
       result = await getProfile(username)
       if result.username.len > 0:
         result.insert()
+
+proc setProfileCacheTime*(minutes: int) =
+  profileCacheTime = initDuration(minutes=minutes)

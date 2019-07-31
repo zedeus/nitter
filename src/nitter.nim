@@ -1,11 +1,13 @@
 import asyncdispatch, asyncfile, httpclient, strutils, strformat, uri, os
+from net import Port
+
 import jester, regex
 
-import api, utils, types, cache, formatters, search
-
+import api, utils, types, cache, formatters, search, config
 import views/[general, profile, status]
 
-const cacheDir {.strdefine.} = "/tmp/nitter"
+const configPath {.strdefine.} = "./nitter.conf"
+let cfg = getConfig(configPath)
 
 proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.async.} =
   let
@@ -24,20 +26,27 @@ proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.a
     return ""
 
   let profileHtml = renderProfile(profile, await timelineFut, await railFut)
-  return renderMain(profileHtml, title=pageTitle(profile))
+  return renderMain(profileHtml, title=cfg.title, titleText=pageTitle(profile))
 
 template respTimeline(timeline: typed) =
   if timeline.len == 0:
-    resp Http404, showError("User \"" & @"name" & "\" not found")
+    resp Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
   resp timeline
+
+setProfileCacheTime(cfg.profileCacheTime)
+
+settings:
+  port = Port(cfg.port)
+  staticDir = cfg.staticDir
+  bindAddr = cfg.address
 
 routes:
   get "/":
-    resp renderMain(renderSearch(), title=pageTitle("Search"))
+    resp renderMain(renderSearch(), title=cfg.title, titleText="Search")
 
   post "/search":
     if @"query".len == 0:
-      resp Http404, showError("Please enter a username.")
+      resp Http404, showError("Please enter a username.", cfg.title)
     redirect("/" & @"query")
 
   get "/@name/?":
@@ -62,7 +71,7 @@ routes:
 
     let conversation = await getTweet(@"name", @"id")
     if conversation == nil or conversation.tweet.id.len == 0:
-      resp Http404, showError("Tweet not found")
+      resp Http404, showError("Tweet not found", cfg.title)
 
     let title = pageTitle(conversation.tweet.profile)
     resp renderMain(renderConversation(conversation), title=title)
@@ -74,13 +83,13 @@ routes:
     let
       uri = parseUri(decodeUrl(@"url"))
       path = uri.path.split("/")[2 .. ^1].join("/")
-      filename = cacheDir / cleanFilename(path & uri.query)
+      filename = cfg.cacheDir / cleanFilename(path & uri.query)
 
     if getHmac($uri) != @"sig":
-      resp showError("Failed to verify signature")
+      resp showError("Failed to verify signature", cfg.title)
 
-    if not existsDir(cacheDir):
-      createDir(cacheDir)
+    if not existsDir(cfg.cacheDir):
+      createDir(cfg.cacheDir)
 
     if not existsFile(filename):
       let client = newAsyncHttpClient()
@@ -92,6 +101,7 @@ routes:
 
     let file = openAsync(filename)
     defer: file.close()
+
     resp await readAll(file), mimetype(filename)
 
   get "/video/@sig/@url":
@@ -100,7 +110,7 @@ routes:
     let url = decodeUrl(@"url")
 
     if getHmac(url) != @"sig":
-      resp showError("Failed to verify signature")
+      resp showError("Failed to verify signature", cfg.title)
 
     let
       client = newAsyncHttpClient()
