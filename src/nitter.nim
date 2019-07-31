@@ -3,7 +3,7 @@ from net import Port
 
 import jester, regex
 
-import api, utils, types, cache, formatters, search, config
+import api, utils, types, cache, formatters, search, config, agents
 import views/[general, profile, status]
 
 const configPath {.strdefine.} = "./nitter.conf"
@@ -11,15 +11,16 @@ let cfg = getConfig(configPath)
 
 proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.async.} =
   let
+    agent = getAgent()
     username = name.strip(chars={'/'})
-    profileFut = getCachedProfile(username)
-    railFut = getPhotoRail(username)
+    profileFut = getCachedProfile(username, agent)
+    railFut = getPhotoRail(username, agent)
 
   var timelineFut: Future[Timeline]
   if query.isNone:
-    timelineFut = getTimeline(username, after)
+    timelineFut = getTimeline(username, after, agent)
   else:
-    timelineFut = getTimelineSearch(username, after, get(query))
+    timelineFut = getTimelineSearch(username, after, agent, get(query))
 
   let profile = await profileFut
   if profile.username.len == 0:
@@ -69,7 +70,7 @@ routes:
   get "/@name/status/@id":
     cond '.' notin @"name"
 
-    let conversation = await getTweet(@"name", @"id")
+    let conversation = await getTweet(@"name", @"id", getAgent())
     if conversation == nil or conversation.tweet.id.len == 0:
       resp Http404, showError("Tweet not found", cfg.title)
 

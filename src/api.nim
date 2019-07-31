@@ -4,7 +4,6 @@ import sequtils, strutils, json, xmltree, uri
 import types, parser, parserutils, formatters, search
 
 const
-  agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
   lang = "en-US,en;q=0.9"
   auth = "Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"
   cardAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
@@ -61,7 +60,7 @@ proc fetchJson(url: Uri; headers: HttpHeaders): Future[JsonNode] {.async.} =
   except:
     return nil
 
-proc getGuestToken(force=false): Future[string] {.async.} =
+proc getGuestToken(agent: string; force=false): Future[string] {.async.} =
   if getTime() - tokenUpdated < tokenLifetime and
      not force and tokenUses < tokenMaxUses:
     return guestToken
@@ -85,7 +84,7 @@ proc getGuestToken(force=false): Future[string] {.async.} =
   result = json["guest_token"].to(string)
   guestToken = result
 
-proc getVideo*(tweet: Tweet; token: string) {.async.} =
+proc getVideo*(tweet: Tweet; token, agent: string) {.async.} =
   if tweet.video.isNone(): return
 
   let headers = newHttpHeaders({
@@ -102,8 +101,8 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
   if json == nil:
     if getTime() - tokenUpdated > initDuration(seconds=1):
       tokenUpdated = getTime()
-      discard await getGuestToken(force=true)
-    await getVideo(tweet, guestToken)
+      discard await getGuestToken(agent, force=true)
+    await getVideo(tweet, guestToken, agent)
     return
 
   if tweet.card.isNone:
@@ -113,31 +112,31 @@ proc getVideo*(tweet: Tweet; token: string) {.async.} =
     tweet.video = none(Video)
   tokenUses.inc
 
-proc getVideos*(thread: Thread; token="") {.async.} =
+proc getVideos*(thread: Thread; agent: string; token="") {.async.} =
   if thread == nil: return
 
   var gToken = token
   if gToken.len == 0:
-    gToken = await getGuestToken()
+    gToken = await getGuestToken(agent)
 
   var videoFuts: seq[Future[void]]
   for tweet in thread.tweets.filterIt(it.video.isSome):
-    videoFuts.add getVideo(tweet, gToken)
+    videoFuts.add getVideo(tweet, gToken, agent)
 
   await all(videoFuts)
 
-proc getConversationVideos*(convo: Conversation) {.async.} =
-  var token = await getGuestToken()
+proc getConversationVideos*(convo: Conversation; agent: string) {.async.} =
+  var token = await getGuestToken(agent)
   var futs: seq[Future[void]]
 
-  futs.add getVideo(convo.tweet, token)
-  futs.add convo.replies.mapIt(getVideos(it, token))
-  futs.add getVideos(convo.before, token)
-  futs.add getVideos(convo.after, token)
+  futs.add getVideo(convo.tweet, token, agent)
+  futs.add convo.replies.mapIt(getVideos(it, token, agent))
+  futs.add getVideos(convo.before, token, agent)
+  futs.add getVideos(convo.after, token, agent)
 
   await all(futs)
 
-proc getPoll*(tweet: Tweet) {.async.} =
+proc getPoll*(tweet: Tweet; agent: string) {.async.} =
   if tweet.poll.isNone(): return
 
   let headers = newHttpHeaders({
@@ -154,20 +153,20 @@ proc getPoll*(tweet: Tweet) {.async.} =
 
   tweet.poll = some(parsePoll(html))
 
-proc getPolls*(thread: Thread) {.async.} =
+proc getPolls*(thread: Thread; agent: string) {.async.} =
   if thread == nil: return
   var polls = thread.tweets.filterIt(it.poll.isSome)
-  await all(polls.map(getPoll))
+  await all(polls.mapIt(getPoll(it, agent)))
 
-proc getConversationPolls*(convo: Conversation) {.async.} =
+proc getConversationPolls*(convo: Conversation; agent: string) {.async.} =
   var futs: seq[Future[void]]
-  futs.add getPoll(convo.tweet)
-  futs.add getPolls(convo.before)
-  futs.add getPolls(convo.after)
-  futs.add convo.replies.map(getPolls)
+  futs.add getPoll(convo.tweet, agent)
+  futs.add getPolls(convo.before, agent)
+  futs.add getPolls(convo.after, agent)
+  futs.add convo.replies.mapIt(getPolls(it, agent))
   await all(futs)
 
-proc getCard*(tweet: Tweet) {.async.} =
+proc getCard*(tweet: Tweet; agent: string) {.async.} =
   if tweet.card.isNone(): return
 
   let headers = newHttpHeaders({
@@ -184,20 +183,20 @@ proc getCard*(tweet: Tweet) {.async.} =
 
   parseCard(get(tweet.card), html)
 
-proc getCards*(thread: Thread) {.async.} =
+proc getCards*(thread: Thread; agent: string) {.async.} =
   if thread == nil: return
   var cards = thread.tweets.filterIt(it.card.isSome)
-  await all(cards.map(getCard))
+  await all(cards.mapIt(getCard(it, agent)))
 
-proc getConversationCards*(convo: Conversation) {.async.} =
+proc getConversationCards*(convo: Conversation; agent: string) {.async.} =
   var futs: seq[Future[void]]
-  futs.add getCard(convo.tweet)
-  futs.add getCards(convo.before)
-  futs.add getCards(convo.after)
-  futs.add convo.replies.map(getCards)
+  futs.add getCard(convo.tweet, agent)
+  futs.add getCards(convo.before, agent)
+  futs.add getCards(convo.after, agent)
+  futs.add convo.replies.mapIt(getCards(it, agent))
   await all(futs)
 
-proc getPhotoRail*(username: string): Future[seq[GalleryPhoto]] {.async.} =
+proc getPhotoRail*(username, agent: string): Future[seq[GalleryPhoto]] {.async.} =
   let headers = newHttpHeaders({
     "Accept": jsonAccept,
     "Referer": $(base / username),
@@ -222,7 +221,7 @@ proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile]
 
   result = parseIntentProfile(html)
 
-proc getProfile*(username: string): Future[Profile] {.async.} =
+proc getProfile*(username, agent: string): Future[Profile] {.async.} =
   let headers = newHttpHeaders({
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
     "Referer": $(base / username),
@@ -248,7 +247,7 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
 
   result = parsePopupProfile(html)
 
-proc getTweet*(username, id: string): Future[Conversation] {.async.} =
+proc getTweet*(username, id, agent: string): Future[Conversation] {.async.} =
   let headers = newHttpHeaders({
     "Accept": jsonAccept,
     "Referer": $base,
@@ -269,13 +268,13 @@ proc getTweet*(username, id: string): Future[Conversation] {.async.} =
   result = parseConversation(html)
 
   let
-    vidsFut = getConversationVideos(result)
-    pollFut = getConversationPolls(result)
-    cardFut = getConversationCards(result)
+    vidsFut = getConversationVideos(result, agent)
+    pollFut = getConversationPolls(result, agent)
+    cardFut = getConversationCards(result, agent)
 
   await all(vidsFut, pollFut, cardFut)
 
-proc finishTimeline(json: JsonNode; query: Option[Query]; after: string): Future[Timeline] {.async.} =
+proc finishTimeline(json: JsonNode; query: Option[Query]; after, agent: string): Future[Timeline] {.async.} =
   if json == nil: return Timeline()
 
   result = Timeline(
@@ -292,14 +291,14 @@ proc finishTimeline(json: JsonNode; query: Option[Query]; after: string): Future
   let
     html = parseHtml(json["items_html"].to(string))
     thread = parseThread(html)
-    vidsFut = getVideos(thread)
-    pollFut = getPolls(thread)
-    cardFut = getCards(thread)
+    vidsFut = getVideos(thread, agent)
+    pollFut = getPolls(thread, agent)
+    cardFut = getCards(thread, agent)
 
   await all(vidsFut, pollFut, cardFut)
   result.tweets = thread.tweets
 
-proc getTimeline*(username, after: string): Future[Timeline] {.async.} =
+proc getTimeline*(username, after, agent: string): Future[Timeline] {.async.} =
   let headers = newHttpHeaders({
     "Accept": jsonAccept,
     "Referer": $(base / username),
@@ -320,9 +319,9 @@ proc getTimeline*(username, after: string): Future[Timeline] {.async.} =
     params.add {"max_position": after}
 
   let json = await fetchJson(base / (timelineUrl % username) ? params, headers)
-  result = await finishTimeline(json, none(Query), after)
+  result = await finishTimeline(json, none(Query), after, agent)
 
-proc getTimelineSearch*(username, after: string; query: Query): Future[Timeline] {.async.} =
+proc getTimelineSearch*(username, after, agent: string; query: Query): Future[Timeline] {.async.} =
   let queryParam = genQueryParam(query)
   let queryEncoded = encodeUrl(queryParam, usePlus=false)
 
@@ -347,4 +346,4 @@ proc getTimelineSearch*(username, after: string; query: Query): Future[Timeline]
   }
 
   let json = await fetchJson(base / timelineSearchUrl ? params, headers)
-  result = await finishTimeline(json, some(query), after)
+  result = await finishTimeline(json, some(query), after, agent)
