@@ -71,4 +71,4 @@ class BaseTestCase(BaseCase):
 
 
 def get_timeline_tweet(num=1):
-    return Tweet(f'#tweets > div:nth-child({num}) ')
+    return Tweet(f'#posts > div:nth-child({num}) ')

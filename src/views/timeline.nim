@@ -12,7 +12,7 @@ proc getTabClass(timeline: Timeline; tab: string): string =
   var classes = @["tab-item"]
 
   if timeline.query.isNone:
-    if tab == "tweets":
+    if tab == "posts":
       classes.add "active"
   elif $timeline.query.get().kind == tab:
     classes.add "active"
@@ -22,7 +22,7 @@ proc getTabClass(timeline: Timeline; tab: string): string =
 proc renderSearchTabs(timeline: Timeline; profile: Profile): VNode =
   let link = "/" & profile.username
   buildHtml(ul(class="tab")):
-    li(class=timeline.getTabClass("tweets")):
+    li(class=timeline.getTabClass("posts")):
       a(href=link): text "Tweets"
     li(class=timeline.getTabClass("replies")):
       a(href=(link & "/replies")): text "Tweets & Replies"
@@ -63,7 +63,7 @@ proc threadFilter(it: Tweet; tweetThread: string): bool =
   it.retweet.isNone and it.reply.len == 0 and it.threadId == tweetThread
 
 proc renderTweets(timeline: Timeline): VNode =
-  buildHtml(tdiv(id="tweets")):
+  buildHtml(tdiv(id="posts")):
     var threads: seq[string]
     for tweet in timeline.tweets:
       if tweet.threadId in threads: continue

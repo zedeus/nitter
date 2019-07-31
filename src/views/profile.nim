@@ -26,7 +26,7 @@ proc renderProfileCard*(profile: Profile): VNode =
 
       tdiv(class="profile-card-extra-links"):
         ul(class="profile-statlist"):
-          renderStat(profile.tweets, "tweets")
+          renderStat(profile.tweets, "posts")
           renderStat(profile.followers, "followers")
           renderStat(profile.following, "following")
 
