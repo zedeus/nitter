@@ -25,7 +25,7 @@ proc initQuery*(filters, includes, excludes, separator: string; name=""): Query 
     filters: filters.split(",").filterIt(it in validFilters),
     includes: includes.split(",").filterIt(it in validFilters),
     excludes: excludes.split(",").filterIt(it in validFilters),
-    fromUser: name,
+    fromUser: @[name],
     sep: if sep in separators: sep else: ""
   )
 
@@ -33,7 +33,7 @@ proc getMediaQuery*(name: string): Query =
   Query(
     kind: media,
     filters: @["twimg", "native_video"],
-    fromUser: name,
+    fromUser: @[name],
     sep: "OR"
   )
 
@@ -41,15 +41,17 @@ proc getReplyQuery*(name: string): Query =
   Query(
     kind: replies,
     includes: @["nativeretweets"],
-    fromUser: name
+    fromUser: @[name]
   )
 
 proc genQueryParam*(query: Query): string =
   var filters: seq[string]
   var param: string
 
-  if query.fromUser.len > 0:
-    param = &"from:{query.fromUser} "
+  for i, user in query.fromUser:
+    param &= &"from:{user} "
+    if i < query.fromUser.high:
+      param &= "OR "
 
   for f in query.filters:
     filters.add "filter:" & f

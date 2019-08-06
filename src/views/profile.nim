@@ -64,4 +64,9 @@ proc renderProfile*(profile: Profile; timeline: Timeline;
         renderPhotoRail(profile.username, photoRail)
 
     tdiv(class="timeline-tab"):
-      renderTimeline(timeline, profile)
+      renderTimeline(timeline, profile.username, profile.protected)
+
+proc renderMulti*(timeline: Timeline; usernames: string): VNode =
+  buildHtml(tdiv(class="multi-timeline")):
+    tdiv(class="timeline-tab"):
+      renderTimeline(timeline, usernames, false, multi=true)

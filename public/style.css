@@ -140,7 +140,7 @@ a:hover {
 
 .replying-to {
     color: hsla(240,1%,73%,.9);
-    margin: 4px 0;
+    margin: -4px 0 4px 0;
 }
 
 .status-el .status-content {
@@ -369,6 +369,20 @@ video {
     background-color: #282828;
 }
 
+.multi-header {
+    background-color: #161616;
+    text-align: center;
+    padding: 10px;
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.multi-timeline {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 .profile-tabs {
     max-width: 900px;
     margin: 0 auto;
@@ -387,6 +401,9 @@ video {
     margin: 0;
     text-align: left;
     vertical-align: top;
+}
+
+.profile-tabs > .timeline-tab {
     width: 68% !important;
 }
 
@@ -756,7 +773,7 @@ video {
 }
 
 .timeline-protected {
-    padding-left: 12px;
+    text-align: center;
 }
 
 .timeline-protected p {

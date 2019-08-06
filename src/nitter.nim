@@ -9,18 +9,15 @@ import views/[general, profile, status]
 const configPath {.strdefine.} = "./nitter.conf"
 let cfg = getConfig(configPath)
 
-proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.async.} =
-  let
-    agent = getAgent()
-    username = name.strip(chars={'/'})
-    profileFut = getCachedProfile(username, agent)
-    railFut = getPhotoRail(username, agent)
+proc showSingleTimeline(name, after, agent: string; query: Option[Query]): Future[string] {.async.} =
+  let profileFut = getCachedProfile(name, agent)
+  let railFut = getPhotoRail(name, agent)
 
   var timelineFut: Future[Timeline]
   if query.isNone:
-    timelineFut = getTimeline(username, after, agent)
+    timelineFut = getTimeline(name, after, agent)
   else:
-    timelineFut = getTimelineSearch(username, after, agent, get(query))
+    timelineFut = getTimelineSearch(get(query), after, agent)
 
   let profile = await profileFut
   if profile.username.len == 0:
@@ -28,6 +25,25 @@ proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.a
 
   let profileHtml = renderProfile(profile, await timelineFut, await railFut)
   return renderMain(profileHtml, title=cfg.title, titleText=pageTitle(profile))
+
+proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Query]): Future[string] {.async.} =
+  var q = query
+  if q.isSome:
+    get(q).fromUser = names
+  else:
+    q = some(Query(kind: multi, fromUser: names, excludes: @["replies"]))
+
+  var timeline = renderMulti(await getTimelineSearch(get(q), after, agent), names.join(","))
+  return renderMain(timeline, title=cfg.title, titleText=names.join(" | "))
+
+proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.async.} =
+  let agent = getAgent()
+  let names = name.strip(chars={'/'}).split(",")
+
+  if names.len == 1:
+    return await showSingleTimeline(names[0], after, agent, query)
+  else:
+    return await showMultiTimeline(names, after, agent, query)
 
 template respTimeline(timeline: typed) =
   if timeline.len == 0:

@@ -32,14 +32,14 @@ db("cache.db", "", "", ""):
 
 type
   QueryKind* = enum
-    replies, media, custom = "search"
+    replies, media, multi, custom = "search"
 
   Query* = object
     kind*: QueryKind
     filters*: seq[string]
     includes*: seq[string]
     excludes*: seq[string]
-    fromUser*: string
+    fromUser*: seq[string]
     sep*: string
 
   VideoType* = enum

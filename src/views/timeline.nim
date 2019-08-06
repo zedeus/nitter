@@ -11,16 +11,16 @@ proc getQuery(timeline: Timeline): string =
 proc getTabClass(timeline: Timeline; tab: string): string =
   var classes = @["tab-item"]
 
-  if timeline.query.isNone:
+  if timeline.query.isNone or get(timeline.query).kind == multi:
     if tab == "posts":
       classes.add "active"
-  elif $timeline.query.get().kind == tab:
+  elif $get(timeline.query).kind == tab:
     classes.add "active"
 
   return classes.join(" ")
 
-proc renderSearchTabs(timeline: Timeline; profile: Profile): VNode =
-  let link = "/" & profile.username
+proc renderSearchTabs(timeline: Timeline; username: string): VNode =
+  let link = "/" & username
   buildHtml(ul(class="tab")):
     li(class=timeline.getTabClass("posts")):
       a(href=link): text "Tweets"
@@ -29,14 +29,14 @@ proc renderSearchTabs(timeline: Timeline; profile: Profile): VNode =
     li(class=timeline.getTabClass("media")):
       a(href=(link & "/media")): text "Media"
 
-proc renderNewer(timeline: Timeline; profile: Profile): VNode =
+proc renderNewer(timeline: Timeline; username: string): VNode =
   buildHtml(tdiv(class="status-el show-more")):
-    a(href=("/" & profile.username & getQuery(timeline).strip(chars={'?'}))):
+    a(href=("/" & username & getQuery(timeline).strip(chars={'?'}))):
       text "Load newest tweets"
 
-proc renderOlder(timeline: Timeline; profile: Profile): VNode =
+proc renderOlder(timeline: Timeline; username: string): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"/{profile.username}{getQuery(timeline)}after={timeline.minId}")):
+    a(href=(&"/{username}{getQuery(timeline)}after={timeline.minId}")):
       text "Load older tweets"
 
 proc renderNoMore(): VNode =
@@ -74,20 +74,25 @@ proc renderTweets(timeline: Timeline): VNode =
         renderThread(thread)
         threads &= tweet.threadId
 
-proc renderTimeline*(timeline: Timeline; profile: Profile): VNode =
+proc renderTimeline*(timeline: Timeline; username: string;
+                     protected: bool; multi=false): VNode =
   buildHtml(tdiv):
-    renderSearchTabs(timeline, profile)
+    if multi:
+      tdiv(class="multi-header"):
+        text username.replace(",", " | ")
 
-    if not profile.protected and not timeline.beginning:
-      renderNewer(timeline, profile)
+    if not protected:
+      renderSearchTabs(timeline, username)
+      if not timeline.beginning:
+        renderNewer(timeline, username)
 
-    if profile.protected:
-      renderProtected(profile.username)
+    if protected:
+      renderProtected(username)
     elif timeline.tweets.len == 0:
       renderNoneFound()
     else:
       renderTweets(timeline)
       if timeline.hasMore or timeline.query.isSome:
-        renderOlder(timeline, profile)
+        renderOlder(timeline, username)
       else:
         renderNoMore()

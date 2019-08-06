@@ -26,7 +26,7 @@ proc renderSearch*(): VNode =
   buildHtml(tdiv(class="panel")):
     tdiv(class="search-panel"):
       form(`method`="post", action="search"):
-        input(`type`="text", name="query", placeholder="Enter username...")
+        input(`type`="text", name="query", placeholder="Enter usernames...")
         button(`type`="submit"): text "🔎"
 
 proc renderError*(error: string): VNode =

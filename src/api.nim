@@ -308,7 +308,7 @@ proc getTimeline*(username, after, agent: string): Future[Timeline] {.async.} =
   let json = await fetchJson(base / (timelineUrl % username) ? params, headers)
   result = await finishTimeline(json, none(Query), after, agent)
 
-proc getTimelineSearch*(username, after, agent: string; query: Query): Future[Timeline] {.async.} =
+proc getTimelineSearch*(query: Query; after, agent: string): Future[Timeline] {.async.} =
   let queryParam = genQueryParam(query)
   let queryEncoded = encodeUrl(queryParam, usePlus=false)
 
