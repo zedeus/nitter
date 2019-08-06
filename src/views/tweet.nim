@@ -1,4 +1,4 @@
-import strutils
+import strutils, sequtils
 import karax/[karaxdsl, vdom, vstyles]
 
 import ../types, ../utils, ../formatters
