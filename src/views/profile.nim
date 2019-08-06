@@ -4,10 +4,11 @@ import karax/[karaxdsl, vdom, vstyles]
 import ../types, ../utils, ../formatters
 import tweet, timeline, renderutils
 
-proc renderStat(stat, text: string): VNode =
-  buildHtml(li(class=text)):
-    span(class="profile-stat-header"): text capitalizeAscii(text)
-    span(class="profile-stat-num"): text stat
+proc renderStat(num, class: string; text=""): VNode =
+  let t = if text.len > 0: text else: class
+  buildHtml(li(class=class)):
+    span(class="profile-stat-header"): text capitalizeAscii(t)
+    span(class="profile-stat-num"): text num
 
 proc renderProfileCard*(profile: Profile): VNode =
   buildHtml(tdiv(class="profile-card")):
@@ -26,7 +27,7 @@ proc renderProfileCard*(profile: Profile): VNode =
 
       tdiv(class="profile-card-extra-links"):
         ul(class="profile-statlist"):
-          renderStat(profile.tweets, "posts")
+          renderStat(profile.tweets, "posts", text="Tweets")
           renderStat(profile.followers, "followers")
           renderStat(profile.following, "following")
 
