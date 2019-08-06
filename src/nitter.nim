@@ -1,4 +1,4 @@
-import asyncdispatch, asyncfile, httpclient, strutils, strformat, uri, os
+import asyncdispatch, asyncfile, httpclient, sequtils, strutils, strformat, uri, os
 from net import Port
 
 import jester, regex
@@ -34,11 +34,11 @@ proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Q
     q = some(Query(kind: multi, fromUser: names, excludes: @["replies"]))
 
   var timeline = renderMulti(await getTimelineSearch(get(q), after, agent), names.join(","))
-  return renderMain(timeline, title=cfg.title, titleText=names.join(" | "))
+  return renderMain(timeline, title=cfg.title, titleText="Multi")
 
 proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.async.} =
   let agent = getAgent()
-  let names = name.strip(chars={'/'}).split(",")
+  let names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
 
   if names.len == 1:
     return await showSingleTimeline(names[0], after, agent, query)

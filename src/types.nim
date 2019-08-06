@@ -3,6 +3,10 @@ import norm/sqlite
 
 export sqlite, options
 
+type
+  VideoType* = enum
+    vmap, m3u8, mp4
+
 db("cache.db", "", "", ""):
   type
     Profile* = object
@@ -30,6 +34,24 @@ db("cache.db", "", "", ""):
           formatIt: getTime().toUnix()
         .}: Time
 
+    Video* = object
+      videoId*: string
+      contentId*: string
+      durationMs*: int
+      url*: string
+      thumb*: string
+      views*: string
+      playbackType* {.
+          dbType: "STRING",
+          parseIt: parseEnum[VideoType](it.s),
+          formatIt: $it,
+        .}: VideoType
+      available* {.
+          dbType: "STRING",
+          parseIt: parseBool(it.s)
+          formatIt: $it
+        .}: bool
+
 type
   QueryKind* = enum
     replies, media, multi, custom = "search"
@@ -41,18 +63,6 @@ type
     excludes*: seq[string]
     fromUser*: seq[string]
     sep*: string
-
-  VideoType* = enum
-    vmap, m3u8, mp4
-
-  Video* = object
-    contentId*: string
-    playbackType*: VideoType
-    durationMs*: int
-    url*: string
-    thumb*: string
-    views*: string
-    available*: bool
 
   Gif* = object
     url*: string

@@ -117,7 +117,7 @@ proc getGuestToken(agent: string; force=false): Future[string] {.async.} =
   result = json["guest_token"].to(string)
   guestToken = result
 
-proc getVideo*(tweet: Tweet; token, agent: string) {.async.} =
+proc getVideoFetch*(tweet: Tweet; token, agent: string) {.async.} =
   if tweet.video.isNone(): return
 
   let headers = newHttpHeaders({
@@ -135,15 +135,31 @@ proc getVideo*(tweet: Tweet; token, agent: string) {.async.} =
     if getTime() - tokenUpdated > initDuration(seconds=1):
       tokenUpdated = getTime()
       discard await getGuestToken(agent, force=true)
-    await getVideo(tweet, guestToken, agent)
+    await getVideoFetch(tweet, guestToken, agent)
     return
 
   if tweet.card.isNone:
-    tweet.video = some(parseVideo(json))
+    tweet.video = some(parseVideo(json, tweet.id))
   else:
-    get(tweet.card).video = some(parseVideo(json))
+    get(tweet.card).video = some(parseVideo(json, tweet.id))
     tweet.video = none(Video)
   tokenUses.inc
+
+proc getVideoVar*(tweet: Tweet): var Option[Video] =
+  if tweet.card.isSome():
+    return get(tweet.card).video
+  else:
+    return tweet.video
+
+proc getVideo*(tweet: Tweet; token, agent: string; force=false) {.async.} =
+  withDb:
+    try:
+      getVideoVar(tweet) = some(Video.getOne("videoId = ?", tweet.id))
+    except KeyError:
+      await getVideoFetch(tweet, token, agent)
+      var video = getVideoVar(tweet)
+      if video.isSome():
+        get(video).insert()
 
 proc getPoll*(tweet: Tweet; agent: string) {.async.} =
   if tweet.poll.isNone(): return

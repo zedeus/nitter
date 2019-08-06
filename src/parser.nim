@@ -125,7 +125,7 @@ proc parseConversation*(node: XmlNode): Conversation =
     else:
       result.replies.add parseThread(thread)
 
-proc parseVideo*(node: JsonNode): Video =
+proc parseVideo*(node: JsonNode; tweetId: string): Video =
   let
     track = node{"track"}
     cType = track["contentType"].to(string)
@@ -148,6 +148,7 @@ proc parseVideo*(node: JsonNode): Video =
   else:
     echo "Can't parse video of type ", cType
 
+  result.videoId = tweetId
   result.thumb = node["posterImage"].to(string)
 
 proc parsePoll*(node: XmlNode): Poll =
