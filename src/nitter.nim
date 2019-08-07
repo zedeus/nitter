@@ -59,7 +59,7 @@ settings:
 
 routes:
   get "/":
-    resp renderMain(renderSearch(), title=cfg.title, titleText="Search")
+    resp renderMain(renderSearch(), title=cfg.title)
 
   post "/search":
     if @"query".len == 0:
@@ -117,9 +117,10 @@ routes:
       resp Http404
 
     let file = openAsync(filename)
-    defer: file.close()
+    let buf = await readAll(file)
+    file.close()
 
-    resp await readAll(file), mimetype(filename)
+    resp buf, mimetype(filename)
 
   get "/video/@sig/@url":
     cond "http" in @"url"
