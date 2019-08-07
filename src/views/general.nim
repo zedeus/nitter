@@ -1,15 +1,35 @@
 import karax/[karaxdsl, vdom]
 
+import ../utils
+
 const doctype = "<!DOCTYPE html>\n"
 
-proc renderMain*(body: VNode; title="Nitter"; titleText=""): string =
+proc renderMain*(body: VNode; title="Nitter"; titleText=""; desc="";
+                 `type`="article"; video=""; images: seq[string] = @[]): string =
   let node = buildHtml(html(lang="en")):
     head:
-      if titleText.len > 0:
-        title: text titleText & " | " & title
-      else:
-        title: text title
       link(rel="stylesheet", `type`="text/css", href="/style.css")
+
+      title:
+        if titleText.len > 0:
+          text titleText & " | " & title
+        else:
+          text title
+
+      meta(name="og:type", content=`type`)
+      meta(name="og:title", content=titleText)
+      meta(name="og:description", content=desc)
+      meta(name="og:site_name", content="Twitter")
+
+      for url in images:
+        meta(name="og:image", content=getSigUrl(url, "pic"))
+
+      if video.len > 0:
+        meta(name="og:video:url", content=video)
+        meta(name="og:video:secure_url", content=video)
+        meta(name="og:video:type", content="text/html")
+        meta(name="og:video:width", content="1200")
+        meta(name="og:video:height", content="675")
 
     body:
       nav(id="nav", class="nav-bar container"):

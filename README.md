@@ -27,7 +27,6 @@ is on implementing missing features.
 
 - Search (images/videos, hashtags, etc.)
 - Custom timeline filter
-- Nitter link previews
 - More caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
 - Simple account system with customizable feed
 - Video support with hls.js

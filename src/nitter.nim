@@ -24,7 +24,7 @@ proc showSingleTimeline(name, after, agent: string; query: Option[Query]): Futur
     return ""
 
   let profileHtml = renderProfile(profile, await timelineFut, await railFut)
-  return renderMain(profileHtml, title=cfg.title, titleText=pageTitle(profile))
+  return renderMain(profileHtml, title=cfg.title, titleText=pageTitle(profile), desc=pageDesc(profile))
 
 proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Query]): Future[string] {.async.} =
   var q = query
@@ -91,7 +91,17 @@ routes:
       resp Http404, showError("Tweet not found", cfg.title)
 
     let title = pageTitle(conversation.tweet.profile)
-    resp renderMain(renderConversation(conversation), title=cfg.title, titleText=title)
+    let desc = conversation.tweet.text
+    let html = renderConversation(conversation)
+
+    if conversation.tweet.video.isSome():
+      let thumb = get(conversation.tweet.video).thumb
+      let vidUrl = getVideoEmbed(get(conversation.tweet.video))
+      resp renderMain(html, title=cfg.title, titleText=title, desc=desc,
+                      images = @[thumb], `type`="video", video=vidUrl)
+    else:
+      resp renderMain(html, title=cfg.title, titleText=title,
+                      desc=desc, images=conversation.tweet.photos)
 
   get "/pic/@sig/@url":
     cond "http" in @"url"

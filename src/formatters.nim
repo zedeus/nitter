@@ -68,8 +68,14 @@ proc getUserpic*(userpic: string; style=""): string =
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
+proc getVideoEmbed*(video: Video): string =
+  &"https://twitter.com/i/videos/{video.videoId}?embed_source=facebook"
+
 proc pageTitle*(profile: Profile): string =
   &"{profile.fullname} (@{profile.username})"
+
+proc pageDesc*(profile: Profile): string =
+  "The latest tweets from " & profile.fullname
 
 proc getTime*(tweet: Tweet): string =
   tweet.time.format("d/M/yyyy', ' HH:mm:ss")
