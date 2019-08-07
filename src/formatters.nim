@@ -68,8 +68,8 @@ proc getUserpic*(userpic: string; style=""): string =
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
-proc getVideoEmbed*(video: Video): string =
-  &"https://twitter.com/i/videos/{video.videoId}?embed_source=facebook"
+proc getVideoEmbed*(id: string): string =
+  &"https://twitter.com/i/videos/{id}?embed_source=facebook"
 
 proc pageTitle*(profile: Profile): string =
   &"{profile.fullname} (@{profile.username})"

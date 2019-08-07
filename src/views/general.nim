@@ -16,20 +16,18 @@ proc renderMain*(body: VNode; title="Nitter"; titleText=""; desc="";
         else:
           text title
 
-      meta(name="og:type", content=`type`)
-      meta(name="og:title", content=titleText)
-      meta(name="og:description", content=desc)
-      meta(name="og:site_name", content="Twitter")
+      meta(property="og:type", content=`type`)
+      meta(property="og:title", content=titleText)
+      meta(property="og:url", content="https://t.co/VOkeVRgJgc")
+      meta(property="og:description", content=desc)
+      meta(property="og:site_name", content="Twitter")
 
       for url in images:
-        meta(name="og:image", content=getSigUrl(url, "pic"))
+        meta(property="og:image", content=getSigUrl(url, "pic"))
 
       if video.len > 0:
-        meta(name="og:video:url", content=video)
-        meta(name="og:video:secure_url", content=video)
-        meta(name="og:video:type", content="text/html")
-        meta(name="og:video:width", content="1200")
-        meta(name="og:video:height", content="675")
+        meta(property="og:video:url", content=video)
+        meta(property="og:video:secure_url", content=video)
 
     body:
       nav(id="nav", class="nav-bar container"):

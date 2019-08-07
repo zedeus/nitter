@@ -96,7 +96,12 @@ routes:
 
     if conversation.tweet.video.isSome():
       let thumb = get(conversation.tweet.video).thumb
-      let vidUrl = getVideoEmbed(get(conversation.tweet.video))
+      let vidUrl = getVideoEmbed(conversation.tweet.id)
+      resp renderMain(html, title=cfg.title, titleText=title, desc=desc,
+                      images = @[thumb], `type`="video", video=vidUrl)
+    elif conversation.tweet.gif.isSome():
+      let thumb = get(conversation.tweet.gif).thumb
+      let vidUrl = getVideoEmbed(conversation.tweet.id)
       resp renderMain(html, title=cfg.title, titleText=title, desc=desc,
                       images = @[thumb], `type`="video", video=vidUrl)
     else:
