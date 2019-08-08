@@ -13,15 +13,52 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 
 ## Installation
 
+You need to install nim on your system: https://nim-lang.org/install.html
+It is possible to install nim system wide or in the user directory you create below.
+
 ```bash
-git clone https://github.com/zedeus/nitter
-cd nitter
-nimble build
+# useradd -m nitter
+# su nitter
+$ git clone https://github.com/zedeus/nitter
+$ cd nitter
+$ nimble build -d:release
+$ mkdir ./tmp
 ```
 
-To run, `./nitter`. It's currently not possible to change any settings or things
+To run nitter, execute `./nitter`. It's currently not possible to change any settings or things
 like the title, this will change as the project matures a bit. For now the focus
 is on implementing missing features.
+
+You should put nitter behind a reverse proxy with e.g. nginx or apache.
+
+It is also possible to run nitter via systemd:
+
+```bash
+[Unit]
+Description=Nitter (An alternative Twitter front-end)
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+
+# set user and group
+User=nitter
+Group=nitter
+
+# configure location
+WorkingDirectory=/home/nitter/nitter
+ExecStart=/home/nitter/nitter/nitter
+
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then enable and start
+`systemctl enable --now nitter.service`
 
 ## Todo (roughly in this order)
 
