@@ -63,6 +63,8 @@ proc genQueryParam*(query: Query): string =
   return strip(param & filters.join(&" {query.sep} "))
 
 proc genQueryUrl*(query: Query): string =
+  if query.kind == multi: return "?"
+
   result = &"/{query.kind}?"
   if query.kind != custom: return
 
