@@ -58,7 +58,7 @@ WantedBy=multi-user.target
 ```
 
 Then enable and start
-`systemctl enable --now nitter.service && systemctl start nitter.service`
+`systemctl enable --now nitter.service`
 
 ## Todo (roughly in this order)
 
