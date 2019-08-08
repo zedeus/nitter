@@ -13,8 +13,8 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 
 ## Installation
 
-You need to install nimble on your system: https://nim-lang.org/install.html
-It is possible to install nimble system wide or in the user directory you create below.
+You need to install nim on your system: https://nim-lang.org/install.html
+It is possible to install nim system wide or in the user directory you create below.
 
 ```bash
 # useradd -m nitter
