@@ -3,3 +3,4 @@ nitter
 *.db
 /tests/__pycache__
 /tests/geckodriver.log
+/tmp
