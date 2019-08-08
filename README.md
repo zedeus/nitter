@@ -13,13 +13,15 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 
 ## Installation
 
+You need to install nimble on your system: https://nim-lang.org/install.html
+It is possible to install nimble system wide or in the user directory you create below.
+
 ```bash
 # useradd -m nitter
 # su nitter
-$ curl https://nim-lang.org/choosenim/init.sh -sSf | sh
 $ git clone https://github.com/zedeus/nitter
 $ cd nitter
-$ nimble build
+$ nimble build -d:release
 $ mkdir ./tmp
 ```
 
@@ -29,7 +31,7 @@ is on implementing missing features.
 
 You should put nitter behind a reverse proxy with e.g. nginx or apache.
 
-It is also possibele to run nitter via systemd:
+It is also possible to run nitter via systemd:
 
 ```bash
 [Unit]
@@ -55,8 +57,8 @@ RestartSec=15
 WantedBy=multi-user.target
 ```
 
-Than enable and start
-`systemctl enable nitter.service && systemctl start nitter.service`
+Then enable and start
+`systemctl enable --now nitter.service && systemctl start nitter.service`
 
 ## Todo (roughly in this order)
 
