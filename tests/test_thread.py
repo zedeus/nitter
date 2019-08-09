@@ -20,9 +20,6 @@ thread = [
      ['The', 'The', 'Today', 'Some', 'If', 'There', 'Above'],
      [['Thank', 'Also,', 'Awesome.', 'Thank']]],
 
-    ['Nitrux_NX/status/1138643619550810112', [], '"The', [],
-     [['@bipin_joshi11', 'bc']]],
-
     ['gmpreussner/status/999766552546299904', [], 'A', [],
      [['I'], ['I']]]
 ]
