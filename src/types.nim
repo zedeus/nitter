@@ -1,4 +1,4 @@
-import times, sequtils, strutils, options
+import times, sequtils, options
 import norm/sqlite
 
 export sqlite, options

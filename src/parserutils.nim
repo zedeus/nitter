@@ -1,7 +1,7 @@
-import xmltree, htmlparser, strtabs, strformat, strutils, times
+import xmltree, strtabs, strformat, strutils, times
 import regex
 
-import types, formatters, api
+import types, formatters
 
 from q import nil
 

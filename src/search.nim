@@ -1,4 +1,4 @@
-import asyncdispatch, strutils, strformat, sequtils, uri, tables
+import strutils, strformat, sequtils
 
 import types
 
