@@ -5,7 +5,7 @@ import types
 const
   separators = @["AND", "OR"]
   validFilters = @[
-    "media", "images", "twimg",
+    "media", "images", "twimg", "videos",
     "native_video", "consumer_video", "pro_video",
     "links", "news", "quote", "mentions",
     "replies", "retweets", "nativeretweets",
