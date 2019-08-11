@@ -2,6 +2,26 @@ import xmltree, sequtils, strutils, json
 
 import types, parserutils, formatters
 
+proc parseTimelineProfile*(node: XmlNode): Profile =
+  let profile = node.select(".ProfileHeaderCard")
+  if profile == nil: return
+
+  let pre = ".ProfileHeaderCard-"
+  result = Profile(
+    fullname:  profile.getName(pre & "nameLink"),
+    username:  profile.getUsername(pre & "screenname"),
+    joinDate:  profile.getDate(pre & "joinDateText"),
+    location:  profile.selectText(pre & "locationText").stripText(),
+    website:   profile.selectText(pre & "url").stripText(),
+    bio:       profile.getBio(pre & "bio"),
+    userpic:   node.getAvatar(".profile-picture img"),
+    verified:  isVerified(profile),
+    protected: isProtected(profile),
+    banner:    getTimelineBanner(node)
+  )
+
+  result.getProfileStats(node.select(".ProfileNav-list"))
+
 proc parsePopupProfile*(node: XmlNode): Profile =
   let profile = node.select(".profile-card")
   if profile == nil: return
@@ -124,6 +144,16 @@ proc parseConversation*(node: XmlNode): Conversation =
       result.replies.add parseThread(reply)
     else:
       result.replies.add parseThread(thread)
+
+proc parseTimeline*(node: XmlNode; after: string): Timeline =
+  if node == nil: return
+  result = Timeline(
+    tweets: parseThread(node.select(".stream > .stream-items")).tweets,
+    minId: node.attr("data-min-position"),
+    maxId: node.attr("data-max-position"),
+    hasMore: node.select(".has-more-items") != nil,
+    beginning: after.len == 0
+  )
 
 proc parseVideo*(node: JsonNode; tweetId: string): Video =
   let

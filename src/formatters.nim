@@ -62,7 +62,7 @@ proc stripTwitterUrls*(text: string): string =
   result = result.replace(ellipsisRegex, "")
 
 proc getUserpic*(userpic: string; style=""): string =
-  let pic = userpic.replace(re"_(normal|bigger|mini|200x200)(\.[A-z]+)$", "$2")
+  let pic = userpic.replace(re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$", "$2")
   pic.replace(re"(\.[A-z]+)$", style & "$1")
 
 proc getUserpic*(profile: Profile; style=""): string =
@@ -76,6 +76,12 @@ proc pageTitle*(profile: Profile): string =
 
 proc pageDesc*(profile: Profile): string =
   "The latest tweets from " & profile.fullname
+
+proc getJoinDate*(profile: Profile): string =
+  profile.joinDate.format("'Joined' MMMM YYYY")
+
+proc getJoinDateFull*(profile: Profile): string =
+  profile.joinDate.format("h:mm tt - d MMM YYYY")
 
 proc getTime*(tweet: Tweet): string =
   tweet.time.format("d/M/yyyy', ' HH:mm:ss")

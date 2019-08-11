@@ -445,14 +445,6 @@ video {
     display: flex;
 }
 
-.profile-card-tabs {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex: 1 1 auto;
-    max-width: 100%;
-}
-
 .profile-card-tabs-name {
     max-width: 100%;
 }
@@ -496,18 +488,24 @@ video {
 .profile-card-extra {
     display: contents;
     flex: 100%;
-    margin-top: 4px;
+    margin-top: 6px;
 }
 
 .profile-bio {
     overflow: hidden;
     overflow-wrap: break-word;
     width: 100%;
-    margin: 10px -6px 0px 0px;
+    margin: 4px -6px 6px 0px;
 }
 
 .profile-bio p {
     margin: 0;
+}
+
+.profile-location, .profile-website, .profile-joindate {
+    color: #f8f8f2cf;
+    margin: 2px 0px;
+    width: 100%;
 }
 
 .profile-description {
@@ -735,24 +733,12 @@ video {
     margin: 0;
     padding: 0;
     width: 100%;
+    justify-content: space-between;
 }
 
 .profile-statlist > li {
     display: table-cell;
     text-align: center;
-}
-
-.profile-statlist .posts {
-    flex: 0.4 1 0;
-}
-
-.profile-statlist .followers {
-    flex: 1 1 0;
-    padding: 0 3px;
-}
-
-.profile-statlist .following {
-    flex: 0.5 1 0;
 }
 
 .profile-stat-header {

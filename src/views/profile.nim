@@ -15,21 +15,35 @@ proc renderProfileCard*(profile: Profile): VNode =
     a(class="profile-card-avatar", href=profile.getUserPic().getSigUrl("pic")):
       genImg(profile.getUserpic("_200x200"))
 
-    tdiv(class="profile-card-tabs"):
-      tdiv(class="profile-card-tabs-name"):
-        linkUser(profile, class="profile-card-fullname")
-        linkUser(profile, class="profile-card-username")
+    tdiv(class="profile-card-tabs-name"):
+      linkUser(profile, class="profile-card-fullname")
+      linkUser(profile, class="profile-card-username")
 
     tdiv(class="profile-card-extra"):
       if profile.bio.len > 0:
         tdiv(class="profile-bio"):
           p: verbatim linkifyText(profile.bio)
 
+      if profile.location.len > 0:
+        tdiv(class="profile-location"):
+          span: text "📍 " & profile.location
+
+      if profile.website.len > 0:
+        tdiv(class="profile-website"):
+          span:
+            text "🔗 "
+            a(href=profile.website): text profile.website
+
+      tdiv(class="profile-joindate"):
+        span(title=getJoinDateFull(profile)):
+          text "📅 " & getJoinDate(profile)
+
       tdiv(class="profile-card-extra-links"):
         ul(class="profile-statlist"):
           renderStat(profile.tweets, "posts", text="Tweets")
           renderStat(profile.followers, "followers")
           renderStat(profile.following, "following")
+          renderStat(profile.likes, "likes")
 
 proc renderPhotoRail(username: string; photoRail: seq[GalleryPhoto]): VNode =
   buildHtml(tdiv(class="photo-rail-card")):

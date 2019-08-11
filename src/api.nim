@@ -6,7 +6,7 @@ import types, parser, parserutils, formatters, search
 const
   lang = "en-US,en;q=0.9"
   auth = "Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"
-  cardAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
+  accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
   jsonAccept = "application/json, text/javascript, */*; q=0.01"
 
   base = parseUri("https://twitter.com/")
@@ -38,7 +38,7 @@ macro genMediaGet(media: untyped; token=false) =
     single = ident("get" & mediaName)
 
   quote do:
-    proc `multi`(thread: Thread; agent: string; token="") {.async.} =
+    proc `multi`(thread: Thread | Timeline; agent: string; token="") {.async.} =
       if thread == nil: return
       var `media` = thread.tweets.filterIt(it.`media`.isSome)
       when `token`:
@@ -165,7 +165,7 @@ proc getPoll*(tweet: Tweet; agent: string) {.async.} =
   if tweet.poll.isNone(): return
 
   let headers = newHttpHeaders({
-    "Accept": cardAccept,
+    "Accept": accept,
     "Referer": $(base / getLink(tweet)),
     "User-Agent": agent,
     "Authority": "twitter.com",
@@ -182,7 +182,7 @@ proc getCard*(tweet: Tweet; agent: string) {.async.} =
   if tweet.card.isNone(): return
 
   let headers = newHttpHeaders({
-    "Accept": cardAccept,
+    "Accept": accept,
     "Referer": $(base / getLink(tweet)),
     "User-Agent": agent,
     "Authority": "twitter.com",
@@ -350,3 +350,39 @@ proc getTimelineSearch*(query: Query; after, agent: string): Future[Timeline] {.
 
   let json = await fetchJson(base / timelineSearchUrl ? params, headers)
   result = await finishTimeline(json, some(query), after, agent)
+
+proc getProfileAndTimeline*(username, agent, after: string): Future[(Profile, Timeline)] {.async.} =
+  let headers = newHttpHeaders({
+    "authority": "twitter.com",
+    "accept": accept,
+    "referer": "https://twitter.com/" & username,
+    "accept-language": lang
+  })
+
+  var url = base / username
+  if after.len > 0:
+    url = url ? {"max_position": after}
+
+  let
+    html = await fetchHtml(url, headers)
+    timeline = parseTimeline(html.select("#timeline > .stream-container"), after)
+    profile = parseTimelineProfile(html)
+
+    vidsFut = getVideos(timeline, agent)
+    pollFut = getPolls(timeline, agent)
+    cardFut = getCards(timeline, agent)
+
+  await all(vidsFut, pollFut, cardFut)
+  result = (profile, timeline)
+
+proc getProfileFull*(username: string): Future[Profile] {.async.} =
+  let headers = newHttpHeaders({
+    "authority": "twitter.com",
+    "accept": accept,
+    "referer": "https://twitter.com/" & username,
+    "accept-language": lang
+  })
+
+  let html = await fetchHtml(base / username, headers)
+  if html == nil: return
+  result = parseTimelineProfile(html)

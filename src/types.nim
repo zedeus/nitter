@@ -12,12 +12,15 @@ db("cache.db", "", "", ""):
     Profile* = object
       username*: string
       fullname*: string
+      location*: string
+      website*: string
       bio*: string
       userpic*: string
       banner*: string
       following*: string
       followers*: string
       tweets*: string
+      likes*: string
       verified* {.
           dbType: "STRING",
           parseIt: parseBool(it.s)
@@ -28,6 +31,11 @@ db("cache.db", "", "", ""):
           parseIt: parseBool(it.s)
           formatIt: $it
         .}: bool
+      joinDate* {.
+        dbType: "INTEGER",
+        parseIt: it.i.fromUnix(),
+        formatIt: it.toUnix()
+        .}: Time
       updated* {.
           dbType: "INTEGER",
           parseIt: it.i.fromUnix(),

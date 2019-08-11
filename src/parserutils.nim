@@ -32,18 +32,14 @@ proc getHeader(profile: XmlNode): XmlNode =
     result = profile.select(".stream-item-header")
   if result == nil:
     result = profile.select(".ProfileCard-userFields")
+  if result == nil:
+    result = profile
 
 proc isVerified*(profile: XmlNode): bool =
   getHeader(profile).select(".Icon.Icon--verified") != nil
 
 proc isProtected*(profile: XmlNode): bool =
   getHeader(profile).select(".Icon.Icon--protected") != nil
-
-proc getName*(profile: XmlNode; selector: string): string =
-  profile.selectText(selector).stripText()
-
-proc getUsername*(profile: XmlNode; selector: string): string =
-  profile.selectText(selector).strip(chars={'@', ' '})
 
 proc emojify*(node: XmlNode) =
   for i in node.selectAll(".Emoji"):
@@ -79,22 +75,53 @@ proc getTimestamp*(tweet: XmlNode): Time =
 proc getShortTime*(tweet: XmlNode): string =
   getTime(tweet).innerText()
 
+proc getDate*(node: XmlNode; selector: string): Time =
+  let date = node.select(selector)
+  if date == nil: return
+  parseTime(date.attr("title"), "h:mm tt - d MMM YYYY", utc())
+
+proc getName*(profile: XmlNode; selector: string): string =
+  profile.selectText(selector).stripText()
+
+proc getUsername*(profile: XmlNode; selector: string): string =
+  profile.selectText(selector).strip(chars={'@', ' ', '\n'})
+
 proc getBio*(profile: XmlNode; selector: string): string =
   profile.selectText(selector).stripText()
 
 proc getAvatar*(profile: XmlNode; selector: string): string =
   profile.selectAttr(selector, "src").getUserpic()
 
-proc getBanner*(tweet: XmlNode): string =
-  let url = tweet.selectAttr("svg > image", "xlink:href")
+proc getBanner*(node: XmlNode): string =
+  let url = node.selectAttr("svg > image", "xlink:href")
   if url.len > 0:
     result = url.replace("600x200", "1500x500")
   else:
-    result = tweet.selectAttr(".ProfileCard-bg", "style")
+    result = node.selectAttr(".ProfileCard-bg", "style")
     result = result.replace("background-color: ", "")
 
   if result.len == 0:
     result = "#161616"
+
+proc getTimelineBanner*(node: XmlNode): string =
+  let banner = node.select(".ProfileCanopy-headerBg img")
+  let img = banner.attr("src")
+  if img.len > 0:
+    return img
+
+  let style = node.select("style").innerText()
+  var m: RegexMatch
+  if style.find(re"a:active \{\n +color: (#[A-Z0-9]+)", m):
+    return style[m.group(0)[0]]
+
+proc getProfileStats*(profile: var Profile; node: XmlNode) =
+  for s in node.selectAll( ".ProfileNav-stat"):
+    let text = s.attr("title").split(" ")[0]
+    case s.attr("data-nav")
+    of "followers": profile.followers = text
+    of "following": profile.following = text
+    of "favorites": profile.likes = text
+    of "tweets": profile.tweets = text
 
 proc getPopupStats*(profile: var Profile; node: XmlNode) =
   for s in node.selectAll( ".ProfileCardStats-statLink"):

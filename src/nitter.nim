@@ -10,20 +10,31 @@ const configPath {.strdefine.} = "./nitter.conf"
 let cfg = getConfig(configPath)
 
 proc showSingleTimeline(name, after, agent: string; query: Option[Query]): Future[string] {.async.} =
-  let profileFut = getCachedProfile(name, agent)
   let railFut = getPhotoRail(name, agent)
 
-  var timelineFut: Future[Timeline]
-  if query.isNone:
-    timelineFut = getTimeline(name, after, agent)
-  else:
-    timelineFut = getTimelineSearch(get(query), after, agent)
+  var timeline: Timeline
+  var profile: Profile
+  var cachedProfile = hasCachedProfile(name)
 
-  let profile = await profileFut
+  if cachedProfile.isSome:
+    profile = get(cachedProfile)
+
+  if query.isNone:
+    if cachedProfile.isSome:
+      timeline = await getTimeline(name, after, agent)
+    else:
+      (profile, timeline) = await getProfileAndTimeline(name, agent, after)
+      cache(profile)
+  else:
+    var timelineFut = getTimelineSearch(get(query), after, agent)
+    if cachedProfile.isNone:
+      profile = await getCachedProfile(name, agent)
+    timeline = await timelineFut
+
   if profile.username.len == 0:
     return ""
 
-  let profileHtml = renderProfile(profile, await timelineFut, await railFut)
+  let profileHtml = renderProfile(profile, timeline, await railFut)
   return renderMain(profileHtml, title=cfg.title, titleText=pageTitle(profile), desc=pageDesc(profile))
 
 proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Query]): Future[string] {.async.} =
