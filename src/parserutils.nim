@@ -114,6 +114,10 @@ proc getTimelineBanner*(node: XmlNode): string =
   if style.find(re"a:active \{\n +color: (#[A-Z0-9]+)", m):
     return style[m.group(0)[0]]
 
+proc getMediaCount*(node: XmlNode): string =
+  let text = node.selectText(".PhotoRail-headingWithCount")
+  return text.stripText().split(" ")[0]
+
 proc getProfileStats*(profile: var Profile; node: XmlNode) =
   for s in node.selectAll( ".ProfileNav-stat"):
     let text = s.attr("title").split(" ")[0]

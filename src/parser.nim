@@ -17,7 +17,8 @@ proc parseTimelineProfile*(node: XmlNode): Profile =
     userpic:   node.getAvatar(".profile-picture img"),
     verified:  isVerified(profile),
     protected: isProtected(profile),
-    banner:    getTimelineBanner(node)
+    banner:    getTimelineBanner(node),
+    media:     getMediaCount(node)
   )
 
   result.getProfileStats(node.select(".ProfileNav-list"))

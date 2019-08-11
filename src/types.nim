@@ -21,6 +21,7 @@ db("cache.db", "", "", ""):
       followers*: string
       tweets*: string
       likes*: string
+      media*: string
       verified* {.
           dbType: "STRING",
           parseIt: parseBool(it.s)

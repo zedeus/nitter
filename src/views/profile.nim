@@ -45,16 +45,16 @@ proc renderProfileCard*(profile: Profile): VNode =
           renderStat(profile.following, "following")
           renderStat(profile.likes, "likes")
 
-proc renderPhotoRail(username: string; photoRail: seq[GalleryPhoto]): VNode =
+proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
   buildHtml(tdiv(class="photo-rail-card")):
     tdiv(class="photo-rail-header"):
-      a(href=(&"/{username}/media")):
-        text "🖼 Photos and videos"
+      a(href=(&"/{profile.username}/media")):
+        text &"🖼 {profile.media} Photos and videos"
 
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:
         if i == 16: break
-        a(href=(&"/{username}/status/{photo.tweetId}"),
+        a(href=(&"/{profile.username}/status/{photo.tweetId}"),
           style={backgroundColor: photo.color}):
           genImg(photo.url & ":thumb")
 
@@ -75,7 +75,7 @@ proc renderProfile*(profile: Profile; timeline: Timeline;
     tdiv(class="profile-tab"):
       renderProfileCard(profile)
       if photoRail.len > 0:
-        renderPhotoRail(profile.username, photoRail)
+        renderPhotoRail(profile, photoRail)
 
     tdiv(class="timeline-tab"):
       renderTimeline(timeline, profile.username, profile.protected)
