@@ -8,7 +8,8 @@ proc renderStat(num, class: string; text=""): VNode =
   let t = if text.len > 0: text else: class
   buildHtml(li(class=class)):
     span(class="profile-stat-header"): text capitalizeAscii(t)
-    span(class="profile-stat-num"): text num
+    span(class="profile-stat-num"):
+      text if num.len == 0: "?" else: num
 
 proc renderProfileCard*(profile: Profile): VNode =
   buildHtml(tdiv(class="profile-card")):
