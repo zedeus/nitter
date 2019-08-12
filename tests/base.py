@@ -19,6 +19,10 @@ class Profile(object):
     verified = '.verified-icon'
     banner = '.profile-banner'
     bio = '.profile-bio'
+    location = '.profile-location'
+    website = '.profile-website'
+    joinDate = '.profile-joindate'
+    mediaCount = '.photo-rail-header'
 
 
 class Timeline(object):

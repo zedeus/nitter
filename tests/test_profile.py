@@ -3,8 +3,9 @@ from parameterized import parameterized
 
 profiles = [
         ['mobile_test', 'Test account',
-         'Test Account. test test Testing username with @mobile_test_2 and a #hashtag'],
-        ['mobile_test_2', 'mobile test 2', '']
+         'Test Account. test test Testing username with @mobile_test_2 and a #hashtag',
+         '📍 San Francisco, CA', '🔗 example.com/foobar', '📅 Joined October 2009', '100'],
+        ['mobile_test_2', 'mobile test 2', '', '', '', '📅 Joined January 2011', '13']
 ]
 
 verified = [['jack'], ['elonmusk']]
@@ -28,15 +29,24 @@ banner_image = [
 
 class ProfileTest(BaseTestCase):
     @parameterized.expand(profiles)
-    def test_data(self, username, fullname, bio):
+    def test_data(self, username, fullname, bio, location, website, joinDate, mediaCount):
         self.open_nitter(username)
         self.assert_exact_text(fullname, Profile.fullname)
         self.assert_exact_text(f'@{username}', Profile.username)
 
-        if len(bio) > 0:
-            self.assert_exact_text(bio, Profile.bio)
-        else:
-            self.assert_element_absent(Profile.bio)
+        tests = [
+            (bio, Profile.bio),
+            (location, Profile.location),
+            (website, Profile.website),
+            (joinDate, Profile.joinDate),
+            (f"🖼 {mediaCount} Photos and videos", Profile.mediaCount)
+        ]
+
+        for text, selector in tests:
+            if len(text) > 0:
+                self.assert_exact_text(text, selector)
+            else:
+                self.assert_element_absent(selector)
 
     @parameterized.expand(verified)
     def test_verified(self, username):
