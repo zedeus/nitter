@@ -18,7 +18,6 @@ proc renderMain*(body: VNode; title="Nitter"; titleText=""; desc="";
 
       meta(property="og:type", content=`type`)
       meta(property="og:title", content=titleText)
-      meta(property="og:url", content="https://t.co/VOkeVRgJgc")
       meta(property="og:description", content=desc)
       meta(property="og:site_name", content="Twitter")
 
