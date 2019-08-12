@@ -1,6 +1,20 @@
 from seleniumbase import BaseCase
 
 
+class Quote(object):
+    def __init__(self, tweet=''):
+        quote = tweet + '.quote '
+        namerow = quote + '.fullname-and-username '
+        self.link = quote + '.quote-link'
+        self.fullname = namerow + '.fullname'
+        self.username = namerow + '.username'
+        self.text = quote + '.quote-text'
+        self.media = quote + '.quote-media'
+        self.unavailable = quote + '.quote.unavailable'
+        self.sensitive = quote + '.quote-sensitive'
+        self.badge = quote + '.quote-badge'
+
+
 class Tweet(object):
     def __init__(self, tweet=''):
         namerow = tweet + '.tweet-header '

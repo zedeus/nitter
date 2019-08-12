@@ -14,10 +14,10 @@ proc renderHeader(tweet: Tweet): VNode =
         span: text "📌 Pinned Tweet"
 
     tdiv(class="tweet-header"):
-      tdiv(class="tweet-name-row"):
-        a(class="tweet-avatar", href=("/" & tweet.profile.username)):
-          genImg(tweet.profile.getUserpic("_bigger"), class="avatar")
+      a(class="tweet-avatar", href=("/" & tweet.profile.username)):
+        genImg(tweet.profile.getUserpic("_bigger"), class="avatar")
 
+      tdiv(class="tweet-name-row"):
         tdiv(class="fullname-and-username"):
           linkUser(tweet.profile, class="fullname")
           linkUser(tweet.profile, class="username")

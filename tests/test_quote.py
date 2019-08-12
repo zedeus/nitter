@@ -1,0 +1,66 @@
+from base import BaseTestCase, Quote, Conversation
+from parameterized import parameterized
+
+text = [
+    ['elonmusk/status/1138136540096319488',
+     'Tesla Owners Online', '@Model3Owners',
+     """As of March 58.4% of new car sales in Norway are electric. 
+
+What are we doing wrong? reuters.com/article/us-norwa…"""],
+
+    ['SpaceX/status/1136998058242088960',
+     'SpaceX Jobs', '@SpaceXJobs',
+     'Super excited to be number 1! Let’s make humanity multiplanetary 🚀 businessinsider.com/universu…'],
+
+    ['nim_lang/status/924694255364341760',
+     'Hacker News', '@newsycombinator',
+     'Why Rust fails hard at scientific computing andre-ratsimbazafy.com/why-r…']
+]
+
+image = [
+    ['elonmusk/status/1138827760107790336', 'D83h6Y8UIAE2Wlz'],
+    ['SpaceX/status/1067155053461426176', 'Ds9EYfxXoAAPNmx']
+]
+
+gif = [
+    ['SpaceX/status/747497521593737216', 'Cl-R5yFWkAA_-3X'],
+    ['nim_lang/status/1068099315074248704', 'DtJSqP9WoAAKdRC']
+]
+
+video = [
+    ['bkuensting/status/1067316003200217088', 'IyCaQlzF0q8u9vBd', '1:05']
+]
+
+
+class QuoteTest(BaseTestCase):
+    @parameterized.expand(text)
+    def test_text(self, tweet, fullname, username, text):
+        self.open_nitter(tweet)
+        quote = Quote(Conversation.main + " ")
+        self.assert_text(fullname, quote.fullname)
+        self.assert_text(username, quote.username)
+        self.assert_text(text, quote.text)
+
+    @parameterized.expand(image)
+    def test_image(self, tweet, url):
+        self.open_nitter(tweet)
+        quote = Quote(Conversation.main + " ")
+        self.assert_element_visible(quote.media)
+        self.assert_element_not_visible(quote.badge)
+        self.assertIn(url, self.get_image_url(quote.media + ' img'))
+
+    @parameterized.expand(gif)
+    def test_gif(self, tweet, thumb):
+        self.open_nitter(tweet)
+        quote = Quote(Conversation.main + " ")
+        self.assert_element_visible(quote.badge)
+        self.assert_text('GIF', quote.badge)
+        self.assertIn(thumb, self.get_image_url(quote.media + ' img'))
+
+    @parameterized.expand(video)
+    def test_video(self, tweet, thumb, length):
+        self.open_nitter(tweet)
+        quote = Quote(Conversation.main + " ")
+        self.assert_element_visible(quote.badge)
+        self.assert_text(length, quote.badge)
+        self.assertIn(thumb, self.get_image_url(quote.media + ' img'))
