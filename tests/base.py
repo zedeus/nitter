@@ -1,6 +1,16 @@
 from seleniumbase import BaseCase
 
 
+class Card(object):
+    def __init__(self, tweet=''):
+        card = tweet + '.card '
+        self.link = card + 'a'
+        self.title = card + '.card-title'
+        self.description = card + '.card-description'
+        self.destination = card + '.card-destination'
+        self.image = card + '.card-image'
+
+
 class Quote(object):
     def __init__(self, tweet=''):
         quote = tweet + '.quote '
