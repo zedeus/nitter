@@ -193,6 +193,7 @@ nav {
     padding-right: 10px;
     display: flex;
     align-items: center;
+    flex-basis: 920px;
     height: 50px;
 }
 
@@ -202,6 +203,26 @@ nav {
     height: 50px;
     overflow: hidden;
     flex-wrap: wrap;
+}
+
+.item.right {
+    text-align: right;
+    justify-content: flex-end;
+}
+
+.site-logo {
+    width: 35px;
+    height: 35px;
+}
+
+.site-about {
+    font-size: 17px;
+    padding-right: 2px;
+    margin-top: -0.75px;
+}
+
+.site-settings {
+    font-size: 18px;
 }
 
 .attachments {

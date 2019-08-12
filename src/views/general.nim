@@ -4,6 +4,18 @@ import ../utils
 
 const doctype = "<!DOCTYPE html>\n"
 
+proc renderNavbar*(title: string): VNode =
+  buildHtml(nav(id="nav", class="nav-bar container")):
+    tdiv(class="inner-nav"):
+      tdiv(class="item"):
+        a(class="site-name", href="/"): text title
+
+      a(href="/"): img(class="site-logo", src="/logo.png")
+
+      tdiv(class="item right"):
+        a(class="site-about", href="/about"): text "🛈"
+        a(class="site-settings", href="/settings"): text "⚙"
+
 proc renderMain*(body: VNode; title="Nitter"; titleText=""; desc="";
                  `type`="article"; video=""; images: seq[string] = @[]): string =
   let node = buildHtml(html(lang="en")):
@@ -29,10 +41,7 @@ proc renderMain*(body: VNode; title="Nitter"; titleText=""; desc="";
         meta(property="og:video:secure_url", content=video)
 
     body:
-      nav(id="nav", class="nav-bar container"):
-        tdiv(class="inner-nav"):
-          tdiv(class="item"):
-            a(href="/", class="site-name"): text title
+      renderNavbar(title)
 
       tdiv(id="content", class="container"):
         body
