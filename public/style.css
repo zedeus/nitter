@@ -597,7 +597,7 @@ video {
     float: none;
     border-radius: 0;
     position: relative;
-    width: auto;
+    width: 100%;
     background-color: #0f0f0f !important;
 }
 

@@ -33,7 +33,7 @@ proc renderProfileCard*(profile: Profile): VNode =
         tdiv(class="profile-website"):
           span:
             text "🔗 "
-            a(href=profile.website): text profile.website
+            linkText(profile.website)
 
       tdiv(class="profile-joindate"):
         span(title=getJoinDateFull(profile)):
