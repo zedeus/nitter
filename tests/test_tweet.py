@@ -80,6 +80,11 @@ retweet = [
     [3, 'mobile_test_8', 'mobile test 8', 'jack 🌍🌏🌎✔', '@jack', 'twttr']
 ]
 
+reply = [
+    ['mobile_test?after=471336696307392513', '@mobile_test', '@mobile_test'],
+    ['mobile_test_2?after=375101899214561280', '@mobile_test_2', '@mobile_test']
+]
+
 
 class TweetTest(BaseTestCase):
     @parameterized.expand(timeline)
@@ -138,3 +143,10 @@ class TweetTest(BaseTestCase):
     def test_invalid_id(self, tweet):
         self.open_nitter(tweet)
         self.assert_text('Tweet not found', '.error-panel')
+
+    @parameterized.expand(reply)
+    def test_reply(self, tweet, username, reply):
+        self.open_nitter(tweet)
+        tweet = get_timeline_tweet(1)
+        self.assert_text(username, tweet.username)
+        self.assert_text('Replying to ' + reply, tweet.reply)

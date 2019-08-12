@@ -8,7 +8,8 @@ class Tweet(object):
         self.username = namerow + '.username'
         self.date = namerow + '.tweet-date'
         self.text = tweet + '.status-content.media-body'
-        self.retweet = tweet = '.retweet'
+        self.retweet = tweet + '.retweet'
+        self.reply = tweet + '.replying-to'
 
 
 class Profile(object):
