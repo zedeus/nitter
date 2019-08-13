@@ -184,11 +184,10 @@ routes:
     if getHmac(url) != @"sig":
       resp showError("Failed to verify signature", cfg.title, prefs)
 
-    let
-      client = newAsyncHttpClient()
-      video = await client.getContent(url)
+    let client = newAsyncHttpClient()
+    let video = await client.getContent(url)
+    client.close()
 
-    defer: client.close()
     resp video, mimetype(url)
 
 runForever()
