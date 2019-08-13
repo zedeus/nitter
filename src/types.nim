@@ -23,23 +23,17 @@ db("cache.db", "", "", ""):
       likes*: string
       media*: string
       verified* {.
-          dbType: "STRING",
-          parseIt: parseBool(it.s)
-          formatIt: $it
-        .}: bool
+          dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
       protected* {.
-          dbType: "STRING",
-          parseIt: parseBool(it.s)
-          formatIt: $it
-        .}: bool
+          dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
       joinDate* {.
-        dbType: "INTEGER",
-        parseIt: it.i.fromUnix(),
+        dbType: "INTEGER"
+        parseIt: it.i.fromUnix()
         formatIt: it.toUnix()
         .}: Time
       updated* {.
-          dbType: "INTEGER",
-          parseIt: it.i.fromUnix(),
+          dbType: "INTEGER"
+          parseIt: it.i.fromUnix()
           formatIt: getTime().toUnix()
         .}: Time
 
@@ -60,6 +54,12 @@ db("cache.db", "", "", ""):
           parseIt: parseBool(it.s)
           formatIt: $it
         .}: bool
+
+    Prefs* = object
+      videoPlayback* {.
+        dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      autoplayGifs* {.
+        dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
 
 type
   QueryKind* = enum

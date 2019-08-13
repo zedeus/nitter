@@ -1,6 +1,6 @@
 import karax/[karaxdsl, vdom]
 
-import ../utils
+import ../utils, ../types
 
 const doctype = "<!DOCTYPE html>\n"
 
@@ -14,9 +14,9 @@ proc renderNavbar*(title: string): VNode =
 
       tdiv(class="item right"):
         a(class="site-about", href="/about"): text "🛈"
-        a(class="site-settings", href="/settings"): text "⚙"
+        a(class="site-prefs", href="/settings"): text "⚙"
 
-proc renderMain*(body: VNode; title="Nitter"; titleText=""; desc="";
+proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="";
                  `type`="article"; video=""; images: seq[string] = @[]): string =
   let node = buildHtml(html(lang="en")):
     head:
@@ -60,5 +60,5 @@ proc renderError*(error: string): VNode =
     tdiv(class="error-panel"):
       span: text error
 
-proc showError*(error: string; title: string): string =
-  renderMain(renderError(error), title=title, titleText="Error")
+proc showError*(error: string; title: string; prefs: Prefs): string =
+  renderMain(renderError(error), prefs, title=title, titleText="Error")

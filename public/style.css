@@ -277,7 +277,7 @@ nav {
     overflow: hidden;
 }
 
-video {
+video, .video-container img {
     height: 100%;
     width: 100%;
 }
@@ -1072,4 +1072,46 @@ video {
 
 .poll-info {
     color: #868687;
+}
+
+.preferences-container {
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.preferences {
+    background-color: #222222;
+}
+
+fieldset {
+    margin: .35em 0 .75em;
+    border: 0;
+}
+
+legend {
+    width: 100%;
+    padding: .6em 0 .3em 0;
+    margin-bottom: .2em;
+    border: 0;
+    border-bottom: 1px solid #888888;
+    font-size: 16px;
+}
+
+.pref-group {
+    margin: .2em; 0;
+}
+
+.pref-submit:hover {
+    background-color: #a8a8a8;
+}
+
+.pref-submit {
+    background-color: #e2e2e2;
+    color: #000;
+    border: none;
+    border-radius: 2px;
+    padding: 3px 6px;
+    margin-left: 6px;
+    margin-top: 4px;
 }

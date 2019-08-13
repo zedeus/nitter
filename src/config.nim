@@ -1,5 +1,5 @@
 import parsecfg except Config
-import os, net, types, strutils
+import net, types, strutils
 
 proc get[T](config: parseCfg.Config; s, v: string; default: T): T =
   let val = config.getSectionValue(s, v)

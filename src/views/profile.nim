@@ -68,7 +68,7 @@ proc renderBanner(profile: Profile): VNode =
         genImg(profile.banner)
 
 proc renderProfile*(profile: Profile; timeline: Timeline;
-                    photoRail: seq[GalleryPhoto]): VNode =
+                    photoRail: seq[GalleryPhoto]; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-tabs")):
     tdiv(class="profile-banner"):
       renderBanner(profile)
@@ -79,9 +79,9 @@ proc renderProfile*(profile: Profile; timeline: Timeline;
         renderPhotoRail(profile, photoRail)
 
     tdiv(class="timeline-tab"):
-      renderTimeline(timeline, profile.username, profile.protected)
+      renderTimeline(timeline, profile.username, profile.protected, prefs)
 
-proc renderMulti*(timeline: Timeline; usernames: string): VNode =
+proc renderMulti*(timeline: Timeline; usernames: string; prefs: Prefs): VNode =
   buildHtml(tdiv(class="multi-timeline")):
     tdiv(class="timeline-tab"):
-      renderTimeline(timeline, usernames, false, multi=true)
+      renderTimeline(timeline, usernames, false, prefs, multi=true)

@@ -44,26 +44,38 @@ proc renderAlbum(tweet: Tweet): VNode =
               target="_blank", style={display: flex}):
               genImg(photo)
 
-proc renderVideo(video: Video): VNode =
+proc renderVideo(video: Video; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments")):
     tdiv(class="gallery-video"):
       tdiv(class="attachment video-container"):
+        let thumb = video.thumb.getSigUrl("pic")
         case video.playbackType
         of mp4:
-          video(poster=video.thumb.getSigUrl("pic"), controls=""):
+          video(poster=thumb, controls=""):
             source(src=video.url.getSigUrl("video"), `type`="video/mp4")
         of m3u8, vmap:
-          video(poster=video.thumb.getSigUrl("pic"))
-          tdiv(class="video-overlay"):
-            p: text "Video playback not supported"
+          if prefs.videoPlayback:
+            video(poster=thumb)
+            tdiv(class="video-overlay"):
+              p: text "Video playback not supported yet"
+          else:
+            img(src=thumb)
+            tdiv(class="video-overlay"):
+              p: text "Video playback disabled"
 
-proc renderGif(gif: Gif): VNode =
+proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
     tdiv(class="gallery-gif", style=style(maxHeight, "unset")):
       tdiv(class="attachment"):
-        video(class="gif", poster=gif.thumb.getSigUrl("pic"),
-              autoplay="", muted="", loop=""):
-          source(src=gif.url.getSigUrl("video"), `type`="video/mp4")
+        let thumb = gif.thumb.getSigUrl("pic")
+        let url = gif.url.getSigUrl("video")
+        if prefs.autoplayGifs:
+
+          video(class="gif", poster=thumb, autoplay="", muted="", loop=""):
+            source(src=url, `type`="video/mp4")
+        else:
+          video(class="gif", poster=thumb, controls="", muted="", loop=""):
+            source(src=url, `type`="video/mp4")
 
 proc renderPoll(poll: Poll): VNode =
   buildHtml(tdiv(class="poll")):
@@ -86,7 +98,7 @@ proc renderCardImage(card: Card): VNode =
           tdiv(class="card-overlay-circle"):
             span(class="card-overlay-triangle")
 
-proc renderCard(card: Card): VNode =
+proc renderCard(card: Card; prefs: Prefs): VNode =
   const largeCards = {summaryLarge, liveEvent, promoWebsite, promoVideo}
   let large = if card.kind in largeCards: " large" else: ""
 
@@ -95,7 +107,7 @@ proc renderCard(card: Card): VNode =
       if card.image.isSome:
         renderCardImage(card)
       elif card.video.isSome:
-        renderVideo(get(card.video))
+        renderVideo(get(card.video), prefs)
 
       tdiv(class="card-content-container"):
         tdiv(class="card-content"):
@@ -161,7 +173,8 @@ proc renderQuote(quote: Quote): VNode =
       a(href=getLink(quote)):
         text "Show this thread"
 
-proc renderTweet*(tweet: Tweet; class=""; index=0; total=(-1); last=false): VNode =
+proc renderTweet*(tweet: Tweet; prefs: Prefs; class="";
+                  index=0; total=(-1); last=false): VNode =
   var divClass = class
   if index == total or last:
     divClass = "thread-last " & class
@@ -187,13 +200,13 @@ proc renderTweet*(tweet: Tweet; class=""; index=0; total=(-1); last=false): VNod
           renderQuote(tweet.quote.get())
 
         if tweet.card.isSome:
-          renderCard(tweet.card.get())
+          renderCard(tweet.card.get(), prefs)
         elif tweet.photos.len > 0:
           renderAlbum(tweet)
         elif tweet.video.isSome:
-          renderVideo(tweet.video.get())
+          renderVideo(tweet.video.get(), prefs)
         elif tweet.gif.isSome:
-          renderGif(tweet.gif.get())
+          renderGif(tweet.gif.get(), prefs)
         elif tweet.poll.isSome:
           renderPoll(tweet.poll.get())
 

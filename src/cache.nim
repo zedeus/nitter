@@ -1,7 +1,7 @@
 import asyncdispatch, times
 import types, api
 
-withDb:
+withCustomDb("cache.db", "", "", ""):
   try:
     createTables()
   except DbError:
@@ -13,7 +13,7 @@ proc isOutdated*(profile: Profile): bool =
   getTime() - profile.updated > profileCacheTime
 
 proc cache*(profile: var Profile) =
-  withDb:
+  withCustomDb("cache.db", "", "", ""):
     try:
       let p = Profile.getOne("lower(username) = ?", toLower(profile.username))
       profile.id = p.id
@@ -23,7 +23,7 @@ proc cache*(profile: var Profile) =
         profile.insert()
 
 proc hasCachedProfile*(username: string): Option[Profile] =
-  withDb:
+  withCustomDb("cache.db", "", "", ""):
     try:
       let p = Profile.getOne("lower(username) = ?", toLower(username))
       doAssert not p.isOutdated
@@ -32,7 +32,7 @@ proc hasCachedProfile*(username: string): Option[Profile] =
       result = none(Profile)
 
 proc getCachedProfile*(username, agent: string; force=false): Future[Profile] {.async.} =
-  withDb:
+  withCustomDb("cache.db", "", "", ""):
     try:
       result.getOne("lower(username) = ?", toLower(username))
       doAssert not result.isOutdated
