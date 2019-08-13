@@ -386,6 +386,7 @@ video, .video-container img {
     padding: 0 2em;
     line-height: 2em;
 }
+
 .show-more a:hover {
     background-color: #282828;
 }
@@ -441,7 +442,6 @@ video, .video-container img {
     text-align: left;
     vertical-align: top;
     max-width: 32%;
-    position: sticky;
     top: 50px;
 }
 

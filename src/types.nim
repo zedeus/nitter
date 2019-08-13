@@ -22,10 +22,8 @@ db("cache.db", "", "", ""):
       tweets*: string
       likes*: string
       media*: string
-      verified* {.
-          dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
-      protected* {.
-          dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      verified* {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      protected* {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
       joinDate* {.
         dbType: "INTEGER"
         parseIt: it.i.fromUnix()
@@ -49,17 +47,14 @@ db("cache.db", "", "", ""):
           parseIt: parseEnum[VideoType](it.s),
           formatIt: $it,
         .}: VideoType
-      available* {.
-          dbType: "STRING",
-          parseIt: parseBool(it.s)
-          formatIt: $it
-        .}: bool
+      available* {.dbType: "STRING", parseIt: parseBool(it.s) formatIt: $it.}: bool
 
     Prefs* = object
-      videoPlayback* {.
-        dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
-      autoplayGifs* {.
-        dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      videoPlayback*  {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      autoplayGifs*   {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      hideTweetStats* {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      hideBanner*     {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      stickyProfile*  {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
 
 type
   QueryKind* = enum

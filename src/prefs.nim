@@ -32,6 +32,19 @@ const prefList*: Table[string, seq[Pref]] = {
 
     Pref(kind: checkbox, name: "autoplayGifs", label: "Autoplay gifs",
          defaultState: true),
+  ],
+
+  "Display": @[
+    Pref(kind: checkbox, name: "hideTweetStats",
+         label: "Hide tweet stats (replies, retweets, likes",
+         defaultState: false),
+
+    Pref(kind: checkbox, name: "hideBanner", label: "Hide profile banner",
+         defaultState: false),
+
+    Pref(kind: checkbox, name: "stickyProfile",
+         label: "Make profile sidebar stick to top",
+         defaultState: true)
   ]
 }.toTable
 

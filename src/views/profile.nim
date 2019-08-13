@@ -70,10 +70,12 @@ proc renderBanner(profile: Profile): VNode =
 proc renderProfile*(profile: Profile; timeline: Timeline;
                     photoRail: seq[GalleryPhoto]; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-tabs")):
-    tdiv(class="profile-banner"):
-      renderBanner(profile)
+    if not prefs.hideBanner:
+      tdiv(class="profile-banner"):
+        renderBanner(profile)
 
-    tdiv(class="profile-tab"):
+    let sticky = if prefs.stickyProfile: "sticky" else: "unset"
+    tdiv(class="profile-tab", style={position: sticky}):
       renderProfileCard(profile)
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)

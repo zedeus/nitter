@@ -210,7 +210,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; class="";
         elif tweet.poll.isSome:
           renderPoll(tweet.poll.get())
 
-        renderStats(tweet.stats)
+        if not prefs.hideTweetStats:
+          renderStats(tweet.stats)
 
         if tweet.hasThread and "timeline" in class:
           a(class="show-thread", href=getLink(tweet)):
