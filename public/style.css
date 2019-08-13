@@ -390,6 +390,10 @@ video, .video-container img {
     background-color: #282828;
 }
 
+.show-thread {
+    display: block;
+}
+
 .multi-header {
     background-color: #161616;
     text-align: center;

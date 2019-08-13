@@ -170,7 +170,7 @@ proc renderQuote(quote: Quote): VNode =
       verbatim linkifyText(quote.text)
 
     if quote.hasThread:
-      a(href=getLink(quote)):
+      a(class="show-thread", href=getLink(quote)):
         text "Show this thread"
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; class="";
@@ -213,5 +213,5 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; class="";
         renderStats(tweet.stats)
 
         if tweet.hasThread and "timeline" in class:
-          a(href=getLink(tweet)):
+          a(class="show-thread", href=getLink(tweet)):
             text "Show this thread"
