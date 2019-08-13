@@ -52,10 +52,10 @@ macro genMediaGet(media: untyped; token=false) =
       var futs: seq[Future[void]]
       when `token`:
         var token = await getGuestToken(agent)
-        futs.add `single`(convo.tweet, token, agent)
-        futs.add `multi`(convo.before, token, agent)
-        futs.add `multi`(convo.after, token, agent)
-        futs.add convo.replies.mapIt(`multi`(it, token, agent))
+        futs.add `single`(convo.tweet, agent, token)
+        futs.add `multi`(convo.before, agent, token=token)
+        futs.add `multi`(convo.after, agent, token=token)
+        futs.add convo.replies.mapIt(`multi`(it, agent, token=token))
       else:
         futs.add `single`(convo.tweet, agent)
         futs.add `multi`(convo.before, agent)
@@ -117,7 +117,7 @@ proc getGuestToken(agent: string; force=false): Future[string] {.async.} =
   result = json["guest_token"].to(string)
   guestToken = result
 
-proc getVideoFetch*(tweet: Tweet; token, agent: string) {.async.} =
+proc getVideoFetch*(tweet: Tweet; agent, token: string) {.async.} =
   if tweet.video.isNone(): return
 
   let headers = newHttpHeaders({
@@ -135,7 +135,7 @@ proc getVideoFetch*(tweet: Tweet; token, agent: string) {.async.} =
     if getTime() - tokenUpdated > initDuration(seconds=1):
       tokenUpdated = getTime()
       discard await getGuestToken(agent, force=true)
-    await getVideoFetch(tweet, guestToken, agent)
+    await getVideoFetch(tweet, agent, guestToken)
     return
 
   if tweet.card.isNone:
@@ -151,12 +151,12 @@ proc getVideoVar*(tweet: Tweet): var Option[Video] =
   else:
     return tweet.video
 
-proc getVideo*(tweet: Tweet; token, agent: string; force=false) {.async.} =
+proc getVideo*(tweet: Tweet; agent, token: string; force=false) {.async.} =
   withDb:
     try:
       getVideoVar(tweet) = some(Video.getOne("videoId = ?", tweet.id))
     except KeyError:
-      await getVideoFetch(tweet, token, agent)
+      await getVideoFetch(tweet, agent, token)
       var video = getVideoVar(tweet)
       if video.isSome():
         get(video).insert()
