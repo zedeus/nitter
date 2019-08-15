@@ -46,7 +46,7 @@ const prefList*: Table[string, seq[Pref]] = {
 
   "Display": @[
     Pref(kind: checkbox, name: "hideTweetStats",
-         label: "Hide tweet stats (replies, retweets, likes",
+         label: "Hide tweet stats (replies, retweets, likes)",
          defaultState: false),
 
     Pref(kind: checkbox, name: "hideBanner", label: "Hide profile banner",

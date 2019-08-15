@@ -92,7 +92,7 @@ routes:
   post "/saveprefs":
     var prefs = getCookiePrefs(request)
     genUpdatePrefs()
-    setCookie("preferences", $prefs.id, daysForward(360))
+    setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=true)
     redirect("/settings")
 
   get "/settings":
