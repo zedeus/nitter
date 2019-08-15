@@ -1,4 +1,5 @@
-import asyncdispatch, asyncfile, httpclient, sequtils, strutils, strformat, uri, os
+import asyncdispatch, asyncfile, httpclient, uri, os
+import sequtils, strformat, strutils
 from net import Port
 
 import jester, regex

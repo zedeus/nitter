@@ -11,7 +11,7 @@ proc renderStat(num, class: string; text=""): VNode =
     span(class="profile-stat-num"):
       text if num.len == 0: "?" else: num
 
-proc renderProfileCard*(profile: Profile): VNode =
+proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-card")):
     a(class="profile-card-avatar", href=profile.getUserPic().getSigUrl("pic")):
       genImg(profile.getUserpic("_200x200"))
@@ -23,7 +23,7 @@ proc renderProfileCard*(profile: Profile): VNode =
     tdiv(class="profile-card-extra"):
       if profile.bio.len > 0:
         tdiv(class="profile-bio"):
-          p: verbatim linkifyText(profile.bio)
+          p: verbatim linkifyText(profile.bio, prefs)
 
       if profile.location.len > 0:
         tdiv(class="profile-location"):
@@ -76,7 +76,7 @@ proc renderProfile*(profile: Profile; timeline: Timeline;
 
     let sticky = if prefs.stickyProfile: "sticky" else: "unset"
     tdiv(class="profile-tab", style={position: sticky}):
-      renderProfileCard(profile)
+      renderProfileCard(profile, prefs)
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)
 

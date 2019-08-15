@@ -1,4 +1,4 @@
-import asyncdispatch, times, macros, tables
+import asyncdispatch, times, macros, tables, xmltree
 import types
 
 withCustomDb("prefs.db", "", "", ""):
@@ -25,6 +25,16 @@ type
       placeholder*: string
 
 const prefList*: Table[string, seq[Pref]] = {
+  "Privacy": @[
+    Pref(kind: input, name: "replaceTwitter",
+         label: "Replace Twitter links with Nitter (blank to disable)",
+         defaultInput: "nitter.net", placeholder: "Nitter hostname"),
+
+    Pref(kind: input, name: "replaceYouTube",
+         label: "Replace YouTube links with Invidious (blank to disable)",
+         defaultInput: "invidio.us", placeholder: "Invidious hostname")
+  ],
+
   "Media": @[
     Pref(kind: checkbox, name: "videoPlayback",
          label: "Enable hls.js video playback (requires JavaScript)",
@@ -94,7 +104,7 @@ macro genUpdatePrefs*(): untyped =
     of checkbox:
       result.add quote do: prefs.`ident` = `value` == "on"
     of input:
-      result.add quote do: prefs.`ident` = `value`
+      result.add quote do: prefs.`ident` = xmltree.escape(strip(`value`))
     of select:
       let options = pref.options
       let default = pref.defaultOption

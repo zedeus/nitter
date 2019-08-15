@@ -11,6 +11,8 @@ const
   usernameRegex = re"(^|[^A-z0-9_?])@([A-z0-9_]+)"
   picRegex = re"pic.twitter.com/[^ ]+"
   ellipsisRegex = re" ?…"
+  ytRegex = re"youtu(be.com|.be)"
+  twRegex = re"twitter.com"
   nbsp = $Rune(0x000A0)
 
 proc stripText*(text: string): string =
@@ -46,7 +48,7 @@ proc reUsernameToLink*(m: RegexMatch; s: string): string =
 
   pretext & toLink("/" & username, "@" & username)
 
-proc linkifyText*(text: string): string =
+proc linkifyText*(text: string; prefs: Prefs): string =
   result = xmltree.escape(stripText(text))
   result = result.replace(ellipsisRegex, "")
   result = result.replace(emailRegex, reEmailToLink)
@@ -55,6 +57,16 @@ proc linkifyText*(text: string): string =
   result = result.replace(re"([^\s\(\n%])<a", "$1 <a")
   result = result.replace(re"</a>\s+([;.,!\)'%]|&apos;)", "</a>$1")
   result = result.replace(re"^\. <a", ".<a")
+  if prefs.replaceYouTube.len > 0:
+    result = result.replace(ytRegex, prefs.replaceYouTube)
+  if prefs.replaceTwitter.len > 0:
+    result = result.replace(twRegex, prefs.replaceTwitter)
+
+proc replaceUrl*(url: string; prefs: Prefs): string =
+  if prefs.replaceYouTube.len > 0:
+    return url.replace(ytRegex, prefs.replaceYouTube)
+  if prefs.replaceTwitter.len > 0:
+    return url.replace(twRegex, prefs.replaceTwitter)
 
 proc stripTwitterUrls*(text: string): string =
   result = text

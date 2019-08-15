@@ -92,7 +92,7 @@ proc renderPoll(poll: Poll): VNode =
 proc renderCardImage(card: Card): VNode =
   buildHtml(tdiv(class="card-image-container")):
     tdiv(class="card-image"):
-      img(src=get(card.image).getSigUrl("pic"))
+      img(src=getSigUrl(get(card.image), "pic"))
       if card.kind == player:
         tdiv(class="card-overlay"):
           tdiv(class="card-overlay-circle"):
@@ -103,7 +103,7 @@ proc renderCard(card: Card; prefs: Prefs): VNode =
   let large = if card.kind in largeCards: " large" else: ""
 
   buildHtml(tdiv(class=("card" & large))):
-    a(class="card-container", href=card.url):
+    a(class="card-container", href=replaceUrl(card.url, prefs)):
       if card.image.isSome:
         renderCardImage(card)
       elif card.video.isSome:
@@ -147,7 +147,7 @@ proc renderQuoteMedia(quote: Quote): VNode =
       tdiv(class="quote-sensitive"):
         icon "attention", class="quote-sensitive-icon"
 
-proc renderQuote(quote: Quote): VNode =
+proc renderQuote(quote: Quote; prefs: Prefs): VNode =
   if not quote.available:
     return buildHtml(tdiv(class="quote unavailable")):
       tdiv(class="unavailable-quote"):
@@ -167,7 +167,7 @@ proc renderQuote(quote: Quote): VNode =
       renderReply(quote)
 
     tdiv(class="quote-text"):
-      verbatim linkifyText(quote.text)
+      verbatim linkifyText(quote.text, prefs)
 
     if quote.hasThread:
       a(class="show-thread", href=getLink(quote)):
@@ -194,10 +194,10 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; class="";
           renderReply(tweet)
 
         tdiv(class="status-content media-body"):
-          verbatim linkifyText(tweet.text)
+          verbatim linkifyText(tweet.text, prefs)
 
         if tweet.quote.isSome:
-          renderQuote(tweet.quote.get())
+          renderQuote(tweet.quote.get(), prefs)
 
         if tweet.card.isSome:
           renderCard(tweet.card.get(), prefs)

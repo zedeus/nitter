@@ -43,9 +43,9 @@ db("cache.db", "", "", ""):
       thumb*: string
       views*: string
       playbackType* {.
-          dbType: "STRING",
-          parseIt: parseEnum[VideoType](it.s),
-          formatIt: $it,
+          dbType: "STRING"
+          parseIt: parseEnum[VideoType](it.s)
+          formatIt: $it
         .}: VideoType
       available* {.dbType: "STRING", parseIt: parseBool(it.s) formatIt: $it.}: bool
 
@@ -55,6 +55,8 @@ db("cache.db", "", "", ""):
       hideTweetStats* {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
       hideBanner*     {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
       stickyProfile*  {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      replaceYouTube*: string
+      replaceTwitter*: string
 
 type
   QueryKind* = enum
