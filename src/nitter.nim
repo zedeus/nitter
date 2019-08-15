@@ -95,6 +95,12 @@ routes:
     setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=true)
     redirect("/settings")
 
+  post "/resetprefs":
+    var prefs = getCookiePrefs(request)
+    resetPrefs(prefs)
+    setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=true)
+    redirect("/settings")
+
   get "/settings":
     let prefs = getCookiePrefs(request)
     resp renderMain(renderPreferences(prefs), prefs, title=cfg.title, titleText="Preferences")

@@ -96,6 +96,12 @@ proc getPrefs*(id: string): Prefs =
       result = genDefaultPrefs()
       cache(result)
 
+proc resetPrefs*(prefs: var Prefs) =
+  var defPrefs = genDefaultPrefs()
+  defPrefs.id = prefs.id
+  cache(defPrefs)
+  prefs = defPrefs
+
 macro genUpdatePrefs*(): untyped =
   result = nnkStmtList.newTree()
 

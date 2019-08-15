@@ -53,9 +53,13 @@ macro renderPrefs*(): untyped =
 
 proc renderPreferences*(prefs: Prefs): VNode =
   buildHtml(tdiv(class="preferences-container")):
-    form(class="preferences", `method`="post", action="saveprefs"):
-      fieldset:
+    fieldset(class="preferences"):
+      form(`method`="post", action="saveprefs"):
         renderPrefs()
 
         button(`type`="submit", class="pref-submit"):
           text "Save preferences"
+
+      form(`method`="post", action="resetprefs", class="pref-reset"):
+        button(`type`="submit", class="pref-submit"):
+          text "Reset preferences"

@@ -1092,10 +1092,6 @@ legend {
     margin: .2em; 0;
 }
 
-.pref-submit:hover {
-    background-color: #a8a8a8;
-}
-
 .pref-submit {
     background-color: #e2e2e2;
     color: #000;
@@ -1104,6 +1100,15 @@ legend {
     padding: 3px 6px;
     margin-left: 6px;
     margin-top: 4px;
+}
+
+.pref-submit:hover {
+    background-color: #a8a8a8;
+}
+
+.pref-reset {
+    float: right;
+    margin-top: -25px;
 }
 
 .icon-container {
