@@ -5,28 +5,28 @@ import ../types, ../prefs
 
 proc genCheckbox(pref, label: string; state: bool): VNode =
   buildHtml(tdiv(class="pref-group")):
-    if state:
-      input(name=pref, `type`="checkbox", checked="")
-    else:
-      input(name=pref, `type`="checkbox")
-    label(`for`=pref): text label
+    label(class="checkbox-container"):
+      text label
+      if state: input(name=pref, `type`="checkbox", checked="")
+      else: input(name=pref, `type`="checkbox")
+      span(class="checkbox")
 
 proc genSelect(pref, label, state: string; options: seq[string]): VNode =
   buildHtml(tdiv(class="pref-group")):
+    label(`for`=pref): text label
     select(name=pref):
       for opt in options:
         if opt == state:
           option(value=opt, selected=""): text opt
         else:
           option(value=opt): text opt
-    label(`for`=pref): text label
 
 proc genInput(pref, label, state, placeholder: string): VNode =
   let s = xmltree.escape(state)
   let p = xmltree.escape(placeholder)
-  buildHtml(tdiv(class="pref-group")):
-    verbatim &"<input name={pref} type=\"text\" placeholder=\"{p}\" value=\"{s}\"/>"
+  buildHtml(tdiv(class="pref-group pref-input")):
     label(`for`=pref): text label
+    verbatim &"<input name={pref} type=\"text\" placeholder=\"{p}\" value=\"{s}\"/>"
 
 macro renderPrefs*(): untyped =
   result = nnkCall.newTree(
@@ -57,9 +57,9 @@ proc renderPreferences*(prefs: Prefs): VNode =
       form(`method`="post", action="saveprefs"):
         renderPrefs()
 
-        button(`type`="submit", class="pref-submit"):
+        button(`type`="submit"):
           text "Save preferences"
 
       form(`method`="post", action="resetprefs", class="pref-reset"):
-        button(`type`="submit", class="pref-submit"):
+        button(`type`="submit"):
           text "Reset preferences"
