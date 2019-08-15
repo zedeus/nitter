@@ -3,7 +3,7 @@ import karax/[karaxdsl, vdom, vstyles]
 
 import ../types, ../prefs
 
-proc genCheckbox(pref: string; label: string; state: bool): VNode =
+proc genCheckbox(pref, label: string; state: bool): VNode =
   buildHtml(tdiv(class="pref-group")):
     if state:
       input(name=pref, `type`="checkbox", checked="")
@@ -11,7 +11,7 @@ proc genCheckbox(pref: string; label: string; state: bool): VNode =
       input(name=pref, `type`="checkbox")
     label(`for`=pref): text label
 
-proc genSelect(pref: string; label: string; options: seq[string]; state: string): VNode =
+proc genSelect(pref, label, state: string; options: seq[string]): VNode =
   buildHtml(tdiv(class="pref-group")):
     select(name=pref):
       for opt in options:
@@ -21,7 +21,7 @@ proc genSelect(pref: string; label: string; options: seq[string]; state: string)
           option(value=opt): text opt
     label(`for`=pref): text label
 
-proc genInput(pref: string; label: string; placeholder, state: string): VNode =
+proc genInput(pref, label, state, placeholder: string): VNode =
   buildHtml(tdiv(class="pref-group")):
     input(name=pref, `type`="text", placeholder=placeholder, value=state)
     label(`for`=pref): text label
@@ -37,27 +37,17 @@ macro renderPrefs*(): untyped =
         nnkCommand.newTree(ident("text"), newLit(header))))
 
     for pref in options:
-      let name = newLit(pref.name)
-      let label = newLit(pref.label)
-      let field = ident(pref.name)
+      let procName = ident("gen" & capitalizeAscii($pref.kind))
+      let state = nnkDotExpr.newTree(ident("prefs"), ident(pref.name))
+      var stmt = nnkStmtList.newTree(
+        nnkCall.newTree(procName, newLit(pref.name), newLit(pref.label), state))
+
       case pref.kind
-      of checkbox:
-        result[2].add nnkStmtList.newTree(
-          nnkCall.newTree(
-            ident("genCheckbox"), name, label,
-            nnkDotExpr.newTree(ident("prefs"), field)))
-      of select:
-        let options = newLit(pref.options)
-        result[2].add nnkStmtList.newTree(
-          nnkCall.newTree(
-            ident("genSelect"), name, label, options,
-            nnkDotExpr.newTree(ident("prefs"), field)))
-      of input:
-        let placeholder = newLit(pref.placeholder)
-        result[2].add nnkStmtList.newTree(
-          nnkCall.newTree(
-            ident("genInput"), name, label, placeholder,
-            nnkDotExpr.newTree(ident("prefs"), field)))
+      of checkbox: discard
+      of select: stmt[0].add newLit(pref.options)
+      of input: stmt[0].add newLit(pref.placeholder)
+
+      result[2].add stmt
 
 proc renderPreferences*(prefs: Prefs): VNode =
   buildHtml(tdiv(class="preferences-container")):

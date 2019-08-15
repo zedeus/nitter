@@ -92,17 +92,15 @@ macro genUpdatePrefs*(): untyped =
 
     case pref.kind
     of checkbox:
-      result.add quote do:
-        prefs.`ident` = `value` == "on"
+      result.add quote do: prefs.`ident` = `value` == "on"
+    of input:
+      result.add quote do: prefs.`ident` = `value`
     of select:
       let options = pref.options
       let default = pref.defaultOption
       result.add quote do:
         if `value` in `options`: prefs.`ident` = `value`
         else: prefs.`ident` = `default`
-    of input:
-      result.add quote do:
-        prefs.`ident` = `value`
 
   result.add quote do:
     cache(prefs)
