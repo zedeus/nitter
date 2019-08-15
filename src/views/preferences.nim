@@ -57,7 +57,7 @@ proc renderPreferences*(prefs: Prefs): VNode =
       form(`method`="post", action="saveprefs"):
         renderPrefs()
 
-        button(`type`="submit"):
+        button(`type`="submit", class="pref-submit"):
           text "Save preferences"
 
       form(`method`="post", action="resetprefs", class="pref-reset"):

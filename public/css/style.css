@@ -208,6 +208,11 @@ nav {
     font-weight: 600;
 }
 
+.site-name:hover {
+    color: #ffaca0;
+    text-decoration: unset;
+}
+
 .site-logo {
     width: 35px;
     height: 35px;
@@ -1075,15 +1080,17 @@ video, .video-container img {
     max-width: 600px;
     margin: 0 auto;
     width: 100%;
+    margin-top: 10px;
 }
 
 .preferences {
-    background-color: #222222;
+    background-color: #1f1f1f;
     width: 100%;
+    padding: 5px 15px 15px 15px;
 }
 
 .preferences input[type="text"] {
-    max-width: 110px;
+    max-width: 120px;
     background-color: #121212;
     padding: 1px 4px;
     color: #f8f8f2;
@@ -1099,23 +1106,6 @@ video, .video-container img {
     border-color: #ff6c60;
 }
 
-.preferences button {
-    background-color: #121212;
-    color: #f8f8f2;
-    border: 1px solid #ff6c6091;
-    padding: 3px 6px;
-    margin-top: 4px;
-    font-size: 14px;
-}
-
-.preferences button:hover {
-    border-color: #ff6c60;
-}
-
-.preferences button:active {
-    border-color: #ff9f97;
-}
-
 fieldset {
     margin: .35em 0 .75em;
     border: 0;
@@ -1123,22 +1113,40 @@ fieldset {
 
 legend {
     width: 100%;
-    padding: .2em 0 .3em 0;
+    padding: .6em 0 .3em 0;
     margin: 0;
     border: 0;
     font-size: 16px;
-    border-bottom: 1px solid #888888;
-    margin-bottom: 5px;
+    border-bottom: 1px solid #3e3e35;
+    margin-bottom: 8px;
 }
 
 .pref-input {
     position: relative;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+}
+
+.pref-submit, .pref-reset button {
+    background-color: #121212;
+    color: #f8f8f2;
+    border: 1px solid #ff6c6091;
+    padding: 3px 6px;
+    margin-top: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    float: right;
+}
+
+.pref-submit:hover, .pref-reset button:hover {
+    border-color: #ff6c60;
+}
+
+.pref-submit:active, .pref-reset button:active {
+    border-color: #ff9f97;
 }
 
 .pref-reset {
-    float: right;
-    margin-top: -28px;
+    float: left;
 }
 
 .icon-container {
