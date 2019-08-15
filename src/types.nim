@@ -22,17 +22,17 @@ db("cache.db", "", "", ""):
       tweets*: string
       likes*: string
       media*: string
-      verified* {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
-      protected* {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      verified*: bool
+      protected*: bool
       joinDate* {.
         dbType: "INTEGER"
         parseIt: it.i.fromUnix()
-        formatIt: it.toUnix()
+        formatIt: dbValue(it.toUnix())
         .}: Time
       updated* {.
           dbType: "INTEGER"
           parseIt: it.i.fromUnix()
-          formatIt: getTime().toUnix()
+          formatIt: dbValue(getTime().toUnix())
         .}: Time
 
     Video* = object
@@ -42,19 +42,19 @@ db("cache.db", "", "", ""):
       url*: string
       thumb*: string
       views*: string
+      available*: bool
       playbackType* {.
           dbType: "STRING"
           parseIt: parseEnum[VideoType](it.s)
-          formatIt: $it
+          formatIt: dbValue($it)
         .}: VideoType
-      available* {.dbType: "STRING", parseIt: parseBool(it.s) formatIt: $it.}: bool
 
     Prefs* = object
-      videoPlayback*  {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
-      autoplayGifs*   {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
-      hideTweetStats* {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
-      hideBanner*     {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
-      stickyProfile*  {.dbType: "STRING", parseIt: parseBool(it.s), formatIt: $it.}: bool
+      videoPlayback*: bool
+      autoplayGifs*: bool
+      hideTweetStats*: bool
+      hideBanner*: bool
+      stickyProfile*: bool
       replaceYouTube*: string
       replaceTwitter*: string
 
