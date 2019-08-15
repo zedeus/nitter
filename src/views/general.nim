@@ -1,5 +1,6 @@
 import karax/[karaxdsl, vdom]
 
+import renderutils
 import ../utils, ../types
 
 const doctype = "<!DOCTYPE html>\n"
@@ -13,14 +14,15 @@ proc renderNavbar*(title: string): VNode =
       a(href="/"): img(class="site-logo", src="/logo.png")
 
       tdiv(class="item right"):
-        a(class="site-about", href="/about"): text "🛈"
-        a(class="site-prefs", href="/settings"): text "⚙"
+        icon "info-circled", title="About", href="/about"
+        icon "cog-2", title="Preferences", href="/settings"
 
 proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="";
                  `type`="article"; video=""; images: seq[string] = @[]): string =
   let node = buildHtml(html(lang="en")):
     head:
-      link(rel="stylesheet", `type`="text/css", href="/style.css")
+      link(rel="stylesheet", `type`="text/css", href="/css/style.css")
+      link(rel="stylesheet", `type`="text/css", href="/css/fontello.css")
 
       title:
         if titleText.len > 0:
@@ -53,7 +55,7 @@ proc renderSearch*(): VNode =
     tdiv(class="search-panel"):
       form(`method`="post", action="search"):
         input(`type`="text", name="query", autofocus="", placeholder="Enter usernames...")
-        button(`type`="submit"): text "🔎"
+        button(`type`="submit"): icon "search"
 
 proc renderError*(error: string): VNode =
   buildHtml(tdiv(class="panel")):

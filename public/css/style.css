@@ -107,29 +107,19 @@ a:hover {
     text-overflow: ellipsis;
 }
 
-.icon {
+.verified-icon {
     color: #fff;
+    background-color: #1da1f2;
     border-radius: 50%;
+    flex-shrink: 0;
+    margin: 2px 0 3px 3px;
+    padding-top: 2px;
+    height: 12px;
+    width: 14px;
+    font-size: 8px;
     display: inline-block;
     text-align: center;
     vertical-align: middle;
-    flex-shrink: 0;
-    margin: 2px 0 3px 3px;
-}
-
-.verified-icon {
-    background-color: #1da1f2;
-    height: 14px;
-    width: 14px;
-    font-size: 10px;
-}
-
-.protected-icon {
-    background-color: #353535;
-    height: 18px;
-    width: 18px;
-    font-size: 12px;
-    font-weight: bold;
 }
 
 .tweet-date {
@@ -215,14 +205,14 @@ nav {
     height: 35px;
 }
 
-.site-about {
-    font-size: 17px;
-    padding-right: 2px;
-    margin-top: -0.75px;
+.item.right a {
+    font-size: 16px;
+    padding-left: 4px;
 }
 
-.site-settings {
-    font-size: 18px;
+.item.right a:hover {
+    color: #ffaca0;
+    text-decoration: unset;
 }
 
 .attachments {
@@ -902,12 +892,8 @@ video, .video-container img {
 }
 
 .quote-sensitive-icon {
-    font-size: 25px;
-    width: 37px;
-    height: 32px;
-    background-color: #4e4e4e;
-    padding-bottom: 5px;
-    margin: 0;
+    font-size: 40px;
+    color: #909090;
 }
 
 .card {
@@ -1118,4 +1104,8 @@ legend {
     padding: 3px 6px;
     margin-left: 6px;
     margin-top: 4px;
+}
+
+.icon-container {
+    display: inline;
 }

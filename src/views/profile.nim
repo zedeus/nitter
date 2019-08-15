@@ -1,8 +1,8 @@
 import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 
-import ../types, ../utils, ../formatters
 import tweet, timeline, renderutils
+import ../types, ../utils, ../formatters
 
 proc renderStat(num, class: string; text=""): VNode =
   let t = if text.len > 0: text else: class
@@ -27,17 +27,17 @@ proc renderProfileCard*(profile: Profile): VNode =
 
       if profile.location.len > 0:
         tdiv(class="profile-location"):
-          span: text "📍 " & profile.location
+          span: icon "location", profile.location
 
       if profile.website.len > 0:
         tdiv(class="profile-website"):
           span:
-            text "🔗 "
+            icon "link"
             linkText(profile.website)
 
       tdiv(class="profile-joindate"):
         span(title=getJoinDateFull(profile)):
-          text "📅 " & getJoinDate(profile)
+          icon "calendar", getJoinDate(profile)
 
       tdiv(class="profile-card-extra-links"):
         ul(class="profile-statlist"):
@@ -50,7 +50,7 @@ proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
   buildHtml(tdiv(class="photo-rail-card")):
     tdiv(class="photo-rail-header"):
       a(href=(&"/{profile.username}/media")):
-        text &"🖼 {profile.media} Photos and videos"
+        icon "picture-1", $profile.media & " Photos and videos"
 
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:

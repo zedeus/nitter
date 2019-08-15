@@ -1,17 +1,18 @@
 import strutils, sequtils
 import karax/[karaxdsl, vdom, vstyles]
 
-import ../types, ../utils, ../formatters
 import renderutils
+import ../types, ../utils, ../formatters
 
 proc renderHeader(tweet: Tweet): VNode =
   buildHtml(tdiv):
     if tweet.retweet.isSome:
       tdiv(class="retweet"):
-        span: text "🔄 " & get(tweet.retweet).by & " retweeted"
+        span: icon "retweet-1", get(tweet.retweet).by & " retweeted"
+
     if tweet.pinned:
       tdiv(class="pinned"):
-        span: text "📌 Pinned Tweet"
+        span: icon "pin", "Pinned Tweet"
 
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.profile.username)):
@@ -70,7 +71,6 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
         let thumb = gif.thumb.getSigUrl("pic")
         let url = gif.url.getSigUrl("video")
         if prefs.autoplayGifs:
-
           video(class="gif", poster=thumb, autoplay="", muted="", loop=""):
             source(src=url, `type`="video/mp4")
         else:
@@ -117,9 +117,9 @@ proc renderCard(card: Card; prefs: Prefs): VNode =
 
 proc renderStats(stats: TweetStats): VNode =
   buildHtml(tdiv(class="tweet-stats")):
-    span(class="tweet-stat"): text "💬 " & $stats.replies
-    span(class="tweet-stat"): text "🔄 " & $stats.retweets
-    span(class="tweet-stat"): text "👍 " & $stats.likes
+    span(class="tweet-stat"): icon "comment", $stats.replies
+    span(class="tweet-stat"): icon "retweet-1", $stats.retweets
+    span(class="tweet-stat"): icon "thumbs-up-alt", $stats.likes
 
 proc renderReply(tweet: Tweet): VNode =
   buildHtml(tdiv(class="replying-to")):
@@ -145,7 +145,7 @@ proc renderQuoteMedia(quote: Quote): VNode =
             tdiv(class="quote-badge-text"): text quote.badge
     elif quote.sensitive:
       tdiv(class="quote-sensitive"):
-        span(class="icon quote-sensitive-icon"): text "❗"
+        icon "attention", class="quote-sensitive-icon"
 
 proc renderQuote(quote: Quote): VNode =
   if not quote.available:
