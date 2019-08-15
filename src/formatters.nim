@@ -11,8 +11,8 @@ const
   usernameRegex = re"(^|[^A-z0-9_?])@([A-z0-9_]+)"
   picRegex = re"pic.twitter.com/[^ ]+"
   ellipsisRegex = re" ?…"
-  ytRegex = re"youtu(be.com|.be)"
-  twRegex = re"twitter.com"
+  ytRegex = re"(www.)?youtu(be.com|.be)"
+  twRegex = re"(www.)?twitter.com"
   nbsp = $Rune(0x000A0)
 
 proc stripText*(text: string): string =
@@ -65,9 +65,9 @@ proc linkifyText*(text: string; prefs: Prefs): string =
 proc replaceUrl*(url: string; prefs: Prefs): string =
   result = url
   if prefs.replaceYouTube.len > 0:
-    result = url.replace(ytRegex, prefs.replaceYouTube)
+    result = result.replace(ytRegex, prefs.replaceYouTube)
   if prefs.replaceTwitter.len > 0:
-    result = url.replace(twRegex, prefs.replaceTwitter)
+    result = result.replace(twRegex, prefs.replaceTwitter)
 
 proc stripTwitterUrls*(text: string): string =
   result = text
