@@ -44,7 +44,7 @@ const prefList*: Table[string, seq[Pref]] = {
          defaultState: false),
 
     Pref(kind: checkbox, name: "autoplayGifs", label: "Autoplay gifs",
-         defaultState: true),
+         defaultState: true)
   ],
 
   "Display": @[

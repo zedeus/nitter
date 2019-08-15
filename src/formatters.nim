@@ -63,10 +63,11 @@ proc linkifyText*(text: string; prefs: Prefs): string =
     result = result.replace(twRegex, prefs.replaceTwitter)
 
 proc replaceUrl*(url: string; prefs: Prefs): string =
+  result = url
   if prefs.replaceYouTube.len > 0:
-    return url.replace(ytRegex, prefs.replaceYouTube)
+    result = url.replace(ytRegex, prefs.replaceYouTube)
   if prefs.replaceTwitter.len > 0:
-    return url.replace(twRegex, prefs.replaceTwitter)
+    result = url.replace(twRegex, prefs.replaceTwitter)
 
 proc stripTwitterUrls*(text: string): string =
   result = text
