@@ -89,3 +89,7 @@ needing a Twitter account.
 ## Screenshot
 
 ![nitter](/screenshot.png)
+
+## Contact
+
+Feel free to join our [Matrix Server](https://riot.im/app/#/room/#nitter:matrix.org), or #nitter on Freenode.
