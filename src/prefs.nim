@@ -1,6 +1,8 @@
 import asyncdispatch, times, macros, tables, xmltree
 import types
 
+const hostname {.strdefine.} = "nitter.net"
+
 withCustomDb("prefs.db", "", "", ""):
   try:
     createTables()
@@ -24,11 +26,12 @@ type
       defaultInput*: string
       placeholder*: string
 
+# TODO: write DSL to simplify this
 const prefList*: Table[string, seq[Pref]] = {
   "Privacy": @[
     Pref(kind: input, name: "replaceTwitter",
          label: "Replace Twitter links with Nitter (blank to disable)",
-         defaultInput: "nitter.net", placeholder: "Nitter hostname"),
+         defaultInput: hostname, placeholder: "Nitter hostname"),
 
     Pref(kind: input, name: "replaceYouTube",
          label: "Replace YouTube links with Invidious (blank to disable)",
