@@ -37,8 +37,7 @@ proc showSingleTimeline(name, after, agent: string; query: Option[Query];
     return ""
 
   let profileHtml = renderProfile(profile, timeline, await railFut, prefs)
-  return renderMain(profileHtml, prefs, title=cfg.title, titleText=pageTitle(profile),
-                    desc=pageDesc(profile))
+  return renderMain(profileHtml, cfg.title, pageTitle(profile), pageDesc(profile))
 
 proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Query];
                        prefs: Prefs): Future[string] {.async.} =
@@ -51,7 +50,7 @@ proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Q
   var timeline = renderMulti(await getTimelineSearch(get(q), after, agent),
                              names.join(","), prefs)
 
-  return renderMain(timeline, prefs, title=cfg.title, titleText="Multi")
+  return renderMain(timeline, cfg.title, "Multi")
 
 proc showTimeline(name, after: string; query: Option[Query];
                   prefs: Prefs): Future[string] {.async.} =
@@ -65,10 +64,10 @@ proc showTimeline(name, after: string; query: Option[Query];
 
 template respTimeline(timeline: typed) =
   if timeline.len == 0:
-    resp Http404, showError("User \"" & @"name" & "\" not found", cfg.title, prefs)
+    resp Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
   resp timeline
 
-proc getCookiePrefs(request: Request): Prefs =
+template cookiePrefs(): untyped {.dirty.} =
   getPrefs(request.cookies.getOrDefault("preferences"))
 
 setProfileCacheTime(cfg.profileCacheTime)
@@ -80,59 +79,55 @@ settings:
 
 routes:
   get "/":
-    let prefs = getCookiePrefs(request)
-    resp renderMain(renderSearch(), prefs, title=cfg.title)
+    resp renderMain(renderSearch(), cfg.title)
 
   post "/search":
     if @"query".len == 0:
-      resp Http404, showError("Please enter a username.", cfg.title,
-                              getCookiePrefs(request))
+      resp Http404, showError("Please enter a username.", cfg.title)
     redirect("/" & @"query")
 
   post "/saveprefs":
-    var prefs = getCookiePrefs(request)
+    var prefs = cookiePrefs()
     genUpdatePrefs()
     setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=true)
-    redirect("/settings")
+    redirect("/")
 
   post "/resetprefs":
-    var prefs = getCookiePrefs(request)
+    var prefs = cookiePrefs()
     resetPrefs(prefs)
     setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=true)
     redirect("/settings")
 
   get "/settings":
-    let prefs = getCookiePrefs(request)
-    resp renderMain(renderPreferences(prefs), prefs, title=cfg.title, titleText="Preferences")
+    resp renderMain(renderPreferences(cookiePrefs()), cfg.title, "Preferences")
 
   get "/@name/?":
     cond '.' notin @"name"
-    let prefs = getCookiePrefs(request)
-    respTimeline(await showTimeline(@"name", @"after", none(Query), prefs))
+    respTimeline(await showTimeline(@"name", @"after", none(Query), cookiePrefs()))
 
   get "/@name/search":
     cond '.' notin @"name"
-    let prefs = getCookiePrefs(request)
+    let prefs = cookiePrefs()
     let query = initQuery(@"filter", @"include", @"not", @"sep", @"name")
-    respTimeline(await showTimeline(@"name", @"after", some(query), prefs))
+    respTimeline(await showTimeline(@"name", @"after", some(query), cookiePrefs()))
 
   get "/@name/replies":
     cond '.' notin @"name"
-    let prefs = getCookiePrefs(request)
-    respTimeline(await showTimeline(@"name", @"after", some(getReplyQuery(@"name")), prefs))
+    let prefs = cookiePrefs()
+    respTimeline(await showTimeline(@"name", @"after", some(getReplyQuery(@"name")), cookiePrefs()))
 
   get "/@name/media":
     cond '.' notin @"name"
-    let prefs = getCookiePrefs(request)
-    respTimeline(await showTimeline(@"name", @"after", some(getMediaQuery(@"name")), prefs))
+    let prefs = cookiePrefs()
+    respTimeline(await showTimeline(@"name", @"after", some(getMediaQuery(@"name")), cookiePrefs()))
 
   get "/@name/status/@id":
     cond '.' notin @"name"
-    let prefs = getCookiePrefs(request)
+    let prefs = cookiePrefs()
 
     let conversation = await getTweet(@"name", @"id", getAgent())
     if conversation == nil or conversation.tweet.id.len == 0:
-      resp Http404, showError("Tweet not found", cfg.title, prefs)
+      resp Http404, showError("Tweet not found", cfg.title)
 
     let title = pageTitle(conversation.tweet.profile)
     let desc = conversation.tweet.text
@@ -141,29 +136,26 @@ routes:
     if conversation.tweet.video.isSome():
       let thumb = get(conversation.tweet.video).thumb
       let vidUrl = getVideoEmbed(conversation.tweet.id)
-      resp renderMain(html, prefs, title=cfg.title, titleText=title, desc=desc,
-                      images = @[thumb], `type`="video", video=vidUrl)
+      resp renderMain(html, cfg.title, title, desc, images = @[thumb],
+                      `type`="video", video=vidUrl)
     elif conversation.tweet.gif.isSome():
       let thumb = get(conversation.tweet.gif).thumb
       let vidUrl = getVideoEmbed(conversation.tweet.id)
-      resp renderMain(html, prefs, title=cfg.title, titleText=title, desc=desc,
-                      images = @[thumb], `type`="video", video=vidUrl)
+      resp renderMain(html, cfg.title, title, desc, images = @[thumb],
+                      `type`="video", video=vidUrl)
     else:
-      resp renderMain(html, prefs, title=cfg.title, titleText=title,
-                      desc=desc, images=conversation.tweet.photos)
+      resp renderMain(html, cfg.title, title, desc, images=conversation.tweet.photos)
 
   get "/pic/@sig/@url":
     cond "http" in @"url"
     cond "twimg" in @"url"
-    let prefs = getCookiePrefs(request)
-
     let
       uri = parseUri(decodeUrl(@"url"))
       path = uri.path.split("/")[2 .. ^1].join("/")
       filename = cfg.cacheDir / cleanFilename(path & uri.query)
 
     if getHmac($uri) != @"sig":
-      resp showError("Failed to verify signature", cfg.title, prefs)
+      resp showError("Failed to verify signature", cfg.title)
 
     if not existsDir(cfg.cacheDir):
       createDir(cfg.cacheDir)
@@ -185,11 +177,10 @@ routes:
   get "/video/@sig/@url":
     cond "http" in @"url"
     cond "video.twimg" in @"url"
-    let prefs = getCookiePrefs(request)
     let url = decodeUrl(@"url")
 
     if getHmac(url) != @"sig":
-      resp showError("Failed to verify signature", cfg.title, prefs)
+      resp showError("Failed to verify signature", cfg.title)
 
     let client = newAsyncHttpClient()
     let video = await client.getContent(url)

@@ -17,7 +17,7 @@ proc renderNavbar*(title: string): VNode =
         icon "info-circled", title="About", href="/about"
         icon "cog-2", title="Preferences", href="/settings"
 
-proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="";
+proc renderMain*(body: VNode; title="Nitter"; titleText=""; desc="";
                  `type`="article"; video=""; images: seq[string] = @[]): string =
   let node = buildHtml(html(lang="en")):
     head:
@@ -62,5 +62,5 @@ proc renderError*(error: string): VNode =
     tdiv(class="error-panel"):
       span: text error
 
-proc showError*(error: string; title: string; prefs: Prefs): string =
-  renderMain(renderError(error), prefs, title=title, titleText="Error")
+proc showError*(error, title: string): string =
+  renderMain(renderError(error), title, "Error")
