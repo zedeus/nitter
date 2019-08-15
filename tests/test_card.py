@@ -11,12 +11,12 @@ card = [
     ['Bountysource/status/1141879700639215617',
      '$1,000 Bounty on kivy/plyer',
      'Automation and Screen Reader Support',
-     'bountysource.com', 'TF5vo84K', False],
+     'bountysource.com', '1161324818224078848', False],
 
     ['lorenlugosch/status/1115440394148487168',
      'lorenlugosch/pretrain_speech_model',
      'Speech Model Pre-training for End-to-End Spoken Language Understanding - lorenlugosch/pretrain_speech_model',
-     'github.com', 'VwMnYBVh', False],
+     'github.com', '1161172194040246272', False],
 
     ['PyTorch/status/1123379369672450051',
      'PyTorch',
@@ -31,7 +31,7 @@ card = [
     ['TheTwoffice/status/558685306090946561',
      'Eternity: a moment standing still forever…',
      '- James Montgomery. | facebook | 500px | ferpectshotz | I dusted off this one from my old archives, it was taken while I was living in mighty new York city working at Wall St. I think this was the 11...',
-     'flickr.com', '1LT6fSLU', True],
+     'flickr.com', '161236662619389953', True],
 
     ['nim_lang/status/1136652293510717440',
      'Version 0.20.0 released',
@@ -51,7 +51,7 @@ card = [
     ['voidtarget/status/1094632512926605312',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too)',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too) - obsplugin.nim',
-     'gist.github.com', '37n4WuBF', True],
+     'gist.github.com', '1160647657574076423', True],
 
     ['AdsAPI/status/1110272721005367296',
      'Conversation Targeting',
@@ -67,7 +67,7 @@ card = [
 no_thumb = [
     ['nim_lang/status/1082989146040340480',
      'Nim in 2018: A short recap',
-     'Posted in r/programming by u/miran1 • 38 points and 46 comments',
+     'Posted in r/programming by u/miran1 • 36 points and 46 comments',
      'reddit.com'],
 
     ['brent_p/status/1088857328680488961',
@@ -80,17 +80,17 @@ playable = [
     ['nim_lang/status/1118234460904919042',
      'Nim development blog 2019-03',
      'Arne (aka Krux02) * debugging: * improved nim-gdb, $ works, framefilter * alias for --debugger:native: -g * bugs: * forwarding of .pure. * sizeof union * fea...',
-     'youtube.com', 'rJkABhGF'],
+     'youtube.com', '1161613174514290688'],
 
     ['nim_lang/status/1121090879823986688',
      'Nim - First natively compiled language w/ hot code-reloading at...',
      '#nim #c++ #ACCUConf Nim is a statically typed systems and applications programming language which offers perhaps some of the most powerful metaprogramming ca...',
-     'youtube.com', 'FuFgnQ9PA'],
+     'youtube.com', '1161379576087568386'],
 
     ['lele/status/819930645145288704',
      'Eurocrash presents Open Decks - emerging dj #4: E-Musik',
      "OPEN DECKS is Eurocrash's new project about discovering new and emerging dj talents. Every selected dj will have the chance to perform the first dj-set in front of an actual audience. The best dj...",
-     'mixcloud.com', 'FdM8jyi04']
+     'mixcloud.com', '161048988763795457']
 ]
 
 promo = [

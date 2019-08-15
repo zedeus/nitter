@@ -92,7 +92,7 @@ class MediaTest(BaseTestCase):
         self.assert_element_visible(Media.container)
         self.assert_element_visible(Media.video)
 
-        video_thumb = self.get_attribute('video', 'poster')
+        video_thumb = self.get_attribute(Media.video + ' img', 'src')
         self.assertIn(thumb, video_thumb)
 
     @parameterized.expand(gallery)

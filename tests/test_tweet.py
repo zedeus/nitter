@@ -16,7 +16,7 @@ timeline = [
 ]
 
 status = [
-    [20, 'jack 🌍🌏🌎✔', 'jack', '21 Mar 2006', 'just setting up my twttr'],
+    [20, 'jack 🌍🌏🌎', 'jack', '21 Mar 2006', 'just setting up my twttr'],
     [134849778302464000, 'The Twoffice', 'TheTwoffice', '10 Nov 2011', 'test'],
     [105685475985080322, 'The Twoffice', 'TheTwoffice', '22 Aug 2011', 'regular tweet'],
     [572593440719912960, 'Test account', 'mobile_test', '2 Mar 2015', 'testing test']
@@ -77,7 +77,7 @@ emoji = [
 
 retweet = [
     [7, 'mobile_test_2', 'mobile test 2', 'Test account', '@mobile_test', '1234'],
-    [3, 'mobile_test_8', 'mobile test 8', 'jack 🌍🌏🌎✔', '@jack', 'twttr']
+    [3, 'mobile_test_8', 'mobile test 8', 'jack 🌍🌏🌎', '@jack', 'twttr']
 ]
 
 reply = [

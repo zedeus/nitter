@@ -4,15 +4,15 @@ from parameterized import parameterized
 profiles = [
         ['mobile_test', 'Test account',
          'Test Account. test test Testing username with @mobile_test_2 and a #hashtag',
-         '📍 San Francisco, CA', '🔗 example.com/foobar', '📅 Joined October 2009', '100'],
-        ['mobile_test_2', 'mobile test 2', '', '', '', '📅 Joined January 2011', '13']
+         'San Francisco, CA', 'example.com/foobar', 'Joined October 2009', '100'],
+        ['mobile_test_2', 'mobile test 2', '', '', '', 'Joined January 2011', '13']
 ]
 
 verified = [['jack'], ['elonmusk']]
 
 protected = [
-    ['mobile_test_7', 'mobile test 7🔒', ''],
-    ['Poop', 'Randy🔒', 'Social media fanatic.']
+    ['mobile_test_7', 'mobile test 7', ''],
+    ['Poop', 'Randy', 'Social media fanatic.']
 ]
 
 invalid = [['thisprofiledoesntexist'], ['%']]
@@ -39,7 +39,7 @@ class ProfileTest(BaseTestCase):
             (location, Profile.location),
             (website, Profile.website),
             (joinDate, Profile.joinDate),
-            (f"🖼 {mediaCount} Photos and videos", Profile.mediaCount)
+            (mediaCount + " Photos and videos", Profile.mediaCount)
         ]
 
         for text, selector in tests:
