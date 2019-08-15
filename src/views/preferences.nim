@@ -1,4 +1,4 @@
-import tables, macros
+import tables, macros, strformat, xmltree
 import karax/[karaxdsl, vdom, vstyles]
 
 import ../types, ../prefs
@@ -22,8 +22,10 @@ proc genSelect(pref, label, state: string; options: seq[string]): VNode =
     label(`for`=pref): text label
 
 proc genInput(pref, label, state, placeholder: string): VNode =
+  let s = xmltree.escape(state)
+  let p = xmltree.escape(placeholder)
   buildHtml(tdiv(class="pref-group")):
-    input(name=pref, `type`="text", placeholder=placeholder, value=state)
+    verbatim &"<input name={pref} type=\"text\" placeholder=\"{p}\" value=\"{s}\"/>"
     label(`for`=pref): text label
 
 macro renderPrefs*(): untyped =
