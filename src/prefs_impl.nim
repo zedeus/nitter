@@ -54,7 +54,7 @@ const prefList*: Table[string, seq[Pref]] = {
   ]
 }.toTable
 
-iterator allPrefs(): Pref =
+iterator allPrefs*(): Pref =
   for k, v in prefList:
     for pref in v:
       yield pref
@@ -93,18 +93,3 @@ macro genUpdatePrefs*(): untyped =
   result.add quote do:
     cache(prefs)
 
-macro genPrefsType*(): untyped =
-  result = nnkTypeSection.newTree(nnkTypeDef.newTree(
-    nnkPostfix.newTree(ident("*"), ident("Prefs")), newEmptyNode(),
-    nnkObjectTy.newTree(newEmptyNode(), newEmptyNode(), nnkRecList.newTree())))
-
-  result[0][2][2].add nnkIdentDefs.newTree(
-    nnkPostfix.newTree(ident("*"), ident("id")), ident("int"), newEmptyNode())
-
-  for pref in allPrefs():
-    result[0][2][2].add nnkIdentDefs.newTree(
-      nnkPostfix.newTree(ident("*"), ident(pref.name)),
-      (case pref.kind
-       of checkbox: ident("bool")
-       of input, select: ident("string")),
-      newEmptyNode())

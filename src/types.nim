@@ -50,7 +50,14 @@ db("cache.db", "", "", ""):
           formatIt: dbValue($it)
         .}: VideoType
 
-  genPrefsType()
+    Prefs* = object
+      videoPlayback*: bool
+      autoplayGifs*: bool
+      hideTweetStats*: bool
+      hideBanner*: bool
+      stickyProfile*: bool
+      replaceYouTube*: string
+      replaceTwitter*: string
 
 type
   QueryKind* = enum

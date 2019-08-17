@@ -1,8 +1,19 @@
-import strutils
+import sequtils, macros
 import types
 import prefs_impl
 
 export genUpdatePrefs
+
+static:
+  var pFields: seq[string]
+  for id in getTypeImpl(Prefs)[2]:
+    if $id[0] == "id": continue
+    pFields.add $id[0]
+
+  let pDefs = toSeq(allPrefs()).mapIt(it.name)
+  let missing = pDefs.filterIt(it notin pFields)
+  if missing.len > 0:
+    raiseAssert("{$1} missing from the Prefs type" % missing.join(", "))
 
 withCustomDb("prefs.db", "", "", ""):
   try:
