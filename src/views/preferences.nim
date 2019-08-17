@@ -1,7 +1,7 @@
 import tables, macros, strformat, xmltree
 import karax/[karaxdsl, vdom, vstyles]
 
-import ../types, ../prefs
+import ../types, ../prefs_impl
 
 proc genCheckbox(pref, label: string; state: bool): VNode =
   buildHtml(tdiv(class="pref-group")):

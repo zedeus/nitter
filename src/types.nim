@@ -1,5 +1,6 @@
 import times, sequtils, options
 import norm/sqlite
+import prefs_impl
 
 export sqlite, options
 
@@ -49,14 +50,7 @@ db("cache.db", "", "", ""):
           formatIt: dbValue($it)
         .}: VideoType
 
-    Prefs* = object
-      videoPlayback*: bool
-      autoplayGifs*: bool
-      hideTweetStats*: bool
-      hideBanner*: bool
-      stickyProfile*: bool
-      replaceYouTube*: string
-      replaceTwitter*: string
+  genPrefsType()
 
 type
   QueryKind* = enum
