@@ -15,7 +15,7 @@ proc renderNavbar*(title: string): VNode =
 
       tdiv(class="item right"):
         icon "info-circled", title="About", href="/about"
-        icon "cog-2", title="Preferences", href="/settings"
+        icon "cog", title="Preferences", href="/settings"
 
 proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="";
                  `type`="article"; video=""; images: seq[string] = @[]): string =

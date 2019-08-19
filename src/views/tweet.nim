@@ -8,7 +8,7 @@ proc renderHeader(tweet: Tweet): VNode =
   buildHtml(tdiv):
     if tweet.retweet.isSome:
       tdiv(class="retweet"):
-        span: icon "retweet-1", get(tweet.retweet).by & " retweeted"
+        span: icon "retweet", get(tweet.retweet).by & " retweeted"
 
     if tweet.pinned:
       tdiv(class="pinned"):
@@ -141,11 +141,13 @@ proc renderCard(card: Card; prefs: Prefs): VNode =
         tdiv(class="card-content-container"):
           renderCardContent(card)
 
-proc renderStats(stats: TweetStats): VNode =
+proc renderStats(stats: TweetStats; views: string): VNode =
   buildHtml(tdiv(class="tweet-stats")):
     span(class="tweet-stat"): icon "comment", $stats.replies
-    span(class="tweet-stat"): icon "retweet-1", $stats.retweets
-    span(class="tweet-stat"): icon "thumbs-up-alt", $stats.likes
+    span(class="tweet-stat"): icon "retweet", $stats.retweets
+    span(class="tweet-stat"): icon "thumbs-up", $stats.likes
+    if views.len > 0:
+      span(class="tweet-stat"): icon "play", views
 
 proc renderReply(tweet: Tweet): VNode =
   buildHtml(tdiv(class="replying-to")):
@@ -214,6 +216,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; class="";
   buildHtml(tdiv(class=divClass)):
     tdiv(class="status-el"):
       tdiv(class="status-body"):
+        var views = ""
         renderHeader(tweet)
 
         if index == 0 and tweet.reply.len > 0:
@@ -231,13 +234,14 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; class="";
           renderAlbum(tweet)
         elif tweet.video.isSome:
           renderVideo(tweet.video.get(), prefs)
+          views = tweet.video.get().views
         elif tweet.gif.isSome:
           renderGif(tweet.gif.get(), prefs)
         elif tweet.poll.isSome:
           renderPoll(tweet.poll.get())
 
         if not prefs.hideTweetStats:
-          renderStats(tweet.stats)
+          renderStats(tweet.stats, views)
 
         if tweet.hasThread and "timeline" in class:
           a(class="show-thread", href=getLink(tweet)):

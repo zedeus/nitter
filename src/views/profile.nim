@@ -50,7 +50,7 @@ proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
   buildHtml(tdiv(class="photo-rail-card")):
     tdiv(class="photo-rail-header"):
       a(href=(&"/{profile.username}/media")):
-        icon "picture-1", $profile.media & " Photos and videos"
+        icon "picture", $profile.media & " Photos and videos"
 
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:
