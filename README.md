@@ -66,7 +66,6 @@ Then enable and start
 - Custom timeline filter
 - More caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
 - Simple account system with customizable feed
-- Video support with hls.js
 - Json API endpoints
 - Themes
 - Nitter logo
