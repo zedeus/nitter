@@ -970,6 +970,14 @@ video, .video-container img {
     display: block;
 }
 
+.card-content-container {
+    color: unset;
+}
+
+.card-content-container:hover {
+    text-decoration: none;
+}
+
 .card-image-container {
     width: 98px;
     flex-shrink: 0;

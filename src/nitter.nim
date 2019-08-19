@@ -191,6 +191,12 @@ routes:
     let client = newAsyncHttpClient()
     var content = await client.getContent(url)
 
+    if ".vmap" in url:
+      var m: RegexMatch
+      discard content.find(re"""url="(.+.m3u8)"""", m)
+      url = decodeUrl(content[m.group(0)[0]])
+      content = await client.getContent(url)
+
     if ".m3u8" in url:
       content = proxifyVideo(content, prefs.proxyVideos)
 

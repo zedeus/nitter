@@ -117,22 +117,29 @@ proc renderCardImage(card: Card): VNode =
           tdiv(class="card-overlay-circle"):
             span(class="card-overlay-triangle")
 
+proc renderCardContent(card: Card): VNode =
+  buildHtml(tdiv(class="card-content")):
+    h2(class="card-title"): text card.title
+    p(class="card-description"): text card.text
+    span(class="card-destination"): text card.dest
+
 proc renderCard(card: Card; prefs: Prefs): VNode =
   const largeCards = {summaryLarge, liveEvent, promoWebsite, promoVideo}
   let large = if card.kind in largeCards: " large" else: ""
+  let url = replaceUrl(card.url, prefs)
 
   buildHtml(tdiv(class=("card" & large))):
-    a(class="card-container", href=replaceUrl(card.url, prefs)):
-      if card.image.isSome:
-        renderCardImage(card)
-      elif card.video.isSome:
+    if card.video.isSome:
+      tdiv(class="card-container"):
         renderVideo(get(card.video), prefs)
-
-      tdiv(class="card-content-container"):
-        tdiv(class="card-content"):
-          h2(class="card-title"): text card.title
-          p(class="card-description"): text card.text
-          span(class="card-destination"): text card.dest
+        a(class="card-content-container", href=url):
+          renderCardContent(card)
+    else:
+      a(class="card-container", href=url):
+        if card.image.isSome:
+          renderCardImage(card)
+        tdiv(class="card-content-container"):
+          renderCardContent(card)
 
 proc renderStats(stats: TweetStats): VNode =
   buildHtml(tdiv(class="tweet-stats")):
