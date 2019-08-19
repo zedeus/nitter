@@ -51,7 +51,9 @@ db("cache.db", "", "", ""):
         .}: VideoType
 
     Prefs* = object
-      videoPlayback*: bool
+      hlsPlayback*: bool
+      mp4Playback*: bool
+      muteVideos*: bool
       autoplayGifs*: bool
       hideTweetStats*: bool
       hideBanner*: bool

@@ -45,24 +45,42 @@ proc renderAlbum(tweet: Tweet): VNode =
               target="_blank", style={display: flex}):
               genImg(photo)
 
+proc isPlaybackEnabled(prefs: Prefs; video: Video): bool =
+  case video.playbackType
+  of mp4: prefs.mp4Playback
+  of m3u8, vmap: prefs.hlsPlayback
+
+proc renderVideoDisabled(video: Video): VNode =
+  buildHtml(tdiv):
+    img(src=video.thumb.getSigUrl("pic"))
+    tdiv(class="video-overlay"):
+      case video.playbackType
+      of mp4:
+        p: text "mp4 playback disabled in preferences"
+      of m3u8, vmap:
+        p: text "hls playback disabled in preferences"
+
 proc renderVideo(video: Video; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments")):
     tdiv(class="gallery-video"):
       tdiv(class="attachment video-container"):
-        let thumb = video.thumb.getSigUrl("pic")
-        case video.playbackType
-        of mp4:
-          video(poster=thumb, controls=""):
-            source(src=video.url.getSigUrl("video"), `type`="video/mp4")
-        of m3u8, vmap:
-          if prefs.videoPlayback:
+        if prefs.isPlaybackEnabled(video):
+          let thumb = video.thumb.getSigUrl("pic")
+          let source = video.url.getSigUrl("video")
+          case video.playbackType
+          of mp4:
+            if prefs.muteVideos:
+              video(poster=thumb, controls="", muted=""):
+                source(src=source, `type`="video/mp4")
+            else:
+              video(poster=thumb, controls=""):
+                source(src=source, `type`="video/mp4")
+          of m3u8, vmap:
             video(poster=thumb)
             tdiv(class="video-overlay"):
               p: text "Video playback not supported yet"
-          else:
-            img(src=thumb)
-            tdiv(class="video-overlay"):
-              p: text "Video playback disabled"
+        else:
+          renderVideoDisabled(video)
 
 proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):

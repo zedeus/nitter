@@ -32,8 +32,16 @@ const prefList*: Table[string, seq[Pref]] = {
   ],
 
   "Media": @[
-    Pref(kind: checkbox, name: "videoPlayback",
-         label: "Enable hls.js video playback (requires JavaScript)",
+    Pref(kind: checkbox, name: "mp4Playback",
+        label: "Enable mp4 video playback",
+        defaultState: true),
+
+    Pref(kind: checkbox, name: "hlsPlayback",
+         label: "Enable hls video streaming (requires JavaScript)",
+         defaultState: false),
+
+    Pref(kind: checkbox, name: "muteVideos",
+         label: "Mute videos by default",
          defaultState: false),
 
     Pref(kind: checkbox, name: "autoplayGifs", label: "Autoplay gifs",
