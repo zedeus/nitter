@@ -182,16 +182,19 @@ routes:
 
   get "/video/@sig/@url":
     cond "http" in @"url"
-    cond "video.twimg" in @"url"
-    let url = decodeUrl(@"url")
+    var url = decodeUrl(@"url")
+    let prefs = cookiePrefs()
 
     if getHmac(url) != @"sig":
       resp showError("Failed to verify signature", cfg.title)
 
     let client = newAsyncHttpClient()
-    let video = await client.getContent(url)
-    client.close()
+    var content = await client.getContent(url)
 
-    resp video, mimetype(url)
+    if ".m3u8" in url:
+      content = proxifyVideo(content, prefs.proxyVideos)
+
+    client.close()
+    resp content, mimetype(url)
 
 runForever()

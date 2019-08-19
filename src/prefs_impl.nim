@@ -40,6 +40,10 @@ const prefList*: Table[string, seq[Pref]] = {
          label: "Enable hls video streaming (requires JavaScript)",
          defaultState: false),
 
+    Pref(kind: checkbox, name: "proxyVideos",
+         label: "Proxy video streaming through the server (might be slow)",
+         defaultState: false),
+
     Pref(kind: checkbox, name: "muteVideos",
          label: "Mute videos by default",
          defaultState: false),

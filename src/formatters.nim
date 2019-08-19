@@ -1,7 +1,7 @@
 import strutils, strformat, htmlgen, xmltree, times
 import regex
 
-import types
+import types, utils
 
 from unicode import Rune, `$`
 
@@ -73,6 +73,12 @@ proc stripTwitterUrls*(text: string): string =
   result = text
   result = result.replace(picRegex, "")
   result = result.replace(ellipsisRegex, "")
+
+proc proxifyVideo*(manifest: string; proxy: bool): string =
+  proc cb(m: RegexMatch; s: string): string =
+    result = "https://video.twimg.com" & s[m.group(0)[0]]
+    if proxy: result = result.getSigUrl("video")
+  result = manifest.replace(re"(.+(.ts|.m3u8|.vmap))", cb)
 
 proc getUserpic*(userpic: string; style=""): string =
   let pic = userpic.replace(re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$", "$2")

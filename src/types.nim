@@ -53,6 +53,7 @@ db("cache.db", "", "", ""):
     Prefs* = object
       hlsPlayback*: bool
       mp4Playback*: bool
+      proxyVideos*: bool
       muteVideos*: bool
       autoplayGifs*: bool
       hideTweetStats*: bool
