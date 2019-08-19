@@ -297,7 +297,7 @@ video, .video-container img {
     top: 0;
     left: 0;
     z-index: 1;
-    background-color: #000000bd;
+    background-color: #0000008d;
 }
 
 .video-overlay p {
@@ -307,6 +307,15 @@ video, .video-container img {
     text-align: center;
     top: calc(50% - 20px);
     font-size: 20px;
+}
+
+.video-overlay div {
+    position: relative;
+    z-index: 0;
+    top: calc(50% - 20px);
+    margin: 0 auto;
+    width: 40px;
+    height: 40px;
 }
 
 .still-image {

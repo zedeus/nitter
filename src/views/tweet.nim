@@ -76,9 +76,10 @@ proc renderVideo(video: Video; prefs: Prefs): VNode =
               video(poster=thumb, controls=""):
                 source(src=source, `type`="video/mp4")
           of m3u8, vmap:
-            video(poster=thumb)
-            tdiv(class="video-overlay"):
-              p: text "Video playback not supported yet"
+            video(poster=thumb, data-url=source, data-autoload="false")
+            verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
+            verbatim "<div class=\"card-overlay-circle\">"
+            verbatim "<span class=\"card-overlay-triangle\"</span></div></div>"
         else:
           renderVideoDisabled(video)
 

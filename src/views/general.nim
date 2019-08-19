@@ -17,12 +17,16 @@ proc renderNavbar*(title: string): VNode =
         icon "info-circled", title="About", href="/about"
         icon "cog-2", title="Preferences", href="/settings"
 
-proc renderMain*(body: VNode; title="Nitter"; titleText=""; desc="";
+proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="";
                  `type`="article"; video=""; images: seq[string] = @[]): string =
   let node = buildHtml(html(lang="en")):
     head:
       link(rel="stylesheet", `type`="text/css", href="/css/style.css")
       link(rel="stylesheet", `type`="text/css", href="/css/fontello.css")
+
+      if prefs.hlsPlayback:
+        script(src="/js/hls.light.min.js")
+        script(src="/js/hlsPlayback.js")
 
       title:
         if titleText.len > 0:
@@ -63,4 +67,4 @@ proc renderError*(error: string): VNode =
       span: text error
 
 proc showError*(error, title: string): string =
-  renderMain(renderError(error), title, "Error")
+  renderMain(renderError(error), Prefs(), title, "Error")

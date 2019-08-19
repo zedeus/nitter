@@ -37,7 +37,7 @@ proc showSingleTimeline(name, after, agent: string; query: Option[Query];
     return ""
 
   let profileHtml = renderProfile(profile, timeline, await railFut, prefs)
-  return renderMain(profileHtml, cfg.title, pageTitle(profile), pageDesc(profile))
+  return renderMain(profileHtml, prefs, cfg.title, pageTitle(profile), pageDesc(profile))
 
 proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Query];
                        prefs: Prefs): Future[string] {.async.} =
@@ -50,7 +50,7 @@ proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Q
   var timeline = renderMulti(await getTimelineSearch(get(q), after, agent),
                              names.join(","), prefs)
 
-  return renderMain(timeline, cfg.title, "Multi")
+  return renderMain(timeline, prefs, cfg.title, "Multi")
 
 proc showTimeline(name, after: string; query: Option[Query];
                   prefs: Prefs): Future[string] {.async.} =
@@ -79,7 +79,7 @@ settings:
 
 routes:
   get "/":
-    resp renderMain(renderSearch(), cfg.title)
+    resp renderMain(renderSearch(), Prefs(), cfg.title)
 
   post "/search":
     if @"query".len == 0:
@@ -104,7 +104,8 @@ routes:
       if refUri.path.len > 0 and "/settings" notin refUri.path: refUri.path
       else: "/"
     if refUri.query.len > 0: path &= &"?{refUri.query}"
-    resp renderMain(renderPreferences(cookiePrefs(), path), cfg.title, "Preferences")
+    let prefs = cookiePrefs()
+    resp renderMain(renderPreferences(prefs, path), prefs, cfg.title, "Preferences")
 
   get "/@name/?":
     cond '.' notin @"name"
@@ -141,15 +142,15 @@ routes:
     if conversation.tweet.video.isSome():
       let thumb = get(conversation.tweet.video).thumb
       let vidUrl = getVideoEmbed(conversation.tweet.id)
-      resp renderMain(html, cfg.title, title, desc, images = @[thumb],
+      resp renderMain(html, prefs, cfg.title, title, desc, images = @[thumb],
                       `type`="video", video=vidUrl)
     elif conversation.tweet.gif.isSome():
       let thumb = get(conversation.tweet.gif).thumb
       let vidUrl = getVideoEmbed(conversation.tweet.id)
-      resp renderMain(html, cfg.title, title, desc, images = @[thumb],
+      resp renderMain(html, prefs, cfg.title, title, desc, images = @[thumb],
                       `type`="video", video=vidUrl)
     else:
-      resp renderMain(html, cfg.title, title, desc, images=conversation.tweet.photos)
+      resp renderMain(html, prefs, cfg.title, title, desc, images=conversation.tweet.photos)
 
   get "/pic/@sig/@url":
     cond "http" in @"url"
