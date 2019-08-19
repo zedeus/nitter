@@ -167,6 +167,7 @@ type
   Config* = ref object
     address*: string
     port*: int
+    useHttps*: bool
     title*: string
     staticDir*: string
     cacheDir*: string

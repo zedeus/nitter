@@ -15,6 +15,7 @@ proc getConfig*(path: string): Config =
   Config(
     address: cfg.get("Server", "address", "0.0.0.0"),
     port: cfg.get("Server", "port", 8080),
+    useHttps: cfg.get("Server", "https", true),
     title: cfg.get("Server", "title", "Nitter"),
     staticDir: cfg.get("Server", "staticDir", "./public"),
 

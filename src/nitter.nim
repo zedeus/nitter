@@ -89,13 +89,13 @@ routes:
   post "/saveprefs":
     var prefs = cookiePrefs()
     genUpdatePrefs()
-    setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=true)
+    setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=cfg.useHttps)
     redirect("/")
 
   post "/resetprefs":
     var prefs = cookiePrefs()
     resetPrefs(prefs)
-    setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=true)
+    setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=cfg.useHttps)
     redirect("/settings")
 
   get "/settings":
