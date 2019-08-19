@@ -170,12 +170,14 @@ proc parseVideo*(node: JsonNode; tweetId: string): Video =
       durationMs: track["durationMs"].to(int),
       views: track["viewCount"].to(string),
       url: track["playbackUrl"].to(string),
-      available: track{"mediaAvailability"}["status"].to(string) == "available")
+      available: track{"mediaAvailability"}["status"].to(string) == "available",
+      reason: track{"mediaAvailability"}["reason"].to(string))
   of "vmap":
     result = Video(
       playbackType: vmap,
       durationMs: track["durationMs"].to(int),
-      url: track["vmapUrl"].to(string))
+      url: track["vmapUrl"].to(string),
+      available: true)
   else:
     echo "Can't parse video of type ", cType
 

@@ -60,12 +60,26 @@ proc renderVideoDisabled(video: Video): VNode =
       of m3u8, vmap:
         p: text "hls playback disabled in preferences"
 
+proc renderVideoUnavailable(video: Video): VNode =
+  buildHtml(tdiv):
+    img(src=video.thumb.getSigUrl("pic"))
+    tdiv(class="video-overlay"):
+      case video.reason
+      of "dmcaed":
+        p: text "This media has been disabled in response to a report by the copyright owner"
+      else:
+        p: text "This media is unavailable"
+
 proc renderVideo(video: Video; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments")):
     tdiv(class="gallery-video"):
       tdiv(class="attachment video-container"):
-        if prefs.isPlaybackEnabled(video):
-          let thumb = video.thumb.getSigUrl("pic")
+        let thumb = video.thumb.getSigUrl("pic")
+        if not video.available:
+          renderVideoUnavailable(video)
+        elif not prefs.isPlaybackEnabled(video):
+          renderVideoDisabled(video)
+        else:
           let source = video.url.getSigUrl("video")
           case video.playbackType
           of mp4:
@@ -80,8 +94,6 @@ proc renderVideo(video: Video; prefs: Prefs): VNode =
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
             verbatim "<div class=\"overlay-circle\">"
             verbatim "<span class=\"overlay-triangle\"</span></div></div>"
-        else:
-          renderVideoDisabled(video)
 
 proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):

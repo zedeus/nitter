@@ -44,6 +44,7 @@ db("cache.db", "", "", ""):
       thumb*: string
       views*: string
       available*: bool
+      reason*: string
       playbackType* {.
           dbType: "STRING"
           parseIt: parseEnum[VideoType](it.s)
