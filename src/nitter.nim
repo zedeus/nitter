@@ -1,15 +1,17 @@
-import asyncdispatch, asyncfile, httpclient, sequtils, strutils, strformat, uri, os
+import asyncdispatch, asyncfile, httpclient, uri, os
+import sequtils, strformat, strutils
 from net import Port
 
 import jester, regex
 
-import api, utils, types, cache, formatters, search, config, agents
-import views/[general, profile, status]
+import api, utils, types, cache, formatters, search, config, prefs, agents
+import views/[general, profile, status, preferences]
 
 const configPath {.strdefine.} = "./nitter.conf"
 let cfg = getConfig(configPath)
 
-proc showSingleTimeline(name, after, agent: string; query: Option[Query]): Future[string] {.async.} =
+proc showSingleTimeline(name, after, agent: string; query: Option[Query];
+                        prefs: Prefs): Future[string] {.async.} =
   let railFut = getPhotoRail(name, agent)
 
   var timeline: Timeline
@@ -34,32 +36,39 @@ proc showSingleTimeline(name, after, agent: string; query: Option[Query]): Futur
   if profile.username.len == 0:
     return ""
 
-  let profileHtml = renderProfile(profile, timeline, await railFut)
-  return renderMain(profileHtml, title=cfg.title, titleText=pageTitle(profile), desc=pageDesc(profile))
+  let profileHtml = renderProfile(profile, timeline, await railFut, prefs)
+  return renderMain(profileHtml, cfg.title, pageTitle(profile), pageDesc(profile))
 
-proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Query]): Future[string] {.async.} =
+proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Query];
+                       prefs: Prefs): Future[string] {.async.} =
   var q = query
   if q.isSome:
     get(q).fromUser = names
   else:
     q = some(Query(kind: multi, fromUser: names, excludes: @["replies"]))
 
-  var timeline = renderMulti(await getTimelineSearch(get(q), after, agent), names.join(","))
-  return renderMain(timeline, title=cfg.title, titleText="Multi")
+  var timeline = renderMulti(await getTimelineSearch(get(q), after, agent),
+                             names.join(","), prefs)
 
-proc showTimeline(name, after: string; query: Option[Query]): Future[string] {.async.} =
+  return renderMain(timeline, cfg.title, "Multi")
+
+proc showTimeline(name, after: string; query: Option[Query];
+                  prefs: Prefs): Future[string] {.async.} =
   let agent = getAgent()
   let names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
 
   if names.len == 1:
-    return await showSingleTimeline(names[0], after, agent, query)
+    return await showSingleTimeline(names[0], after, agent, query, prefs)
   else:
-    return await showMultiTimeline(names, after, agent, query)
+    return await showMultiTimeline(names, after, agent, query, prefs)
 
 template respTimeline(timeline: typed) =
   if timeline.len == 0:
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
   resp timeline
+
+template cookiePrefs(): untyped {.dirty.} =
+  getPrefs(request.cookies.getOrDefault("preferences"))
 
 setProfileCacheTime(cfg.profileCacheTime)
 
@@ -70,32 +79,56 @@ settings:
 
 routes:
   get "/":
-    resp renderMain(renderSearch(), title=cfg.title)
+    resp renderMain(renderSearch(), cfg.title)
 
   post "/search":
     if @"query".len == 0:
       resp Http404, showError("Please enter a username.", cfg.title)
     redirect("/" & @"query")
 
+  post "/saveprefs":
+    var prefs = cookiePrefs()
+    genUpdatePrefs()
+    setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=cfg.useHttps)
+    redirect(decodeUrl(@"referer"))
+
+  post "/resetprefs":
+    var prefs = cookiePrefs()
+    resetPrefs(prefs)
+    setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=cfg.useHttps)
+    redirect("/settings")
+
+  get "/settings":
+    let refUri = request.headers.getOrDefault("Referer").parseUri()
+    var path =
+      if refUri.path.len > 0 and "/settings" notin refUri.path: refUri.path
+      else: "/"
+    if refUri.query.len > 0: path &= &"?{refUri.query}"
+    resp renderMain(renderPreferences(cookiePrefs(), path), cfg.title, "Preferences")
+
   get "/@name/?":
     cond '.' notin @"name"
-    respTimeline(await showTimeline(@"name", @"after", none(Query)))
+    respTimeline(await showTimeline(@"name", @"after", none(Query), cookiePrefs()))
 
   get "/@name/search":
     cond '.' notin @"name"
+    let prefs = cookiePrefs()
     let query = initQuery(@"filter", @"include", @"not", @"sep", @"name")
-    respTimeline(await showTimeline(@"name", @"after", some(query)))
+    respTimeline(await showTimeline(@"name", @"after", some(query), cookiePrefs()))
 
   get "/@name/replies":
     cond '.' notin @"name"
-    respTimeline(await showTimeline(@"name", @"after", some(getReplyQuery(@"name"))))
+    let prefs = cookiePrefs()
+    respTimeline(await showTimeline(@"name", @"after", some(getReplyQuery(@"name")), cookiePrefs()))
 
   get "/@name/media":
     cond '.' notin @"name"
-    respTimeline(await showTimeline(@"name", @"after", some(getMediaQuery(@"name"))))
+    let prefs = cookiePrefs()
+    respTimeline(await showTimeline(@"name", @"after", some(getMediaQuery(@"name")), cookiePrefs()))
 
   get "/@name/status/@id":
     cond '.' notin @"name"
+    let prefs = cookiePrefs()
 
     let conversation = await getTweet(@"name", @"id", getAgent())
     if conversation == nil or conversation.tweet.id.len == 0:
@@ -103,26 +136,24 @@ routes:
 
     let title = pageTitle(conversation.tweet.profile)
     let desc = conversation.tweet.text
-    let html = renderConversation(conversation)
+    let html = renderConversation(conversation, prefs)
 
     if conversation.tweet.video.isSome():
       let thumb = get(conversation.tweet.video).thumb
       let vidUrl = getVideoEmbed(conversation.tweet.id)
-      resp renderMain(html, title=cfg.title, titleText=title, desc=desc,
-                      images = @[thumb], `type`="video", video=vidUrl)
+      resp renderMain(html, cfg.title, title, desc, images = @[thumb],
+                      `type`="video", video=vidUrl)
     elif conversation.tweet.gif.isSome():
       let thumb = get(conversation.tweet.gif).thumb
       let vidUrl = getVideoEmbed(conversation.tweet.id)
-      resp renderMain(html, title=cfg.title, titleText=title, desc=desc,
-                      images = @[thumb], `type`="video", video=vidUrl)
+      resp renderMain(html, cfg.title, title, desc, images = @[thumb],
+                      `type`="video", video=vidUrl)
     else:
-      resp renderMain(html, title=cfg.title, titleText=title,
-                      desc=desc, images=conversation.tweet.photos)
+      resp renderMain(html, cfg.title, title, desc, images=conversation.tweet.photos)
 
   get "/pic/@sig/@url":
     cond "http" in @"url"
     cond "twimg" in @"url"
-
     let
       uri = parseUri(decodeUrl(@"url"))
       path = uri.path.split("/")[2 .. ^1].join("/")
@@ -156,11 +187,10 @@ routes:
     if getHmac(url) != @"sig":
       resp showError("Failed to verify signature", cfg.title)
 
-    let
-      client = newAsyncHttpClient()
-      video = await client.getContent(url)
+    let client = newAsyncHttpClient()
+    let video = await client.getContent(url)
+    client.close()
 
-    defer: client.close()
     resp video, mimetype(url)
 
 runForever()

@@ -1,5 +1,6 @@
 import times, sequtils, options
 import norm/sqlite
+import prefs_impl
 
 export sqlite, options
 
@@ -22,25 +23,17 @@ db("cache.db", "", "", ""):
       tweets*: string
       likes*: string
       media*: string
-      verified* {.
-          dbType: "STRING",
-          parseIt: parseBool(it.s)
-          formatIt: $it
-        .}: bool
-      protected* {.
-          dbType: "STRING",
-          parseIt: parseBool(it.s)
-          formatIt: $it
-        .}: bool
+      verified*: bool
+      protected*: bool
       joinDate* {.
-        dbType: "INTEGER",
-        parseIt: it.i.fromUnix(),
-        formatIt: it.toUnix()
+        dbType: "INTEGER"
+        parseIt: it.i.fromUnix()
+        formatIt: dbValue(it.toUnix())
         .}: Time
       updated* {.
-          dbType: "INTEGER",
-          parseIt: it.i.fromUnix(),
-          formatIt: getTime().toUnix()
+          dbType: "INTEGER"
+          parseIt: it.i.fromUnix()
+          formatIt: dbValue(getTime().toUnix())
         .}: Time
 
     Video* = object
@@ -50,16 +43,23 @@ db("cache.db", "", "", ""):
       url*: string
       thumb*: string
       views*: string
+      available*: bool
       playbackType* {.
-          dbType: "STRING",
-          parseIt: parseEnum[VideoType](it.s),
-          formatIt: $it,
+          dbType: "STRING"
+          parseIt: parseEnum[VideoType](it.s)
+          formatIt: dbValue($it)
         .}: VideoType
-      available* {.
-          dbType: "STRING",
-          parseIt: parseBool(it.s)
-          formatIt: $it
-        .}: bool
+
+    Prefs* = object
+      hlsPlayback*: bool
+      mp4Playback*: bool
+      muteVideos*: bool
+      autoplayGifs*: bool
+      hideTweetStats*: bool
+      hideBanner*: bool
+      stickyProfile*: bool
+      replaceYouTube*: string
+      replaceTwitter*: string
 
 type
   QueryKind* = enum
@@ -169,6 +169,7 @@ type
   Config* = ref object
     address*: string
     port*: int
+    useHttps*: bool
     title*: string
     staticDir*: string
     cacheDir*: string

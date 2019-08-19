@@ -1,5 +1,5 @@
 import parsecfg except Config
-import os, net, types, strutils
+import net, types, strutils
 
 proc get[T](config: parseCfg.Config; s, v: string; default: T): T =
   let val = config.getSectionValue(s, v)
@@ -15,6 +15,7 @@ proc getConfig*(path: string): Config =
   Config(
     address: cfg.get("Server", "address", "0.0.0.0"),
     port: cfg.get("Server", "port", 8080),
+    useHttps: cfg.get("Server", "https", true),
     title: cfg.get("Server", "title", "Nitter"),
     staticDir: cfg.get("Server", "staticDir", "./public"),
 

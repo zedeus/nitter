@@ -54,28 +54,28 @@ proc renderProtected(username: string): VNode =
     h2: text "This account's tweets are protected."
     p: text &"Only confirmed followers have access to @{username}'s tweets."
 
-proc renderThread(thread: seq[Tweet]): VNode =
+proc renderThread(thread: seq[Tweet]; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-tweet thread-line")):
     for i, threadTweet in thread.sortedByIt(it.time):
-      renderTweet(threadTweet, "thread", index=i, total=thread.high)
+      renderTweet(threadTweet, prefs, class="thread", index=i, total=thread.high)
 
 proc threadFilter(it: Tweet; tweetThread: string): bool =
   it.retweet.isNone and it.reply.len == 0 and it.threadId == tweetThread
 
-proc renderTweets(timeline: Timeline): VNode =
+proc renderTweets(timeline: Timeline; prefs: Prefs): VNode =
   buildHtml(tdiv(id="posts")):
     var threads: seq[string]
     for tweet in timeline.tweets:
       if tweet.threadId in threads: continue
       let thread = timeline.tweets.filterIt(threadFilter(it, tweet.threadId))
       if thread.len < 2:
-        renderTweet(tweet, "timeline-tweet")
+        renderTweet(tweet, prefs, class="timeline-tweet")
       else:
-        renderThread(thread)
+        renderThread(thread, prefs)
         threads &= tweet.threadId
 
-proc renderTimeline*(timeline: Timeline; username: string;
-                     protected: bool; multi=false): VNode =
+proc renderTimeline*(timeline: Timeline; username: string; protected: bool;
+                     prefs: Prefs; multi=false): VNode =
   buildHtml(tdiv):
     if multi:
       tdiv(class="multi-header"):
@@ -91,7 +91,7 @@ proc renderTimeline*(timeline: Timeline; username: string;
     elif timeline.tweets.len == 0:
       renderNoneFound()
     else:
-      renderTweets(timeline)
+      renderTweets(timeline, prefs)
       if timeline.hasMore or timeline.query.isSome:
         renderOlder(timeline, username)
       else:

@@ -1,6 +1,7 @@
 import karax/[karaxdsl, vdom]
 
-import ../utils
+import renderutils
+import ../utils, ../types
 
 const doctype = "<!DOCTYPE html>\n"
 
@@ -13,14 +14,15 @@ proc renderNavbar*(title: string): VNode =
       a(href="/"): img(class="site-logo", src="/logo.png")
 
       tdiv(class="item right"):
-        a(class="site-about", href="/about"): text "🛈"
-        a(class="site-settings", href="/settings"): text "⚙"
+        icon "info-circled", title="About", href="/about"
+        icon "cog-2", title="Preferences", href="/settings"
 
 proc renderMain*(body: VNode; title="Nitter"; titleText=""; desc="";
                  `type`="article"; video=""; images: seq[string] = @[]): string =
   let node = buildHtml(html(lang="en")):
     head:
-      link(rel="stylesheet", `type`="text/css", href="/style.css")
+      link(rel="stylesheet", `type`="text/css", href="/css/style.css")
+      link(rel="stylesheet", `type`="text/css", href="/css/fontello.css")
 
       title:
         if titleText.len > 0:
@@ -53,12 +55,12 @@ proc renderSearch*(): VNode =
     tdiv(class="search-panel"):
       form(`method`="post", action="search"):
         input(`type`="text", name="query", autofocus="", placeholder="Enter usernames...")
-        button(`type`="submit"): text "🔎"
+        button(`type`="submit"): icon "search"
 
 proc renderError*(error: string): VNode =
   buildHtml(tdiv(class="panel")):
     tdiv(class="error-panel"):
       span: text error
 
-proc showError*(error: string; title: string): string =
-  renderMain(renderError(error), title=title, titleText="Error")
+proc showError*(error, title: string): string =
+  renderMain(renderError(error), title, "Error")

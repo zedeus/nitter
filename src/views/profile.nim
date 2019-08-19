@@ -1,8 +1,8 @@
 import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 
-import ../types, ../utils, ../formatters
 import tweet, timeline, renderutils
+import ../types, ../utils, ../formatters
 
 proc renderStat(num, class: string; text=""): VNode =
   let t = if text.len > 0: text else: class
@@ -11,7 +11,7 @@ proc renderStat(num, class: string; text=""): VNode =
     span(class="profile-stat-num"):
       text if num.len == 0: "?" else: num
 
-proc renderProfileCard*(profile: Profile): VNode =
+proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-card")):
     a(class="profile-card-avatar", href=profile.getUserPic().getSigUrl("pic")):
       genImg(profile.getUserpic("_200x200"))
@@ -23,21 +23,21 @@ proc renderProfileCard*(profile: Profile): VNode =
     tdiv(class="profile-card-extra"):
       if profile.bio.len > 0:
         tdiv(class="profile-bio"):
-          p: verbatim linkifyText(profile.bio)
+          p: verbatim linkifyText(profile.bio, prefs)
 
       if profile.location.len > 0:
         tdiv(class="profile-location"):
-          span: text "📍 " & profile.location
+          span: icon "location", profile.location
 
       if profile.website.len > 0:
         tdiv(class="profile-website"):
           span:
-            text "🔗 "
+            icon "link"
             linkText(profile.website)
 
       tdiv(class="profile-joindate"):
         span(title=getJoinDateFull(profile)):
-          text "📅 " & getJoinDate(profile)
+          icon "calendar", getJoinDate(profile)
 
       tdiv(class="profile-card-extra-links"):
         ul(class="profile-statlist"):
@@ -50,7 +50,7 @@ proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
   buildHtml(tdiv(class="photo-rail-card")):
     tdiv(class="photo-rail-header"):
       a(href=(&"/{profile.username}/media")):
-        text &"🖼 {profile.media} Photos and videos"
+        icon "picture-1", $profile.media & " Photos and videos"
 
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:
@@ -68,20 +68,22 @@ proc renderBanner(profile: Profile): VNode =
         genImg(profile.banner)
 
 proc renderProfile*(profile: Profile; timeline: Timeline;
-                    photoRail: seq[GalleryPhoto]): VNode =
+                    photoRail: seq[GalleryPhoto]; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-tabs")):
-    tdiv(class="profile-banner"):
-      renderBanner(profile)
+    if not prefs.hideBanner:
+      tdiv(class="profile-banner"):
+        renderBanner(profile)
 
-    tdiv(class="profile-tab"):
-      renderProfileCard(profile)
+    let sticky = if prefs.stickyProfile: "sticky" else: "unset"
+    tdiv(class="profile-tab", style={position: sticky}):
+      renderProfileCard(profile, prefs)
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)
 
     tdiv(class="timeline-tab"):
-      renderTimeline(timeline, profile.username, profile.protected)
+      renderTimeline(timeline, profile.username, profile.protected, prefs)
 
-proc renderMulti*(timeline: Timeline; usernames: string): VNode =
+proc renderMulti*(timeline: Timeline; usernames: string; prefs: Prefs): VNode =
   buildHtml(tdiv(class="multi-timeline")):
     tdiv(class="timeline-tab"):
-      renderTimeline(timeline, usernames, false, multi=true)
+      renderTimeline(timeline, usernames, false, prefs, multi=true)

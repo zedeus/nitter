@@ -2,6 +2,18 @@ import karax/[karaxdsl, vdom, vstyles]
 
 import ../types, ../utils
 
+proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
+  var c = "icon-" & icon
+  if class.len > 0: c = c & " " & class
+  buildHtml(tdiv(class="icon-container")):
+    if href.len > 0:
+      a(class=c, title=title, href=href)
+    else:
+      span(class=c, title=title)
+
+    if text.len > 0:
+      text " " & text
+
 proc linkUser*(profile: Profile, class=""): VNode =
   let
     isName = "username" notin class
@@ -12,9 +24,10 @@ proc linkUser*(profile: Profile, class=""): VNode =
   buildHtml(a(href=href, class=class, title=nameText)):
     text nameText
     if isName and profile.verified:
-      span(class="icon verified-icon", title="Verified account"): text "✔"
+      icon "ok", class="verified-icon", title="Verified account"
     if isName and profile.protected:
-      span(class="icon protected-icon", title="Protected account"): text "🔒"
+      text " "
+      icon "lock-circled", title="Protected account"
 
 proc genImg*(url: string; class=""): VNode =
   buildHtml():
