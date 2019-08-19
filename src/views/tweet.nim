@@ -78,8 +78,8 @@ proc renderVideo(video: Video; prefs: Prefs): VNode =
           of m3u8, vmap:
             video(poster=thumb, data-url=source, data-autoload="false")
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
-            verbatim "<div class=\"card-overlay-circle\">"
-            verbatim "<span class=\"card-overlay-triangle\"</span></div></div>"
+            verbatim "<div class=\"overlay-circle\">"
+            verbatim "<span class=\"overlay-triangle\"</span></div></div>"
         else:
           renderVideoDisabled(video)
 
@@ -114,8 +114,8 @@ proc renderCardImage(card: Card): VNode =
       img(src=getSigUrl(get(card.image), "pic"))
       if card.kind == player:
         tdiv(class="card-overlay"):
-          tdiv(class="card-overlay-circle"):
-            span(class="card-overlay-triangle")
+          tdiv(class="overlay-circle"):
+            span(class="overlay-triangle")
 
 proc renderCardContent(card: Card): VNode =
   buildHtml(tdiv(class="card-content")):

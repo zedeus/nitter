@@ -1035,7 +1035,7 @@ video, .video-container img {
     opacity: 0.8;
 }
 
-.card-overlay-circle {
+.overlay-circle {
     border-radius: 50%;
     background-color: #404040;
     width: 40px;
@@ -1047,13 +1047,23 @@ video, .video-container img {
     border-style: solid;
 }
 
-.card-overlay-triangle {
+.overlay-triangle {
     width: 0;
     height: 0;
     border-style: solid;
     border-width: 12px 0 12px 17px;
     border-color: transparent transparent transparent #d8574d;
     margin-left: 14px;
+}
+
+.card-overlay:hover .overlay-circle,
+.video-overlay:hover .overlay-circle {
+    border-color: #ff6c60;
+}
+
+.card-overlay:hover .overlay-triangle,
+.video-overlay:hover .overlay-triangle {
+    border-color: transparent transparent transparent #ff6c60;
 }
 
 .poll-meter {
