@@ -51,10 +51,12 @@ macro renderPrefs*(): untyped =
 
       result[2].add stmt
 
-proc renderPreferences*(prefs: Prefs): VNode =
+proc renderPreferences*(prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="preferences-container")):
     fieldset(class="preferences"):
       form(`method`="post", action="saveprefs"):
+        verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
+
         renderPrefs()
 
         button(`type`="submit", class="pref-submit"):

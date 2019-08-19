@@ -90,7 +90,7 @@ routes:
     var prefs = cookiePrefs()
     genUpdatePrefs()
     setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=cfg.useHttps)
-    redirect("/")
+    redirect(decodeUrl(@"referer"))
 
   post "/resetprefs":
     var prefs = cookiePrefs()
@@ -99,7 +99,12 @@ routes:
     redirect("/settings")
 
   get "/settings":
-    resp renderMain(renderPreferences(cookiePrefs()), cfg.title, "Preferences")
+    let refUri = request.headers.getOrDefault("Referer").parseUri()
+    var path =
+      if refUri.path.len > 0 and "/settings" notin refUri.path: refUri.path
+      else: "/"
+    if refUri.query.len > 0: path &= &"?{refUri.query}"
+    resp renderMain(renderPreferences(cookiePrefs(), path), cfg.title, "Preferences")
 
   get "/@name/?":
     cond '.' notin @"name"
