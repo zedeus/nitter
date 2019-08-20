@@ -79,7 +79,8 @@ proc parseQuote*(quote: XmlNode): Quote =
 
 proc parseTweet*(node: XmlNode): Tweet =
   let tweet = node.select(".tweet")
-  if tweet == nil: return Tweet()
+  if tweet == nil or "withheld-tweet" in tweet.attr("class"):
+    return Tweet()
 
   result = Tweet(
     id:        tweet.attr("data-item-id"),
@@ -119,7 +120,7 @@ proc parseThread*(nodes: XmlNode): Thread =
   result = Thread()
   for n in nodes.filterIt(it.kind != xnText):
     let class = n.attr("class").toLower()
-    if "tombstone" in class or "unavailable" in class:
+    if "tombstone" in class or "unavailable" in class or "withheld" in class:
       result.tweets.add Tweet()
     elif "morereplies" in class:
       result.more = getMoreReplies(n)
