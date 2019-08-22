@@ -86,6 +86,15 @@ routes:
       resp Http404, showError("Please enter a username.", cfg.title)
     redirect("/" & @"query")
 
+  get "/settings":
+    let refUri = request.headers.getOrDefault("Referer").parseUri()
+    var path =
+      if refUri.path.len > 0 and "/settings" notin refUri.path: refUri.path
+      else: "/"
+    if refUri.query.len > 0: path &= &"?{refUri.query}"
+    let prefs = cookiePrefs()
+    resp renderMain(renderPreferences(prefs, path), prefs, cfg.title, "Preferences")
+
   post "/saveprefs":
     var prefs = cookiePrefs()
     genUpdatePrefs()
@@ -98,14 +107,12 @@ routes:
     setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=cfg.useHttps)
     redirect("/settings")
 
-  get "/settings":
-    let refUri = request.headers.getOrDefault("Referer").parseUri()
-    var path =
-      if refUri.path.len > 0 and "/settings" notin refUri.path: refUri.path
-      else: "/"
-    if refUri.query.len > 0: path &= &"?{refUri.query}"
-    let prefs = cookiePrefs()
-    resp renderMain(renderPreferences(prefs, path), prefs, cfg.title, "Preferences")
+  post "/enablehls":
+    var prefs = cookiePrefs()
+    prefs.hlsPlayback = true
+    cache(prefs)
+    setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=cfg.useHttps)
+    redirect(request.headers.getOrDefault("referer"))
 
   get "/@name/?":
     cond '.' notin @"name"

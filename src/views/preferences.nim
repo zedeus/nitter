@@ -54,7 +54,7 @@ macro renderPrefs*(): untyped =
 proc renderPreferences*(prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="preferences-container")):
     fieldset(class="preferences"):
-      form(`method`="post", action="saveprefs"):
+      form(`method`="post", action="/saveprefs"):
         verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
 
         renderPrefs()
@@ -62,6 +62,6 @@ proc renderPreferences*(prefs: Prefs; path: string): VNode =
         button(`type`="submit", class="pref-submit"):
           text "Save preferences"
 
-      form(`method`="post", action="resetprefs", class="pref-reset"):
+      form(`method`="post", action="/resetprefs", class="pref-reset"):
         button(`type`="submit"):
           text "Reset preferences"

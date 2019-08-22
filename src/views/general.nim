@@ -57,7 +57,7 @@ proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="
 proc renderSearch*(): VNode =
   buildHtml(tdiv(class="panel")):
     tdiv(class="search-panel"):
-      form(`method`="post", action="search"):
+      form(`method`="post", action="/search"):
         input(`type`="text", name="query", autofocus="", placeholder="Enter usernames...")
         button(`type`="submit"): icon "search"
 
