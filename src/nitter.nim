@@ -152,6 +152,9 @@ routes:
     else:
       resp renderMain(html, prefs, cfg.title, title, desc, images=conversation.tweet.photos)
 
+  get "/i/web/status/@id":
+    redirect("/i/status/" & @"id")
+
   get "/pic/@sig/@url":
     cond "http" in @"url"
     cond "twimg" in @"url"
