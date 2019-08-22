@@ -42,7 +42,7 @@ const prefList*: Table[string, seq[Pref]] = {
 
     Pref(kind: checkbox, name: "proxyVideos",
          label: "Proxy video streaming through the server (might be slow)",
-         defaultState: false),
+         defaultState: true),
 
     Pref(kind: checkbox, name: "muteVideos",
          label: "Mute videos by default",
