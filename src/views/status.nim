@@ -4,6 +4,13 @@ import karax/[karaxdsl, vdom]
 import ../types
 import tweet, renderutils
 
+proc renderMoreReplies(thread: Thread): VNode =
+  let num = if thread.more != -1: $thread.more & " " else: ""
+  let reply = if thread.more == 1: "reply" else: "replies"
+  buildHtml(tdiv(class="status-el more-replies")):
+    a(class="more-replies-text", title="Not implemented yet"):
+      text $num & "more " & reply
+
 proc renderReplyThread(thread: Thread; prefs: Prefs): VNode =
   buildHtml(tdiv(class="reply thread thread-line")):
     for i, tweet in thread.tweets:
@@ -11,11 +18,7 @@ proc renderReplyThread(thread: Thread; prefs: Prefs): VNode =
       renderTweet(tweet, prefs, index=i, last=last)
 
     if thread.more != 0:
-      let num = if thread.more != -1: $thread.more & " " else: ""
-      let reply = if thread.more == 1: "reply" else: "replies"
-      tdiv(class="status-el more-replies"):
-        a(class="more-replies-text", title="Not implemented yet"):
-          text $num & "more " & reply
+      renderMoreReplies(thread)
 
 proc renderConversation*(conversation: Conversation; prefs: Prefs): VNode =
   let hasAfter = conversation.after != nil
@@ -33,8 +36,12 @@ proc renderConversation*(conversation: Conversation; prefs: Prefs): VNode =
       if hasAfter:
         tdiv(class="after-tweet thread-line"):
           let total = conversation.after.tweets.high
+          let more = conversation.after.more
           for i, tweet in conversation.after.tweets:
-            renderTweet(tweet, prefs, index=i, total=total)
+            renderTweet(tweet, prefs, index=i, last=(i == total and more == 0))
+
+          if more != 0:
+            renderMoreReplies(conversation.after)
 
     if conversation.replies.len > 0:
       tdiv(class="replies"):

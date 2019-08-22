@@ -345,6 +345,11 @@ video, .video-container img {
     display: flex;
 }
 
+.video-overlay button {
+    padding: 5px 8px;
+    font-size: 16px;
+}
+
 .still-image {
     max-height: 379.5px;
     max-width: 533px;
@@ -400,6 +405,9 @@ video, .video-container img {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.tweet-stats {
     margin-bottom: -3px;
 }
 
