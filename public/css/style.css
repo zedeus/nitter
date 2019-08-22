@@ -900,6 +900,7 @@ video, .video-container img {
     float: left;
     margin-right: 7px;
     border-radius: 7px;
+    position: relative;
 }
 
 .quote-media {
@@ -915,7 +916,8 @@ video, .video-container img {
 }
 
 .quote-badge {
-    left: 6px;
+    left: 0px;
+    bottom: 0;
     position: absolute;
     z-index: 1;
     align-self: flex-end;
