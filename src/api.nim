@@ -13,10 +13,10 @@ const
   apiBase = parseUri("https://api.twitter.com/1.1/")
 
   timelineUrl = "i/profiles/show/$1/timeline/tweets"
-  timelineSearchUrl = "i/search/timeline"
   timelineMediaUrl = "i/profiles/show/$1/media_timeline"
   profilePopupUrl = "i/profiles/popup"
   profileIntentUrl = "intent/user"
+  searchUrl = "i/search/timeline"
   tweetUrl = "status"
   videoUrl = "videos/tweet/config/$1.json"
   tokenUrl = "guest/activate.json"
@@ -40,7 +40,7 @@ macro genMediaGet(media: untyped; token=false) =
   quote do:
     proc `multi`(thread: Thread | Timeline; agent: string; token="") {.async.} =
       if thread == nil: return
-      var `media` = thread.tweets.filterIt(it.`media`.isSome)
+      var `media` = thread.content.filterIt(it.`media`.isSome)
       when `token`:
         var gToken = token
         if gToken.len == 0: gToken = await getGuestToken(agent)
@@ -299,7 +299,7 @@ proc finishTimeline(json: JsonNode; query: Option[Query]; after, agent: string):
     cardFut = getCards(thread, agent)
 
   await all(vidsFut, pollFut, cardFut)
-  result.tweets = thread.tweets
+  result.content = thread.content
 
 proc getTimeline*(username, after, agent: string): Future[Timeline] {.async.} =
   let headers = newHttpHeaders({
@@ -348,7 +348,7 @@ proc getTimelineSearch*(query: Query; after, agent: string): Future[Timeline] {.
     "reset_error_state": "false"
   }
 
-  let json = await fetchJson(base / timelineSearchUrl ? params, headers)
+  let json = await fetchJson(base / searchUrl ? params, headers)
   result = await finishTimeline(json, some(query), after, agent)
 
 proc getProfileAndTimeline*(username, agent, after: string): Future[(Profile, Timeline)] {.async.} =

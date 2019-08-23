@@ -75,6 +75,14 @@ type
     fromUser*: seq[string]
     sep*: string
 
+  Result*[T] = ref object
+    content*: seq[T]
+    minId*: string
+    maxId*: string
+    hasMore*: bool
+    beginning*: bool
+    query*: Option[Query]
+
   Gif* = object
     url*: string
     thumb*: string
@@ -151,7 +159,7 @@ type
     poll*: Option[Poll]
 
   Thread* = ref object
-    tweets*: seq[Tweet]
+    content*: seq[Tweet]
     more*: int
 
   Conversation* = ref object
@@ -160,13 +168,7 @@ type
     after*: Thread
     replies*: seq[Thread]
 
-  Timeline* = ref object
-    tweets*: seq[Tweet]
-    minId*: string
-    maxId*: string
-    hasMore*: bool
-    beginning*: bool
-    query*: Option[Query]
+  Timeline* = Result[Tweet]
 
   Config* = ref object
     address*: string
@@ -178,4 +180,4 @@ type
     profileCacheTime*: int
 
 proc contains*(thread: Thread; tweet: Tweet): bool =
-  thread.tweets.anyIt(it.id == tweet.id)
+  thread.content.anyIt(it.id == tweet.id)

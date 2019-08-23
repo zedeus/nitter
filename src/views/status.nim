@@ -13,8 +13,8 @@ proc renderMoreReplies(thread: Thread): VNode =
 
 proc renderReplyThread(thread: Thread; prefs: Prefs): VNode =
   buildHtml(tdiv(class="reply thread thread-line")):
-    for i, tweet in thread.tweets:
-      let last = (i == thread.tweets.high and thread.more == 0)
+    for i, tweet in thread.content:
+      let last = (i == thread.content.high and thread.more == 0)
       renderTweet(tweet, prefs, index=i, last=last)
 
     if thread.more != 0:
@@ -26,7 +26,7 @@ proc renderConversation*(conversation: Conversation; prefs: Prefs): VNode =
     tdiv(class="main-thread"):
       if conversation.before != nil:
         tdiv(class="before-tweet thread-line"):
-          for i, tweet in conversation.before.tweets:
+          for i, tweet in conversation.before.content:
             renderTweet(tweet, prefs, index=i)
 
       tdiv(class="main-tweet"):
@@ -35,9 +35,9 @@ proc renderConversation*(conversation: Conversation; prefs: Prefs): VNode =
 
       if hasAfter:
         tdiv(class="after-tweet thread-line"):
-          let total = conversation.after.tweets.high
+          let total = conversation.after.content.high
           let more = conversation.after.more
-          for i, tweet in conversation.after.tweets:
+          for i, tweet in conversation.after.content:
             renderTweet(tweet, prefs, index=i, last=(i == total and more == 0))
 
           if more != 0:

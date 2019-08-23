@@ -65,9 +65,9 @@ proc threadFilter(it: Tweet; tweetThread: string): bool =
 proc renderTweets(timeline: Timeline; prefs: Prefs): VNode =
   buildHtml(tdiv(id="posts")):
     var threads: seq[string]
-    for tweet in timeline.tweets:
+    for tweet in timeline.content:
       if tweet.threadId in threads: continue
-      let thread = timeline.tweets.filterIt(threadFilter(it, tweet.threadId))
+      let thread = timeline.content.filterIt(threadFilter(it, tweet.threadId))
       if thread.len < 2:
         renderTweet(tweet, prefs, class="timeline-tweet")
       else:
@@ -88,7 +88,7 @@ proc renderTimeline*(timeline: Timeline; username: string; protected: bool;
 
     if protected:
       renderProtected(username)
-    elif timeline.tweets.len == 0:
+    elif timeline.content.len == 0:
       renderNoneFound()
     else:
       renderTweets(timeline, prefs)

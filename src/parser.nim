@@ -121,11 +121,11 @@ proc parseThread*(nodes: XmlNode): Thread =
   for n in nodes.filterIt(it.kind != xnText):
     let class = n.attr("class").toLower()
     if "tombstone" in class or "unavailable" in class or "withheld" in class:
-      result.tweets.add Tweet()
+      result.content.add Tweet()
     elif "morereplies" in class:
       result.more = getMoreReplies(n)
     else:
-      result.tweets.add parseTweet(n)
+      result.content.add parseTweet(n)
 
 proc parseConversation*(node: XmlNode): Conversation =
   result = Conversation(
@@ -150,7 +150,7 @@ proc parseConversation*(node: XmlNode): Conversation =
 proc parseTimeline*(node: XmlNode; after: string): Timeline =
   if node == nil: return
   result = Timeline(
-    tweets: parseThread(node.select(".stream > .stream-items")).tweets,
+    content: parseThread(node.select(".stream > .stream-items")).content,
     minId: node.attr("data-min-position"),
     maxId: node.attr("data-max-position"),
     hasMore: node.select(".has-more-items") != nil,
