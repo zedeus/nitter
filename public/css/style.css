@@ -1204,6 +1204,19 @@ legend {
     display: inline;
 }
 
+.icon-button button {
+    color: #ff6c60;
+    text-decoration: none;
+    border: none;
+    float: none;
+    padding: unset;
+    padding-left: 4px;
+}
+
+.icon-button button:hover {
+    color: #ffaca0;
+}
+
 .checkbox-container {
   display: block;
   position: relative;

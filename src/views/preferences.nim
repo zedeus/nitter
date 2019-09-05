@@ -63,5 +63,6 @@ proc renderPreferences*(prefs: Prefs; path: string): VNode =
           text "Save preferences"
 
       form(`method`="post", action="/resetprefs", class="pref-reset"):
+        verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
         button(`type`="submit"):
           text "Reset preferences"

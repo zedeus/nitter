@@ -1,3 +1,4 @@
+import strutils
 import karax/[karaxdsl, vdom, vstyles]
 
 import ../types, ../utils
@@ -37,3 +38,9 @@ proc linkText*(text: string; class=""): VNode =
   let url = if "http" notin text: "http://" & text else: text
   buildHtml():
     a(href=url, class=class): text text
+
+proc iconReferer*(icon, action, path: string, title=""): VNode =
+  buildHtml(form(`method`="get", action=action, class="icon-button")):
+    verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
+    button(`type`="submit"):
+      icon icon, title=title

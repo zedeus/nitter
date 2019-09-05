@@ -5,7 +5,7 @@ import ../utils, ../types
 
 const doctype = "<!DOCTYPE html>\n"
 
-proc renderNavbar*(title: string): VNode =
+proc renderNavbar*(title, path: string): VNode =
   buildHtml(nav(id="nav", class="nav-bar container")):
     tdiv(class="inner-nav"):
       tdiv(class="item"):
@@ -15,10 +15,10 @@ proc renderNavbar*(title: string): VNode =
 
       tdiv(class="item right"):
         icon "info-circled", title="About", href="/about"
-        icon "cog", title="Preferences", href="/settings"
+        iconReferer "cog", "/settings", path, title="Preferences"
 
 proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="";
-                 `type`="article"; video=""; images: seq[string] = @[]): string =
+                 path="/"; `type`="article"; video=""; images: seq[string] = @[]): string =
   let node = buildHtml(html(lang="en")):
     head:
       link(rel="stylesheet", `type`="text/css", href="/css/style.css")
@@ -47,7 +47,7 @@ proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="
         meta(property="og:video:secure_url", content=video)
 
     body:
-      renderNavbar(title)
+      renderNavbar(title, path)
 
       tdiv(id="content", class="container"):
         body

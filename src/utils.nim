@@ -1,4 +1,4 @@
-import strutils, strformat, uri
+import strutils, strformat, sequtils, uri, tables
 import nimcrypto, regex
 
 const key = "supersecretkey"
@@ -25,3 +25,7 @@ proc getSigUrl*(link: string; path: string): string =
 proc cleanFilename*(filename: string): string =
   const reg = re"[^A-Za-z0-9._-]"
   filename.replace(reg, "_")
+
+proc filterParams*(params: Table): seq[(string, string)] =
+  let filter = ["name", "id"]
+  toSeq(params.pairs()).filterIt(it[0] notin filter)

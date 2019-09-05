@@ -50,7 +50,7 @@ proc isPlaybackEnabled(prefs: Prefs; video: Video): bool =
   of mp4: prefs.mp4Playback
   of m3u8, vmap: prefs.hlsPlayback
 
-proc renderVideoDisabled(video: Video): VNode =
+proc renderVideoDisabled(video: Video; path: string): VNode =
   buildHtml(tdiv):
     img(src=video.thumb.getSigUrl("pic"))
     tdiv(class="video-overlay"):
@@ -59,6 +59,7 @@ proc renderVideoDisabled(video: Video): VNode =
         p: text "mp4 playback disabled in preferences"
       of m3u8, vmap:
         form(`method`="post", action=("/enablehls")):
+          verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
           button(`type`="submit"):
             text "Enable hls playback"
 
@@ -72,7 +73,7 @@ proc renderVideoUnavailable(video: Video): VNode =
       else:
         p: text "This media is unavailable"
 
-proc renderVideo(video: Video; prefs: Prefs): VNode =
+proc renderVideo(video: Video; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="attachments")):
     tdiv(class="gallery-video"):
       tdiv(class="attachment video-container"):
@@ -80,7 +81,7 @@ proc renderVideo(video: Video; prefs: Prefs): VNode =
         if not video.available:
           renderVideoUnavailable(video)
         elif not prefs.isPlaybackEnabled(video):
-          renderVideoDisabled(video)
+          renderVideoDisabled(video, path)
         else:
           let source = video.url.getSigUrl("video")
           case video.playbackType
@@ -137,7 +138,7 @@ proc renderCardContent(card: Card): VNode =
     p(class="card-description"): text card.text
     span(class="card-destination"): text card.dest
 
-proc renderCard(card: Card; prefs: Prefs): VNode =
+proc renderCard(card: Card; prefs: Prefs; path: string): VNode =
   const largeCards = {summaryLarge, liveEvent, promoWebsite, promoVideo}
   let large = if card.kind in largeCards: " large" else: ""
   let url = replaceUrl(card.url, prefs)
@@ -145,7 +146,7 @@ proc renderCard(card: Card; prefs: Prefs): VNode =
   buildHtml(tdiv(class=("card" & large))):
     if card.video.isSome:
       tdiv(class="card-container"):
-        renderVideo(get(card.video), prefs)
+        renderVideo(get(card.video), prefs, path)
         a(class="card-content-container", href=url):
           renderCardContent(card)
     else:
@@ -215,7 +216,7 @@ proc renderQuote(quote: Quote; prefs: Prefs): VNode =
       a(class="show-thread", href=getLink(quote)):
         text "Show this thread"
 
-proc renderTweet*(tweet: Tweet; prefs: Prefs; class="";
+proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
                   index=0; total=(-1); last=false): VNode =
   var divClass = class
   if index == total or last:
@@ -243,11 +244,11 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; class="";
           renderQuote(tweet.quote.get(), prefs)
 
         if tweet.card.isSome:
-          renderCard(tweet.card.get(), prefs)
+          renderCard(tweet.card.get(), prefs, path)
         elif tweet.photos.len > 0:
           renderAlbum(tweet)
         elif tweet.video.isSome:
-          renderVideo(tweet.video.get(), prefs)
+          renderVideo(tweet.video.get(), prefs, path)
           views = tweet.video.get().views
         elif tweet.gif.isSome:
           renderGif(tweet.gif.get(), prefs)

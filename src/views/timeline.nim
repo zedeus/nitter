@@ -54,28 +54,29 @@ proc renderProtected(username: string): VNode =
     h2: text "This account's tweets are protected."
     p: text &"Only confirmed followers have access to @{username}'s tweets."
 
-proc renderThread(thread: seq[Tweet]; prefs: Prefs): VNode =
+proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="timeline-tweet thread-line")):
     for i, threadTweet in thread.sortedByIt(it.time):
-      renderTweet(threadTweet, prefs, class="thread", index=i, total=thread.high)
+      renderTweet(threadTweet, prefs, path, class="thread",
+                  index=i, total=thread.high)
 
 proc threadFilter(it: Tweet; tweetThread: string): bool =
   it.retweet.isNone and it.reply.len == 0 and it.threadId == tweetThread
 
-proc renderTweets(timeline: Timeline; prefs: Prefs): VNode =
+proc renderTweets(timeline: Timeline; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(id="posts")):
     var threads: seq[string]
     for tweet in timeline.content:
       if tweet.threadId in threads: continue
       let thread = timeline.content.filterIt(threadFilter(it, tweet.threadId))
       if thread.len < 2:
-        renderTweet(tweet, prefs, class="timeline-tweet")
+        renderTweet(tweet, prefs, path, class="timeline-tweet")
       else:
-        renderThread(thread, prefs)
+        renderThread(thread, prefs, path)
         threads &= tweet.threadId
 
 proc renderTimeline*(timeline: Timeline; username: string; protected: bool;
-                     prefs: Prefs; multi=false): VNode =
+                     prefs: Prefs; path: string; multi=false): VNode =
   buildHtml(tdiv):
     if multi:
       tdiv(class="multi-header"):
@@ -91,7 +92,7 @@ proc renderTimeline*(timeline: Timeline; username: string; protected: bool;
     elif timeline.content.len == 0:
       renderNoneFound()
     else:
-      renderTweets(timeline, prefs)
+      renderTweets(timeline, prefs, path)
       if timeline.hasMore or timeline.query.isSome:
         renderOlder(timeline, username)
       else:
