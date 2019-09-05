@@ -1,6 +1,7 @@
 import tables, macros, strformat, xmltree
 import karax/[karaxdsl, vdom, vstyles]
 
+import renderutils
 import ../types, ../prefs_impl
 
 proc genCheckbox(pref, label: string; state: bool): VNode =
@@ -55,14 +56,11 @@ proc renderPreferences*(prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="preferences-container")):
     fieldset(class="preferences"):
       form(`method`="post", action="/saveprefs"):
-        verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
+        refererField path
 
         renderPrefs()
 
         button(`type`="submit", class="pref-submit"):
           text "Save preferences"
 
-      form(`method`="post", action="/resetprefs", class="pref-reset"):
-        verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
-        button(`type`="submit"):
-          text "Reset preferences"
+      buttonReferer "/resetprefs", "Reset Preferences", path, class="pref-reset"

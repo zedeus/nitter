@@ -39,8 +39,18 @@ proc linkText*(text: string; class=""): VNode =
   buildHtml():
     a(href=url, class=class): text text
 
+proc refererField*(path: string): VNode =
+  buildHtml():
+    verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
+
 proc iconReferer*(icon, action, path: string, title=""): VNode =
   buildHtml(form(`method`="get", action=action, class="icon-button")):
-    verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
+    refererField path
     button(`type`="submit"):
       icon icon, title=title
+
+proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNode =
+  buildHtml(form(`method`=`method`, action=action, class=class)):
+    refererField path
+    button(`type`="submit"):
+      text text

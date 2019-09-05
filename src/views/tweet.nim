@@ -58,10 +58,7 @@ proc renderVideoDisabled(video: Video; path: string): VNode =
       of mp4:
         p: text "mp4 playback disabled in preferences"
       of m3u8, vmap:
-        form(`method`="post", action=("/enablehls")):
-          verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
-          button(`type`="submit"):
-            text "Enable hls playback"
+        buttonReferer "/enablehls", "Enable hls playback", path
 
 proc renderVideoUnavailable(video: Video): VNode =
   buildHtml(tdiv):
