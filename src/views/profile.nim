@@ -2,7 +2,7 @@ import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 
 import tweet, timeline, renderutils
-import ../types, ../utils, ../formatters
+import ".."/[types, utils, formatters]
 
 proc renderStat(num, class: string; text=""): VNode =
   let t = if text.len > 0: text else: class

@@ -2,7 +2,7 @@ import strutils, sequtils
 import karax/[karaxdsl, vdom, vstyles]
 
 import renderutils
-import ../types, ../utils, ../formatters
+import ".."/[types, utils, formatters]
 
 proc renderHeader(tweet: Tweet): VNode =
   buildHtml(tdiv):
