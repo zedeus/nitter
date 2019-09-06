@@ -1,8 +1,7 @@
-import strutils, strformat
 import karax/[karaxdsl, vdom]
 
 import ../types
-import tweet, renderutils
+import tweet
 
 proc renderMoreReplies(thread: Thread): VNode =
   let num = if thread.more != -1: $thread.more & " " else: ""

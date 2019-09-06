@@ -1,5 +1,5 @@
 import strutils
-import karax/[karaxdsl, vdom, vstyles]
+import karax/[karaxdsl, vdom]
 
 import ../types, ../utils
 

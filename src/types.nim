@@ -1,6 +1,5 @@
 import times, sequtils, options
 import norm/sqlite
-import prefs_impl
 
 export sqlite, options
 

@@ -80,20 +80,17 @@ proc createTimelineRouter*(cfg: Config) =
 
     get "/@name/search":
       cond '.' notin @"name"
-      let prefs = cookiePrefs()
       let query = initQuery(@"filter", @"include", @"not", @"sep", @"name")
       respTimeline(await showTimeline(@"name", @"after", some(query),
                                       cookiePrefs(), getPath(), cfg.title))
 
     get "/@name/replies":
       cond '.' notin @"name"
-      let prefs = cookiePrefs()
       respTimeline(await showTimeline(@"name", @"after", some(getReplyQuery(@"name")),
                                       cookiePrefs(), getPath(), cfg.title))
 
     get "/@name/media":
       cond '.' notin @"name"
-      let prefs = cookiePrefs()
       respTimeline(await showTimeline(@"name", @"after", some(getMediaQuery(@"name")),
                                       cookiePrefs(), getPath(), cfg.title))
 
