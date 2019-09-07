@@ -358,7 +358,7 @@ video, .video-container img {
 
 .still-image img {
     object-fit: cover;
-    max-width: 533px;
+    max-width: 100%;
     max-height: 379.5px;
     border-color: #222;
     flex-basis: 300px;
@@ -518,7 +518,15 @@ video, .video-container img {
     display: flex;
 }
 
+.profile-card-info {
+    width: 100%;
+    overflow: auto;
+    overflow-wrap: break-word;
+}
+
 .profile-card-tabs-name {
+    overflow: auto;
+    overflow-wrap: break-word;
     max-width: 100%;
 }
 
@@ -551,7 +559,7 @@ video, .video-container img {
 
 .profile-card-avatar img {
     display: block;
-    width: calc(100% - 4px);
+    width: calc(100% - 8px);
     height: 100%;
     margin: 0;
     border: 4px solid #282828;
@@ -594,11 +602,33 @@ video, .video-container img {
     background: #161616;
     border-radius: 0 0 4px 4px;
     width: 100%;
-    margin-top: 5px;
+    margin: 5px 0;
 }
 
 .photo-rail-header {
     padding: 5px 12px 0px 12px;
+}
+
+.photo-rail-header-mobile {
+    padding: 5px 12px 0px 12px;
+    display: none;
+}
+
+#photo-rail-toggle {
+    display: none;
+}
+
+.photo-rail-label {
+    width: 100%;
+    float: unset;
+    color: #ff6c60;
+    display: flex;
+    justify-content: space-between;
+}
+
+#photo-rail-toggle:checked ~ .photo-rail-grid {
+    max-height: 600px;
+    padding-bottom: 12px;
 }
 
 .photo-rail-grid {
@@ -1010,6 +1040,7 @@ video, .video-container img {
 
 .card-content-container {
     color: unset;
+    overflow: auto;
 }
 
 .card-content-container:hover {
@@ -1151,7 +1182,6 @@ video, .video-container img {
 
 .preferences {
     background-color: #1f1f1f;
-    width: 100%;
     padding: 5px 15px 15px 15px;
 }
 
@@ -1196,6 +1226,10 @@ legend {
     margin-bottom: 6px;
 }
 
+.pref-input label {
+    padding-right: 135px;
+}
+
 .pref-reset {
     float: left;
 }
@@ -1223,6 +1257,7 @@ legend {
   margin-bottom: 5px;
   cursor: pointer;
   user-select: none;
+  padding-right: 22px;
 }
 
 .checkbox-container input {
@@ -1267,4 +1302,67 @@ legend {
   font-size: 13px;
   font-family: "fontello";
   content: '\e803';
+}
+
+@media (max-width: 600px) {
+    .profile-tabs {
+        width: 100vw;
+    }
+
+    .profile-tab {
+        width: 100%;
+        max-width: unset;
+        position: initial !important;
+        padding: 0;
+    }
+
+    .profile-tabs > .timeline-tab {
+        width: 100% !important;
+    }
+
+    .profile-card-info {
+        display: flex;
+    }
+
+    .profile-card-tabs-name {
+        overflow: auto;
+        overflow-wrap: break-word;
+    }
+
+    .profile-card-avatar {
+        padding-bottom: 6px;
+        height: 60px;
+        width: unset;
+    }
+
+    .profile-card-avatar img {
+        border-width: 2px;
+        width: unset;
+    }
+
+    .photo-rail-header {
+        display: none;
+    }
+
+    .photo-rail-header-mobile {
+        display: block;
+    }
+
+    .photo-rail-grid {
+        max-height: 0px;
+        padding-bottom: 0;
+        overflow: hidden;
+        transition: padding-bottom 0.4s ease-in;
+        transition: max-height 0.4s;
+    }
+
+    .quote-media-container {
+        width: 70px;
+        max-height: 70px;
+    }
+
+    .preferences-container {
+        max-width: 95vw;
+        margin: 0;
+    }
 }

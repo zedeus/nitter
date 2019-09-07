@@ -13,12 +13,13 @@ proc renderStat(num, class: string; text=""): VNode =
 
 proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-card")):
-    a(class="profile-card-avatar", href=profile.getUserPic().getSigUrl("pic")):
-      genImg(profile.getUserpic("_200x200"))
+    tdiv(class="profile-card-info"):
+      a(class="profile-card-avatar", href=profile.getUserPic().getSigUrl("pic")):
+        genImg(profile.getUserpic("_200x200"))
 
-    tdiv(class="profile-card-tabs-name"):
-      linkUser(profile, class="profile-card-fullname")
-      linkUser(profile, class="profile-card-username")
+      tdiv(class="profile-card-tabs-name"):
+        linkUser(profile, class="profile-card-fullname")
+        linkUser(profile, class="profile-card-username")
 
     tdiv(class="profile-card-extra"):
       if profile.bio.len > 0:
@@ -51,6 +52,12 @@ proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
     tdiv(class="photo-rail-header"):
       a(href=(&"/{profile.username}/media")):
         icon "picture", $profile.media & " Photos and videos"
+
+    input(id="photo-rail-toggle", `type`="checkbox")
+    tdiv(class="photo-rail-header-mobile"):
+      label(`for`="photo-rail-toggle", class="photo-rail-label"):
+        icon "picture", $profile.media & " Photos and videos"
+        icon "down"
 
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:
