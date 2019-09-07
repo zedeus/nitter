@@ -14,7 +14,8 @@ proc renderStat(num, class: string; text=""): VNode =
 proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-card")):
     tdiv(class="profile-card-info"):
-      a(class="profile-card-avatar", href=profile.getUserPic().getSigUrl("pic")):
+      let url = profile.getUserPic().getSigUrl("pic")
+      a(class="profile-card-avatar", href=url, target="_blank"):
         genImg(profile.getUserpic("_200x200"))
 
       tdiv(class="profile-card-tabs-name"):
@@ -71,7 +72,7 @@ proc renderBanner(profile: Profile): VNode =
     if "#" in profile.banner:
       tdiv(class="profile-banner-color", style={backgroundColor: profile.banner})
     else:
-      a(href=getSigUrl(profile.banner, "pic")):
+      a(href=getSigUrl(profile.banner, "pic"), target="_blank"):
         genImg(profile.banner)
 
 proc renderProfile*(profile: Profile; timeline: Timeline;

@@ -6,7 +6,7 @@ const key = "supersecretkey"
 proc mimetype*(filename: string): string =
   if ".png" in filename:
     "image/" & "png"
-  elif ".jpg" in filename or ".jpeg" in filename:
+  elif ".jpg" in filename or ".jpeg" in filename or "1500x500" in filename:
     "image/" & "jpg"
   elif ".mp4" in filename:
     "video/" & "mp4"

@@ -553,7 +553,7 @@ video, .video-container img {
 .profile-card-avatar {
     display: block;
     width: 100%;
-    padding-bottom: 16px;
+    padding-bottom: 6px;
     margin-right: 4px;
 }
 
@@ -1330,7 +1330,6 @@ legend {
     }
 
     .profile-card-avatar {
-        padding-bottom: 6px;
         height: 60px;
         width: unset;
     }
@@ -1363,6 +1362,5 @@ legend {
 
     .preferences-container {
         max-width: 95vw;
-        margin: 0;
     }
 }
