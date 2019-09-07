@@ -34,6 +34,7 @@ proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="
         else:
           text title
 
+      meta(name="viewport", content="width=device-width, initial-scale=1.0")
       meta(property="og:type", content=`type`)
       meta(property="og:title", content=titleText)
       meta(property="og:description", content=desc)
