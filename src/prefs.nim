@@ -39,7 +39,6 @@ proc getPrefs*(id: string): Prefs =
       result.getOne("id = ?", id)
     except KeyError:
       result = genDefaultPrefs()
-      cache(result)
 
 proc resetPrefs*(prefs: var Prefs) =
   var defPrefs = genDefaultPrefs()
