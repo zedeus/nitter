@@ -105,3 +105,16 @@ macro genUpdatePrefs*(): untyped =
   result.add quote do:
     cache(prefs)
 
+macro genPrefsType*(): untyped =
+  let name = nnkPostfix.newTree(ident("*"), ident("Prefs"))
+  result = quote do:
+    type `name` = object
+      id* {.pk, ro.}: int
+
+  for pref in allPrefs():
+    result[0][2][2].add nnkIdentDefs.newTree(
+      nnkPostfix.newTree(ident("*"), ident(pref.name)),
+      (case pref.kind
+       of checkbox: ident("bool")
+       of input, select: ident("string")),
+      newEmptyNode())

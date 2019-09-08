@@ -1,6 +1,8 @@
 import times, sequtils, options
 import norm/sqlite
 
+import prefs_impl
+
 export sqlite, options
 
 type
@@ -50,19 +52,7 @@ dbTypes:
           formatIt: dbValue($it)
         .}: VideoType
 
-    Prefs* = object
-      hlsPlayback*: bool
-      mp4Playback*: bool
-      proxyVideos*: bool
-      muteVideos*: bool
-      autoplayGifs*: bool
-      hideTweetStats*: bool
-      hideBanner*: bool
-      stickyProfile*: bool
-      replaceYouTube*: string
-      replaceTwitter*: string
-
-
+genPrefsType()
 dbFromTypes("cache.db", "", "", "", [Profile, Video])
 
 type
