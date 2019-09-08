@@ -78,8 +78,11 @@ proc parseQuote*(quote: XmlNode): Quote =
   result.getQuoteMedia(quote)
 
 proc parseTweet*(node: XmlNode): Tweet =
+  if "withheld" in node.attr("class"):
+    return Tweet(tombstone: getTombstone(node.selectText(".Tombstone-label")))
+
   let tweet = node.select(".tweet")
-  if tweet == nil or "withheld-tweet" in tweet.attr("class"):
+  if tweet == nil:
     return Tweet()
 
   result = Tweet(
@@ -113,7 +116,8 @@ proc parseTweet*(node: XmlNode): Tweet =
   let tombstone = tweet.select(".Tombstone")
   if tombstone != nil:
     if "unavailable" in tombstone.innerText():
-      result.quote = some(Quote())
+      let quote = Quote(tombstone: getTombstone(node.selectText(".Tombstone-label")))
+      result.quote = some(quote)
 
 proc parseThread*(nodes: XmlNode): Thread =
   if nodes == nil: return
@@ -128,8 +132,13 @@ proc parseThread*(nodes: XmlNode): Thread =
       result.content.add parseTweet(n)
 
 proc parseConversation*(node: XmlNode): Conversation =
+  let tweet = node.select(".permalink-tweet-container")
+
+  if tweet == nil:
+    return Conversation(tweet: parseTweet(node.select(".permalink-tweet-withheld")))
+
   result = Conversation(
-    tweet:  parseTweet(node.select(".permalink-tweet-container")),
+    tweet:  parseTweet(tweet),
     before: parseThread(node.select(".in-reply-to .stream-items"))
   )
 

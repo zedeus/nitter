@@ -118,6 +118,7 @@ type
     hasThread*: bool
     sensitive*: bool
     available*: bool
+    tombstone*: string
     thumb*: string
     badge*: string
 
@@ -139,8 +140,9 @@ type
     shortTime*: string
     reply*: seq[string]
     pinned*: bool
-    available*: bool
     hasThread*: bool
+    available*: bool
+    tombstone*: string
     stats*: TweetStats
     retweet*: Option[Retweet]
     quote*: Option[Quote]

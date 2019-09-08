@@ -191,7 +191,10 @@ proc renderQuote(quote: Quote; prefs: Prefs): VNode =
   if not quote.available:
     return buildHtml(tdiv(class="quote unavailable")):
       tdiv(class="unavailable-quote"):
-        text "This tweet is unavailable"
+        if quote.tombstone.len > 0:
+          text quote.tombstone
+        else:
+          text "This tweet is unavailable"
 
   buildHtml(tdiv(class="quote")):
     a(class="quote-link", href=getLink(quote))
@@ -223,7 +226,10 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
     return buildHtml(tdiv(class=divClass)):
       tdiv(class="status-el unavailable"):
         tdiv(class="unavailable-box"):
-          text "This tweet is unavailable"
+          if tweet.tombstone.len > 0:
+            text tweet.tombstone
+          else:
+            text "This tweet is unavailable"
 
   buildHtml(tdiv(class=divClass)):
     tdiv(class="status-el"):

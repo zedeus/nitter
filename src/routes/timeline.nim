@@ -100,7 +100,10 @@ proc createTimelineRouter*(cfg: Config) =
 
       let conversation = await getTweet(@"name", @"id", getAgent())
       if conversation == nil or conversation.tweet.id.len == 0:
-        resp Http404, showError("Tweet not found", cfg.title)
+        if conversation.tweet.tombstone.len > 0:
+          resp Http404, showError(conversation.tweet.tombstone, cfg.title)
+        else:
+          resp Http404, showError("Tweet not found", cfg.title)
 
       let path = getPath()
       let title = pageTitle(conversation.tweet.profile)

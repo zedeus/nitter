@@ -107,3 +107,6 @@ proc getTime*(tweet: Tweet): string =
 
 proc getLink*(tweet: Tweet | Quote): string =
   &"/{tweet.profile.username}/status/{tweet.id}"
+
+proc getTombstone*(text: string): string =
+  text.replace(re"\n* *Learn more", "").stripText().strip(chars={' ', '\n'})
