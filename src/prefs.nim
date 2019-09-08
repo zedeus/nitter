@@ -1,6 +1,5 @@
-import sequtils, macros
-import types
-import prefs_impl
+import strutils, sequtils, macros
+import prefs_impl, types
 
 export genUpdatePrefs
 
@@ -15,14 +14,16 @@ static:
   if missing.len > 0:
     raiseAssert("{$1} missing from the Prefs type" % missing.join(", "))
 
-withCustomDb("prefs.db", "", "", ""):
+dbFromTypes("prefs.db", "", "", "", [Prefs])
+
+withDb:
   try:
     createTables()
   except DbError:
     discard
 
 proc cache*(prefs: var Prefs) =
-  withCustomDb("prefs.db", "", "", ""):
+  withDb:
     try:
       doAssert prefs.id != 0
       discard Prefs.getOne("id = ?", prefs.id)
@@ -33,7 +34,7 @@ proc cache*(prefs: var Prefs) =
 proc getPrefs*(id: string): Prefs =
   if id.len == 0: return genDefaultPrefs()
 
-  withCustomDb("prefs.db", "", "", ""):
+  withDb:
     try:
       result.getOne("id = ?", id)
     except KeyError:

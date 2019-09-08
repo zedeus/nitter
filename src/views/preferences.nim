@@ -1,4 +1,4 @@
-import tables, macros, strformat, xmltree
+import tables, macros, strformat, strutils, xmltree
 import karax/[karaxdsl, vdom, vstyles]
 
 import renderutils

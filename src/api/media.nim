@@ -102,7 +102,7 @@ proc getVideoVar(tweet: Tweet): var Option[Video] =
     return tweet.video
 
 proc getVideo*(tweet: Tweet; agent, token: string; force=false) {.async.} =
-  withDb:
+  withCustomDb("cache.db", "", "", ""):
     try:
       getVideoVar(tweet) = some(Video.getOne("videoId = ?", tweet.id))
     except KeyError:

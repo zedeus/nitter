@@ -7,7 +7,7 @@ type
   VideoType* = enum
     vmap, m3u8, mp4
 
-db("cache.db", "", "", ""):
+dbTypes:
   type
     Profile* = object
       username*: string
@@ -61,6 +61,9 @@ db("cache.db", "", "", ""):
       stickyProfile*: bool
       replaceYouTube*: string
       replaceTwitter*: string
+
+
+dbFromTypes("cache.db", "", "", "", [Profile, Video])
 
 type
   QueryKind* = enum
