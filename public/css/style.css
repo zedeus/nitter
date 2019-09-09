@@ -1304,6 +1304,20 @@ legend {
   content: '\e803';
 }
 
+.about-page {
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+    margin-top: 10px;
+    background-color: #1f1f1f;
+    padding: 8px 15px;
+    align-self: start;
+}
+
+.about-list {
+    padding-left: 1.3em;
+}
+
 @media (max-width: 600px) {
     .profile-tabs {
         width: 100vw;

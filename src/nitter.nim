@@ -4,7 +4,7 @@ from net import Port
 import jester
 
 import types, config, prefs
-import views/general
+import views/[general, about]
 import routes/[preferences, timeline, media]
 
 const configPath {.strdefine.} = "./nitter.conf"
@@ -22,6 +22,9 @@ settings:
 routes:
   get "/":
     resp renderMain(renderSearch(), Prefs(), cfg.title)
+
+  get "/about":
+    resp renderMain(renderAbout(), Prefs(), cfg.title)
 
   post "/search":
     if @"query".len == 0:
