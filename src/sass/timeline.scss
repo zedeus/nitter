@@ -1,0 +1,139 @@
+@import '_variables';
+
+#posts {
+    background-color: $bg_panel;
+}
+
+.timeline-tab {
+    float: right;
+    padding: 0;
+    box-sizing: border-box;
+    display: inline-block;
+    font-size: 14px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.multi-timeline {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+
+    .timeline-tab {
+        width: 100%;
+    }
+}
+
+.multi-header {
+    background-color: $bg_panel;
+    text-align: center;
+    padding: 10px;
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.tab {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0 0 5px 0;
+    background-color: $bg_panel;
+    padding: 0;
+}
+
+.tab-item {
+    flex: 1 1 0;
+    text-align: center;
+    margin-top: 0;
+
+    a {
+        border-bottom: .1rem solid transparent;
+        color: inherit;
+        display: block;
+        padding: 8px 0;
+        text-decoration: none;
+        font-weight: bold;
+
+        &:hover {
+            text-decoration: none;
+        }
+
+        &.active {
+            border-bottom-color: $accent;
+            color: $accent;
+        }
+    }
+
+    &.active a {
+        border-bottom-color: $accent;
+        color: $accent;
+    }
+}
+
+.timeline-tweet {
+    border-bottom: 1px solid $border_grey;
+}
+
+.timeline-footer {
+    background-color: $bg_panel;
+    padding: 6px 0;
+}
+
+.timeline-header {
+    background-color: $bg_panel;
+    padding: 6px 0;
+}
+
+.timeline-protected {
+    text-align: center;
+
+    p {
+        margin: 8px 0;
+    }
+
+    h2 {
+        color: $accent;
+        font-size: 20px;
+        font-weight: 600;
+    }
+}
+
+.timeline-none {
+    color: $accent;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.timeline-end {
+    background-color: $bg_panel;
+    color: $accent;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.show-more {
+    background-color: $bg_panel;
+    text-align: center;
+    padding: .75em 0;
+    display: block;
+
+    &.status-el {
+        border-bottom: 1px solid $border_grey;
+    }
+
+    a {
+        background-color: $darkest_grey;
+        display: inline-block;
+        height: 2em;
+        padding: 0 2em;
+        line-height: 2em;
+
+        &:hover {
+            background-color: $darker_grey;
+        }
+    }
+}

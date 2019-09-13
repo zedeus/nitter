@@ -1,0 +1,60 @@
+@import '_variables';
+
+@mixin panel($width, $max-width) {
+    max-width: $max-width;
+    margin: 0 auto;
+    float: none;
+    border-radius: 0;
+    position: relative;
+    width: $width;
+}
+
+@mixin play-button {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+
+    &:hover {
+        .overlay-circle {
+            border-color: $accent;
+        }
+
+        .overlay-triangle {
+            border-color: transparent transparent transparent $accent;
+        }
+    }
+}
+
+@mixin breakable {
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+@mixin ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@mixin center-panel($bg) {
+    padding: 12px;
+    border-radius: 4px;
+    display: flex;
+    background: $bg;
+    box-shadow: 0 0 15px $shadow_dark;
+    margin: auto;
+    margin-top: -50px;
+}
+
+@mixin input-colors {
+    &:hover {
+        border-color: $accent;
+    }
+
+    &:active {
+        border-color: $accent_light;
+    }
+}

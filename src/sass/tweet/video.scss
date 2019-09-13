@@ -1,0 +1,58 @@
+@import '_variables';
+@import '_mixins';
+
+video {
+    height: 100%;
+    width: 100%;
+}
+
+.gallery-video {
+    display: flex;
+    overflow: hidden;
+}
+
+.video-container {
+    max-height: 530px;
+
+    img {
+        height: 100%;
+        width: 100%;
+    }
+}
+
+.video-overlay {
+    @include play-button;
+    background-color: $shadow;
+
+    p {
+        position: relative;
+        z-index: 0;
+        text-align: center;
+        top: calc(50% - 20px);
+        font-size: 20px;
+        line-height: 1.3;
+        margin: 0 20px;
+    }
+
+    div {
+        position: relative;
+        z-index: 0;
+        top: calc(50% - 20px);
+        margin: 0 auto;
+        width: 40px;
+        height: 40px;
+    }
+
+    form {
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+    }
+
+    button {
+        padding: 5px 8px;
+        font-size: 16px;
+    }
+}

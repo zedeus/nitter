@@ -1,0 +1,73 @@
+@import '_variables';
+@import '_mixins';
+
+.conversation {
+    @include panel(100%, 600px);
+    background-color: $bg_color !important;
+}
+
+.main-thread {
+    margin-bottom: 20px;
+    background-color: $bg_panel;
+}
+
+.main-tweet .status-content {
+    font-size: 20px;
+}
+
+.reply {
+    background-color: $bg_panel;
+    margin-bottom: 10px;
+}
+
+.thread-line {
+    .status-el::before {
+        background: $accent_dark;
+        content: '';
+        position: relative;
+        min-width: 3px;
+        width: 3px;
+        left: 26px;
+        border-radius: 2px;
+        margin-left: -3px;
+        margin-bottom: 37px;
+        top: 56px;
+    }
+
+    .unavailable::before {
+        top: 48px;
+        margin-bottom: 28px;
+    }
+
+    .more-replies::before {
+        content: '...';
+        background: unset;
+        color: $more_replies_dots;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 0.25em;
+        left: 1.2em;
+        width: 5px;
+        top: 2px;
+        margin-bottom: 0;
+        margin-left: -5px;
+    }
+}
+
+.thread-last .status-el::before {
+    background: unset;
+    min-width: unset;
+    width: 0;
+    margin: 0;
+}
+
+.more-replies {
+    padding-top: 0.3em !important;
+}
+
+.more-replies-text {
+    @include ellipsis;
+    display: block;
+    margin-left: 58px;
+    padding: 7px 0;
+}

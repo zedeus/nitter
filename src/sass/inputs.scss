@@ -1,0 +1,114 @@
+@import '_variables';
+@import '_mixins';
+
+button {
+    @include input-colors;
+    background-color: $bg_elements;
+    color: $fg_color;
+    border: 1px solid $accent_border;
+    padding: 3px 6px;
+    font-size: 14px;
+    cursor: pointer;
+    float: right;
+}
+
+input[type="text"] {
+    @include input-colors;
+    background-color: $bg_elements;
+    padding: 1px 4px;
+    color: $fg_color;
+    border: 1px solid $accent_border;
+    border-radius: 0;
+    font-size: 14px;
+}
+
+.icon-button button {
+    color: $accent;
+    text-decoration: none;
+    border: none;
+    float: none;
+    padding: unset;
+    padding-left: 4px;
+
+    &:hover {
+        color: $accent_light;
+    }
+}
+
+.checkbox {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    height: 17px;
+    width: 17px;
+    background-color: $bg_elements;
+    border: 1px solid $accent_border;
+
+    &:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+}
+
+.checkbox-container {
+    display: block;
+    position: relative;
+    margin-bottom: 5px;
+    cursor: pointer;
+    user-select: none;
+    padding-right: 22px;
+
+    input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+
+        &:checked ~ .checkbox:after {
+            display: block;
+        }
+    }
+
+    &:hover input ~ .checkbox {
+        border-color: $accent;
+    }
+
+    &:active input ~ .checkbox {
+        border-color: $accent_light;
+    }
+
+    .checkbox:after {
+        left: 2px;
+        bottom: 0;
+        font-size: 13px;
+        font-family: $font_4;
+        content: '\e803';
+    }
+}
+
+.preferences {
+    button {
+        margin: 6px 0 3px 0;
+    }
+
+    label {
+        padding-right: 135px;
+    }
+
+    input[type="text"] {
+        position: absolute;
+        right: 0;
+        max-width: 120px;
+    }
+
+    .pref-input {
+        position: relative;
+        margin-bottom: 6px;
+    }
+
+    .pref-reset {
+        float: left;
+    }
+}

@@ -1,0 +1,133 @@
+@import '_variables';
+@import '_mixins';
+@import 'thread';
+@import 'media';
+@import 'video';
+@import 'card';
+@import 'poll';
+@import 'quote';
+
+.status-el {
+    overflow-wrap: break-word;
+    border-left-width: 0;
+    min-width: 0;
+    padding: .75em;
+    display: flex;
+
+    .status-content {
+        font-family: $font_3;
+        line-height: 1.4em;
+    }
+}
+
+.status-body {
+    flex: 1;
+    min-width: 0;
+    margin-left: 58px;
+}
+
+.tweet-header {
+    padding: 0;
+    vertical-align: bottom;
+    flex-basis: 100%;
+    margin-bottom: .2em;
+
+    a {
+        display: inline-block;
+        word-break: break-all;
+        max-width: 100%;
+    }
+}
+
+.tweet-name-row {
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.fullname-and-username {
+    display: flex;
+    min-width: 0;
+}
+
+.fullname {
+    @include ellipsis;
+    flex-shrink: 2;
+    max-width: 80%;
+    font-size: 14px;
+    font-weight: 700;
+    color: $fg_color;
+}
+
+.username {
+    @include ellipsis;
+    min-width: 1.6em;
+    margin-left: .4em;
+    word-wrap: normal;
+}
+
+.tweet-date {
+    display: flex;
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+
+.tweet-avatar {
+    display: contents !important;
+
+    img {
+        float: left;
+        margin-top: 3px;
+        margin-left: -58px;
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+    }
+}
+
+.replying-to {
+    color: $fg_dark;
+    margin: -2px 0 4px;
+}
+
+.retweet, .pinned, .tweet-stats {
+    align-content: center;
+    color: $grey;
+    display: flex;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 22px;
+
+    span {
+        @include ellipsis;
+    }
+}
+
+.retweet {
+    margin-top: -5px !important;
+}
+
+.tweet-stats {
+    margin-bottom: -3px;
+}
+
+.tweet-stat {
+    padding-top: 5px;
+    padding-right: 8px;
+}
+
+.show-thread {
+    display: block;
+}
+
+.unavailable-box {
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    border: solid 1px $dark_grey;
+    border-radius: 10px;
+    background-color: $bg_color;
+}

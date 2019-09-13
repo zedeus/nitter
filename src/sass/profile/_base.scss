@@ -1,0 +1,61 @@
+@import '_variables';
+@import '_mixins';
+
+@import 'card';
+@import 'photo-rail';
+
+.profile-timeline, .profile-tabs {
+    @include panel(auto, 900px);
+}
+
+.profile-tabs {
+    > .timeline-tab {
+        width: 68% !important;
+    }
+}
+
+.profile-banner {
+    padding-bottom: 4px;
+
+    a {
+        display: inherit;
+        line-height: 0;
+    }
+
+    img {
+        width: 100%;
+    }
+}
+
+.profile-banner-color {
+    width: 100%;
+    padding-bottom: 25%;
+}
+
+.profile-tab {
+    padding: 0 4px 0 0;
+    box-sizing: border-box;
+    display: inline-block;
+    font-size: 14px;
+    text-align: left;
+    vertical-align: top;
+    max-width: 32%;
+    top: 50px;
+}
+
+@media(max-width: 600px) {
+    .profile-tabs {
+        width: 100vw;
+
+        .timeline-tab {
+            width: 100% !important;
+        }
+    }
+
+    .profile-tab {
+        width: 100%;
+        max-width: unset;
+        position: initial !important;
+        padding: 0;
+    }
+}

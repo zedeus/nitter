@@ -53,7 +53,7 @@ macro renderPrefs*(): untyped =
       result[2].add stmt
 
 proc renderPreferences*(prefs: Prefs; path: string): VNode =
-  buildHtml(tdiv(class="preferences-container")):
+  buildHtml(tdiv(class="overlay-panel")):
     fieldset(class="preferences"):
       form(`method`="post", action="/saveprefs"):
         refererField path

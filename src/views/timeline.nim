@@ -41,12 +41,12 @@ proc renderOlder(timeline: Timeline; username: string): VNode =
 
 proc renderNoMore(): VNode =
   buildHtml(tdiv(class="timeline-footer")):
-    h2(class="timeline-end", style={textAlign: "center"}):
+    h2(class="timeline-end"):
       text "No more tweets."
 
 proc renderNoneFound(): VNode =
   buildHtml(tdiv(class="timeline-header")):
-    h2(class="timeline-none", style={textAlign: "center"}):
+    h2(class="timeline-none"):
       text "No tweets found."
 
 proc renderProtected(username: string): VNode =

@@ -1,0 +1,102 @@
+@import '_variables';
+
+.quote {
+    margin-top: 10px;
+    border: solid 1px $dark_grey;
+    border-radius: 10px;
+    background-color: $bg_elements;
+    overflow: auto;
+    padding: 6px;
+    position: relative;
+
+    &:hover {
+        border-color: $grey;
+    }
+
+    &.unavailable:hover {
+        border-color: $dark_grey;
+    }
+}
+
+.unavailable-quote {
+    padding: 6px;
+}
+
+.quote-link {
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+}
+
+.quote-text {
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.quote-media-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    max-height: 102px;
+    width: 102px;
+    float: left;
+    margin-right: 7px;
+    border-radius: 7px;
+    position: relative;
+}
+
+.quote-media {
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+
+    img {
+        width: 100%;
+        height: 100%;
+        align-self: center;
+    }
+}
+
+.quote-badge {
+    left: 0;
+    bottom: 0;
+    position: absolute;
+    z-index: 1;
+    align-self: flex-end;
+}
+
+.quote-badge-text {
+    margin: 4px;
+    background: $shadow;
+    border-radius: 4px;
+    color: #fffffff0;
+    padding: 1px 3px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.quote-sensitive {
+    background: $darker_grey;
+    width: 102px;
+    height: 102px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.quote-sensitive-icon {
+    font-size: 40px;
+    color: $grey;
+}
+
+@media(max-width: 600px) {
+    .quote-media-container {
+        width: 70px;
+        max-height: 70px;
+    }
+}

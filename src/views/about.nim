@@ -1,7 +1,7 @@
 import karax/[karaxdsl, vdom]
 
 proc renderAbout*(): VNode =
-  buildHtml(tdiv(class="about-page")):
+  buildHtml(tdiv(class="overlay-panel")):
     h1: text "About"
     p:
       text "Nitter is a free and open source alternative Twitter front-end focused on privacy. "

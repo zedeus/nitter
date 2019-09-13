@@ -1,0 +1,37 @@
+@import '_variables';
+@import '_mixins';
+
+.panel-container {
+    margin: auto;
+    font-size: 130%;
+}
+
+.error-panel {
+    @include center-panel($error_red);
+}
+
+.search-panel > form {
+    @include center-panel($darkest-grey);
+
+    button {
+        background: #303030;
+        color: $fg_color;
+        border: 0;
+        border-radius: 3px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 30px;
+        height: 30px;
+    }
+
+    input {
+        font-size: 16px;
+        width: 100%;
+        background: $bg_elements;
+        color: $fg_color;
+        border: 0;
+        border-radius: 4px;
+        padding: 4px;
+        margin-right: 8px;
+    }
+}

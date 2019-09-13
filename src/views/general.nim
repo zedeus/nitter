@@ -56,14 +56,14 @@ proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="
   result = doctype & $node
 
 proc renderSearch*(): VNode =
-  buildHtml(tdiv(class="panel")):
+  buildHtml(tdiv(class="panel-container")):
     tdiv(class="search-panel"):
       form(`method`="post", action="/search"):
         input(`type`="text", name="query", autofocus="", placeholder="Enter usernames...")
         button(`type`="submit"): icon "search"
 
 proc renderError*(error: string): VNode =
-  buildHtml(tdiv(class="panel")):
+  buildHtml(tdiv(class="panel-container")):
     tdiv(class="error-panel"):
       span: text error
 

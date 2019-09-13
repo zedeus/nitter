@@ -1,0 +1,102 @@
+@import '_variables';
+
+.gallery-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow: hidden;
+    flex-grow: 1;
+    max-height: 379.5px;
+    max-width: 533px;
+
+    .still-image {
+        width: 100%;
+    }
+}
+
+.attachments {
+    margin-top: .35em;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-height: 600px;
+    border-radius: 7px;
+    overflow: hidden;
+    flex-flow: column;
+    background-color: $bg_color;
+    align-items: center;
+
+    .image-attachment {
+        width: 100%;
+    }
+}
+
+.attachment {
+    position: relative;
+    line-height: 0;
+    overflow: hidden;
+    margin: 0 .25em 0 0;
+    flex-grow: 1;
+    box-sizing: border-box;
+    min-width: 2em;
+
+    &:last-child {
+        margin: 0;
+        max-height: 530px;
+    }
+}
+
+.still-image {
+    max-height: 379.5px;
+    max-width: 533px;
+    justify-content: center;
+
+    img {
+        object-fit: cover;
+        max-width: 100%;
+        max-height: 379.5px;
+        flex-basis: 300px;
+    }
+}
+
+.image {
+    display: inline-block;
+}
+
+.single-image {
+    display: inline-block;
+    width: unset;
+}
+
+.overlay-circle {
+    border-radius: 50%;
+    background-color: $dark_grey;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    display: flex;
+    border-width: 5px;
+    border-color: $play_button_red;
+    border-style: solid;
+}
+
+.overlay-triangle {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 0 12px 17px;
+    border-color: transparent transparent transparent $play_button_red;
+    margin-left: 14px;
+}
+
+.media-gif {
+    display: inline-block;
+    background-color: unset;
+}
+
+.media-body {
+    flex: 1;
+    padding: 0;
+    white-space: pre-wrap;
+}
