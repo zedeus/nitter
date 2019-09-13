@@ -20,7 +20,7 @@ type
       placeholder*: string
 
 # TODO: write DSL to simplify this
-const prefList*: Table[string, seq[Pref]] = {
+const prefList*: OrderedTable[string, seq[Pref]] = {
   "Privacy": @[
     Pref(kind: input, name: "replaceTwitter",
          label: "Replace Twitter links with Nitter (blank to disable)",
@@ -33,8 +33,8 @@ const prefList*: Table[string, seq[Pref]] = {
 
   "Media": @[
     Pref(kind: checkbox, name: "mp4Playback",
-        label: "Enable mp4 video playback",
-        defaultState: true),
+         label: "Enable mp4 video playback",
+         defaultState: true),
 
     Pref(kind: checkbox, name: "hlsPlayback",
          label: "Enable hls video streaming (requires JavaScript)",
@@ -64,7 +64,7 @@ const prefList*: Table[string, seq[Pref]] = {
          label: "Make profile sidebar stick to top",
          defaultState: true)
   ]
-}.toTable
+}.toOrderedTable
 
 iterator allPrefs*(): Pref =
   for k, v in prefList:
