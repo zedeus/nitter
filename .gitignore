@@ -4,3 +4,5 @@ nitter
 /tests/__pycache__
 /tests/geckodriver.log
 /tmp
+/tools/gencss
+/src/public/style.css

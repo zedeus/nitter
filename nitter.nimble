@@ -11,9 +11,16 @@ bin           = @["nitter"]
 # Dependencies
 
 requires "nim >= 0.19.9"
-requires "norm >= 1.0.15"
+requires "norm >= 1.0.17"
 requires "jester >= 0.4.3"
 requires "regex >= 0.11.2"
 requires "q >= 0.0.7"
 requires "nimcrypto >= 0.3.9"
 requires "karax#b99a543"
+requires "sass"
+
+
+# Tasks
+
+task scss, "Generate css":
+  exec "nim c --hint[Processing]:off -r tools/gencss"
