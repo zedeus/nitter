@@ -13,7 +13,10 @@ proc renderSearch*(): VNode =
         button(`type`="submit"): icon "search"
 
 proc renderTweetSearch*(timeline: Timeline; prefs: Prefs; path: string): VNode =
-  let users = get(timeline.query).fromUser
+  let users =
+    if timeline.query.isSome: get(timeline.query).fromUser
+    else: @[]
+
   buildHtml(tdiv(class="timeline-container")):
     tdiv(class="timeline-header"):
       text users.join(" | ")
