@@ -10,7 +10,7 @@
     background-color: $bg_panel;
 }
 
-.main-tweet .status-content {
+.main-tweet .tweet-content {
     font-size: 20px;
 }
 
@@ -20,7 +20,7 @@
 }
 
 .thread-line {
-    .status-el::before {
+    .timeline-item::before {
         background: $accent_dark;
         content: '';
         position: relative;
@@ -53,7 +53,7 @@
     }
 }
 
-.thread-last .status-el::before {
+.timeline-item.thread-last::before {
     background: unset;
     min-width: unset;
     width: 0;

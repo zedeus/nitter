@@ -75,6 +75,12 @@ proc renderBanner(profile: Profile): VNode =
       a(href=getPicUrl(profile.banner), target="_blank"):
         genImg(profile.banner)
 
+proc renderProtected(username: string): VNode =
+  buildHtml(tdiv(class="timeline-container timeline")):
+    tdiv(class="timeline-header timeline-protected"):
+      h2: text "This account's tweets are protected."
+      p: text &"Only confirmed followers have access to @{username}'s tweets."
+
 proc renderProfile*(profile: Profile; timeline: Timeline;
                     photoRail: seq[GalleryPhoto]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="profile-tabs")):
@@ -88,11 +94,9 @@ proc renderProfile*(profile: Profile; timeline: Timeline;
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)
 
-    tdiv(class="timeline-tab"):
-      renderTimeline(timeline, profile.username, profile.protected, prefs, path)
-
-proc renderMulti*(timeline: Timeline; usernames: string;
-                  prefs: Prefs; path: string): VNode =
-  buildHtml(tdiv(class="multi-timeline")):
-    tdiv(class="timeline-tab"):
-      renderTimeline(timeline, usernames, false, prefs, path, multi=true)
+    tdiv(class="timeline-container"):
+      if profile.protected:
+        renderProtected(profile.username)
+      else:
+        renderProfileTabs(timeline, profile.username)
+        renderTimelineTweets(timeline, prefs, path)

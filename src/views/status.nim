@@ -6,7 +6,7 @@ import tweet
 proc renderMoreReplies(thread: Thread): VNode =
   let num = if thread.more != -1: $thread.more & " " else: ""
   let reply = if thread.more == 1: "reply" else: "replies"
-  buildHtml(tdiv(class="status-el more-replies")):
+  buildHtml(tdiv(class="timeline-item more-replies")):
     a(class="more-replies-text", title="Not implemented yet"):
       text $num & "more " & reply
 

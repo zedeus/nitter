@@ -224,43 +224,42 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
 
   if not tweet.available:
     return buildHtml(tdiv(class=divClass)):
-      tdiv(class="status-el unavailable"):
+      tdiv(class="timeline-item unavailable"):
         tdiv(class="unavailable-box"):
           if tweet.tombstone.len > 0:
             text tweet.tombstone
           else:
             text "This tweet is unavailable"
 
-  buildHtml(tdiv(class=divClass)):
-    tdiv(class="status-el"):
-      tdiv(class="status-body"):
-        var views = ""
-        renderHeader(tweet)
+  buildHtml(tdiv(class=("timeline-item " & divClass))):
+    tdiv(class="tweet-body"):
+      var views = ""
+      renderHeader(tweet)
 
-        if index == 0 and tweet.reply.len > 0:
-          renderReply(tweet)
+      if index == 0 and tweet.reply.len > 0:
+        renderReply(tweet)
 
-        tdiv(class="status-content media-body"):
-          verbatim linkifyText(tweet.text, prefs)
+      tdiv(class="tweet-content media-body"):
+        verbatim linkifyText(tweet.text, prefs)
 
-        if tweet.quote.isSome:
-          renderQuote(tweet.quote.get(), prefs)
+      if tweet.quote.isSome:
+        renderQuote(tweet.quote.get(), prefs)
 
-        if tweet.card.isSome:
-          renderCard(tweet.card.get(), prefs, path)
-        elif tweet.photos.len > 0:
-          renderAlbum(tweet)
-        elif tweet.video.isSome:
-          renderVideo(tweet.video.get(), prefs, path)
-          views = tweet.video.get().views
-        elif tweet.gif.isSome:
-          renderGif(tweet.gif.get(), prefs)
-        elif tweet.poll.isSome:
-          renderPoll(tweet.poll.get())
+      if tweet.card.isSome:
+        renderCard(tweet.card.get(), prefs, path)
+      elif tweet.photos.len > 0:
+        renderAlbum(tweet)
+      elif tweet.video.isSome:
+        renderVideo(tweet.video.get(), prefs, path)
+        views = tweet.video.get().views
+      elif tweet.gif.isSome:
+        renderGif(tweet.gif.get(), prefs)
+      elif tweet.poll.isSome:
+        renderPoll(tweet.poll.get())
 
-        if not prefs.hideTweetStats:
-          renderStats(tweet.stats, views)
+      if not prefs.hideTweetStats:
+        renderStats(tweet.stats, views)
 
-        if tweet.hasThread and "timeline" in class:
-          a(class="show-thread", href=getLink(tweet)):
-            text "Show this thread"
+      if tweet.hasThread and "timeline" in class:
+        a(class="show-thread", href=getLink(tweet)):
+          text "Show this thread"

@@ -1,25 +1,29 @@
 import strutils, strformat, sequtils, algorithm, times
 import karax/[karaxdsl, vdom, vstyles]
 
-import ../types, ../search
+import ".."/[types, query, formatters]
 import tweet, renderutils
 
-proc getQuery(timeline: Timeline): string =
-  if timeline.query.isNone: "?"
-  else: genQueryUrl(get(timeline.query))
+proc getQuery(query: Option[Query]): string =
+  if query.isNone:
+    result = "?"
+  else:
+    result = genQueryUrl(get(query))
+    if result[^1] != '?':
+      result &= "&"
 
-proc getTabClass(timeline: Timeline; tab: string): string =
+proc getTabClass(results: Result; tab: string): string =
   var classes = @["tab-item"]
 
-  if timeline.query.isNone or get(timeline.query).kind == multi:
+  if results.query.isNone or get(results.query).kind == multi:
     if tab == "posts":
       classes.add "active"
-  elif $get(timeline.query).kind == tab:
+  elif $get(results.query).kind == tab:
     classes.add "active"
 
   return classes.join(" ")
 
-proc renderSearchTabs(timeline: Timeline; username: string): VNode =
+proc renderProfileTabs*(timeline: Timeline; username: string): VNode =
   let link = "/" & username
   buildHtml(ul(class="tab")):
     li(class=timeline.getTabClass("posts")):
@@ -29,33 +33,28 @@ proc renderSearchTabs(timeline: Timeline; username: string): VNode =
     li(class=timeline.getTabClass("media")):
       a(href=(link & "/media")): text "Media"
 
-proc renderNewer(timeline: Timeline; username: string): VNode =
-  buildHtml(tdiv(class="status-el show-more")):
-    a(href=("/" & username & getQuery(timeline).strip(chars={'?'}))):
-      text "Load newest tweets"
+proc renderNewer(query: Option[Query]): VNode =
+  buildHtml(tdiv(class="timeline-item show-more")):
+    a(href=(getQuery(query).strip(chars={'?', '&'}))):
+      text "Load newest"
 
-proc renderOlder(timeline: Timeline; username: string): VNode =
+proc renderOlder(query: Option[Query]; minId: string): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"/{username}{getQuery(timeline)}after={timeline.minId}")):
-      text "Load older tweets"
+    a(href=(&"{getQuery(query)}after={minId}")):
+      text "Load older"
 
 proc renderNoMore(): VNode =
   buildHtml(tdiv(class="timeline-footer")):
     h2(class="timeline-end"):
-      text "No more tweets."
+      text "No more items"
 
 proc renderNoneFound(): VNode =
   buildHtml(tdiv(class="timeline-header")):
     h2(class="timeline-none"):
-      text "No tweets found."
-
-proc renderProtected(username: string): VNode =
-  buildHtml(tdiv(class="timeline-header timeline-protected")):
-    h2: text "This account's tweets are protected."
-    p: text &"Only confirmed followers have access to @{username}'s tweets."
+      text "No items found"
 
 proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
-  buildHtml(tdiv(class="timeline-tweet thread-line")):
+  buildHtml(tdiv(class="thread-line")):
     for i, threadTweet in thread.sortedByIt(it.time):
       renderTweet(threadTweet, prefs, path, class="thread",
                   index=i, total=thread.high)
@@ -63,37 +62,26 @@ proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
 proc threadFilter(it: Tweet; tweetThread: string): bool =
   it.retweet.isNone and it.reply.len == 0 and it.threadId == tweetThread
 
-proc renderTweets(timeline: Timeline; prefs: Prefs; path: string): VNode =
-  buildHtml(tdiv(id="posts")):
-    var threads: seq[string]
-    for tweet in timeline.content:
-      if tweet.threadId in threads: continue
-      let thread = timeline.content.filterIt(threadFilter(it, tweet.threadId))
-      if thread.len < 2:
-        renderTweet(tweet, prefs, path, class="timeline-tweet")
-      else:
-        renderThread(thread, prefs, path)
-        threads &= tweet.threadId
 
-proc renderTimeline*(timeline: Timeline; username: string; protected: bool;
-                     prefs: Prefs; path: string; multi=false): VNode =
-  buildHtml(tdiv):
-    if multi:
-      tdiv(class="multi-header"):
-        text username.replace(",", " | ")
+proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): VNode =
+  buildHtml(tdiv(class="timeline")):
+    if not results.beginning:
+      renderNewer(results.query)
 
-    if not protected:
-      renderSearchTabs(timeline, username)
-      if not timeline.beginning:
-        renderNewer(timeline, username)
-
-    if protected:
-      renderProtected(username)
-    elif timeline.content.len == 0:
+    if results.content.len == 0:
       renderNoneFound()
     else:
-      renderTweets(timeline, prefs, path)
-      if timeline.hasMore or timeline.query.isSome:
-        renderOlder(timeline, username)
+      var threads: seq[string]
+      for tweet in results.content:
+        if tweet.threadId in threads: continue
+        let thread = results.content.filterIt(threadFilter(it, tweet.threadId))
+        if thread.len < 2:
+          renderTweet(tweet, prefs, path)
+        else:
+          renderThread(thread, prefs, path)
+          threads &= tweet.threadId
+
+      if results.hasMore or results.query.isSome:
+        renderOlder(results.query, results.minId)
       else:
         renderNoMore()
