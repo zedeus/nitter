@@ -64,7 +64,7 @@ proc showTimeline*(name, after: string; query: Option[Query];
   else:
     let
       timeline = await fetchMultiTimeline(names, after, agent, query)
-      html = renderMulti(timeline, names.join(","), prefs, path)
+      html = renderTweetSearch(timeline, prefs, path)
     return renderMain(html, prefs, title, "Multi")
 
 template respTimeline*(timeline: typed) =

@@ -14,6 +14,9 @@ proc createSearchRouter*(cfg: Config) =
       if @"text".len == 0 or "." in @"text":
         resp Http404, showError("Please enter a valid username.", cfg.title)
 
+      if @"text".len > 200:
+        resp Http400, showError("Search input too long.", cfg.title)
+
       if "," in @"text":
         redirect("/" & @"text")
 

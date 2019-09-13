@@ -3,7 +3,7 @@ import asyncdispatch, strutils
 import jester
 
 import router_utils, timeline
-import ".."/[cache, agents, search]
+import ".."/[cache, agents, query]
 import ../views/general
 
 include "../views/rss.nimf"
