@@ -14,6 +14,7 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 ## Installation
 
 To compile Nitter you need a Nim installation, see here for details: https://nim-lang.org/install.html
+
 You also need to install `libsass` to compile the scss files.
 It is possible to install Nim system-wide or in the user directory you create below.
 
