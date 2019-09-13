@@ -12,26 +12,34 @@ proc getQuery(query: Option[Query]): string =
     if result[^1] != '?':
       result &= "&"
 
-proc getTabClass(results: Result; tab: string): string =
+proc getTabClass(query: Option[Query]; tab: string): string =
   var classes = @["tab-item"]
 
-  if results.query.isNone or get(results.query).kind == multi:
+  if query.isNone or get(query).kind == multi:
     if tab == "posts":
       classes.add "active"
-  elif $get(results.query).kind == tab:
+  elif $get(query).kind == tab:
     classes.add "active"
 
   return classes.join(" ")
 
-proc renderProfileTabs*(timeline: Timeline; username: string): VNode =
+proc renderProfileTabs*(query: Option[Query]; username: string): VNode =
   let link = "/" & username
   buildHtml(ul(class="tab")):
-    li(class=timeline.getTabClass("posts")):
+    li(class=query.getTabClass("posts")):
       a(href=link): text "Tweets"
-    li(class=timeline.getTabClass("replies")):
+    li(class=query.getTabClass("replies")):
       a(href=(link & "/replies")): text "Tweets & Replies"
-    li(class=timeline.getTabClass("media")):
+    li(class=query.getTabClass("media")):
       a(href=(link & "/media")): text "Media"
+
+proc renderSearchTabs*(query: Option[Query]): VNode =
+  var q = if query.isSome: get(query) else: Query()
+
+  buildHtml(ul(class="tab")):
+    li(class=query.getTabClass("users")):
+      q.kind = users
+      a(href=genQueryUrl(q)): text "Users"
 
 proc renderNewer(query: Option[Query]): VNode =
   buildHtml(tdiv(class="timeline-item show-more")):
@@ -62,6 +70,34 @@ proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
 proc threadFilter(it: Tweet; tweetThread: string): bool =
   it.retweet.isNone and it.reply.len == 0 and it.threadId == tweetThread
 
+proc renderUser(user: Profile; prefs: Prefs): VNode =
+  buildHtml(tdiv(class="timeline-item")):
+    tdiv(class="tweet-body profile-result"):
+      tdiv(class="tweet-header"):
+        a(class="tweet-avatar", href=("/" & user.username)):
+          genImg(user.getUserpic("_bigger"), class="avatar")
+
+        tdiv(class="tweet-name-row"):
+          tdiv(class="fullname-and-username"):
+            linkUser(user, class="fullname")
+        linkUser(user, class="username")
+
+      tdiv(class="tweet-content media-body"):
+        verbatim linkifyText(user.bio, prefs)
+
+proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs): VNode =
+  buildHtml(tdiv(class="timeline")):
+    if not results.beginning:
+      renderNewer(results.query)
+
+    if results.content.len > 0:
+      for user in results.content:
+        renderUser(user, prefs)
+      renderOlder(results.query, results.minId)
+    elif results.beginning:
+      renderNoneFound()
+    else:
+      renderNoMore()
 
 proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="timeline")):

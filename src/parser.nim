@@ -23,14 +23,14 @@ proc parseTimelineProfile*(node: XmlNode): Profile =
 
   result.getProfileStats(node.select(".ProfileNav-list"))
 
-proc parsePopupProfile*(node: XmlNode): Profile =
-  let profile = node.select(".profile-card")
+proc parsePopupProfile*(node: XmlNode; selector=".profile-card"): Profile =
+  let profile = node.select(selector)
   if profile == nil: return
 
   result = Profile(
     fullname:  profile.getName(".fullname"),
     username:  profile.getUsername(".username"),
-    bio:       profile.getBio(".bio"),
+    bio:       profile.getBio(".bio", fallback=".ProfileCard-bio"),
     userpic:   profile.getAvatar(".ProfileCard-avatarImage"),
     verified:  isVerified(profile),
     protected: isProtected(profile),

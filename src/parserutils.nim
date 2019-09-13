@@ -86,8 +86,11 @@ proc getName*(profile: XmlNode; selector: string): string =
 proc getUsername*(profile: XmlNode; selector: string): string =
   profile.selectText(selector).strip(chars={'@', ' ', '\n'})
 
-proc getBio*(profile: XmlNode; selector: string): string =
-  profile.selectText(selector).stripText()
+proc getBio*(profile: XmlNode; selector: string; fallback=""): string =
+  var bio = profile.selectText(selector)
+  if bio.len == 0 and fallback.len > 0:
+    bio = profile.selectText(fallback)
+  stripText(bio)
 
 proc getAvatar*(profile: XmlNode; selector: string): string =
   profile.selectAttr(selector, "src").getUserpic()

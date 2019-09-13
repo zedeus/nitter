@@ -3,14 +3,14 @@ import asyncdispatch, strutils, sequtils, uri
 import jester
 
 import router_utils
-import ".."/[api, prefs, types, utils, cache, formatters, agents, search]
-import ../views/[general, profile, timeline, status]
+import ".."/[api, prefs, types, utils, cache, formatters, agents, query]
+import ../views/[general, profile, timeline, status, search]
 
 include "../views/rss.nimf"
 
 export uri, sequtils
 export router_utils
-export api, cache, formatters, search, agents
+export api, cache, formatters, query, agents
 export profile, timeline, status
 
 type ProfileTimeline = (Profile, Timeline, seq[GalleryPhoto])
@@ -33,7 +33,7 @@ proc fetchSingleTimeline*(name, after, agent: string;
       (profile, timeline) = await getProfileAndTimeline(name, agent, after)
       cache(profile)
   else:
-    var timelineFut = getTimelineSearch(get(query), after, agent)
+    var timelineFut = getSearch[Tweet](get(query), after, agent)
     if cachedProfile.isNone:
       profile = await getCachedProfile(name, agent)
     timeline = await timelineFut
@@ -49,7 +49,7 @@ proc fetchMultiTimeline*(names: seq[string]; after, agent: string;
   else:
     q = some(Query(kind: multi, fromUser: names, excludes: @["replies"]))
 
-  return await getTimelineSearch(get(q), after, agent)
+  return await getSearch[Tweet](get(q), after, agent)
 
 proc showTimeline*(name, after: string; query: Option[Query];
                    prefs: Prefs; path, title, rss: string): Future[string] {.async.} =

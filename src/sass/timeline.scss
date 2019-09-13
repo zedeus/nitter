@@ -20,6 +20,14 @@
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
+
+    input[type="text"] {
+        height: 20px;
+    }
+
+    button {
+        float: unset;
+    }
 }
 
 .tab {

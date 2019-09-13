@@ -98,5 +98,5 @@ proc renderProfile*(profile: Profile; timeline: Timeline;
       if profile.protected:
         renderProtected(profile.username)
       else:
-        renderProfileTabs(timeline, profile.username)
+        renderProfileTabs(timeline.query, profile.username)
         renderTimelineTweets(timeline, prefs, path)

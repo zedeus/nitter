@@ -18,8 +18,7 @@ const
   posPrefix = "thGAVUV0VFVBa"
   posSuffix = "EjUAFQAlAFUAFQAA"
 
-proc initQuery*(filters, includes, excludes, separator, text: string;
-                name=""): Query =
+proc initQuery*(filters, includes, excludes, separator, text: string; name=""): Query =
   var sep = separator.strip().toUpper()
   Query(
     kind: custom,
@@ -50,6 +49,9 @@ proc genQueryParam*(query: Query): string =
   var filters: seq[string]
   var param: string
 
+  if query.kind == users:
+    return query.text
+
   for i, user in query.fromUser:
     param &= &"from:{user} "
     if i < query.fromUser.high:
@@ -67,12 +69,18 @@ proc genQueryParam*(query: Query): string =
     result &= " " & query.text
 
 proc genQueryUrl*(query: Query): string =
-  if query.kind == multi: return "?"
+  if query.fromUser.len > 0:
+    result = "/" & query.fromUser.join(",")
 
-  result = &"/{query.kind}?"
-  if query.kind != custom: return
+  if query.kind == multi:
+    return result & "?"
 
-  var params: seq[string]
+  if query.kind notin {custom, users}:
+    return result & &"/{query.kind}?"
+
+  result &= &"/search?"
+
+  var params = @[&"kind={query.kind}"]
   if query.filters.len > 0:
     params &= "filter=" & query.filters.join(",")
   if query.includes.len > 0:
@@ -84,7 +92,7 @@ proc genQueryUrl*(query: Query): string =
   if query.text.len > 0:
     params &= "text=" & query.text
   if params.len > 0:
-    result &= params.join("&") & "&"
+    result &= params.join("&")
 
 proc cleanPos*(pos: string): string =
   pos.multiReplace((posPrefix, ""), (posSuffix, ""))

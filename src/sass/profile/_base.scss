@@ -43,6 +43,14 @@
     top: 50px;
 }
 
+.profile-result .username {
+    margin: 0 !important;
+}
+
+.profile-result .tweet-header {
+    margin-bottom: unset;
+}
+
 @media(max-width: 600px) {
     .profile-tabs {
         width: 100vw;

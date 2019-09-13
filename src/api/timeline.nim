@@ -1,7 +1,7 @@
 import httpclient, asyncdispatch, htmlparser
 import sequtils, strutils, json, xmltree, uri
 
-import ".."/[types, parser, parserutils, formatters, search]
+import ".."/[types, parser, parserutils, formatters, query]
 import utils, consts, media
 
 proc finishTimeline*(json: JsonNode; query: Option[Query]; after, agent: string): Future[Timeline] {.async.} =
