@@ -5,4 +5,4 @@ nitter
 /tests/geckodriver.log
 /tmp
 /tools/gencss
-/src/public/style.css
+/public/css/style.css
