@@ -1,7 +1,15 @@
 import strutils, strformat, sequtils, uri, tables
 import nimcrypto, regex
 
-const key = "supersecretkey"
+const
+  key = "supersecretkey"
+  twitterDomains = @[
+    "twitter.com",
+    "twimg.com",
+    "abs.twimg.com",
+    "pbs.twimg.com",
+    "video.twimg.com"
+  ]
 
 proc mimetype*(filename: string): string =
   if ".png" in filename:
@@ -16,11 +24,17 @@ proc mimetype*(filename: string): string =
 proc getHmac*(data: string): string =
   ($hmac(sha256, key, data))[0 .. 12]
 
-proc getSigUrl*(link: string; path: string): string =
+proc getVidUrl*(link: string): string =
   let
     sig = getHmac(link)
     url = encodeUrl(link)
-  &"/{path}/{sig}/{url}"
+  &"/video/{sig}/{url}"
+
+proc getGifUrl*(link: string): string =
+  &"/gif/{encodeUrl(link)}"
+
+proc getPicUrl*(link: string): string =
+  &"/pic/{encodeUrl(link)}"
 
 proc cleanFilename*(filename: string): string =
   const reg = re"[^A-Za-z0-9._-]"
@@ -29,3 +43,6 @@ proc cleanFilename*(filename: string): string =
 proc filterParams*(params: Table): seq[(string, string)] =
   let filter = ["name", "id"]
   toSeq(params.pairs()).filterIt(it[0] notin filter)
+
+proc isTwitterUrl*(url: string): bool =
+  parseUri(url).hostname in twitterDomains

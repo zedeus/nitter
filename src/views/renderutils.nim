@@ -32,7 +32,7 @@ proc linkUser*(profile: Profile, class=""): VNode =
 
 proc genImg*(url: string; class=""): VNode =
   buildHtml():
-    img(src=url.getSigUrl("pic"), class=class, alt="Image")
+    img(src=getPicUrl(url), class=class, alt="Image")
 
 proc linkText*(text: string; class=""): VNode =
   let url = if "http" notin text: "http://" & text else: text

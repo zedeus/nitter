@@ -41,7 +41,7 @@ proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="
       meta(property="og:site_name", content="Twitter")
 
       for url in images:
-        meta(property="og:image", content=getSigUrl(url, "pic"))
+        meta(property="og:image", content=getPicUrl(url))
 
       if video.len > 0:
         meta(property="og:video:url", content=video)

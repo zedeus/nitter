@@ -77,7 +77,7 @@ proc stripTwitterUrls*(text: string): string =
 proc proxifyVideo*(manifest: string; proxy: bool): string =
   proc cb(m: RegexMatch; s: string): string =
     result = "https://video.twimg.com" & s[m.group(0)[0]]
-    if proxy: result = result.getSigUrl("video")
+    if proxy: result = getVidUrl(result)
   result = manifest.replace(re"(.+(.ts|.m3u8|.vmap))", cb)
 
 proc getUserpic*(userpic: string; style=""): string =

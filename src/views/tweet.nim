@@ -41,7 +41,7 @@ proc renderAlbum(tweet: Tweet): VNode =
       tdiv(class="gallery-row", style={marginTop: margin}):
         for photo in photos:
           tdiv(class="attachment image"):
-            a(href=getSigUrl(photo & "?name=orig", "pic"), class="still-image",
+            a(href=getPicUrl(photo & "?name=orig"), class="still-image",
               target="_blank", style={display: flex}):
               genImg(photo)
 
@@ -52,7 +52,7 @@ proc isPlaybackEnabled(prefs: Prefs; video: Video): bool =
 
 proc renderVideoDisabled(video: Video; path: string): VNode =
   buildHtml(tdiv):
-    img(src=video.thumb.getSigUrl("pic"))
+    img(src=getPicUrl(video.thumb))
     tdiv(class="video-overlay"):
       case video.playbackType
       of mp4:
@@ -62,7 +62,7 @@ proc renderVideoDisabled(video: Video; path: string): VNode =
 
 proc renderVideoUnavailable(video: Video): VNode =
   buildHtml(tdiv):
-    img(src=video.thumb.getSigUrl("pic"))
+    img(src=getPicUrl(video.thumb))
     tdiv(class="video-overlay"):
       case video.reason
       of "dmcaed":
@@ -74,13 +74,13 @@ proc renderVideo(video: Video; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="attachments")):
     tdiv(class="gallery-video"):
       tdiv(class="attachment video-container"):
-        let thumb = video.thumb.getSigUrl("pic")
+        let thumb = getPicUrl(video.thumb)
         if not video.available:
           renderVideoUnavailable(video)
         elif not prefs.isPlaybackEnabled(video):
           renderVideoDisabled(video, path)
         else:
-          let source = video.url.getSigUrl("video")
+          let source = getVidUrl(video.url)
           case video.playbackType
           of mp4:
             if prefs.muteVideos:
@@ -99,8 +99,8 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
     tdiv(class="gallery-gif", style=style(maxHeight, "unset")):
       tdiv(class="attachment"):
-        let thumb = gif.thumb.getSigUrl("pic")
-        let url = gif.url.getSigUrl("video")
+        let thumb = getPicUrl(gif.thumb)
+        let url = getGifUrl(gif.url)
         if prefs.autoplayGifs:
           video(class="gif", poster=thumb, autoplay="", muted="", loop=""):
             source(src=url, `type`="video/mp4")
@@ -123,7 +123,7 @@ proc renderPoll(poll: Poll): VNode =
 proc renderCardImage(card: Card): VNode =
   buildHtml(tdiv(class="card-image-container")):
     tdiv(class="card-image"):
-      img(src=getSigUrl(get(card.image), "pic"))
+      img(src=getPicUrl(get(card.image)))
       if card.kind == player:
         tdiv(class="card-overlay"):
           tdiv(class="overlay-circle"):

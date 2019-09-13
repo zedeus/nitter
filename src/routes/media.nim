@@ -12,24 +12,26 @@ export utils
 
 proc createMediaRouter*(cfg: Config) =
   router media:
-    get "/pic/@sig/@url":
+    get "/pic/@url":
       cond "http" in @"url"
       cond "twimg" in @"url"
-      let
-        uri = parseUri(decodeUrl(@"url"))
-        path = uri.path.split("/")[2 .. ^1].join("/")
-        filename = cfg.cacheDir / cleanFilename(path & uri.query)
 
-      if getHmac($uri) != @"sig":
-        resp showError("Failed to verify signature", cfg.title)
+      let uri = parseUri(decodeUrl(@"url"))
+      cond isTwitterUrl($uri) == true
+
+      let path = uri.path.split("/")[2 .. ^1].join("/")
+      let filename = cfg.cacheDir / cleanFilename(path & uri.query)
 
       if not existsDir(cfg.cacheDir):
         createDir(cfg.cacheDir)
 
       if not existsFile(filename):
         let client = newAsyncHttpClient()
-        await client.downloadFile($uri, filename)
-        client.close()
+        try:
+          await client.downloadFile($uri, filename)
+          client.close()
+        except:
+          discard
 
       if not existsFile(filename):
         resp Http404
@@ -39,6 +41,27 @@ proc createMediaRouter*(cfg: Config) =
       file.close()
 
       resp buf, mimetype(filename)
+
+    get "/gif/@url":
+      cond "http" in @"url"
+      cond "twimg" in @"url"
+      cond "mp4" in @"url" or "gif" in @"url"
+
+      let url = decodeUrl(@"url")
+      cond isTwitterUrl(url) == true
+
+      let client = newAsyncHttpClient()
+      var content: string
+      try:
+        content = await client.getContent(url)
+        client.close
+      except:
+        discard
+
+      if content.len == 0:
+        resp Http404
+
+      resp content, mimetype(url)
 
     get "/video/@sig/@url":
       cond "http" in @"url"
