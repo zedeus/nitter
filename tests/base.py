@@ -95,8 +95,8 @@ class BaseTestCase(BaseCase):
 
     def search_username(self, username):
         self.open_nitter()
-        self.update_text('input', username)
-        self.submit('form')
+        self.update_text('.search-panel input', username)
+        self.submit('.search-panel form')
 
 
 def get_timeline_tweet(num=1):

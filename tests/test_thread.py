@@ -3,7 +3,7 @@ from parameterized import parameterized
 
 thread = [
     ['octonion/status/975253897697611777', [], 'Based', ['Crystal', 'Julia'], [
-        ['For', 'Then', 'Okay,', 'Python', 'Speed', 'Java', 'Coding', 'I', 'more'],
+        ['For', 'Then', 'Okay,', 'Python', 'Speed', 'Java', 'Coding', 'I', 'You'],
         ['yeah,']
     ]],
 
@@ -13,7 +13,7 @@ thread = [
 
     ['gauravssnl/status/975364889039417344',
      ['Based', 'For', 'Then', 'Okay,', 'Python'], 'Speed', [], [
-         ['Java', 'more'], ['JAVA!']
+         ['Java', 'Coding', 'I', 'You'], ['JAVA!']
      ]],
 
     ['d0m96/status/1141811379407425537', [], 'I\'m',

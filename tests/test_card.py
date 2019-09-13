@@ -8,11 +8,6 @@ card = [
      'A sample of a Qt app written using mostly nim. Contribute to sinkingsugar/nimqt-example development by creating an account on GitHub.',
      'github.com', False],
 
-    ['Bountysource/status/1141879700639215617',
-     '$1,000 Bounty on kivy/plyer',
-     'Automation and Screen Reader Support',
-     'bountysource.com', False],
-
     ['lorenlugosch/status/1115440394148487168',
      'lorenlugosch/pretrain_speech_model',
      'Speech Model Pre-training for End-to-End Spoken Language Understanding - lorenlugosch/pretrain_speech_model',
@@ -37,6 +32,11 @@ card = [
      'Version 0.20.0 released',
      'We are very proud to announce Nim version 0.20. This is a massive release, both literally and figuratively. It contains more than 1,000 commits and it marks our release candidate for version 1.0!',
      'nim-lang.org', True],
+
+    ['nim_lang/status/1082989146040340480',
+     'Nim in 2018: A short recap',
+     'Posted in r/programming by u/miran1',
+     'reddit.com', False],
 
     ['Tesla/status/1141041022035623936',
      'Experience the Tesla Arcade',
@@ -65,10 +65,10 @@ card = [
 ]
 
 no_thumb = [
-    ['nim_lang/status/1082989146040340480',
-     'Nim in 2018: A short recap',
-     'Posted in r/programming by u/miran1 • 36 points and 46 comments',
-     'reddit.com'],
+    ['Bountysource/status/1141879700639215617',
+     '$1,000 Bounty on kivy/plyer',
+     'Automation and Screen Reader Support',
+     'bountysource.com'],
 
     ['brent_p/status/1088857328680488961',
      'Hts Nim Sugar',
