@@ -21,7 +21,7 @@ proc renderReplyThread(thread: Thread; prefs: Prefs; path: string): VNode =
 
 proc renderConversation*(conversation: Conversation; prefs: Prefs; path: string): VNode =
   let hasAfter = conversation.after != nil
-  buildHtml(tdiv(class="conversation", id="posts")):
+  buildHtml(tdiv(class="conversation")):
     tdiv(class="main-thread"):
       if conversation.before != nil:
         tdiv(class="before-tweet thread-line"):

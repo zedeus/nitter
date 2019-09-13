@@ -1,27 +1,25 @@
 @import '_variables';
 
 nav {
-    z-index: 1000;
-    background-color: $bg_overlays;
-    box-shadow: 0 0 4px $shadow;
-}
-
-.nav-bar {
-    padding: 0;
-    width: 100%;
+    display: flex;
     align-items: center;
     position: fixed;
+    background-color: $bg_overlays;
+    box-shadow: 0 0 4px $shadow;
+    padding: 0;
+    width: 100%;
     height: 50px;
+    z-index: 1000;
+}
 
-    .inner-nav {
-        margin: auto;
-        box-sizing: border-box;
-        padding: 0 10px;
-        display: flex;
-        align-items: center;
-        flex-basis: 920px;
-        height: 50px;
-    }
+.inner-nav {
+    margin: auto;
+    box-sizing: border-box;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    flex-basis: 920px;
+    height: 50px;
 }
 
 .site-name {
@@ -39,7 +37,7 @@ nav {
     height: 35px;
 }
 
-.item {
+.nav-item {
     display: flex;
     flex: 1;
     line-height: 50px;

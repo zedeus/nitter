@@ -3,7 +3,6 @@
 
 .conversation {
     @include panel(100%, 600px);
-    background-color: $bg_color !important;
 }
 
 .main-thread {
