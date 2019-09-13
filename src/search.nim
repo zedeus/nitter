@@ -18,10 +18,12 @@ const
   posPrefix = "thGAVUV0VFVBa"
   posSuffix = "EjUAFQAlAFUAFQAA"
 
-proc initQuery*(filters, includes, excludes, separator: string; name=""): Query =
+proc initQuery*(filters, includes, excludes, separator, text: string;
+                name=""): Query =
   var sep = separator.strip().toUpper()
   Query(
     kind: custom,
+    text: text,
     filters: filters.split(",").filterIt(it in validFilters),
     includes: includes.split(",").filterIt(it in validFilters),
     excludes: excludes.split(",").filterIt(it in validFilters),
@@ -60,7 +62,9 @@ proc genQueryParam*(query: Query): string =
   for e in query.excludes:
     filters.add "-filter:" & e
 
-  return strip(param & filters.join(&" {query.sep} "))
+  result = strip(param & filters.join(&" {query.sep} "))
+  if query.text.len > 0:
+    result &= " " & query.text
 
 proc genQueryUrl*(query: Query): string =
   if query.kind == multi: return "?"
@@ -77,6 +81,8 @@ proc genQueryUrl*(query: Query): string =
     params &= "not=" & query.excludes.join(",")
   if query.sep.len > 0:
     params &= "sep=" & query.sep
+  if query.text.len > 0:
+    params &= "text=" & query.text
   if params.len > 0:
     result &= params.join("&") & "&"
 

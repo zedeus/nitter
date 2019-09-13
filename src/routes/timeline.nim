@@ -84,7 +84,7 @@ proc createTimelineRouter*(cfg: Config) =
 
     get "/@name/search":
       cond '.' notin @"name"
-      let query = initQuery(@"filter", @"include", @"not", @"sep", @"name")
+      let query = initQuery(@"filter", @"include", @"not", @"sep", @"text", @"name")
       respTimeline(await showTimeline(@"name", @"after", some(query),
                                       cookiePrefs(), getPath(), cfg.title, ""))
 

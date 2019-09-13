@@ -61,6 +61,7 @@ type
 
   Query* = object
     kind*: QueryKind
+    text*: string
     filters*: seq[string]
     includes*: seq[string]
     excludes*: seq[string]
