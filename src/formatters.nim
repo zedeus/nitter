@@ -11,8 +11,8 @@ const
   usernameRegex = re"(^|[^A-z0-9_?])@([A-z0-9_]+)"
   picRegex = re"pic.twitter.com/[^ ]+"
   ellipsisRegex = re" ?…"
-  ytRegex = re"(www.)?youtu(be.com|.be)"
-  twRegex = re"(www.)?twitter.com"
+  ytRegex = re"(www.|m.)?youtu(be.com|.be)"
+  twRegex = re"(www.|mobile.)?twitter.com"
   nbsp = $Rune(0x000A0)
 
 proc stripText*(text: string): string =
