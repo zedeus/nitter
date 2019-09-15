@@ -127,7 +127,8 @@ proc createTimelineRouter*(cfg: Config) =
         resp renderMain(html, prefs, cfg.title, title, desc, path, images = @[thumb],
                         `type`="video", video=vidUrl)
       else:
-        resp renderMain(html, prefs, cfg.title, title, desc, path, images=conversation.tweet.photos)
+        resp renderMain(html, prefs, cfg.title, title, desc, path,
+                        images=conversation.tweet.photos, `type`="photo")
 
     get "/i/web/status/@id":
       redirect("/i/status/" & @"id")

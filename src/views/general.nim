@@ -43,7 +43,7 @@ proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="
       meta(property="og:type", content=`type`)
       meta(property="og:title", content=titleText)
       meta(property="og:description", content=desc)
-      meta(property="og:site_name", content="Twitter")
+      meta(property="og:site_name", content="Nitter")
 
       for url in images:
         meta(property="og:image", content=getPicUrl(url))
