@@ -15,6 +15,8 @@ const
   twRegex = re"(www.|mobile.)?twitter.com"
   nbsp = $Rune(0x000A0)
 
+const hostname {.strdefine.} = "nitter.net"
+
 proc stripText*(text: string): string =
   text.replace(nbsp, " ").strip()
 
@@ -23,12 +25,16 @@ proc shortLink*(text: string; length=28): string =
   if result.len > length:
     result = result[0 ..< length] & "…"
 
-proc toLink*(url, text: string; class="timeline-link"): string =
-  a(text, class=class, href=url)
+proc toLink*(url, text: string): string =
+  a(text, href=url)
+
+proc reUrlToShortLink*(m: RegexMatch; s: string): string =
+  let url = s[m.group(0)[0]]
+  toLink(url, shortLink(url))
 
 proc reUrlToLink*(m: RegexMatch; s: string): string =
   let url = s[m.group(0)[0]]
-  toLink(url, shortLink(url))
+  toLink(url, url.replace(re"https?://(www.)?", ""))
 
 proc reEmailToLink*(m: RegexMatch; s: string): string =
   let url = s[m.group(0)[0]]
@@ -48,19 +54,9 @@ proc reUsernameToLink*(m: RegexMatch; s: string): string =
 
   pretext & toLink("/" & username, "@" & username)
 
-proc linkifyText*(text: string; prefs: Prefs): string =
-  result = xmltree.escape(stripText(text))
-  result = result.replace(ellipsisRegex, "")
-  result = result.replace(emailRegex, reEmailToLink)
-  result = result.replace(urlRegex, reUrlToLink)
-  result = result.replace(usernameRegex, reUsernameToLink)
-  result = result.replace(re"([^\s\(\n%])<a", "$1 <a")
-  result = result.replace(re"</a>\s+([;.,!\)'%]|&apos;)", "</a>$1")
-  result = result.replace(re"^\. <a", ".<a")
-  if prefs.replaceYouTube.len > 0:
-    result = result.replace(ytRegex, prefs.replaceYouTube)
-  if prefs.replaceTwitter.len > 0:
-    result = result.replace(twRegex, prefs.replaceTwitter)
+proc reUsernameToFullLink*(m: RegexMatch; s: string): string =
+  result = reUsernameToLink(m, s)
+  result = result.replace("href=\"/", &"href=\"https://{hostname}/")
 
 proc replaceUrl*(url: string; prefs: Prefs): string =
   result = url
@@ -68,6 +64,21 @@ proc replaceUrl*(url: string; prefs: Prefs): string =
     result = result.replace(ytRegex, prefs.replaceYouTube)
   if prefs.replaceTwitter.len > 0:
     result = result.replace(twRegex, prefs.replaceTwitter)
+
+proc linkifyText*(text: string; prefs: Prefs; rss=false): string =
+  result = xmltree.escape(stripText(text))
+  result = result.replace(ellipsisRegex, "")
+  result = result.replace(emailRegex, reEmailToLink)
+  if rss:
+    result = result.replace(urlRegex, reUrlToLink)
+    result = result.replace(usernameRegex, reUsernameToFullLink)
+  else:
+    result = result.replace(urlRegex, reUrlToShortLink)
+    result = result.replace(usernameRegex, reUsernameToLink)
+  result = result.replace(re"([^\s\(\n%])<a", "$1 <a")
+  result = result.replace(re"</a>\s+([;.,!\)'%]|&apos;)", "</a>$1")
+  result = result.replace(re"^\. <a", ".<a")
+  result = result.replaceUrl(prefs)
 
 proc stripTwitterUrls*(text: string): string =
   result = text

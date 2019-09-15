@@ -6,6 +6,8 @@ import router_utils
 import ".."/[api, prefs, types, utils, cache, formatters, agents, search]
 import ../views/[general, profile, timeline, status]
 
+include "../views/rss.nimf"
+
 export uri, sequtils
 export router_utils
 export api, cache, formatters, search, agents
@@ -69,6 +71,26 @@ template respTimeline*(timeline: typed) =
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
   resp timeline
 
+proc showRssTimeline*(name: string): Future[string] {.async.} =
+  var timeline: Timeline
+  var profile: Profile
+  var cachedProfile = hasCachedProfile(name)
+  let agent = getAgent()
+
+  if cachedProfile.isSome:
+    profile = get(cachedProfile)
+
+  if cachedProfile.isSome:
+    timeline = await getTimeline(name, "", agent)
+  else:
+    (profile, timeline) = await getProfileAndTimeline(name, agent, "")
+  cache(profile)
+
+  if profile.username.len == 0:
+    return ""
+
+  return renderTimelineRss(timeline.content, profile)
+
 proc createTimelineRouter*(cfg: Config) =
   setProfileCacheTime(cfg.profileCacheTime)
 
@@ -93,6 +115,15 @@ proc createTimelineRouter*(cfg: Config) =
       cond '.' notin @"name"
       respTimeline(await showTimeline(@"name", @"after", some(getMediaQuery(@"name")),
                                       cookiePrefs(), getPath(), cfg.title))
+
+    get "/@name/rss":
+      cond '.' notin @"name"
+      let rss = await showRssTimeline(@"name")
+      if rss.len == 0:
+        resp Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
+      else:
+        resp rss, "application/rss+xml;charset=utf-8"
+
 
     get "/@name/status/@id":
       cond '.' notin @"name"
