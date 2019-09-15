@@ -114,7 +114,10 @@ proc getJoinDateFull*(profile: Profile): string =
   profile.joinDate.format("h:mm tt - d MMM YYYY")
 
 proc getTime*(tweet: Tweet): string =
-  tweet.time.format("d/M/yyyy', ' HH:mm:ss")
+  tweet.time.format("d/M/yyyy', 'HH:mm:ss")
+
+proc getRfc822Time*(tweet: Tweet): string =
+  tweet.time.format("ddd', 'd MMM yyyy HH:mm:ss 'GMT'")
 
 proc getLink*(tweet: Tweet | Quote): string =
   &"/{tweet.profile.username}/status/{tweet.id}"
