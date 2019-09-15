@@ -13,8 +13,10 @@ export router_utils
 export api, cache, formatters, search, agents
 export profile, timeline, status
 
-proc showSingleTimeline(name, after, agent: string; query: Option[Query];
-                        prefs: Prefs; path, title: string): Future[string] {.async.} =
+type ProfileTimeline = (Profile, Timeline, seq[GalleryPhoto])
+
+proc fetchSingleTimeline*(name, after, agent: string;
+                          query: Option[Query]): Future[ProfileTimeline] {.async.} =
   let railFut = getPhotoRail(name, agent)
 
   var timeline: Timeline
@@ -36,61 +38,39 @@ proc showSingleTimeline(name, after, agent: string; query: Option[Query];
       profile = await getCachedProfile(name, agent)
     timeline = await timelineFut
 
-  if profile.username.len == 0:
-    return ""
+  if profile.username.len == 0: return
+  return (profile, timeline, await railFut)
 
-  let rssUrl = profile.username & "/rss"
-  let profileHtml = renderProfile(profile, timeline, await railFut, prefs, path)
-  return renderMain(profileHtml, prefs, title, pageTitle(profile),
-                    pageDesc(profile), path, rss=rssUrl)
-
-proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Query];
-                       prefs: Prefs; path, title: string): Future[string] {.async.} =
+proc fetchMultiTimeline*(names: seq[string]; after, agent: string;
+                         query: Option[Query]): Future[Timeline] {.async.} =
   var q = query
   if q.isSome:
     get(q).fromUser = names
   else:
     q = some(Query(kind: multi, fromUser: names, excludes: @["replies"]))
 
-  var timeline = renderMulti(await getTimelineSearch(get(q), after, agent),
-                             names.join(","), prefs, path)
-
-  return renderMain(timeline, prefs, title, "Multi")
+  return await getTimelineSearch(get(q), after, agent)
 
 proc showTimeline*(name, after: string; query: Option[Query];
-                  prefs: Prefs; path, title: string): Future[string] {.async.} =
+                   prefs: Prefs; path, title, rss: string): Future[string] {.async.} =
   let agent = getAgent()
   let names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
 
   if names.len == 1:
-    return await showSingleTimeline(names[0], after, agent, query, prefs, path, title)
+    let (p, t, r) = await fetchSingleTimeline(names[0], after, agent, query)
+    if p.username.len == 0: return
+    let pHtml = renderProfile(p, t, r, prefs, path)
+    return renderMain(pHtml, prefs, title, pageTitle(p), pageDesc(p), path, rss=rss)
   else:
-    return await showMultiTimeline(names, after, agent, query, prefs, path, title)
+    let
+      timeline = await fetchMultiTimeline(names, after, agent, query)
+      html = renderMulti(timeline, names.join(","), prefs, path)
+    return renderMain(html, prefs, title, "Multi")
 
 template respTimeline*(timeline: typed) =
   if timeline.len == 0:
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
   resp timeline
-
-proc showRssTimeline*(name: string): Future[string] {.async.} =
-  var timeline: Timeline
-  var profile: Profile
-  var cachedProfile = hasCachedProfile(name)
-  let agent = getAgent()
-
-  if cachedProfile.isSome:
-    profile = get(cachedProfile)
-
-  if cachedProfile.isSome:
-    timeline = await getTimeline(name, "", agent)
-  else:
-    (profile, timeline) = await getProfileAndTimeline(name, agent, "")
-  cache(profile)
-
-  if profile.username.len == 0:
-    return ""
-
-  return renderTimelineRss(timeline.content, profile)
 
 proc createTimelineRouter*(cfg: Config) =
   setProfileCacheTime(cfg.profileCacheTime)
@@ -98,33 +78,27 @@ proc createTimelineRouter*(cfg: Config) =
   router timeline:
     get "/@name/?":
       cond '.' notin @"name"
-      respTimeline(await showTimeline(@"name", @"after", none(Query),
-                                      cookiePrefs(), getPath(), cfg.title))
+      let rss = "/$1/rss" % @"name"
+      respTimeline(await showTimeline(@"name", @"after", none(Query), cookiePrefs(),
+                                      getPath(), cfg.title, rss))
 
     get "/@name/search":
       cond '.' notin @"name"
       let query = initQuery(@"filter", @"include", @"not", @"sep", @"name")
       respTimeline(await showTimeline(@"name", @"after", some(query),
-                                      cookiePrefs(), getPath(), cfg.title))
+                                      cookiePrefs(), getPath(), cfg.title, ""))
 
     get "/@name/replies":
       cond '.' notin @"name"
+      let rss = "/$1/replies/rss" % @"name"
       respTimeline(await showTimeline(@"name", @"after", some(getReplyQuery(@"name")),
-                                      cookiePrefs(), getPath(), cfg.title))
+                                      cookiePrefs(), getPath(), cfg.title, rss))
 
     get "/@name/media":
       cond '.' notin @"name"
+      let rss = "/$1/media/rss" % @"name"
       respTimeline(await showTimeline(@"name", @"after", some(getMediaQuery(@"name")),
-                                      cookiePrefs(), getPath(), cfg.title))
-
-    get "/@name/rss":
-      cond '.' notin @"name"
-      let rss = await showRssTimeline(@"name")
-      if rss.len == 0:
-        resp Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
-      else:
-        resp rss, "application/rss+xml;charset=utf-8"
-
+                                      cookiePrefs(), getPath(), cfg.title, rss))
 
     get "/@name/status/@id":
       cond '.' notin @"name"
