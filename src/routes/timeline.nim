@@ -39,9 +39,10 @@ proc showSingleTimeline(name, after, agent: string; query: Option[Query];
   if profile.username.len == 0:
     return ""
 
+  let rssUrl = profile.username & "/rss"
   let profileHtml = renderProfile(profile, timeline, await railFut, prefs, path)
   return renderMain(profileHtml, prefs, title, pageTitle(profile),
-                    pageDesc(profile), path)
+                    pageDesc(profile), path, rss=rssUrl)
 
 proc showMultiTimeline(names: seq[string]; after, agent: string; query: Option[Query];
                        prefs: Prefs; path, title: string): Future[string] {.async.} =
