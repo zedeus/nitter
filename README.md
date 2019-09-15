@@ -10,6 +10,7 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - AGPLv3 licensed, no proprietary instances permitted
 - Dark theme
 - Lightweight (for [@nim_lang](https://twitter.com/nim_lang), 36KB vs 580KB from twitter.com)
+- Native RSS feeds
 
 ## Installation
 

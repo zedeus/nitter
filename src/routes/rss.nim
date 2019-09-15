@@ -3,13 +3,10 @@ import asyncdispatch, strutils
 import jester
 
 import router_utils, timeline
-import ".."/[types, utils, cache, agents, search]
+import ".."/[cache, agents, search]
 import ../views/general
 
 include "../views/rss.nimf"
-
-export uri
-export cache, search, agents
 
 proc showRss*(name: string; query: Option[Query]): Future[string] {.async.} =
   let (profile, timeline, _) = await fetchSingleTimeline(name, "", getAgent(), query)

@@ -26,6 +26,9 @@ proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="
       link(rel="stylesheet", `type`="text/css", href="/css/style.css")
       link(rel="stylesheet", `type`="text/css", href="/css/fontello.css")
 
+      if rss.len > 0:
+        link(rel="alternate", `type`="application/rss+xml", href=rss, title="RSS feed")
+
       if prefs.hlsPlayback:
         script(src="/js/hls.light.min.js")
         script(src="/js/hlsPlayback.js")
