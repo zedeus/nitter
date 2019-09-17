@@ -37,6 +37,9 @@ proc renderSearchTabs*(query: Option[Query]): VNode =
   var q = if query.isSome: get(query) else: Query()
 
   buildHtml(ul(class="tab")):
+    li(class=query.getTabClass("custom")):
+      q.kind = custom
+      a(href=genQueryUrl(q)): text "Tweets"
     li(class=query.getTabClass("users")):
       q.kind = users
       a(href=genQueryUrl(q)): text "Users"

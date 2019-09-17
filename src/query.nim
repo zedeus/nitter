@@ -4,12 +4,19 @@ import types
 
 const
   separators = @["AND", "OR"]
-  validFilters = @[
+  validFilters* = @[
     "media", "images", "twimg", "videos",
     "native_video", "consumer_video", "pro_video",
     "links", "news", "quote", "mentions",
     "replies", "retweets", "nativeretweets",
     "verified", "safe"
+  ]
+  commonFilters* = @[
+    "media", "videos", "images", "links", "news", "quote"
+  ]
+  advancedFilters* = @[
+    "mentions", "verified", "safe", "twimg", "native_video",
+    "consumer_video", "pro_video"
   ]
 
 # Experimental, this might break in the future

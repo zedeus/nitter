@@ -1,4 +1,4 @@
-import strutils
+import strutils, strformat, xmltree
 import karax/[karaxdsl, vdom]
 
 import ../types, ../utils
@@ -39,9 +39,12 @@ proc linkText*(text: string; class=""): VNode =
   buildHtml():
     a(href=url, class=class): text text
 
-proc refererField*(path: string): VNode =
+proc hiddenField*(name, value: string): VNode =
   buildHtml():
-    verbatim "<input name=\"referer\" style=\"display: none\" value=\"$1\"/>" % path
+    verbatim "<input name=\"$1\" style=\"display: none\" value=\"$2\"/>" % [name, value]
+
+proc refererField*(path: string): VNode =
+  hiddenField("referer", path)
 
 proc iconReferer*(icon, action, path: string, title=""): VNode =
   buildHtml(form(`method`="get", action=action, class="icon-button")):
@@ -54,3 +57,30 @@ proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNod
     refererField path
     button(`type`="submit"):
       text text
+
+proc genCheckbox*(pref, label: string; state: bool): VNode =
+  buildHtml(tdiv(class="pref-group")):
+    label(class="checkbox-container"):
+      text label
+      if state: input(name=pref, `type`="checkbox", checked="")
+      else: input(name=pref, `type`="checkbox")
+      span(class="checkbox")
+
+proc genInput*(pref, label, state, placeholder: string; class=""): VNode =
+  let s = xmltree.escape(state)
+  let p = xmltree.escape(placeholder)
+  buildHtml(tdiv(class=("pref-group pref-input " & class))):
+    if label.len > 0:
+      label(`for`=pref): text label
+    verbatim &"<input name={pref} type=\"text\" placeholder=\"{p}\" value=\"{s}\"/>"
+
+proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
+  buildHtml(tdiv(class="pref-group")):
+    label(`for`=pref): text label
+    select(name=pref):
+      for opt in options:
+        if opt == state:
+          option(value=opt, selected=""): text opt
+        else:
+          option(value=opt): text opt
+

@@ -88,6 +88,10 @@ input[type="text"] {
     }
 }
 
+.pref-group {
+    display: inline;
+}
+
 .preferences {
     button {
         margin: 6px 0 3px 0;
@@ -101,6 +105,10 @@ input[type="text"] {
         position: absolute;
         right: 0;
         max-width: 120px;
+    }
+
+    .pref-group {
+        display: block;
     }
 
     .pref-input {
