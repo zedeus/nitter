@@ -5,7 +5,7 @@ import jester
 
 import types, config, prefs
 import views/[general, about]
-import routes/[preferences, timeline, media]
+import routes/[preferences, timeline, media, rss]
 
 const configPath {.strdefine.} = "./nitter.conf"
 let cfg = getConfig(configPath)
@@ -13,6 +13,7 @@ let cfg = getConfig(configPath)
 createPrefRouter(cfg)
 createTimelineRouter(cfg)
 createMediaRouter(cfg)
+createRssRouter(cfg)
 
 settings:
   port = Port(cfg.port)
@@ -32,6 +33,7 @@ routes:
     redirect("/" & @"query")
 
   extend preferences, ""
+  extend rss, ""
   extend timeline, ""
   extend media, ""
 

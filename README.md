@@ -10,6 +10,7 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - AGPLv3 licensed, no proprietary instances permitted
 - Dark theme
 - Lightweight (for [@nim_lang](https://twitter.com/nim_lang), 36KB vs 580KB from twitter.com)
+- Native RSS feeds
 
 ## Installation
 
@@ -23,11 +24,12 @@ It is possible to install Nim system-wide or in the user directory you create be
 # su nitter
 $ git clone https://github.com/zedeus/nitter
 $ cd nitter
-$ nimble build -d:release
+$ nimble build -d:release -d:hostname="..."
 $ nimble scss
 $ mkdir ./tmp
 ```
 
+Change `-d:hostname="..."` to your instance's domain, eg. `-d:hostname:"nitter.net"`.
 Set your port and page title in `nitter.conf`, then run Nitter by executing `./nitter`.
 You should run Nitter behind a reverse proxy such as nginx or Apache for better
 security.
