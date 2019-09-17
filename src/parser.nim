@@ -185,7 +185,7 @@ proc parseVideo*(node: JsonNode; tweetId: string): Video =
   of "vmap":
     result = Video(
       playbackType: vmap,
-      durationMs: track["durationMs"].to(int),
+      durationMs: track.getOrDefault("durationMs").getInt(0),
       url: track["vmapUrl"].to(string),
       available: true)
   else:
