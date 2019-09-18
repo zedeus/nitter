@@ -60,10 +60,10 @@ proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNod
 
 proc genCheckbox*(pref, label: string; state: bool): VNode =
   buildHtml(label(class="pref-group checkbox-container")):
-      text label
-      if state: input(name=pref, `type`="checkbox", checked="")
-      else: input(name=pref, `type`="checkbox")
-      span(class="checkbox")
+    text label
+    if state: input(name=pref, `type`="checkbox", checked="")
+    else: input(name=pref, `type`="checkbox")
+    span(class="checkbox")
 
 proc genInput*(pref, label, state, placeholder: string; class=""): VNode =
   let s = xmltree.escape(state)

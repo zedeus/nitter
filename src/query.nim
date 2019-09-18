@@ -26,10 +26,12 @@ proc initQuery*(pms: Table[string, string]; name=""): Query =
   result = Query(
     kind: parseEnum[QueryKind](@"kind", custom),
     text: @"text",
-    fromUser: @[name],
     filters: validFilters.filterIt("f-" & it in pms),
     excludes: validFilters.filterIt("e-" & it in pms),
   )
+
+  if name.len > 0:
+    result.fromUser = name.split(",")
 
   if @"e-nativeretweets".len == 0:
     result.includes.add "nativeretweets"
