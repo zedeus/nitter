@@ -49,7 +49,7 @@ proc getTimeline*(username, after, agent: string): Future[Timeline] {.async.} =
     params.add {"max_position": after}
 
   let json = await fetchJson(base / (timelineUrl % username) ? params, headers)
-  result = await finishTimeline(json, none(Query), after, agent)
+  result = await finishTimeline(json, none Query, after, agent)
 
 proc getProfileAndTimeline*(username, agent, after: string): Future[(Profile, Timeline)] {.async.} =
   let headers = newHttpHeaders({

@@ -180,9 +180,9 @@ proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
   if player == nil: return
 
   if "gif" in player.attr("class"):
-    tweet.gif = some(getGif(player.select(".PlayableMedia-player")))
+    tweet.gif = some getGif(player.select(".PlayableMedia-player"))
   elif "video" in player.attr("class"):
-    tweet.video = some(Video())
+    tweet.video = some Video()
 
 proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
   if node.select(".QuoteTweet--sensitive") != nil:
@@ -209,7 +209,7 @@ proc getTweetCard*(tweet: Tweet; node: XmlNode) =
     cardType = cardType.split(":")[^1]
 
   if "poll" in cardType:
-    tweet.poll = some(Poll())
+    tweet.poll = some Poll()
     return
 
   let cardDiv = node.select(".card2 > .js-macaw-cards-iframe-container")
@@ -230,7 +230,7 @@ proc getTweetCard*(tweet: Tweet; node: XmlNode) =
     if n.attr("href") == cardUrl:
       card.url = n.attr("data-expanded-url")
 
-  tweet.card = some(card)
+  tweet.card = some card
 
 proc getMoreReplies*(node: XmlNode): int =
   let text = node.innerText().strip()

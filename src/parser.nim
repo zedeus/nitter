@@ -104,20 +104,20 @@ proc parseTweet*(node: XmlNode): Tweet =
 
   let by = tweet.selectText(".js-retweet-text > a > b")
   if by.len > 0:
-    result.retweet = some(Retweet(
+    result.retweet = some Retweet(
       by: stripText(by),
       id: tweet.attr("data-retweet-id")
-    ))
+    )
 
   let quote = tweet.select(".QuoteTweet-innerContainer")
   if quote != nil:
-    result.quote = some(parseQuote(quote))
+    result.quote = some parseQuote(quote)
 
   let tombstone = tweet.select(".Tombstone")
   if tombstone != nil:
     if "unavailable" in tombstone.innerText():
       let quote = Quote(tombstone: getTombstone(node.selectText(".Tombstone-label")))
-      result.quote = some(quote)
+      result.quote = some quote
 
 proc parseThread*(nodes: XmlNode): Thread =
   if nodes == nil: return
@@ -234,7 +234,7 @@ proc parseCard*(card: var Card; node: XmlNode) =
   let image = node.select(".tcu-imageWrapper img")
   if image != nil:
     # workaround for issue 11713
-    card.image = some(image.attr("data-src").replace("gname", "g&name"))
+    card.image = some image.attr("data-src").replace("gname", "g&name")
 
   if card.kind == liveEvent:
     card.text = card.title

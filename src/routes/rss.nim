@@ -21,12 +21,12 @@ proc createRssRouter*(cfg: Config) =
   router rss:
     get "/@name/rss":
       cond '.' notin @"name"
-      respRss(await showRss(@"name", none(Query)))
+      respRss(await showRss(@"name", none Query))
 
     get "/@name/replies/rss":
       cond '.' notin @"name"
-      respRss(await showRss(@"name", some(getReplyQuery(@"name"))))
+      respRss(await showRss(@"name", some getReplyQuery(@"name")))
 
     get "/@name/media/rss":
       cond '.' notin @"name"
-      respRss(await showRss(@"name", some(getMediaQuery(@"name"))))
+      respRss(await showRss(@"name", some getMediaQuery(@"name")))

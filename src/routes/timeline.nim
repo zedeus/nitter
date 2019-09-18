@@ -47,7 +47,7 @@ proc fetchMultiTimeline*(names: seq[string]; after, agent: string;
   if q.isSome:
     get(q).fromUser = names
   else:
-    q = some(Query(kind: multi, fromUser: names, excludes: @["replies"]))
+    q = some Query(kind: multi, fromUser: names, excludes: @["replies"])
 
   return await getSearch[Tweet](get(q), after, agent)
 
@@ -79,25 +79,25 @@ proc createTimelineRouter*(cfg: Config) =
     get "/@name/?":
       cond '.' notin @"name"
       let rss = "/$1/rss" % @"name"
-      respTimeline(await showTimeline(@"name", @"after", none(Query), cookiePrefs(),
+      respTimeline(await showTimeline(@"name", @"after", none Query, cookiePrefs(),
                                       getPath(), cfg.title, rss))
 
     get "/@name/search":
       cond '.' notin @"name"
-      let query = initQuery(@"filter", @"include", @"not", @"sep", @"text", @"name")
-      respTimeline(await showTimeline(@"name", @"after", some(query),
+      let query = some initQuery(@"filter", @"include", @"not", @"sep", @"text", @"name")
+      respTimeline(await showTimeline(@"name", @"after", query,
                                       cookiePrefs(), getPath(), cfg.title, ""))
 
     get "/@name/replies":
       cond '.' notin @"name"
       let rss = "/$1/replies/rss" % @"name"
-      respTimeline(await showTimeline(@"name", @"after", some(getReplyQuery(@"name")),
+      respTimeline(await showTimeline(@"name", @"after", some getReplyQuery(@"name"),
                                       cookiePrefs(), getPath(), cfg.title, rss))
 
     get "/@name/media":
       cond '.' notin @"name"
       let rss = "/$1/media/rss" % @"name"
-      respTimeline(await showTimeline(@"name", @"after", some(getMediaQuery(@"name")),
+      respTimeline(await showTimeline(@"name", @"after", some getMediaQuery(@"name"),
                                       cookiePrefs(), getPath(), cfg.title, rss))
 
     get "/@name/status/@id":
