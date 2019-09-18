@@ -12,38 +12,6 @@ proc getQuery(query: Option[Query]): string =
     if result[^1] != '?':
       result &= "&"
 
-proc getTabClass(query: Option[Query]; tab: string): string =
-  var classes = @["tab-item"]
-
-  if query.isNone or get(query).kind == multi:
-    if tab == "posts":
-      classes.add "active"
-  elif $get(query).kind == tab:
-    classes.add "active"
-
-  return classes.join(" ")
-
-proc renderProfileTabs*(query: Option[Query]; username: string): VNode =
-  let link = "/" & username
-  buildHtml(ul(class="tab")):
-    li(class=query.getTabClass("posts")):
-      a(href=link): text "Tweets"
-    li(class=query.getTabClass("replies")):
-      a(href=(link & "/replies")): text "Tweets & Replies"
-    li(class=query.getTabClass("media")):
-      a(href=(link & "/media")): text "Media"
-
-proc renderSearchTabs*(query: Option[Query]): VNode =
-  var q = if query.isSome: get(query) else: Query()
-
-  buildHtml(ul(class="tab")):
-    li(class=query.getTabClass("custom")):
-      q.kind = custom
-      a(href=genQueryUrl(q)): text "Tweets"
-    li(class=query.getTabClass("users")):
-      q.kind = users
-      a(href=genQueryUrl(q)): text "Users"
-
 proc renderNewer(query: Option[Query]): VNode =
   buildHtml(tdiv(class="timeline-item show-more")):
     a(href=(getQuery(query).strip(chars={'?', '&'}))):

@@ -1,4 +1,4 @@
-import strutils, strformat, sequtils
+import strutils, strformat, sequtils, tables
 
 import types
 
@@ -11,13 +11,6 @@ const
     "replies", "retweets", "nativeretweets",
     "verified", "safe"
   ]
-  commonFilters* = @[
-    "media", "videos", "images", "links", "news", "quote"
-  ]
-  advancedFilters* = @[
-    "mentions", "verified", "safe", "twimg", "native_video",
-    "consumer_video", "pro_video"
-  ]
 
 # Experimental, this might break in the future
 # Till then, it results in shorter urls
@@ -25,17 +18,21 @@ const
   posPrefix = "thGAVUV0VFVBa"
   posSuffix = "EjUAFQAlAFUAFQAA"
 
-proc initQuery*(filters, includes, excludes, separator, text: string; name=""): Query =
-  var sep = separator.strip().toUpper()
-  Query(
-    kind: custom,
-    text: text,
-    filters: filters.split(",").filterIt(it in validFilters),
-    includes: includes.split(",").filterIt(it in validFilters),
-    excludes: excludes.split(",").filterIt(it in validFilters),
+template `@`(param: string): untyped =
+  if param in pms: pms[param]
+  else: ""
+
+proc initQuery*(pms: Table[string, string]; name=""): Query =
+  result = Query(
+    kind: parseEnum[QueryKind](@"kind", custom),
+    text: @"text",
     fromUser: @[name],
-    sep: if sep in separators: sep else: ""
+    filters: validFilters.filterIt("f-" & it in pms),
+    excludes: validFilters.filterIt("e-" & it in pms),
   )
+
+  if @"e-nativeretweets".len == 0:
+    result.includes.add "nativeretweets"
 
 proc getMediaQuery*(name: string): Query =
   Query(
@@ -88,16 +85,15 @@ proc genQueryUrl*(query: Query): string =
   result &= &"/search?"
 
   var params = @[&"kind={query.kind}"]
-  if query.filters.len > 0:
-    params &= "filter=" & query.filters.join(",")
-  if query.includes.len > 0:
-    params &= "include=" & query.includes.join(",")
-  if query.excludes.len > 0:
-    params &= "not=" & query.excludes.join(",")
-  if query.sep.len > 0:
-    params &= "sep=" & query.sep
   if query.text.len > 0:
-    params &= "text=" & query.text
+    params.add "text=" & query.text
+  for f in query.filters:
+    params.add "f-" & f & "=on"
+  for e in query.excludes:
+    params.add "e-" & e & "=on"
+  for i in query.excludes:
+    params.add "i-" & i & "=on"
+
   if params.len > 0:
     result &= params.join("&")
 

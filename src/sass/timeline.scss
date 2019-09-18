@@ -10,20 +10,15 @@
     > div:not(:last-child) {
         border-bottom: 1px solid $border_grey;
     }
-
 }
 
 .timeline-header {
     background-color: $bg_panel;
     text-align: center;
-    padding: 10px;
+    padding: 8px;
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
-
-    input[type="text"] {
-        height: 20px;
-    }
 
     button {
         float: unset;
@@ -70,11 +65,6 @@
 }
 
 .timeline-footer {
-    background-color: $bg_panel;
-    padding: 6px 0;
-}
-
-.timeline-header {
     background-color: $bg_panel;
     padding: 6px 0;
 }

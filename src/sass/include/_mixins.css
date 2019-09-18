@@ -58,3 +58,29 @@
         border-color: $accent_light;
     }
 }
+
+@mixin search-resize($width, $rows, $height) {
+    @media(max-width: $width) {
+        .search-toggles {
+            grid-template-columns: repeat($rows, auto);
+        }
+
+        #search-panel-toggle:checked ~ .search-panel {
+            max-height: $height !important;
+        }
+    }
+}
+
+@mixin create-toggle($elem, $height) {
+    ##{$elem}-toggle {
+        display: none;
+
+        &:checked ~ .#{$elem} {
+            max-height: $height;
+        }
+
+        &:checked ~ label .icon-down:before {
+            transform: rotate(180deg) translateY(-1px);
+        }
+    }
+}

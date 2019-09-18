@@ -64,7 +64,7 @@ proc showTimeline*(name, after: string; query: Option[Query];
   else:
     let
       timeline = await fetchMultiTimeline(names, after, agent, query)
-      html = renderTimelineSearch(timeline, prefs, path)
+      html = renderTweetSearch(timeline, prefs, path)
     return renderMain(html, prefs, title, "Multi")
 
 template respTimeline*(timeline: typed) =
@@ -84,9 +84,9 @@ proc createTimelineRouter*(cfg: Config) =
 
     get "/@name/search":
       cond '.' notin @"name"
-      let query = some initQuery(@"filter", @"include", @"not", @"sep", @"text", @"name")
-      respTimeline(await showTimeline(@"name", @"after", query,
-                                      cookiePrefs(), getPath(), cfg.title, ""))
+      let query = some initQuery(params(request), name=(@"name"))
+      respTimeline(await showTimeline(@"name", @"after", query, cookiePrefs(),
+                                      getPath(), cfg.title, ""))
 
     get "/@name/replies":
       cond '.' notin @"name"

@@ -1,0 +1,83 @@
+@import '_variables';
+@import '_mixins';
+
+.search-title {
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+.search-field {
+    display: flex;
+    flex-wrap: wrap;
+
+    button {
+        margin: 0 2px 2px 0;
+    }
+
+    .pref-input {
+        margin: 0 4px 2px 0;
+        flex-grow: 1;
+    }
+
+    input[type="text"] {
+        height: 20px;
+        width: calc(100% - 8px);
+    }
+
+    > label {
+        display: inline;
+        background-color: #121212;
+        color: #F8F8F2;
+        border: 1px solid #FF6C6091;
+        padding: 1px 6px 2px 6px;
+        font-size: 14px;
+        cursor: pointer;
+        margin-bottom: 2px;
+
+        @include input-colors;
+    }
+
+    @include create-toggle(search-panel, 140px);
+}
+
+.search-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s;
+
+    flex-grow: 1;
+    font-weight: initial;
+    text-align: left;
+
+    > div {
+        line-height: 1.7em;
+    }
+
+    .checkbox-container {
+        display: inline;
+        padding-right: unset;
+        margin-bottom: unset;
+        margin-left: 23px;
+    }
+
+    .checkbox {
+        right: unset;
+        left: -22px;
+    }
+
+    .checkbox-container .checkbox:after {
+        top: -4px;
+    }
+}
+
+.search-toggles {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(6, auto);
+    grid-column-gap: 10px;
+}
+
+@include search-resize(530px, 5, 185px);
+@include search-resize(475px, 4, 185px);
+@include search-resize(406px, 3, 250px);

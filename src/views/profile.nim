@@ -1,7 +1,7 @@
 import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 
-import tweet, timeline, renderutils
+import renderutils, search
 import ".."/[types, utils, formatters]
 
 proc renderStat(num, class: string; text=""): VNode =
@@ -54,11 +54,10 @@ proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
       a(href=(&"/{profile.username}/media")):
         icon "picture", $profile.media & " Photos and videos"
 
-    input(id="photo-rail-toggle", `type`="checkbox")
-    tdiv(class="photo-rail-header-mobile"):
-      label(`for`="photo-rail-toggle", class="photo-rail-label"):
-        icon "picture", $profile.media & " Photos and videos"
-        icon "down"
+    input(id="photo-rail-grid-toggle", `type`="checkbox")
+    label(`for`="photo-rail-grid-toggle", class="photo-rail-header-mobile"):
+      icon "picture", $profile.media & " Photos and videos"
+      icon "down"
 
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:
@@ -76,13 +75,17 @@ proc renderBanner(profile: Profile): VNode =
         genImg(profile.banner)
 
 proc renderProtected(username: string): VNode =
-  buildHtml(tdiv(class="timeline-container timeline")):
-    tdiv(class="timeline-header timeline-protected"):
-      h2: text "This account's tweets are protected."
-      p: text &"Only confirmed followers have access to @{username}'s tweets."
+  buildHtml(tdiv(class="timeline-container")):
+    tdiv(class="timeline-container timeline"):
+      tdiv(class="timeline-header timeline-protected"):
+        h2: text "This account's tweets are protected."
+        p: text &"Only confirmed followers have access to @{username}'s tweets."
 
 proc renderProfile*(profile: Profile; timeline: Timeline;
                     photoRail: seq[GalleryPhoto]; prefs: Prefs; path: string): VNode =
+  if timeline.query.isNone:
+    timeline.query = some Query(fromUser: @[profile.username])
+
   buildHtml(tdiv(class="profile-tabs")):
     if not prefs.hideBanner:
       tdiv(class="profile-banner"):
@@ -94,9 +97,7 @@ proc renderProfile*(profile: Profile; timeline: Timeline;
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)
 
-    tdiv(class="timeline-container"):
-      if profile.protected:
-        renderProtected(profile.username)
-      else:
-        renderProfileTabs(timeline.query, profile.username)
-        renderTimelineTweets(timeline, prefs, path)
+    if profile.protected:
+      renderProtected(profile.username)
+    else:
+      renderTweetSearch(timeline, prefs, path)

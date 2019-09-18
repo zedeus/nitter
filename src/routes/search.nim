@@ -1,4 +1,4 @@
-import strutils, uri
+import strutils, sequtils, uri
 
 import jester
 
@@ -14,24 +14,7 @@ proc createSearchRouter*(cfg: Config) =
       if @"text".len > 200:
         resp Http400, showError("Search input too long.", cfg.title)
 
-      let kind = parseEnum[QueryKind](@"kind", custom)
-      var query = Query(kind: kind, text: @"text")
-
-      if @"retweets".len == 0:
-        query.excludes.add "nativeretweets"
-      else:
-        query.includes.add "nativeretweets"
-
-      if @"replies".len == 0:
-        query.excludes.add "replies"
-      else:
-        query.includes.add "replies"
-
-      for f in validFilters:
-        if "f-" & f in params(request):
-          query.filters.add f
-        if "e-" & f in params(request):
-          query.excludes.add f
+      let query = initQuery(params(request))
 
       case query.kind
       of users:

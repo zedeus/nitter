@@ -59,8 +59,7 @@ proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNod
       text text
 
 proc genCheckbox*(pref, label: string; state: bool): VNode =
-  buildHtml(tdiv(class="pref-group")):
-    label(class="checkbox-container"):
+  buildHtml(label(class="pref-group checkbox-container")):
       text label
       if state: input(name=pref, `type`="checkbox", checked="")
       else: input(name=pref, `type`="checkbox")
@@ -83,4 +82,3 @@ proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
           option(value=opt, selected=""): text opt
         else:
           option(value=opt): text opt
-
