@@ -42,7 +42,7 @@ proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.asyn
     }
 
   let json = await fetchJson(base / searchUrl ? params, headers)
-  if json == nil: return Result[T]()
+  if json == nil: return Result[T](query: some query)
 
   result = getResult[T](json, query, after)
   if not json.hasKey("items_html"): return
