@@ -68,6 +68,7 @@ type
     fromUser*: seq[string]
     since*: string
     until*: string
+    near*: string
     sep*: string
 
   Result*[T] = ref object

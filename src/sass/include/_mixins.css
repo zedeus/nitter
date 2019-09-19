@@ -59,14 +59,25 @@
     }
 }
 
-@mixin search-resize($width, $rows, $height) {
+@mixin search-resize($width, $rows) {
     @media(max-width: $width) {
         .search-toggles {
             grid-template-columns: repeat($rows, auto);
         }
 
         #search-panel-toggle:checked ~ .search-panel {
-            max-height: $height !important;
+            @if $rows == 6 {
+                max-height: 200px !important;
+            }
+            @if $rows == 5 {
+                max-height: 300px !important;
+            }
+            @if $rows == 4 {
+                max-height: 300px !important;
+            }
+            @if $rows == 3 {
+                max-height: 365px !important;
+            }
         }
     }
 }

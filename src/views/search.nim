@@ -76,11 +76,16 @@ proc renderSearchPanel*(query: Query): VNode =
               else: k in query.excludes
             genCheckbox(&"{f[0]}-{k}", v, state)
 
-      span(class="search-title"): text "Time range"
-      tdiv(class="date-range"):
-        genDate("since", query.since)
-        span(class="search-title"): text "-"
-        genDate("until", query.until)
+      tdiv(class="search-row"):
+        tdiv:
+          span(class="search-title"): text "Time range"
+          tdiv(class="date-range"):
+            genDate("since", query.since)
+            span(class="search-title"): text "-"
+            genDate("until", query.until)
+        tdiv:
+          span(class="search-title"): text "Near"
+          genInput("near", "", query.near, placeholder="Location...")
 
 proc renderTweetSearch*(tweets: Result[Tweet]; prefs: Prefs; path: string): VNode =
   let query = tweets.query

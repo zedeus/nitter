@@ -29,7 +29,8 @@ proc initQuery*(pms: Table[string, string]; name=""): Query =
     filters: validFilters.filterIt("f-" & it in pms),
     excludes: validFilters.filterIt("e-" & it in pms),
     since: @"since",
-    until: @"until"
+    until: @"until",
+    near: @"near"
   )
 
   if name.len > 0:
@@ -77,6 +78,8 @@ proc genQueryParam*(query: Query): string =
     result &= " since:" & query.since
   if query.until.len > 0:
     result &= " until:" & query.until
+  if query.near.len > 0:
+    result &= &" near:\"{query.near}\" within:15mi"
   if query.text.len > 0:
     result &= " " & query.text
 
@@ -106,6 +109,8 @@ proc genQueryUrl*(query: Query): string =
     params.add "since=" & query.since
   if query.until.len > 0:
     params.add "until=" & query.until
+  if query.near.len > 0:
+    params.add "near=" & query.near
 
   if params.len > 0:
     result &= params.join("&")

@@ -42,12 +42,16 @@ input::-webkit-datetime-edit-year-field:focus {
 }
 
 .date-range {
-    display: block;
+    .date-input {
+        display: inline-block;
+        position: relative;
+    }
 
     .icon-container {
-        margin-left: -22px;
-        margin-right: 4px;
         pointer-events: none;
+        position: absolute;
+        top: 2px;
+        right: 5px;
     }
 
     .search-title {
