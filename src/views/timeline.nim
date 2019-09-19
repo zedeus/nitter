@@ -80,10 +80,13 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): 
       renderNoneFound()
     else:
       var threads: seq[string]
+      var retweets: seq[string]
       for tweet in results.content:
-        if tweet.threadId in threads: continue
+        if tweet.threadId in threads or tweet.id in retweets: continue
         let thread = results.content.filterIt(threadFilter(it, tweet.threadId))
         if thread.len < 2:
+          if tweet.retweet.isSome:
+            retweets &= tweet.id
           renderTweet(tweet, prefs, path, showThread=tweet.hasThread)
         else:
           renderThread(thread, prefs, path)
