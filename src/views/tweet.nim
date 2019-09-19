@@ -1,4 +1,4 @@
-import strutils, sequtils
+import strutils, sequtils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 
 import renderutils
@@ -228,15 +228,15 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
     divClass = "thread-last " & class
 
   if not tweet.available:
-    return buildHtml(tdiv(class=divClass)):
-      tdiv(class="timeline-item unavailable"):
-        tdiv(class="unavailable-box"):
-          if tweet.tombstone.len > 0:
-            text tweet.tombstone
-          else:
-            text "This tweet is unavailable"
+    return buildHtml(tdiv(class=divClass & "unavailable timeline-item")):
+      tdiv(class="unavailable-box"):
+        if tweet.tombstone.len > 0:
+          text tweet.tombstone
+        else:
+          text "This tweet is unavailable"
 
   buildHtml(tdiv(class=("timeline-item " & divClass))):
+    a(class="tweet-link", href=getLink(tweet))
     tdiv(class="tweet-body"):
       var views = ""
       renderHeader(tweet)

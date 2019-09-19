@@ -24,14 +24,17 @@
     margin-right: 6px;
     min-width: 30px;
     text-align: right;
+    pointer-events: all;
 }
 
 .poll-choice-option {
     position: relative;
+    pointer-events: all;
 }
 
 .poll-info {
     color: $grey;
+    pointer-events: all;
 }
 
 .leader .poll-choice-bar {

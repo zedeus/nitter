@@ -9,6 +9,7 @@
     flex-grow: 1;
     max-height: 379.5px;
     max-width: 533px;
+    pointer-events: all;
 
     .still-image {
         width: 100%;
@@ -27,6 +28,7 @@
     flex-flow: column;
     background-color: $bg_color;
     align-items: center;
+    pointer-events: all;
 
     .image-attachment {
         width: 100%;

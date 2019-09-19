@@ -11,11 +11,15 @@
     flex: 1;
     min-width: 0;
     margin-left: 58px;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .tweet-content {
     font-family: $font_3;
     line-height: 1.4em;
+    pointer-events: all;
+    display: inline;
 }
 
 .tweet-header {
@@ -28,6 +32,7 @@
         display: inline-block;
         word-break: break-all;
         max-width: 100%;
+        pointer-events: all;
     }
 }
 
@@ -80,6 +85,7 @@
 .replying-to {
     color: $fg_dark;
     margin: -2px 0 4px;
+    pointer-events: all;
 }
 
 .retweet, .pinned, .tweet-stats {
@@ -121,4 +127,16 @@
     border: solid 1px $dark_grey;
     border-radius: 10px;
     background-color: $bg_color;
+}
+
+.tweet-link {
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+
+    &:hover {
+        background-color: #1a1a1a;
+    }
 }

@@ -20,7 +20,8 @@
 }
 
 .thread-line {
-    .timeline-item::before {
+    .timeline-item::before,
+    &.timeline-item::before {
         background: $accent_dark;
         content: '';
         position: relative;
@@ -31,6 +32,8 @@
         margin-left: -3px;
         margin-bottom: 37px;
         top: 56px;
+        z-index: 1;
+        pointer-events: none;
     }
 
     .unavailable::before {
