@@ -60,7 +60,8 @@ proc renderSearchPanel*(query: Query): VNode =
   let action = if user.len > 0: &"/{user}/search" else: "/search"
   buildHtml(form(`method`="get", action=action, class="search-field")):
     hiddenField("kind", "custom")
-    genInput("text", "", query.text, "Enter search...", class="pref-inline")
+    genInput("text", "", query.text, "Enter search...",
+             class="pref-inline", autofocus=true)
     button(`type`="submit"): icon "search"
     input(id="search-panel-toggle", `type`="checkbox")
     label(`for`="search-panel-toggle"):

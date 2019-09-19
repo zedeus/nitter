@@ -5,7 +5,7 @@ import ".."/[types, parser, parserutils, formatters, query]
 import utils, consts, media
 
 proc finishTimeline*(json: JsonNode; query: Query; after, agent: string): Future[Timeline] {.async.} =
-  if json == nil: return Timeline()
+  if json == nil: return Timeline(beginning: true, query: query)
 
   result = Timeline(
     hasMore: json["has_more_items"].to(bool),

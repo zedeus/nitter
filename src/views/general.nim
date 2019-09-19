@@ -14,6 +14,7 @@ proc renderNavbar*(title, path, rss: string): VNode =
       a(href="/"): img(class="site-logo", src="/logo.png")
 
       tdiv(class="nav-item right"):
+        icon "search", title="Search", href="/search"
         if rss.len > 0:
           icon "rss", title="RSS Feed", href=rss
         icon "info-circled", title="About", href="/about"
