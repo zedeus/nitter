@@ -1,4 +1,4 @@
-import strutils, strformat, unicode, tables
+import strutils, strformat, sequtils, unicode, tables
 import karax/[karaxdsl, vdom, vstyles]
 
 import renderutils, timeline
@@ -55,6 +55,10 @@ proc renderSearchTabs*(query: Query): VNode =
       q.kind = users
       a(href=genQueryUrl(q)): text "Users"
 
+proc isPanelOpen(q: Query): bool =
+  q.filters.len > 0 or q.excludes.len > 0 or
+  @[q.near, q.until, q.since].anyIt(it.len > 0)
+
 proc renderSearchPanel*(query: Query): VNode =
   let user = query.fromUser.join(",")
   let action = if user.len > 0: &"/{user}/search" else: "/search"
@@ -63,7 +67,10 @@ proc renderSearchPanel*(query: Query): VNode =
     genInput("text", "", query.text, "Enter search...",
              class="pref-inline", autofocus=true)
     button(`type`="submit"): icon "search"
-    input(id="search-panel-toggle", `type`="checkbox")
+    if isPanelOpen(query):
+      input(id="search-panel-toggle", `type`="checkbox", checked="")
+    else:
+      input(id="search-panel-toggle", `type`="checkbox")
     label(`for`="search-panel-toggle"):
       icon "down"
     tdiv(class="search-panel"):
