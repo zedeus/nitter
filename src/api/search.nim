@@ -9,7 +9,7 @@ proc getResult[T](json: JsonNode; query: Query; after: string): Result[T] =
     hasMore: json["has_more_items"].to(bool),
     maxId: json.getOrDefault("max_position").getStr(""),
     minId: json.getOrDefault("min_position").getStr("").cleanPos(),
-    query: some query,
+    query: query,
     beginning: after.len == 0
   )
 
@@ -42,14 +42,14 @@ proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.asyn
     }
 
   let json = await fetchJson(base / searchUrl ? params, headers)
-  if json == nil: return Result[T](query: some query)
+  if json == nil: return Result[T](query: query)
 
   result = getResult[T](json, query, after)
   if not json.hasKey("items_html"): return
   let html = parseHtml(json["items_html"].to(string))
 
   when T is Tweet:
-    result = await finishTimeline(json, some query, after, agent)
+    result = await finishTimeline(json, query, after, agent)
   elif T is Profile:
     result.hasMore = json["items_html"].to(string) != "\n"
     for p in html.selectAll(".js-stream-item"):

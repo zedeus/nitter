@@ -4,20 +4,20 @@ import karax/[karaxdsl, vdom, vstyles]
 import ".."/[types, query, formatters]
 import tweet, renderutils
 
-proc getQuery(query: Option[Query]): string =
-  if query.isNone:
+proc getQuery(query: Query): string =
+  if query.kind == posts:
     result = "?"
   else:
-    result = genQueryUrl(get(query))
+    result = genQueryUrl(query)
     if result[^1] != '?':
       result &= "&"
 
-proc renderNewer(query: Option[Query]): VNode =
+proc renderNewer(query: Query): VNode =
   buildHtml(tdiv(class="timeline-item show-more")):
     a(href=(getQuery(query).strip(chars={'?', '&'}))):
       text "Load newest"
 
-proc renderOlder(query: Option[Query]; minId: string): VNode =
+proc renderOlder(query: Query; minId: string): VNode =
   buildHtml(tdiv(class="show-more")):
     a(href=(&"{getQuery(query)}after={minId}")):
       text "Load older"
@@ -88,7 +88,7 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): 
           renderThread(thread, prefs, path)
           threads &= tweet.threadId
 
-      if results.hasMore or results.query.isSome:
+      if results.hasMore or results.query.kind != posts:
         renderOlder(results.query, results.minId)
       else:
         renderNoMore()

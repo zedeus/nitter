@@ -16,7 +16,7 @@ export profile, timeline, status
 type ProfileTimeline = (Profile, Timeline, seq[GalleryPhoto])
 
 proc fetchSingleTimeline*(name, after, agent: string;
-                          query: Option[Query]): Future[ProfileTimeline] {.async.} =
+                          query: Query): Future[ProfileTimeline] {.async.} =
   let railFut = getPhotoRail(name, agent)
 
   var timeline: Timeline
@@ -26,14 +26,14 @@ proc fetchSingleTimeline*(name, after, agent: string;
   if cachedProfile.isSome:
     profile = get(cachedProfile)
 
-  if query.isNone:
+  if query.kind == posts:
     if cachedProfile.isSome:
       timeline = await getTimeline(name, after, agent)
     else:
       (profile, timeline) = await getProfileAndTimeline(name, agent, after)
       cache(profile)
   else:
-    var timelineFut = getSearch[Tweet](get(query), after, agent)
+    var timelineFut = getSearch[Tweet](query, after, agent)
     if cachedProfile.isNone:
       profile = await getCachedProfile(name, agent)
     timeline = await timelineFut
@@ -42,16 +42,14 @@ proc fetchSingleTimeline*(name, after, agent: string;
   return (profile, timeline, await railFut)
 
 proc fetchMultiTimeline*(names: seq[string]; after, agent: string;
-                         query: Option[Query]): Future[Timeline] {.async.} =
+                         query: Query): Future[Timeline] {.async.} =
   var q = query
-  if q.isSome:
-    get(q).fromUser = names
-  else:
-    q = some Query(kind: multi, fromUser: names, excludes: @["replies"])
+  q.fromUser = names
+  if q.kind == posts and "replies" notin q.excludes:
+    q.excludes.add "replies"
+  return await getSearch[Tweet](q, after, agent)
 
-  return await getSearch[Tweet](get(q), after, agent)
-
-proc showTimeline*(name, after: string; query: Option[Query];
+proc showTimeline*(name, after: string; query: Query;
                    prefs: Prefs; path, title, rss: string): Future[string] {.async.} =
   let agent = getAgent()
   let names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
@@ -79,25 +77,25 @@ proc createTimelineRouter*(cfg: Config) =
     get "/@name/?":
       cond '.' notin @"name"
       let rss = "/$1/rss" % @"name"
-      respTimeline(await showTimeline(@"name", @"after", none Query, cookiePrefs(),
+      respTimeline(await showTimeline(@"name", @"after", Query(), cookiePrefs(),
                                       getPath(), cfg.title, rss))
 
     get "/@name/search":
       cond '.' notin @"name"
-      let query = some initQuery(params(request), name=(@"name"))
+      let query = initQuery(params(request), name=(@"name"))
       respTimeline(await showTimeline(@"name", @"after", query, cookiePrefs(),
                                       getPath(), cfg.title, ""))
 
     get "/@name/replies":
       cond '.' notin @"name"
       let rss = "/$1/replies/rss" % @"name"
-      respTimeline(await showTimeline(@"name", @"after", some getReplyQuery(@"name"),
+      respTimeline(await showTimeline(@"name", @"after", getReplyQuery(@"name"),
                                       cookiePrefs(), getPath(), cfg.title, rss))
 
     get "/@name/media":
       cond '.' notin @"name"
       let rss = "/$1/media/rss" % @"name"
-      respTimeline(await showTimeline(@"name", @"after", some getMediaQuery(@"name"),
+      respTimeline(await showTimeline(@"name", @"after", getMediaQuery(@"name"),
                                       cookiePrefs(), getPath(), cfg.title, rss))
 
     get "/@name/status/@id":

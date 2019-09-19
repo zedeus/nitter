@@ -78,7 +78,7 @@ proc genQueryUrl*(query: Query): string =
   if query.fromUser.len > 0:
     result = "/" & query.fromUser.join(",")
 
-  if query.kind == multi:
+  if query.fromUser.len > 1:
     return result & "?"
 
   if query.kind notin {custom, users}:

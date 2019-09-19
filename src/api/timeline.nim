@@ -4,7 +4,7 @@ import sequtils, strutils, json, xmltree, uri
 import ".."/[types, parser, parserutils, formatters, query]
 import utils, consts, media
 
-proc finishTimeline*(json: JsonNode; query: Option[Query]; after, agent: string): Future[Timeline] {.async.} =
+proc finishTimeline*(json: JsonNode; query: Query; after, agent: string): Future[Timeline] {.async.} =
   if json == nil: return Timeline()
 
   result = Timeline(
@@ -49,7 +49,7 @@ proc getTimeline*(username, after, agent: string): Future[Timeline] {.async.} =
     params.add {"max_position": after}
 
   let json = await fetchJson(base / (timelineUrl % username) ? params, headers)
-  result = await finishTimeline(json, none Query, after, agent)
+  result = await finishTimeline(json, Query(), after, agent)
 
 proc getProfileAndTimeline*(username, agent, after: string): Future[(Profile, Timeline)] {.async.} =
   let headers = newHttpHeaders({

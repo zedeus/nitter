@@ -27,36 +27,31 @@ proc renderSearch*(): VNode =
         input(`type`="text", name="text", autofocus="", placeholder="Enter username...")
         button(`type`="submit"): icon "search"
 
-proc getTabClass(query: Option[Query]; tab: string): string =
+proc getTabClass(query: Query; tab: QueryKind): string =
   var classes = @["tab-item"]
-
-  if query.isNone or get(query).kind == multi:
-    if tab == "posts":
-      classes.add "active"
-  elif $get(query).kind == tab:
+  if query.kind == tab:
     classes.add "active"
-
   return classes.join(" ")
 
-proc renderProfileTabs*(query: Option[Query]; username: string): VNode =
+proc renderProfileTabs*(query: Query; username: string): VNode =
   let link = "/" & username
   buildHtml(ul(class="tab")):
-    li(class=query.getTabClass("posts")):
+    li(class=query.getTabClass(posts)):
       a(href=link): text "Tweets"
-    li(class=query.getTabClass("replies")):
+    li(class=query.getTabClass(replies)):
       a(href=(link & "/replies")): text "Tweets & Replies"
-    li(class=query.getTabClass("media")):
+    li(class=query.getTabClass(media)):
       a(href=(link & "/media")): text "Media"
-    li(class=query.getTabClass("custom")):
+    li(class=query.getTabClass(custom)):
       a(href=(link & "/search")): text "Custom"
 
-proc renderSearchTabs*(query: Option[Query]): VNode =
-  var q = if query.isSome: get(query) else: Query()
+proc renderSearchTabs*(query: Query): VNode =
+  var q = query
   buildHtml(ul(class="tab")):
-    li(class=query.getTabClass("custom")):
+    li(class=query.getTabClass(custom)):
       q.kind = custom
       a(href=genQueryUrl(q)): text "Tweets"
-    li(class=query.getTabClass("users")):
+    li(class=query.getTabClass(users)):
       q.kind = users
       a(href=genQueryUrl(q)): text "Users"
 
@@ -81,10 +76,7 @@ proc renderSearchPanel*(query: Query): VNode =
             genCheckbox(&"{f[0]}-{k}", v, state)
 
 proc renderTweetSearch*(tweets: Result[Tweet]; prefs: Prefs; path: string): VNode =
-  let query =
-    if tweets.query.isSome: get(tweets.query)
-    else: Query(kind: custom)
-
+  let query = tweets.query
   buildHtml(tdiv(class="timeline-container")):
     if query.fromUser.len > 1:
       tdiv(class="timeline-header"):
@@ -94,22 +86,18 @@ proc renderTweetSearch*(tweets: Result[Tweet]; prefs: Prefs; path: string): VNod
         renderSearchPanel(query)
 
     if query.fromUser.len > 0:
-      renderProfileTabs(tweets.query, query.fromUser.join(","))
+      renderProfileTabs(query, query.fromUser.join(","))
     else:
-      renderSearchTabs(tweets.query)
+      renderSearchTabs(query)
 
     renderTimelineTweets(tweets, prefs, path)
 
 proc renderUserSearch*(users: Result[Profile]; prefs: Prefs): VNode =
-  let searchText =
-    if users.query.isSome: get(users.query).text
-    else: ""
-
   buildHtml(tdiv(class="timeline-container")):
     tdiv(class="timeline-header"):
       form(`method`="get", action="/search", class="search-field"):
         hiddenField("kind", "users")
-        genInput("text", "", searchText, "Enter username...", class="pref-inline")
+        genInput("text", "", users.query.text, "Enter username...", class="pref-inline")
         button(`type`="submit"): icon "search"
 
     renderSearchTabs(users.query)

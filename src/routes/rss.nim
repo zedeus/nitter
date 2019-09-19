@@ -8,7 +8,7 @@ import ../views/general
 
 include "../views/rss.nimf"
 
-proc showRss*(name: string; query: Option[Query]): Future[string] {.async.} =
+proc showRss*(name: string; query: Query): Future[string] {.async.} =
   let (profile, timeline, _) = await fetchSingleTimeline(name, "", getAgent(), query)
   return renderTimelineRss(timeline.content, profile)
 
@@ -21,12 +21,12 @@ proc createRssRouter*(cfg: Config) =
   router rss:
     get "/@name/rss":
       cond '.' notin @"name"
-      respRss(await showRss(@"name", none Query))
+      respRss(await showRss(@"name", Query()))
 
     get "/@name/replies/rss":
       cond '.' notin @"name"
-      respRss(await showRss(@"name", some getReplyQuery(@"name")))
+      respRss(await showRss(@"name", getReplyQuery(@"name")))
 
     get "/@name/media/rss":
       cond '.' notin @"name"
-      respRss(await showRss(@"name", some getMediaQuery(@"name")))
+      respRss(await showRss(@"name", getMediaQuery(@"name")))

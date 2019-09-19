@@ -57,7 +57,7 @@ dbFromTypes("cache.db", "", "", "", [Profile, Video])
 
 type
   QueryKind* = enum
-    posts, replies, media, multi, users, custom
+    posts, replies, media, users, custom
 
   Query* = object
     kind*: QueryKind
@@ -74,7 +74,7 @@ type
     maxId*: string
     hasMore*: bool
     beginning*: bool
-    query*: Option[Query]
+    query*: Query
 
   Gif* = object
     url*: string

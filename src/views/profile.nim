@@ -83,9 +83,7 @@ proc renderProtected(username: string): VNode =
 
 proc renderProfile*(profile: Profile; timeline: Timeline;
                     photoRail: seq[GalleryPhoto]; prefs: Prefs; path: string): VNode =
-  if timeline.query.isNone:
-    timeline.query = some Query(fromUser: @[profile.username])
-
+  timeline.query.fromUser = @[profile.username]
   buildHtml(tdiv(class="profile-tabs")):
     if not prefs.hideBanner:
       tdiv(class="profile-banner"):

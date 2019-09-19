@@ -157,7 +157,7 @@ proc parseConversation*(node: XmlNode): Conversation =
       result.replies.add parseThread(thread)
 
 proc parseTimeline*(node: XmlNode; after: string): Timeline =
-  if node == nil: return
+  if node == nil: return Timeline()
   result = Timeline(
     content: parseThread(node.select(".stream > .stream-items")).content,
     minId: node.attr("data-min-position"),
