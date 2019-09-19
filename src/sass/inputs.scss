@@ -12,7 +12,8 @@ button {
     float: right;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="date"] {
     @include input-colors;
     background-color: $bg_elements;
     padding: 1px 4px;
@@ -20,6 +21,38 @@ input[type="text"] {
     border: 1px solid $accent_border;
     border-radius: 0;
     font-size: 14px;
+}
+
+input[type="date"]::-webkit-inner-spin-button {
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+}
+
+input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+}
+
+input::-webkit-datetime-edit-day-field:focus,
+input::-webkit-datetime-edit-month-field:focus,
+input::-webkit-datetime-edit-year-field:focus {
+    background-color: $accent;
+    color: $fg_color;
+    outline: none;
+}
+
+.date-range {
+    display: block;
+
+    .icon-container {
+        margin-left: -22px;
+        margin-right: 4px;
+        pointer-events: none;
+    }
+
+    .search-title {
+        margin: 0 2px;
+    }
 }
 
 .icon-button button {

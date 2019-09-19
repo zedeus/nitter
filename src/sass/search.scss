@@ -40,7 +40,7 @@
         @include input-colors;
     }
 
-    @include create-toggle(search-panel, 140px);
+    @include create-toggle(search-panel, 190px);
 }
 
 .search-panel {
@@ -82,14 +82,14 @@
 }
 
 .profile-tabs {
-    @include search-resize(785px, 5, 185px);
-    @include search-resize(725px, 4, 185px);
-    @include search-resize(600px, 6, 140px);
-    @include search-resize(530px, 5, 185px);
-    @include search-resize(475px, 4, 185px);
-    @include search-resize(406px, 3, 250px);
+    @include search-resize(785px, 5, 240px);
+    @include search-resize(725px, 4, 240px);
+    @include search-resize(600px, 6, 190px);
+    @include search-resize(530px, 5, 240px);
+    @include search-resize(480px, 4, 240px);
+    @include search-resize(410px, 3, 305px);
 }
 
-@include search-resize(530px, 5, 185px);
-@include search-resize(475px, 4, 185px);
-@include search-resize(406px, 3, 250px);
+@include search-resize(530px, 5, 240px);
+@include search-resize(480px, 4, 240px);
+@include search-resize(410px, 3, 305px);

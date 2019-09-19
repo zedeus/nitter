@@ -15,7 +15,7 @@ const
 # Experimental, this might break in the future
 # Till then, it results in shorter urls
 const
-  posPrefix = "thGAVUV0VFVBa"
+  posPrefix = "thGAVUV0VFVB"
   posSuffix = "EjUAFQAlAFUAFQAA"
 
 template `@`(param: string): untyped =
@@ -28,6 +28,8 @@ proc initQuery*(pms: Table[string, string]; name=""): Query =
     text: @"text",
     filters: validFilters.filterIt("f-" & it in pms),
     excludes: validFilters.filterIt("e-" & it in pms),
+    since: @"since",
+    until: @"until"
   )
 
   if name.len > 0:
@@ -71,6 +73,10 @@ proc genQueryParam*(query: Query): string =
     filters.add "-filter:" & e
 
   result = strip(param & filters.join(&" {query.sep} "))
+  if query.since.len > 0:
+    result &= " since:" & query.since
+  if query.until.len > 0:
+    result &= " until:" & query.until
   if query.text.len > 0:
     result &= " " & query.text
 
@@ -96,6 +102,11 @@ proc genQueryUrl*(query: Query): string =
   for i in query.excludes:
     params.add "i-" & i & "=on"
 
+  if query.since.len > 0:
+    params.add "since=" & query.since
+  if query.until.len > 0:
+    params.add "until=" & query.until
+
   if params.len > 0:
     result &= params.join("&")
 
@@ -103,4 +114,6 @@ proc cleanPos*(pos: string): string =
   pos.multiReplace((posPrefix, ""), (posSuffix, ""))
 
 proc genPos*(pos: string): string =
-  posPrefix & pos & posSuffix
+  result = posPrefix & pos
+  if "A==" notin result:
+    result &= posSuffix

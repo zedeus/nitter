@@ -66,6 +66,8 @@ type
     includes*: seq[string]
     excludes*: seq[string]
     fromUser*: seq[string]
+    since*: string
+    until*: string
     sep*: string
 
   Result*[T] = ref object
