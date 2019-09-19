@@ -32,6 +32,7 @@
 
 .card-title {
     @include ellipsis;
+    white-space: unset;
     font-weight: bold;
     font-size: 1.15em;
 }

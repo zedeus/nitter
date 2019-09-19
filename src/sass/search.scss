@@ -42,6 +42,7 @@
 }
 
 .search-panel {
+    width: 100%;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s;
@@ -76,6 +77,15 @@
     display: grid;
     grid-template-columns: repeat(6, auto);
     grid-column-gap: 10px;
+}
+
+.profile-tabs {
+    @include search-resize(785px, 5, 185px);
+    @include search-resize(725px, 4, 185px);
+    @include search-resize(600px, 6, 140px);
+    @include search-resize(530px, 5, 185px);
+    @include search-resize(475px, 4, 185px);
+    @include search-resize(406px, 3, 250px);
 }
 
 @include search-resize(530px, 5, 185px);

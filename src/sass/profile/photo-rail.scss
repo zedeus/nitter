@@ -74,3 +74,23 @@
         transition: max-height 0.4s;
     }
 }
+
+@media(max-width: 600px) {
+    .photo-rail-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    #photo-rail-grid-toggle:checked ~ .photo-rail-grid {
+        max-height: 300px;
+    }
+}
+
+@media(max-width: 450px) {
+    .photo-rail-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    #photo-rail-grid-toggle:checked ~ .photo-rail-grid {
+        max-height: 450px;
+    }
+}
