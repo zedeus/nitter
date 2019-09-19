@@ -12,16 +12,18 @@
     flex-wrap: wrap;
 
     button {
-        margin: 0 2px 2px 0;
+        margin: 0 2px 0 0;
+        height: 23px;
     }
 
     .pref-input {
-        margin: 0 4px 2px 0;
+        margin: 0 4px 0 0;
         flex-grow: 1;
+        height: 23px;
     }
 
     input[type="text"] {
-        height: 20px;
+        height: calc(100% - 4px);
         width: calc(100% - 8px);
     }
 
