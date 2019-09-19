@@ -42,7 +42,7 @@ proc cleanFilename*(filename: string): string =
 
 proc filterParams*(params: Table): seq[(string, string)] =
   let filter = ["name", "id"]
-  toSeq(params.pairs()).filterIt(it[0] notin filter)
+  toSeq(params.pairs()).filterIt(it[0] notin filter and it[1].len > 0)
 
 proc isTwitterUrl*(url: string): bool =
   parseUri(url).hostname in twitterDomains
