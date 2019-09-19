@@ -76,10 +76,9 @@ proc renderBanner(profile: Profile): VNode =
 
 proc renderProtected(username: string): VNode =
   buildHtml(tdiv(class="timeline-container")):
-    tdiv(class="timeline-container timeline"):
-      tdiv(class="timeline-header timeline-protected"):
-        h2: text "This account's tweets are protected."
-        p: text &"Only confirmed followers have access to @{username}'s tweets."
+    tdiv(class="timeline-header timeline-protected"):
+      h2: text "This account's tweets are protected."
+      p: text &"Only confirmed followers have access to @{username}'s tweets."
 
 proc renderProfile*(profile: Profile; timeline: Timeline;
                     photoRail: seq[GalleryPhoto]; prefs: Prefs; path: string): VNode =

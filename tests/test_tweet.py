@@ -147,6 +147,6 @@ class TweetTest(BaseTestCase):
     @parameterized.expand(reply)
     def test_reply(self, tweet, username, reply):
         self.open_nitter(tweet)
-        tweet = get_timeline_tweet(1)
+        tweet = get_timeline_tweet(2)
         self.assert_text(username, tweet.username)
         self.assert_text('Replying to ' + reply, tweet.reply)
