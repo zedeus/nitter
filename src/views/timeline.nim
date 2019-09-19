@@ -35,8 +35,9 @@ proc renderNoneFound(): VNode =
 proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="thread-line")):
     for i, threadTweet in thread.sortedByIt(it.time):
+      let show = i == thread.len and thread[0].id != threadTweet.threadId
       renderTweet(threadTweet, prefs, path, class="thread",
-                  index=i, total=thread.high)
+                  index=i, total=thread.high, showThread=show)
 
 proc threadFilter(it: Tweet; tweetThread: string): bool =
   it.retweet.isNone and it.reply.len == 0 and it.threadId == tweetThread
@@ -83,7 +84,7 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): 
         if tweet.threadId in threads: continue
         let thread = results.content.filterIt(threadFilter(it, tweet.threadId))
         if thread.len < 2:
-          renderTweet(tweet, prefs, path)
+          renderTweet(tweet, prefs, path, showThread=tweet.hasThread)
         else:
           renderThread(thread, prefs, path)
           threads &= tweet.threadId

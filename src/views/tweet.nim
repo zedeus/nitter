@@ -222,7 +222,7 @@ proc renderQuote(quote: Quote; prefs: Prefs): VNode =
         text "Show this thread"
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
-                  index=0; total=(-1); last=false): VNode =
+                  index=0; total=(-1); last=false; showThread=false): VNode =
   var divClass = class
   if index == total or last:
     divClass = "thread-last " & class
@@ -265,6 +265,6 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
       if not prefs.hideTweetStats:
         renderStats(tweet.stats, views)
 
-      if tweet.hasThread and "timeline" in class:
+      if showThread:
         a(class="show-thread", href=getLink(tweet)):
           text "Show this thread"
