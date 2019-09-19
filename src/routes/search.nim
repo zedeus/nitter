@@ -3,7 +3,7 @@ import strutils, sequtils, uri
 import jester
 
 import router_utils
-import ".."/[query, types, utils, api, agents]
+import ".."/[query, types, utils, api, agents, prefs]
 import ../views/[general, search]
 
 export search
@@ -14,7 +14,7 @@ proc createSearchRouter*(cfg: Config) =
       if @"text".len > 200:
         resp Http400, showError("Search input too long.", cfg.title)
 
-      let prefs = Prefs()
+      let prefs = cookiePrefs()
       let query = initQuery(params(request))
 
       case query.kind
