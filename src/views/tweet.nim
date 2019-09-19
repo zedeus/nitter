@@ -31,19 +31,24 @@ proc renderAlbum(tweet: Tweet): VNode =
   let
     groups = if tweet.photos.len < 3: @[tweet.photos]
              else: tweet.photos.distribute(2)
-    class = if groups.len == 1 and groups[0].len == 1: "single-image"
-            else: ""
 
-  buildHtml(tdiv(class=("attachments " & class))):
-    for i, photos in groups:
-      let margin = if i > 0: ".25em" else: ""
-      let flex = if photos.len > 1 or groups.len > 1: "flex" else: "block"
-      tdiv(class="gallery-row", style={marginTop: margin}):
-        for photo in photos:
-          tdiv(class="attachment image"):
-            a(href=getPicUrl(photo & "?name=orig"), class="still-image",
-              target="_blank", style={display: flex}):
-              genImg(photo)
+  if groups.len == 1 and groups[0].len == 1:
+    buildHtml(tdiv(class="single-image")):
+      tdiv(class="attachments gallery-row"):
+        a(href=getPicUrl(groups[0][0] & "?name=orig"), class="still-image",
+          target="_blank"):
+            genImg(groups[0][0])
+  else:
+    buildHtml(tdiv(class="attachments")):
+      for i, photos in groups:
+        let margin = if i > 0: ".25em" else: ""
+        let flex = if photos.len > 1 or groups.len > 1: "flex" else: "block"
+        tdiv(class="gallery-row", style={marginTop: margin}):
+          for photo in photos:
+            tdiv(class="attachment image"):
+              a(href=getPicUrl(photo & "?name=orig"), class="still-image",
+                target="_blank", style={display: flex}):
+                genImg(photo)
 
 proc isPlaybackEnabled(prefs: Prefs; video: Video): bool =
   case video.playbackType
