@@ -47,21 +47,28 @@ proc fetchMultiTimeline*(names: seq[string]; after, agent: string;
     q.excludes.add "replies"
   return await getSearch[Tweet](q, after, agent)
 
-proc showTimeline*(name, after: string; query: Query;
-                   prefs: Prefs; path, title, rss: string): Future[string] {.async.} =
-  let agent = getAgent()
-  let names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
+proc get*(req: Request; key: string): string =
+  if key in params(req): params(req)[key]
+  else: ""
+
+proc showTimeline*(request: Request; query: Query; title, rss: string): Future[string] {.async.} =
+  let
+    agent = getAgent()
+    prefs = cookiePrefs()
+    name = request.get("name")
+    after = request.get("after")
+    names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
 
   if names.len == 1:
     let (p, t, r) = await fetchSingleTimeline(names[0], after, agent, query)
     if p.username.len == 0: return
-    let pHtml = renderProfile(p, t, r, prefs, path)
-    return renderMain(pHtml, prefs, title, pageTitle(p), pageDesc(p), path, rss=rss)
+    let pHtml = renderProfile(p, t, r, prefs, getPath())
+    return renderMain(pHtml, request, title, pageTitle(p), pageDesc(p), rss=rss)
   else:
     let
       timeline = await fetchMultiTimeline(names, after, agent, query)
-      html = renderTweetSearch(timeline, prefs, path)
-    return renderMain(html, prefs, title, "Multi")
+      html = renderTweetSearch(timeline, prefs, getPath())
+    return renderMain(html, request, title, "Multi")
 
 template respTimeline*(timeline: typed) =
   if timeline.len == 0:
@@ -75,57 +82,20 @@ proc createTimelineRouter*(cfg: Config) =
     get "/@name/?":
       cond '.' notin @"name"
       let rss = "/$1/rss" % @"name"
-      respTimeline(await showTimeline(@"name", @"after", Query(), cookiePrefs(),
-                                      getPath(), cfg.title, rss))
+      respTimeline(await showTimeline(request, Query(), cfg.title, rss))
 
     get "/@name/replies":
       cond '.' notin @"name"
       let rss = "/$1/replies/rss" % @"name"
-      respTimeline(await showTimeline(@"name", @"after", getReplyQuery(@"name"),
-                                      cookiePrefs(), getPath(), cfg.title, rss))
+      respTimeline(await showTimeline(request, getReplyQuery(@"name"), cfg.title, rss))
 
     get "/@name/media":
       cond '.' notin @"name"
       let rss = "/$1/media/rss" % @"name"
-      respTimeline(await showTimeline(@"name", @"after", getMediaQuery(@"name"),
-                                      cookiePrefs(), getPath(), cfg.title, rss))
+      respTimeline(await showTimeline(request, getMediaQuery(@"name"), cfg.title, rss))
 
     get "/@name/search":
       cond '.' notin @"name"
       let query = initQuery(params(request), name=(@"name"))
-      let rss = "/$1/search/rss?$2" % [@"name", genQueryUrl(query, onlyParam=true)]
-      respTimeline(await showTimeline(@"name", @"after", query, cookiePrefs(),
-                                      getPath(), cfg.title, rss))
-
-    get "/@name/status/@id":
-      cond '.' notin @"name"
-      let prefs = cookiePrefs()
-
-      let conversation = await getTweet(@"name", @"id", getAgent())
-      if conversation == nil or conversation.tweet.id.len == 0:
-        if conversation != nil and conversation.tweet.tombstone.len > 0:
-          resp Http404, showError(conversation.tweet.tombstone, cfg.title)
-        else:
-          resp Http404, showError("Tweet not found", cfg.title)
-
-      let path = getPath()
-      let title = pageTitle(conversation.tweet.profile)
-      let desc = conversation.tweet.text
-      let html = renderConversation(conversation, prefs, path)
-
-      if conversation.tweet.video.isSome():
-        let thumb = get(conversation.tweet.video).thumb
-        let vidUrl = getVideoEmbed(conversation.tweet.id)
-        resp renderMain(html, prefs, cfg.title, title, desc, path, images = @[thumb],
-                        `type`="video", video=vidUrl)
-      elif conversation.tweet.gif.isSome():
-        let thumb = get(conversation.tweet.gif).thumb
-        let vidUrl = getVideoEmbed(conversation.tweet.id)
-        resp renderMain(html, prefs, cfg.title, title, desc, path, images = @[thumb],
-                        `type`="video", video=vidUrl)
-      else:
-        resp renderMain(html, prefs, cfg.title, title, desc, path,
-                        images=conversation.tweet.photos, `type`="photo")
-
-    get "/i/web/status/@id":
-      redirect("/i/status/" & @"id")
+      let rss = "/$1/search/rss?$2" % [@"name", genQueryUrl(query)]
+      respTimeline(await showTimeline(request, query, cfg.title, rss))

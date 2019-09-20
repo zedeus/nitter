@@ -83,20 +83,8 @@ proc genQueryParam*(query: Query): string =
   if query.text.len > 0:
     result &= " " & query.text
 
-proc genQueryUrl*(query: Query; onlyParam=false): string =
-  if query.fromUser.len > 0:
-    result = "/" & query.fromUser.join(",")
-
-  if query.fromUser.len > 1 and query.kind == posts:
-    return result & "?"
-
-  if query.kind notin {custom, users}:
-    return result & &"/{query.kind}?"
-
-  if onlyParam:
-    result = ""
-  else:
-    result &= &"/search?"
+proc genQueryUrl*(query: Query): string =
+  if query.kind notin {custom, users}: return
 
   var params = @[&"kind={query.kind}"]
   if query.text.len > 0:

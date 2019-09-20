@@ -22,9 +22,9 @@ proc createSearchRouter*(cfg: Config) =
         if "," in @"text":
           redirect("/" & @"text")
         let users = await getSearch[Profile](query, @"after", getAgent())
-        resp renderMain(renderUserSearch(users, prefs), prefs, cfg.title, path=getPath())
+        resp renderMain(renderUserSearch(users, prefs), request, cfg.title)
       of custom:
         let tweets = await getSearch[Tweet](query, @"after", getAgent())
-        resp renderMain(renderTweetSearch(tweets, prefs, getPath()), prefs, cfg.title, path=getPath())
+        resp renderMain(renderTweetSearch(tweets, prefs, getPath()), request, cfg.title)
       else:
         resp Http404, showError("Invalid search.", cfg.title)

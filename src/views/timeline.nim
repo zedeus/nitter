@@ -1,26 +1,24 @@
-import strutils, strformat, sequtils, algorithm, times
+import strutils, strformat, sequtils, algorithm, times, uri
 import karax/[karaxdsl, vdom, vstyles]
 
 import ".."/[types, query, formatters]
 import tweet, renderutils
 
 proc getQuery(query: Query): string =
-  if query.kind == posts:
-    result = "?"
-  else:
+  if query.kind != posts:
     result = genQueryUrl(query)
-    if result[^1] != '?':
-      result &= "&"
+  if result.len > 0:
+    result &= "&"
 
-proc renderNewer(query: Query): VNode =
+proc renderNewer(query: Query; path: string): VNode =
   buildHtml(tdiv(class="timeline-item show-more")):
-    a(href=(getQuery(query).strip(chars={'?', '&'}))):
+    a(href=(&"{path}?{genQueryUrl(query)}")):
       text "Load newest"
 
-proc renderOlder(query: Query; minId: string): VNode =
+proc renderMore(query: Query; minId: string): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"{getQuery(query)}after={minId}")):
-      text "Load older"
+    a(href=(&"?{getQuery(query)}after={minId}")):
+      text "Load more"
 
 proc renderNoMore(): VNode =
   buildHtml(tdiv(class="timeline-footer")):
@@ -58,15 +56,15 @@ proc renderUser(user: Profile; prefs: Prefs): VNode =
       tdiv(class="tweet-content media-body"):
         verbatim linkifyText(user.bio, prefs)
 
-proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs): VNode =
+proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs; path=""): VNode =
   buildHtml(tdiv(class="timeline")):
     if not results.beginning:
-      renderNewer(results.query)
+      renderNewer(results.query, path)
 
     if results.content.len > 0:
       for user in results.content:
         renderUser(user, prefs)
-      renderOlder(results.query, results.minId)
+      renderMore(results.query, results.minId)
     elif results.beginning:
       renderNoneFound()
     else:
@@ -75,7 +73,7 @@ proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs): VNode =
 proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="timeline")):
     if not results.beginning:
-      renderNewer(results.query)
+      renderNewer(results.query, parseUri(path).path)
 
     if results.content.len == 0:
       renderNoneFound()
@@ -94,6 +92,6 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): 
           threads &= tweet.threadId
 
       if results.hasMore or results.query.kind != posts:
-        renderOlder(results.query, results.minId)
+        renderMore(results.query, results.minId)
       else:
         renderNoMore()

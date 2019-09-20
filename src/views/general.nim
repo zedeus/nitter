@@ -1,11 +1,15 @@
+import uri
 import karax/[karaxdsl, vdom]
 
 import renderutils
-import ../utils, ../types
+import ../utils, ../types, ../prefs
+
+import jester
 
 const doctype = "<!DOCTYPE html>\n"
 
-proc renderNavbar*(title, path, rss: string): VNode =
+proc renderNavbar*(title, rss: string; req: Request): VNode =
+  let path = $(parseUri(req.path) ? filterParams(req.params))
   buildHtml(nav):
     tdiv(class="inner-nav"):
       tdiv(class="nav-item"):
@@ -20,8 +24,9 @@ proc renderNavbar*(title, path, rss: string): VNode =
         icon "info-circled", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 
-proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc=""; path="/";
+proc renderMain*(body: VNode; req: Request; title="Nitter"; titleText=""; desc="";
                  rss=""; `type`="article"; video=""; images: seq[string] = @[]): string =
+  let prefs = getPrefs(req.cookies.getOrDefault("preferences"))
   let node = buildHtml(html(lang="en")):
     head:
       link(rel="stylesheet", `type`="text/css", href="/css/style.css")
@@ -54,7 +59,7 @@ proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="
         meta(property="og:video:secure_url", content=video)
 
     body:
-      renderNavbar(title, path, rss)
+      renderNavbar(title, rss, req)
 
       tdiv(class="container"):
         body
@@ -67,4 +72,4 @@ proc renderError*(error: string): VNode =
       span: text error
 
 proc showError*(error, title: string): string =
-  renderMain(renderError(error), Prefs(), title, "Error")
+  renderMain(renderError(error), Request(), title, "Error")

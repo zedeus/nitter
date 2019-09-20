@@ -14,9 +14,8 @@ proc createPrefRouter*(cfg: Config) =
       setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=cfg.useHttps)
 
     get "/settings":
-      let prefs = cookiePrefs()
-      let path = refPath()
-      resp renderMain(renderPreferences(prefs, path), prefs, cfg.title, "Preferences", path)
+      let html = renderPreferences(cookiePrefs(), refPath())
+      resp renderMain(html, request, cfg.title, "Preferences")
 
     post "/saveprefs":
       var prefs = cookiePrefs()

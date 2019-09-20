@@ -9,4 +9,3 @@ template getPath*(): untyped {.dirty.} =
 
 template refPath*(): untyped {.dirty.} =
   if @"referer".len > 0: @"referer" else: "/"
-

@@ -28,10 +28,9 @@ proc renderSearch*(): VNode =
         button(`type`="submit"): icon "search"
 
 proc getTabClass(query: Query; tab: QueryKind): string =
-  var classes = @["tab-item"]
+  result = "tab-item"
   if query.kind == tab:
-    classes.add "active"
-  return classes.join(" ")
+    result &= " active"
 
 proc renderProfileTabs*(query: Query; username: string): VNode =
   let link = "/" & username
@@ -50,10 +49,10 @@ proc renderSearchTabs*(query: Query): VNode =
   buildHtml(ul(class="tab")):
     li(class=query.getTabClass(custom)):
       q.kind = custom
-      a(href=genQueryUrl(q)): text "Tweets"
+      a(href=("?" & genQueryUrl(q))): text "Tweets"
     li(class=query.getTabClass(users)):
       q.kind = users
-      a(href=genQueryUrl(q)): text "Users"
+      a(href=("?" & genQueryUrl(q))): text "Users"
 
 proc isPanelOpen(q: Query): bool =
   q.fromUser.len == 0 and (q.filters.len > 0 or q.excludes.len > 0 or
