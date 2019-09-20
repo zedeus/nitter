@@ -42,6 +42,9 @@ proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.asyn
       "reset_error_state": "false"
     }
 
+  if param in ["include:nativeretweets", "-filter:nativeretweets", ""]:
+    return Result[T](query: query, beginning: true)
+
   let json = await fetchJson(base / searchUrl ? params, headers)
   if json == nil: return Result[T](query: query, beginning: true)
 
