@@ -62,6 +62,10 @@
         border-bottom-color: $accent;
         color: $accent;
     }
+
+    &.wide {
+        flex-grow: 1.2;
+    }
 }
 
 .timeline-footer {
