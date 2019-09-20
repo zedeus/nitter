@@ -44,6 +44,7 @@ proc threadFilter(it: Tweet; tweetThread: string): bool =
 
 proc renderUser(user: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-item")):
+    a(class="tweet-link", href=("/" & user.username))
     tdiv(class="tweet-body profile-result"):
       tdiv(class="tweet-header"):
         a(class="tweet-avatar", href=("/" & user.username)):
