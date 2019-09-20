@@ -56,8 +56,8 @@ proc renderSearchTabs*(query: Query): VNode =
       a(href=genQueryUrl(q)): text "Users"
 
 proc isPanelOpen(q: Query): bool =
-  q.filters.len > 0 or q.excludes.len > 0 or
-  @[q.near, q.until, q.since].anyIt(it.len > 0)
+  q.fromUser.len == 0 and (q.filters.len > 0 or q.excludes.len > 0 or
+  @[q.near, q.until, q.since].anyIt(it.len > 0))
 
 proc renderSearchPanel*(query: Query): VNode =
   let user = query.fromUser.join(",")
