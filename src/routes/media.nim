@@ -3,12 +3,11 @@ import asyncfile, uri, strutils, httpclient, os
 import jester, regex
 
 import router_utils
-import ".."/[types, formatters, utils, prefs]
+import ".."/[types, formatters, prefs]
 import ../views/general
 
 export asyncfile, httpclient, os, strutils
 export regex
-export utils
 
 proc createMediaRouter*(cfg: Config) =
   router media:

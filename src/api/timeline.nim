@@ -2,18 +2,11 @@ import httpclient, asyncdispatch, htmlparser
 import sequtils, strutils, json, xmltree, uri
 
 import ".."/[types, parser, parserutils, formatters, query]
-import utils, consts, media
+import utils, consts, media, search
 
 proc finishTimeline*(json: JsonNode; query: Query; after, agent: string): Future[Timeline] {.async.} =
-  if json == nil: return Timeline(beginning: true, query: query)
-
-  result = Timeline(
-    hasMore: json["has_more_items"].to(bool),
-    maxId: json.getOrDefault("max_position").getStr(""),
-    minId: json.getOrDefault("min_position").getStr("").cleanPos(),
-    query: query,
-    beginning: after.len == 0
-  )
+  result = getResult[Tweet](json, query, after)
+  if json == nil: return
 
   if json["new_latent_count"].to(int) == 0: return
   if not json.hasKey("items_html"): return

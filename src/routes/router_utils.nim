@@ -1,3 +1,6 @@
+import ../utils
+export utils
+
 template cookiePrefs*(): untyped {.dirty.} =
   getPrefs(request.cookies.getOrDefault("preferences"))
 

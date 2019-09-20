@@ -3,7 +3,7 @@ import strutils, sequtils, uri
 import jester
 
 import router_utils
-import ".."/[query, types, utils, api, agents, prefs]
+import ".."/[query, types, api, agents, prefs]
 import ../views/[general, search]
 
 export search

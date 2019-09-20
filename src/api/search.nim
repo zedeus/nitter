@@ -4,7 +4,8 @@ import strutils, json, xmltree, uri
 import ".."/[types, parser, parserutils, query]
 import utils, consts, timeline
 
-proc getResult[T](json: JsonNode; query: Query; after: string): Result[T] =
+proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
+  if json == nil: return Result[T](beginning: true, query: query)
   Result[T](
     hasMore: json["has_more_items"].to(bool),
     maxId: json.getOrDefault("max_position").getStr(""),
@@ -46,11 +47,11 @@ proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.asyn
 
   result = getResult[T](json, query, after)
   if not json.hasKey("items_html"): return
-  let html = parseHtml(json["items_html"].to(string))
 
   when T is Tweet:
     result = await finishTimeline(json, query, after, agent)
   elif T is Profile:
-    result.hasMore = json["items_html"].to(string) != "\n"
-    for p in html.selectAll(".js-stream-item"):
+    let html = json["items_html"].to(string)
+    result.hasMore = html != "\n"
+    for p in parseHtml(html).selectAll(".js-stream-item"):
       result.content.add parsePopupProfile(p, ".ProfileCard")

@@ -3,17 +3,15 @@ import asyncdispatch, strutils, sequtils, uri
 import jester
 
 import router_utils
-import ".."/[api, prefs, types, utils, cache, formatters, agents, query]
-import ../views/[general, profile, timeline, status, search]
+import ".."/[api, prefs, types, formatters, agents]
+import ../views/[general, status]
 
 export uri, sequtils
 export router_utils
-export api, cache, formatters, query, agents
-export profile, status
+export api, formatters, agents
+export status
 
 proc createStatusRouter*(cfg: Config) =
-  setProfileCacheTime(cfg.profileCacheTime)
-
   router status:
     get "/@name/status/@id":
       cond '.' notin @"name"
