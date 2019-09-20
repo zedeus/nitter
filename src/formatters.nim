@@ -1,4 +1,4 @@
-import strutils, strformat, htmlgen, xmltree, times
+import strutils, strformat, sequtils, htmlgen, xmltree, times, uri
 import regex
 
 import types, utils
@@ -8,9 +8,10 @@ from unicode import Rune, `$`
 const
   urlRegex = re"((https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+([/\?][^\s\)]*)?)"
   emailRegex = re"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
-  usernameRegex = re"(^|[^A-z0-9_?])@([A-z0-9_]+)"
+  usernameRegex = re"(^|[^A-z0-9_?\/])@([A-z0-9_]+)"
   picRegex = re"pic.twitter.com/[^ ]+"
   ellipsisRegex = re" ?…"
+  hashtagRegex = re"([^\S])?([#$][A-z0-9]+)"
   ytRegex = re"(www.|m.)?youtu(be.com|.be)"
   twRegex = re"(www.|mobile.)?twitter.com"
   nbsp = $Rune(0x000A0)
@@ -40,6 +41,15 @@ proc reEmailToLink*(m: RegexMatch; s: string): string =
   let url = s[m.group(0)[0]]
   toLink("mailto://" & url, url)
 
+proc reHashtagToLink*(m: RegexMatch; s: string): string =
+  result = if m.group(0).len > 0: s[m.group(0)[0]] else: ""
+  let hash = s[m.group(1)[0]]
+  let link = toLink("/search?text=" & encodeUrl(hash), hash)
+  if hash.any(isAlphaAscii):
+    result &= link
+  else:
+    result &= hash
+
 proc reUsernameToLink*(m: RegexMatch; s: string): string =
   var username = ""
   var pretext = ""
@@ -67,7 +77,7 @@ proc replaceUrl*(url: string; prefs: Prefs): string =
 
 proc linkifyText*(text: string; prefs: Prefs; rss=false): string =
   result = xmltree.escape(stripText(text))
-  result = result.replace(ellipsisRegex, "")
+  result = result.replace(ellipsisRegex, " ")
   result = result.replace(emailRegex, reEmailToLink)
   if rss:
     result = result.replace(urlRegex, reUrlToLink)
@@ -75,6 +85,7 @@ proc linkifyText*(text: string; prefs: Prefs; rss=false): string =
   else:
     result = result.replace(urlRegex, reUrlToShortLink)
     result = result.replace(usernameRegex, reUsernameToLink)
+  result = result.replace(hashtagRegex, reHashtagToLink)
   result = result.replace(re"([^\s\(\n%])<a", "$1 <a")
   result = result.replace(re"</a>\s+([;.,!\)'%]|&apos;)", "</a>$1")
   result = result.replace(re"^\. <a", ".<a")

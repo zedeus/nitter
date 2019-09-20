@@ -37,21 +37,21 @@ class TweetTest(BaseTestCase):
     @parameterized.expand(short)
     def test_short(self, username):
         self.open_nitter(username)
-        self.assert_text('No more tweets.', Timeline.end)
+        self.assert_text('No more items', Timeline.end)
         self.assert_element_absent(Timeline.newest)
         self.assert_element_absent(Timeline.older)
 
     @parameterized.expand(no_more)
     def test_no_more(self, username):
         self.open_nitter(username)
-        self.assert_text('No more tweets.', Timeline.end)
+        self.assert_text('No more items', Timeline.end)
         self.assert_element_present(Timeline.newest)
         self.assert_element_absent(Timeline.older)
 
     @parameterized.expand(none_found)
     def test_none_found(self, username):
         self.open_nitter(username)
-        self.assert_text('No tweets found.', Timeline.none)
+        self.assert_text('No items found', Timeline.none)
         self.assert_element_present(Timeline.newest)
         self.assert_element_absent(Timeline.older)
         self.assert_element_absent(Timeline.end)
@@ -59,7 +59,7 @@ class TweetTest(BaseTestCase):
     @parameterized.expand(empty)
     def test_empty(self, username):
         self.open_nitter(username)
-        self.assert_text('No tweets found.', Timeline.none)
+        self.assert_text('No items found', Timeline.none)
         self.assert_element_absent(Timeline.newest)
         self.assert_element_absent(Timeline.older)
         self.assert_element_absent(Timeline.end)

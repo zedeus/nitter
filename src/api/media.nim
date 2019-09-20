@@ -89,10 +89,10 @@ proc getVideoFetch(tweet: Tweet; agent, token: string) {.async.} =
     return
 
   if tweet.card.isNone:
-    tweet.video = some(parseVideo(json, tweet.id))
+    tweet.video = some parseVideo(json, tweet.id)
   else:
-    get(tweet.card).video = some(parseVideo(json, tweet.id))
-    tweet.video = none(Video)
+    get(tweet.card).video = some parseVideo(json, tweet.id)
+    tweet.video = none Video
   tokenUses.inc
 
 proc getVideoVar(tweet: Tweet): var Option[Video] =
@@ -104,7 +104,7 @@ proc getVideoVar(tweet: Tweet): var Option[Video] =
 proc getVideo*(tweet: Tweet; agent, token: string; force=false) {.async.} =
   withCustomDb("cache.db", "", "", ""):
     try:
-      getVideoVar(tweet) = some(Video.getOne("videoId = ?", tweet.id))
+      getVideoVar(tweet) = some Video.getOne("videoId = ?", tweet.id)
     except KeyError:
       await getVideoFetch(tweet, agent, token)
       var video = getVideoVar(tweet)
@@ -126,7 +126,7 @@ proc getPoll*(tweet: Tweet; agent: string) {.async.} =
   let html = await fetchHtml(url, headers)
   if html == nil: return
 
-  tweet.poll = some(parsePoll(html))
+  tweet.poll = some parsePoll(html)
 
 proc getCard*(tweet: Tweet; agent: string) {.async.} =
   if tweet.card.isNone(): return

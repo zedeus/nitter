@@ -1,7 +1,7 @@
 import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 
-import tweet, timeline, renderutils
+import renderutils, search
 import ".."/[types, utils, formatters]
 
 proc renderStat(num, class: string; text=""): VNode =
@@ -54,11 +54,10 @@ proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
       a(href=(&"/{profile.username}/media")):
         icon "picture", $profile.media & " Photos and videos"
 
-    input(id="photo-rail-toggle", `type`="checkbox")
-    tdiv(class="photo-rail-header-mobile"):
-      label(`for`="photo-rail-toggle", class="photo-rail-label"):
-        icon "picture", $profile.media & " Photos and videos"
-        icon "down"
+    input(id="photo-rail-grid-toggle", `type`="checkbox")
+    label(`for`="photo-rail-grid-toggle", class="photo-rail-header-mobile"):
+      icon "picture", $profile.media & " Photos and videos"
+      icon "down"
 
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:
@@ -75,8 +74,15 @@ proc renderBanner(profile: Profile): VNode =
       a(href=getPicUrl(profile.banner), target="_blank"):
         genImg(profile.banner)
 
+proc renderProtected(username: string): VNode =
+  buildHtml(tdiv(class="timeline-container")):
+    tdiv(class="timeline-header timeline-protected"):
+      h2: text "This account's tweets are protected."
+      p: text &"Only confirmed followers have access to @{username}'s tweets."
+
 proc renderProfile*(profile: Profile; timeline: Timeline;
                     photoRail: seq[GalleryPhoto]; prefs: Prefs; path: string): VNode =
+  timeline.query.fromUser = @[profile.username]
   buildHtml(tdiv(class="profile-tabs")):
     if not prefs.hideBanner:
       tdiv(class="profile-banner"):
@@ -88,11 +94,7 @@ proc renderProfile*(profile: Profile; timeline: Timeline;
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)
 
-    tdiv(class="timeline-tab"):
-      renderTimeline(timeline, profile.username, profile.protected, prefs, path)
-
-proc renderMulti*(timeline: Timeline; usernames: string;
-                  prefs: Prefs; path: string): VNode =
-  buildHtml(tdiv(class="multi-timeline")):
-    tdiv(class="timeline-tab"):
-      renderTimeline(timeline, usernames, false, prefs, path, multi=true)
+    if profile.protected:
+      renderProtected(profile.username)
+    else:
+      renderTweetSearch(timeline, prefs, path)

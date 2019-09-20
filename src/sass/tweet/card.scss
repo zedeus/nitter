@@ -3,6 +3,7 @@
 
 .card {
     margin: 5px 0;
+    pointer-events: all;
 }
 
 .card-container {
@@ -31,6 +32,7 @@
 
 .card-title {
     @include ellipsis;
+    white-space: unset;
     font-weight: bold;
     font-size: 1.15em;
 }

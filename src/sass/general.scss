@@ -10,7 +10,7 @@
     @include center-panel($error_red);
 }
 
-.search-panel > form {
+.search-bar > form {
     @include center-panel($darkest-grey);
 
     button {

@@ -1,4 +1,4 @@
-import strutils, sequtils
+import strutils, sequtils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 
 import renderutils
@@ -31,19 +31,24 @@ proc renderAlbum(tweet: Tweet): VNode =
   let
     groups = if tweet.photos.len < 3: @[tweet.photos]
              else: tweet.photos.distribute(2)
-    class = if groups.len == 1 and groups[0].len == 1: "single-image"
-            else: ""
 
-  buildHtml(tdiv(class=("attachments " & class))):
-    for i, photos in groups:
-      let margin = if i > 0: ".25em" else: ""
-      let flex = if photos.len > 1 or groups.len > 1: "flex" else: "block"
-      tdiv(class="gallery-row", style={marginTop: margin}):
-        for photo in photos:
-          tdiv(class="attachment image"):
-            a(href=getPicUrl(photo & "?name=orig"), class="still-image",
-              target="_blank", style={display: flex}):
-              genImg(photo)
+  if groups.len == 1 and groups[0].len == 1:
+    buildHtml(tdiv(class="single-image")):
+      tdiv(class="attachments gallery-row"):
+        a(href=getPicUrl(groups[0][0] & "?name=orig"), class="still-image",
+          target="_blank"):
+            genImg(groups[0][0])
+  else:
+    buildHtml(tdiv(class="attachments")):
+      for i, photos in groups:
+        let margin = if i > 0: ".25em" else: ""
+        let flex = if photos.len > 1 or groups.len > 1: "flex" else: "block"
+        tdiv(class="gallery-row", style={marginTop: margin}):
+          for photo in photos:
+            tdiv(class="attachment image"):
+              a(href=getPicUrl(photo & "?name=orig"), class="still-image",
+                target="_blank", style={display: flex}):
+                genImg(photo)
 
 proc isPlaybackEnabled(prefs: Prefs; video: Video): bool =
   case video.playbackType
@@ -217,50 +222,49 @@ proc renderQuote(quote: Quote; prefs: Prefs): VNode =
         text "Show this thread"
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
-                  index=0; total=(-1); last=false): VNode =
+                  index=0; total=(-1); last=false; showThread=false): VNode =
   var divClass = class
   if index == total or last:
     divClass = "thread-last " & class
 
   if not tweet.available:
-    return buildHtml(tdiv(class=divClass)):
-      tdiv(class="status-el unavailable"):
-        tdiv(class="unavailable-box"):
-          if tweet.tombstone.len > 0:
-            text tweet.tombstone
-          else:
-            text "This tweet is unavailable"
+    return buildHtml(tdiv(class=divClass & "unavailable timeline-item")):
+      tdiv(class="unavailable-box"):
+        if tweet.tombstone.len > 0:
+          text tweet.tombstone
+        else:
+          text "This tweet is unavailable"
 
-  buildHtml(tdiv(class=divClass)):
-    tdiv(class="status-el"):
-      tdiv(class="status-body"):
-        var views = ""
-        renderHeader(tweet)
+  buildHtml(tdiv(class=("timeline-item " & divClass))):
+    a(class="tweet-link", href=getLink(tweet))
+    tdiv(class="tweet-body"):
+      var views = ""
+      renderHeader(tweet)
 
-        if index == 0 and tweet.reply.len > 0:
-          renderReply(tweet)
+      if index == 0 and tweet.reply.len > 0:
+        renderReply(tweet)
 
-        tdiv(class="status-content media-body"):
-          verbatim linkifyText(tweet.text, prefs)
+      tdiv(class="tweet-content media-body"):
+        verbatim linkifyText(tweet.text, prefs)
 
-        if tweet.quote.isSome:
-          renderQuote(tweet.quote.get(), prefs)
+      if tweet.quote.isSome:
+        renderQuote(tweet.quote.get(), prefs)
 
-        if tweet.card.isSome:
-          renderCard(tweet.card.get(), prefs, path)
-        elif tweet.photos.len > 0:
-          renderAlbum(tweet)
-        elif tweet.video.isSome:
-          renderVideo(tweet.video.get(), prefs, path)
-          views = tweet.video.get().views
-        elif tweet.gif.isSome:
-          renderGif(tweet.gif.get(), prefs)
-        elif tweet.poll.isSome:
-          renderPoll(tweet.poll.get())
+      if tweet.card.isSome:
+        renderCard(tweet.card.get(), prefs, path)
+      elif tweet.photos.len > 0:
+        renderAlbum(tweet)
+      elif tweet.video.isSome:
+        renderVideo(tweet.video.get(), prefs, path)
+        views = tweet.video.get().views
+      elif tweet.gif.isSome:
+        renderGif(tweet.gif.get(), prefs)
+      elif tweet.poll.isSome:
+        renderPoll(tweet.poll.get())
 
-        if not prefs.hideTweetStats:
-          renderStats(tweet.stats, views)
+      if not prefs.hideTweetStats:
+        renderStats(tweet.stats, views)
 
-        if tweet.hasThread and "timeline" in class:
-          a(class="show-thread", href=getLink(tweet)):
-            text "Show this thread"
+      if showThread:
+        a(class="show-thread", href=getLink(tweet)):
+          text "Show this thread"

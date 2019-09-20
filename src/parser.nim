@@ -23,14 +23,14 @@ proc parseTimelineProfile*(node: XmlNode): Profile =
 
   result.getProfileStats(node.select(".ProfileNav-list"))
 
-proc parsePopupProfile*(node: XmlNode): Profile =
-  let profile = node.select(".profile-card")
+proc parsePopupProfile*(node: XmlNode; selector=".profile-card"): Profile =
+  let profile = node.select(selector)
   if profile == nil: return
 
   result = Profile(
     fullname:  profile.getName(".fullname"),
     username:  profile.getUsername(".username"),
-    bio:       profile.getBio(".bio"),
+    bio:       profile.getBio(".bio", fallback=".ProfileCard-bio"),
     userpic:   profile.getAvatar(".ProfileCard-avatarImage"),
     verified:  isVerified(profile),
     protected: isProtected(profile),
@@ -104,20 +104,20 @@ proc parseTweet*(node: XmlNode): Tweet =
 
   let by = tweet.selectText(".js-retweet-text > a > b")
   if by.len > 0:
-    result.retweet = some(Retweet(
+    result.retweet = some Retweet(
       by: stripText(by),
       id: tweet.attr("data-retweet-id")
-    ))
+    )
 
   let quote = tweet.select(".QuoteTweet-innerContainer")
   if quote != nil:
-    result.quote = some(parseQuote(quote))
+    result.quote = some parseQuote(quote)
 
   let tombstone = tweet.select(".Tombstone")
   if tombstone != nil:
     if "unavailable" in tombstone.innerText():
       let quote = Quote(tombstone: getTombstone(node.selectText(".Tombstone-label")))
-      result.quote = some(quote)
+      result.quote = some quote
 
 proc parseThread*(nodes: XmlNode): Thread =
   if nodes == nil: return
@@ -157,7 +157,7 @@ proc parseConversation*(node: XmlNode): Conversation =
       result.replies.add parseThread(thread)
 
 proc parseTimeline*(node: XmlNode; after: string): Timeline =
-  if node == nil: return
+  if node == nil: return Timeline()
   result = Timeline(
     content: parseThread(node.select(".stream > .stream-items")).content,
     minId: node.attr("data-min-position"),
@@ -234,7 +234,7 @@ proc parseCard*(card: var Card; node: XmlNode) =
   let image = node.select(".tcu-imageWrapper img")
   if image != nil:
     # workaround for issue 11713
-    card.image = some(image.attr("data-src").replace("gname", "g&name"))
+    card.image = some image.attr("data-src").replace("gname", "g&name")
 
   if card.kind == liveEvent:
     card.text = card.title

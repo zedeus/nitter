@@ -29,9 +29,9 @@ proc hasCachedProfile*(username: string): Option[Profile] =
     try:
       let p = Profile.getOne("lower(username) = ?", toLower(username))
       doAssert not p.isOutdated
-      result = some(p)
+      result = some p
     except AssertionError, KeyError:
-      result = none(Profile)
+      result = none Profile
 
 proc getCachedProfile*(username, agent: string; force=false): Future[Profile] {.async.} =
   withDb:

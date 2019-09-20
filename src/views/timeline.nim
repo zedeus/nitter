@@ -1,99 +1,99 @@
 import strutils, strformat, sequtils, algorithm, times
 import karax/[karaxdsl, vdom, vstyles]
 
-import ../types, ../search
+import ".."/[types, query, formatters]
 import tweet, renderutils
 
-proc getQuery(timeline: Timeline): string =
-  if timeline.query.isNone: "?"
-  else: genQueryUrl(get(timeline.query))
+proc getQuery(query: Query): string =
+  if query.kind == posts:
+    result = "?"
+  else:
+    result = genQueryUrl(query)
+    if result[^1] != '?':
+      result &= "&"
 
-proc getTabClass(timeline: Timeline; tab: string): string =
-  var classes = @["tab-item"]
+proc renderNewer(query: Query): VNode =
+  buildHtml(tdiv(class="timeline-item show-more")):
+    a(href=(getQuery(query).strip(chars={'?', '&'}))):
+      text "Load newest"
 
-  if timeline.query.isNone or get(timeline.query).kind == multi:
-    if tab == "posts":
-      classes.add "active"
-  elif $get(timeline.query).kind == tab:
-    classes.add "active"
-
-  return classes.join(" ")
-
-proc renderSearchTabs(timeline: Timeline; username: string): VNode =
-  let link = "/" & username
-  buildHtml(ul(class="tab")):
-    li(class=timeline.getTabClass("posts")):
-      a(href=link): text "Tweets"
-    li(class=timeline.getTabClass("replies")):
-      a(href=(link & "/replies")): text "Tweets & Replies"
-    li(class=timeline.getTabClass("media")):
-      a(href=(link & "/media")): text "Media"
-
-proc renderNewer(timeline: Timeline; username: string): VNode =
-  buildHtml(tdiv(class="status-el show-more")):
-    a(href=("/" & username & getQuery(timeline).strip(chars={'?'}))):
-      text "Load newest tweets"
-
-proc renderOlder(timeline: Timeline; username: string): VNode =
+proc renderOlder(query: Query; minId: string): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"/{username}{getQuery(timeline)}after={timeline.minId}")):
-      text "Load older tweets"
+    a(href=(&"{getQuery(query)}after={minId}")):
+      text "Load older"
 
 proc renderNoMore(): VNode =
   buildHtml(tdiv(class="timeline-footer")):
     h2(class="timeline-end"):
-      text "No more tweets."
+      text "No more items"
 
 proc renderNoneFound(): VNode =
   buildHtml(tdiv(class="timeline-header")):
     h2(class="timeline-none"):
-      text "No tweets found."
-
-proc renderProtected(username: string): VNode =
-  buildHtml(tdiv(class="timeline-header timeline-protected")):
-    h2: text "This account's tweets are protected."
-    p: text &"Only confirmed followers have access to @{username}'s tweets."
+      text "No items found"
 
 proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
-  buildHtml(tdiv(class="timeline-tweet thread-line")):
+  buildHtml(tdiv(class="thread-line")):
     for i, threadTweet in thread.sortedByIt(it.time):
+      let show = i == thread.len and thread[0].id != threadTweet.threadId
       renderTweet(threadTweet, prefs, path, class="thread",
-                  index=i, total=thread.high)
+                  index=i, total=thread.high, showThread=show)
 
 proc threadFilter(it: Tweet; tweetThread: string): bool =
   it.retweet.isNone and it.reply.len == 0 and it.threadId == tweetThread
 
-proc renderTweets(timeline: Timeline; prefs: Prefs; path: string): VNode =
-  buildHtml(tdiv(id="posts")):
-    var threads: seq[string]
-    for tweet in timeline.content:
-      if tweet.threadId in threads: continue
-      let thread = timeline.content.filterIt(threadFilter(it, tweet.threadId))
-      if thread.len < 2:
-        renderTweet(tweet, prefs, path, class="timeline-tweet")
-      else:
-        renderThread(thread, prefs, path)
-        threads &= tweet.threadId
+proc renderUser(user: Profile; prefs: Prefs): VNode =
+  buildHtml(tdiv(class="timeline-item")):
+    a(class="tweet-link", href=("/" & user.username))
+    tdiv(class="tweet-body profile-result"):
+      tdiv(class="tweet-header"):
+        a(class="tweet-avatar", href=("/" & user.username)):
+          genImg(user.getUserpic("_bigger"), class="avatar")
 
-proc renderTimeline*(timeline: Timeline; username: string; protected: bool;
-                     prefs: Prefs; path: string; multi=false): VNode =
-  buildHtml(tdiv):
-    if multi:
-      tdiv(class="multi-header"):
-        text username.replace(",", " | ")
+        tdiv(class="tweet-name-row"):
+          tdiv(class="fullname-and-username"):
+            linkUser(user, class="fullname")
+        linkUser(user, class="username")
 
-    if not protected:
-      renderSearchTabs(timeline, username)
-      if not timeline.beginning:
-        renderNewer(timeline, username)
+      tdiv(class="tweet-content media-body"):
+        verbatim linkifyText(user.bio, prefs)
 
-    if protected:
-      renderProtected(username)
-    elif timeline.content.len == 0:
+proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs): VNode =
+  buildHtml(tdiv(class="timeline")):
+    if not results.beginning:
+      renderNewer(results.query)
+
+    if results.content.len > 0:
+      for user in results.content:
+        renderUser(user, prefs)
+      renderOlder(results.query, results.minId)
+    elif results.beginning:
       renderNoneFound()
     else:
-      renderTweets(timeline, prefs, path)
-      if timeline.hasMore or timeline.query.isSome:
-        renderOlder(timeline, username)
+      renderNoMore()
+
+proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): VNode =
+  buildHtml(tdiv(class="timeline")):
+    if not results.beginning:
+      renderNewer(results.query)
+
+    if results.content.len == 0:
+      renderNoneFound()
+    else:
+      var threads: seq[string]
+      var retweets: seq[string]
+      for tweet in results.content:
+        if tweet.threadId in threads or tweet.id in retweets: continue
+        let thread = results.content.filterIt(threadFilter(it, tweet.threadId))
+        if thread.len < 2:
+          if tweet.retweet.isSome:
+            retweets &= tweet.id
+          renderTweet(tweet, prefs, path, showThread=tweet.hasThread)
+        else:
+          renderThread(thread, prefs, path)
+          threads &= tweet.threadId
+
+      if results.hasMore or results.query.kind != posts:
+        renderOlder(results.query, results.minId)
       else:
         renderNoMore()

@@ -8,6 +8,7 @@
     overflow: auto;
     padding: 6px;
     position: relative;
+    pointer-events: all;
 
     &:hover {
         border-color: $grey;
@@ -28,6 +29,10 @@
     left: 0;
     top: 0;
     position: absolute;
+}
+
+.quote .quote-link {
+    z-index: 1;
 }
 
 .quote-text {

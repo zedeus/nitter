@@ -6,14 +6,15 @@ import ../utils, ../types
 const doctype = "<!DOCTYPE html>\n"
 
 proc renderNavbar*(title, path, rss: string): VNode =
-  buildHtml(nav(id="nav", class="nav-bar container")):
+  buildHtml(nav):
     tdiv(class="inner-nav"):
-      tdiv(class="item"):
+      tdiv(class="nav-item"):
         a(class="site-name", href="/"): text title
 
       a(href="/"): img(class="site-logo", src="/logo.png")
 
-      tdiv(class="item right"):
+      tdiv(class="nav-item right"):
+        icon "search", title="Search", href="/search"
         if rss.len > 0:
           icon "rss", title="RSS Feed", href=rss
         icon "info-circled", title="About", href="/about"
@@ -55,17 +56,10 @@ proc renderMain*(body: VNode; prefs: Prefs; title="Nitter"; titleText=""; desc="
     body:
       renderNavbar(title, path, rss)
 
-      tdiv(id="content", class="container"):
+      tdiv(class="container"):
         body
 
   result = doctype & $node
-
-proc renderSearch*(): VNode =
-  buildHtml(tdiv(class="panel-container")):
-    tdiv(class="search-panel"):
-      form(`method`="post", action="/search"):
-        input(`type`="text", name="query", autofocus="", placeholder="Enter usernames...")
-        button(`type`="submit"): icon "search"
 
 proc renderError*(error: string): VNode =
   buildHtml(tdiv(class="panel-container")):

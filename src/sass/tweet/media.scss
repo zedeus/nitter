@@ -9,9 +9,11 @@
     flex-grow: 1;
     max-height: 379.5px;
     max-width: 533px;
+    pointer-events: all;
 
     .still-image {
         width: 100%;
+        display: block;
     }
 }
 
@@ -26,6 +28,7 @@
     flex-flow: column;
     background-color: $bg_color;
     align-items: center;
+    pointer-events: all;
 
     .image-attachment {
         width: 100%;
@@ -66,7 +69,14 @@
 
 .single-image {
     display: inline-block;
-    width: unset;
+    width: 100%;
+    max-height: 600px;
+
+    .attachments {
+        width: unset;
+        max-height: unset;
+        display: inherit;
+    }
 }
 
 .overlay-circle {

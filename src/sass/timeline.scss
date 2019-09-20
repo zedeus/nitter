@@ -1,36 +1,28 @@
 @import '_variables';
 
-#posts {
+.timeline-container {
+    @include panel(100%, 600px);
+}
+
+.timeline {
     background-color: $bg_panel;
-}
 
-.timeline-tab {
-    float: right;
-    padding: 0;
-    box-sizing: border-box;
-    display: inline-block;
-    font-size: 14px;
-    text-align: left;
-    vertical-align: top;
-}
-
-.multi-timeline {
-    max-width: 600px;
-    width: 100%;
-    margin: 0 auto;
-
-    .timeline-tab {
-        width: 100%;
+    > div:not(:last-child) {
+        border-bottom: 1px solid $border_grey;
     }
 }
 
-.multi-header {
+.timeline-header {
     background-color: $bg_panel;
     text-align: center;
-    padding: 10px;
+    padding: 8px;
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
+
+    button {
+        float: unset;
+    }
 }
 
 .tab {
@@ -72,16 +64,7 @@
     }
 }
 
-.timeline-tweet {
-    border-bottom: 1px solid $border_grey;
-}
-
 .timeline-footer {
-    background-color: $bg_panel;
-    padding: 6px 0;
-}
-
-.timeline-header {
     background-color: $bg_panel;
     padding: 6px 0;
 }
@@ -119,11 +102,7 @@
     background-color: $bg_panel;
     text-align: center;
     padding: .75em 0;
-    display: block;
-
-    &.status-el {
-        border-bottom: 1px solid $border_grey;
-    }
+    display: block !important;
 
     a {
         background-color: $darkest_grey;
@@ -136,4 +115,13 @@
             background-color: $darker_grey;
         }
     }
+}
+
+.timeline-item {
+    overflow-wrap: break-word;
+    border-left-width: 0;
+    min-width: 0;
+    padding: .75em;
+    display: flex;
+    position: relative;
 }

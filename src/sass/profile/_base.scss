@@ -4,13 +4,13 @@
 @import 'card';
 @import 'photo-rail';
 
-.profile-timeline, .profile-tabs {
-    @include panel(auto, 900px);
-}
-
 .profile-tabs {
-    > .timeline-tab {
+    @include panel(auto, 900px);
+
+    .timeline-container {
+        float: right;
         width: 68% !important;
+        max-width: unset;
     }
 }
 
@@ -43,11 +43,19 @@
     top: 50px;
 }
 
+.profile-result .username {
+    margin: 0 !important;
+}
+
+.profile-result .tweet-header {
+    margin-bottom: unset;
+}
+
 @media(max-width: 600px) {
     .profile-tabs {
         width: 100vw;
 
-        .timeline-tab {
+        .timeline-container {
             width: 100% !important;
         }
     }

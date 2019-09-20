@@ -65,8 +65,6 @@ Then enable and run the service:
 
 ## Todo (roughly in this order)
 
-- Search (images/videos, hashtags, etc.)
-- Custom timeline filter
 - More caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
 - Simple account system with customizable feed
 - Json API endpoints

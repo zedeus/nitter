@@ -12,7 +12,8 @@ button {
     float: right;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="date"] {
     @include input-colors;
     background-color: $bg_elements;
     padding: 1px 4px;
@@ -22,9 +23,50 @@ input[type="text"] {
     font-size: 14px;
 }
 
+input[type="date"]::-webkit-inner-spin-button {
+    display: none;
+}
+
+input[type="date"]::-webkit-clear-button {
+    margin-left: 17px;
+    filter: grayscale(100%);
+    filter: hue-rotate(120deg);
+}
+
+input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+}
+
+input::-webkit-datetime-edit-day-field:focus,
+input::-webkit-datetime-edit-month-field:focus,
+input::-webkit-datetime-edit-year-field:focus {
+    background-color: $accent;
+    color: $fg_color;
+    outline: none;
+}
+
+.date-range {
+    .date-input {
+        display: inline-block;
+        position: relative;
+    }
+
+    .icon-container {
+        pointer-events: none;
+        position: absolute;
+        top: 2px;
+        right: 5px;
+    }
+
+    .search-title {
+        margin: 0 2px;
+    }
+}
+
 .icon-button button {
     color: $accent;
     text-decoration: none;
+    background: none;
     border: none;
     float: none;
     padding: unset;
@@ -88,6 +130,10 @@ input[type="text"] {
     }
 }
 
+.pref-group {
+    display: inline;
+}
+
 .preferences {
     button {
         margin: 6px 0 3px 0;
@@ -101,6 +147,10 @@ input[type="text"] {
         position: absolute;
         right: 0;
         max-width: 120px;
+    }
+
+    .pref-group {
+        display: block;
     }
 
     .pref-input {

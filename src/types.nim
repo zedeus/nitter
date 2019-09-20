@@ -57,14 +57,18 @@ dbFromTypes("cache.db", "", "", "", [Profile, Video])
 
 type
   QueryKind* = enum
-    replies, media, multi, custom = "search"
+    posts, replies, media, users, custom
 
   Query* = object
     kind*: QueryKind
+    text*: string
     filters*: seq[string]
     includes*: seq[string]
     excludes*: seq[string]
     fromUser*: seq[string]
+    since*: string
+    until*: string
+    near*: string
     sep*: string
 
   Result*[T] = ref object
@@ -73,7 +77,7 @@ type
     maxId*: string
     hasMore*: bool
     beginning*: bool
-    query*: Option[Query]
+    query*: Query
 
   Gif* = object
     url*: string

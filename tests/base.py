@@ -31,7 +31,7 @@ class Tweet(object):
         self.fullname = namerow + '.fullname'
         self.username = namerow + '.username'
         self.date = namerow + '.tweet-date'
-        self.text = tweet + '.status-content.media-body'
+        self.text = tweet + '.tweet-content.media-body'
         self.retweet = tweet + '.retweet'
         self.reply = tweet + '.replying-to'
 
@@ -50,7 +50,7 @@ class Profile(object):
 
 
 class Timeline(object):
-    newest = 'div[class="status-el show-more"]'
+    newest = 'div[class="timeline-item show-more"]'
     older = 'div[class="show-more"]'
     end = '.timeline-end'
     none = '.timeline-none'
@@ -63,8 +63,8 @@ class Conversation(object):
     after = '.after-tweet'
     replies = '.replies'
     thread = '.reply'
-    tweet = '.status-el'
-    tweet_text = '.status-content'
+    tweet = '.timeline-item'
+    tweet_text = '.tweet-content'
 
 
 class Poll(object):
@@ -95,9 +95,9 @@ class BaseTestCase(BaseCase):
 
     def search_username(self, username):
         self.open_nitter()
-        self.update_text('.search-panel input', username)
-        self.submit('.search-panel form')
+        self.update_text('.search-bar input[type=text]', username)
+        self.submit('.search-bar form')
 
 
 def get_timeline_tweet(num=1):
-    return Tweet(f'#posts > div:nth-child({num}) ')
+    return Tweet(f'.timeline > div:nth-child({num}) ')
