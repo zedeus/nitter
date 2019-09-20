@@ -30,3 +30,7 @@ proc createRssRouter*(cfg: Config) =
     get "/@name/media/rss":
       cond '.' notin @"name"
       respRss(await showRss(@"name", getMediaQuery(@"name")))
+
+    get "/@name/search/rss":
+      cond '.' notin @"name"
+      respRss(await showRss(@"name", initQuery(params(request), name=(@"name"))))

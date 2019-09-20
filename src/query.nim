@@ -68,10 +68,10 @@ proc genQueryParam*(query: Query): string =
 
   for f in query.filters:
     filters.add "filter:" & f
-  for i in query.includes:
-    filters.add "include:" & i
   for e in query.excludes:
     filters.add "-filter:" & e
+  for i in query.includes:
+    filters.add "include:" & i
 
   result = strip(param & filters.join(&" {query.sep} "))
   if query.since.len > 0:
@@ -83,7 +83,7 @@ proc genQueryParam*(query: Query): string =
   if query.text.len > 0:
     result &= " " & query.text
 
-proc genQueryUrl*(query: Query): string =
+proc genQueryUrl*(query: Query; onlyParam=false): string =
   if query.fromUser.len > 0:
     result = "/" & query.fromUser.join(",")
 
@@ -93,7 +93,10 @@ proc genQueryUrl*(query: Query): string =
   if query.kind notin {custom, users}:
     return result & &"/{query.kind}?"
 
-  result &= &"/search?"
+  if onlyParam:
+    result = ""
+  else:
+    result &= &"/search?"
 
   var params = @[&"kind={query.kind}"]
   if query.text.len > 0:
@@ -102,7 +105,7 @@ proc genQueryUrl*(query: Query): string =
     params.add "f-" & f & "=on"
   for e in query.excludes:
     params.add "e-" & e & "=on"
-  for i in query.excludes:
+  for i in query.includes:
     params.add "i-" & i & "=on"
 
   if query.since.len > 0:

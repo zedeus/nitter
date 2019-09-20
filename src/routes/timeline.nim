@@ -80,12 +80,6 @@ proc createTimelineRouter*(cfg: Config) =
       respTimeline(await showTimeline(@"name", @"after", Query(), cookiePrefs(),
                                       getPath(), cfg.title, rss))
 
-    get "/@name/search":
-      cond '.' notin @"name"
-      let query = initQuery(params(request), name=(@"name"))
-      respTimeline(await showTimeline(@"name", @"after", query, cookiePrefs(),
-                                      getPath(), cfg.title, ""))
-
     get "/@name/replies":
       cond '.' notin @"name"
       let rss = "/$1/replies/rss" % @"name"
@@ -97,6 +91,13 @@ proc createTimelineRouter*(cfg: Config) =
       let rss = "/$1/media/rss" % @"name"
       respTimeline(await showTimeline(@"name", @"after", getMediaQuery(@"name"),
                                       cookiePrefs(), getPath(), cfg.title, rss))
+
+    get "/@name/search":
+      cond '.' notin @"name"
+      let query = initQuery(params(request), name=(@"name"))
+      let rss = "/$1/search/rss?$2" % [@"name", genQueryUrl(query, onlyParam=true)]
+      respTimeline(await showTimeline(@"name", @"after", query, cookiePrefs(),
+                                      getPath(), cfg.title, rss))
 
     get "/@name/status/@id":
       cond '.' notin @"name"
