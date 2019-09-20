@@ -1,8 +1,8 @@
 import httpclient, asyncdispatch, htmlparser
-import sequtils, strutils, json, xmltree, uri
+import strutils, json, xmltree, uri
 
-import ".."/[types, parser, parserutils, formatters, query]
-import utils, consts, media, timeline
+import ".."/[types, parser, parserutils, query]
+import utils, consts, timeline
 
 proc getResult[T](json: JsonNode; query: Query; after: string): Result[T] =
   Result[T](
