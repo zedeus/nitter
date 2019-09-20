@@ -3,7 +3,7 @@ import asyncdispatch, strutils, sequtils, uri
 import jester
 
 import router_utils
-import ".."/[api, prefs, types, formatters, agents]
+import ".."/[api, types, formatters, agents]
 import ../views/[general, status]
 
 export uri, sequtils

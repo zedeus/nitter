@@ -3,7 +3,7 @@ import strutils, sequtils, uri
 import jester
 
 import router_utils
-import ".."/[query, types, api, agents, prefs]
+import ".."/[query, types, api, agents]
 import ../views/[general, search]
 
 export search
@@ -18,7 +18,7 @@ proc createSearchRouter*(cfg: Config) =
       let query = initQuery(params(request))
 
       case query.kind
-      of users:
+      of userSearch:
         if "," in @"text":
           redirect("/" & @"text")
         let users = await getSearch[Profile](query, @"after", getAgent())

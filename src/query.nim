@@ -58,7 +58,7 @@ proc genQueryParam*(query: Query): string =
   var filters: seq[string]
   var param: string
 
-  if query.kind == users:
+  if query.kind == userSearch:
     return query.text
 
   for i, user in query.fromUser:
@@ -84,7 +84,7 @@ proc genQueryParam*(query: Query): string =
     result &= " " & query.text
 
 proc genQueryUrl*(query: Query): string =
-  if query.kind notin {custom, users}: return
+  if query.kind notin {custom, userSearch}: return
 
   var params = @[&"kind={query.kind}"]
   if query.text.len > 0:

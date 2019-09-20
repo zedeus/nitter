@@ -39,6 +39,16 @@ proc parsePopupProfile*(node: XmlNode; selector=".profile-card"): Profile =
 
   result.getPopupStats(profile)
 
+proc parseListProfile*(profile: XmlNode): Profile =
+  result = Profile(
+    fullname:  profile.getName(".fullname"),
+    username:  profile.getUsername(".username"),
+    bio:       profile.getBio(".bio"),
+    userpic:   profile.getAvatar(".avatar"),
+    verified:  isVerified(profile),
+    protected: isProtected(profile),
+  )
+
 proc parseIntentProfile*(profile: XmlNode): Profile =
   result = Profile(
     fullname:  profile.getName("a.fn.url.alternate-context"),

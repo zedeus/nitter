@@ -23,14 +23,9 @@ proc renderSearch*(): VNode =
   buildHtml(tdiv(class="panel-container")):
     tdiv(class="search-bar"):
       form(`method`="get", action="/search"):
-        hiddenField("kind", "users")
+        hiddenField("kind", "userSearch")
         input(`type`="text", name="text", autofocus="", placeholder="Enter username...")
         button(`type`="submit"): icon "search"
-
-proc getTabClass(query: Query; tab: QueryKind): string =
-  result = "tab-item"
-  if query.kind == tab:
-    result &= " active"
 
 proc renderProfileTabs*(query: Query; username: string): VNode =
   let link = "/" & username
@@ -50,8 +45,8 @@ proc renderSearchTabs*(query: Query): VNode =
     li(class=query.getTabClass(custom)):
       q.kind = custom
       a(href=("?" & genQueryUrl(q))): text "Tweets"
-    li(class=query.getTabClass(users)):
-      q.kind = users
+    li(class=query.getTabClass(userSearch)):
+      q.kind = userSearch
       a(href=("?" & genQueryUrl(q))): text "Users"
 
 proc isPanelOpen(q: Query): bool =
@@ -114,7 +109,7 @@ proc renderUserSearch*(users: Result[Profile]; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-container")):
     tdiv(class="timeline-header"):
       form(`method`="get", action="/search", class="search-field"):
-        hiddenField("kind", "users")
+        hiddenField("kind", "userSearch")
         genInput("text", "", users.query.text, "Enter username...", class="pref-inline")
         button(`type`="submit"): icon "search"
 

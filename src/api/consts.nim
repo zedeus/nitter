@@ -11,6 +11,8 @@ const
 
   timelineUrl* = "i/profiles/show/$1/timeline/tweets"
   timelineMediaUrl* = "i/profiles/show/$1/media_timeline"
+  listUrl* = "$1/lists/$2/timeline"
+  listMembersUrl* = "$1/lists/$2/members"
   profilePopupUrl* = "i/profiles/popup"
   profileIntentUrl* = "intent/user"
   searchUrl* = "i/search/timeline"

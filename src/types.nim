@@ -57,7 +57,7 @@ dbFromTypes("cache.db", "", "", "", [Profile, Video])
 
 type
   QueryKind* = enum
-    posts, replies, media, users, custom
+    posts, replies, media, users, userSearch, custom
 
   Query* = object
     kind*: QueryKind

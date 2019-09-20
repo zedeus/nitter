@@ -3,7 +3,7 @@ import strutils, uri
 import jester
 
 import router_utils
-import ".."/[prefs, types]
+import ".."/[types]
 import ../views/[general, preferences]
 
 export preferences

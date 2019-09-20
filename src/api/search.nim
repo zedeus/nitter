@@ -7,7 +7,7 @@ import utils, consts, timeline
 proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
   if json == nil: return Result[T](beginning: true, query: query)
   Result[T](
-    hasMore: json["has_more_items"].to(bool),
+    hasMore: json.getOrDefault("has_more_items").getBool(false),
     maxId: json.getOrDefault("max_position").getStr(""),
     minId: json.getOrDefault("min_position").getStr("").cleanPos(),
     query: query,
@@ -16,7 +16,7 @@ proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
 
 proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.async.} =
   let
-    kind = if query.kind == users: "users" else: "tweets"
+    kind = if query.kind == userSearch: "users" else: "tweets"
     pos = when T is Tweet: genPos(after) else: after
 
     param = genQueryParam(query)
@@ -46,10 +46,9 @@ proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.asyn
     return Result[T](query: query, beginning: true)
 
   let json = await fetchJson(base / searchUrl ? params, headers)
-  if json == nil: return Result[T](query: query, beginning: true)
 
   result = getResult[T](json, query, after)
-  if not json.hasKey("items_html"): return
+  if json == nil or not json.hasKey("items_html"): return
 
   when T is Tweet:
     result = await finishTimeline(json, query, after, agent)

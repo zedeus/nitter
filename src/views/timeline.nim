@@ -64,7 +64,8 @@ proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs; path=""): VNod
     if results.content.len > 0:
       for user in results.content:
         renderUser(user, prefs)
-      renderMore(results.query, results.minId)
+      if results.minId != "0":
+        renderMore(results.query, results.minId)
     elif results.beginning:
       renderNoneFound()
     else:

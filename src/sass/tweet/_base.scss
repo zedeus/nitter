@@ -85,7 +85,10 @@
 .replying-to {
     color: $fg_dark;
     margin: -2px 0 4px;
-    pointer-events: all;
+
+    a {
+        pointer-events: all;
+    }
 }
 
 .retweet, .pinned, .tweet-stats {

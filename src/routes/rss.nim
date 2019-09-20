@@ -34,3 +34,8 @@ proc createRssRouter*(cfg: Config) =
     get "/@name/search/rss":
       cond '.' notin @"name"
       respRss(await showRss(@"name", initQuery(params(request), name=(@"name"))))
+
+    get "/@name/lists/@list/rss":
+      cond '.' notin @"name"
+      let list = await getListTimeline(@"name", @"list", getAgent(), "")
+      respRss(renderListRss(list.content, @"name", @"list"))

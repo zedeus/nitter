@@ -3,7 +3,7 @@ import asyncfile, uri, strutils, httpclient, os
 import jester, regex
 
 import router_utils
-import ".."/[types, formatters, prefs]
+import ".."/[types, formatters]
 import ../views/general
 
 export asyncfile, httpclient, os, strutils

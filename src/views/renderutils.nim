@@ -30,10 +30,6 @@ proc linkUser*(profile: Profile, class=""): VNode =
       text " "
       icon "lock-circled", title="Protected account"
 
-proc genImg*(url: string; class=""): VNode =
-  buildHtml():
-    img(src=getPicUrl(url), class=class, alt="Image")
-
 proc linkText*(text: string; class=""): VNode =
   let url = if "http" notin text: "http://" & text else: text
   buildHtml():
@@ -91,3 +87,12 @@ proc genDate*(pref, state: string): VNode =
     else:
       verbatim &"<input name={pref} type=\"date\"/>"
     icon "calendar"
+
+proc genImg*(url: string; class=""): VNode =
+  buildHtml():
+    img(src=getPicUrl(url), class=class, alt="Image")
+
+proc getTabClass*(query: Query; tab: QueryKind): string =
+  result = "tab-item"
+  if query.kind == tab:
+    result &= " active"

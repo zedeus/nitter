@@ -71,5 +71,5 @@ proc renderError*(error: string): VNode =
     tdiv(class="error-panel"):
       span: text error
 
-proc showError*(error, title: string): string =
-  renderMain(renderError(error), Request(), title, "Error")
+template showError*(error, title: string): string =
+  renderMain(renderError(error), request, title, "Error")
