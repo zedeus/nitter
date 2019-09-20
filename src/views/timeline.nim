@@ -11,8 +11,10 @@ proc getQuery(query: Query): string =
     result &= "&"
 
 proc renderNewer(query: Query; path: string): VNode =
+  let q = genQueryUrl(query)
+  let url = if q.len > 0: "?" & q else: ""
   buildHtml(tdiv(class="timeline-item show-more")):
-    a(href=(&"{path}?{genQueryUrl(query)}")):
+    a(href=(path & url)):
       text "Load newest"
 
 proc renderMore(query: Query; minId: string): VNode =

@@ -93,7 +93,7 @@ proc genQueryUrl*(query: Query): string =
     params.add "f-" & f & "=on"
   for e in query.excludes:
     params.add "e-" & e & "=on"
-  for i in query.includes:
+  for i in query.includes.filterIt(it != "nativeretweets"):
     params.add "i-" & i & "=on"
 
   if query.since.len > 0:
