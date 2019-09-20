@@ -24,9 +24,13 @@ input[type="date"] {
 }
 
 input[type="date"]::-webkit-inner-spin-button {
-    opacity: 0;
-    margin: 0;
-    padding: 0;
+    display: none;
+}
+
+input[type="date"]::-webkit-clear-button {
+    margin-left: 17px;
+    filter: grayscale(100%);
+    filter: hue-rotate(120deg);
 }
 
 input::-webkit-calendar-picker-indicator {

@@ -1,4 +1,4 @@
-import strutils, strformat, sequtils, tables
+import strutils, strformat, sequtils, tables, uri
 
 import types
 
@@ -97,7 +97,7 @@ proc genQueryUrl*(query: Query): string =
 
   var params = @[&"kind={query.kind}"]
   if query.text.len > 0:
-    params.add "text=" & query.text
+    params.add "text=" & encodeUrl(query.text)
   for f in query.filters:
     params.add "f-" & f & "=on"
   for e in query.excludes:

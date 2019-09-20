@@ -86,5 +86,8 @@ proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
 
 proc genDate*(pref, state: string): VNode =
   buildHtml(span(class="date-input")):
-    verbatim &"<input name={pref} type=\"date\" value=\"{state}\"/>"
+    if state.len > 0:
+      verbatim &"<input name={pref} type=\"date\" value=\"{state}\"/>"
+    else:
+      verbatim &"<input name={pref} type=\"date\"/>"
     icon "calendar"
