@@ -6,8 +6,6 @@ import router_utils
 import ".."/[api, prefs, types, utils, cache, formatters, agents, query]
 import ../views/[general, profile, timeline, status, search]
 
-include "../views/rss.nimf"
-
 export uri, sequtils
 export router_utils
 export api, cache, formatters, query, agents

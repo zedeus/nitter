@@ -5,13 +5,14 @@ import jester
 
 import types, config, prefs
 import views/[general, about]
-import routes/[preferences, timeline, media, search, rss]
+import routes/[preferences, timeline, status, media, search, rss]
 
 const configPath {.strdefine.} = "./nitter.conf"
 let cfg = getConfig(configPath)
 
 createPrefRouter(cfg)
 createTimelineRouter(cfg)
+createStatusRouter(cfg)
 createSearchRouter(cfg)
 createMediaRouter(cfg)
 createRssRouter(cfg)
@@ -32,6 +33,7 @@ routes:
   extend rss, ""
   extend search, ""
   extend timeline, ""
+  extend status, ""
   extend media, ""
 
 runForever()
