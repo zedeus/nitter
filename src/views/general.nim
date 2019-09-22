@@ -20,7 +20,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
       tdiv(class="nav-item right"):
         icon "search", title="Search", href="/search"
         if rss.len > 0:
-          icon "rss", title="RSS Feed", href=rss
+          icon "rss-feed", title="RSS Feed", href=rss
         icon "info-circled", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 

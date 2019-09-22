@@ -50,5 +50,5 @@
 .icon-search:before { content: '\e80e'; } /* '' */
 .icon-pin:before { content: '\e80f'; } /* '' */
 .icon-cog:before { content: '\e812'; } /* '' */
-.icon-rss:before { content: '\f143'; } /* '' */
+.icon-rss-feed:before { content: '\f143'; } /* '' */
 .icon-thumbs-up:before { content: '\f164'; } /* '' */
