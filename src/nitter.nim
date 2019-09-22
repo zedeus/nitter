@@ -30,6 +30,9 @@ routes:
   get "/about":
     resp renderMain(renderAbout(), request, cfg.title)
 
+  get "/about/feature":
+    resp renderMain(renderFeature(), request, cfg.title)
+
   extend preferences, ""
   extend rss, ""
   extend search, ""
