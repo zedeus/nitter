@@ -62,10 +62,6 @@ ul {
     padding-left: 1.3em;
 }
 
-ul.about-list {
-    margin-bottom: 14px;
-}
-
 .container {
     display: flex;
     flex-wrap: wrap;
@@ -87,6 +83,11 @@ ul.about-list {
     background-color: $bg_overlays;
     padding: 10px 15px;
     align-self: start;
+
+    ul {
+        margin-bottom: 14px;
+    }
+
 }
 
 .verified-icon {

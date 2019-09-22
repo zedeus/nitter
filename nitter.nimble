@@ -18,6 +18,7 @@ requires "q >= 0.0.7"
 requires "nimcrypto >= 0.3.9"
 requires "karax#b99a543"
 requires "sass"
+requires "markdown"
 
 
 # Tasks
