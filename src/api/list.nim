@@ -27,8 +27,13 @@ proc getListTimeline*(username, list, agent, after: string): Future[Timeline] {.
 
   let json = await fetchJson(url ? params, headers)
   result = await finishTimeline(json, Query(), after, agent)
-  if result.content.len > 0:
-    result.minId = result.content[^1].id
+  if result.content.len == 0:
+    return
+
+  let last = result.content[^1]
+  result.minId =
+    if last.retweet.isNone: last.id
+    else: get(last.retweet).id
 
 proc getListMembers*(username, list, agent: string): Future[Result[Profile]] {.async.} =
   let url = base / (listMembersUrl % [username, list])
