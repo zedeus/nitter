@@ -91,7 +91,7 @@
     }
 }
 
-.retweet, .pinned, .tweet-stats {
+.retweet-header, .pinned, .tweet-stats {
     align-content: center;
     color: $grey;
     display: flex;
@@ -106,7 +106,7 @@
     }
 }
 
-.retweet {
+.retweet-header {
     margin-top: -5px !important;
 }
 

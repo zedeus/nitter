@@ -7,7 +7,7 @@ import ".."/[types, utils, formatters]
 proc renderHeader(tweet: Tweet): VNode =
   buildHtml(tdiv):
     if tweet.retweet.isSome:
-      tdiv(class="retweet"):
+      tdiv(class="retweet-header"):
         span: icon "retweet", get(tweet.retweet).by & " retweeted"
 
     if tweet.pinned:
