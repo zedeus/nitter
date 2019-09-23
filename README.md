@@ -12,6 +12,44 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - Lightweight (for [@nim_lang](https://twitter.com/nim_lang), 36KB vs 580KB from twitter.com)
 - Native RSS feeds
 
+## Todo (roughly in this order)
+
+- Embeds
+- More caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
+- Simple account system with customizable feed
+- Json API endpoints
+- Themes
+- Nitter logo
+- Emoji support (WIP, uses native font for now)
+
+## Resources
+
+The wiki contains a list of
+[Nitter instances](https://github.com/zedeus/nitter/wiki/Nitter-Instances) and
+a list of [browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
+maintained by the community.
+
+## Why?
+
+It's basically impossible to use Twitter without JavaScript enabled. If you try,
+you're redirected to the legacy mobile version which is awful both functionally
+and aesthetically. For privacy-minded folks, preventing JavaScript analytics and
+potential IP-based tracking is important, but apart from using the legacy mobile
+version and a VPN, it's impossible.
+
+Using an instance of Nitter (hosted on a VPS for example), you can browse
+Twitter without JavaScript while retaining your privacy. In addition to
+respecting your privacy, Nitter is on average around 15 times lighter than
+Twitter, and in some cases serves pages faster.
+
+In the future a simple account system will be added that lets you follow Twitter
+users, allowing you to have a clean chronological timeline without needing a
+Twitter account.
+
+## Screenshot
+
+![nitter](/screenshot.png)
+
 ## Installation
 
 To compile Nitter you need a Nim installation, see here for details: https://nim-lang.org/install.html
@@ -63,38 +101,8 @@ WantedBy=multi-user.target
 Then enable and run the service:
 `systemctl enable --now nitter.service`
 
-## Todo (roughly in this order)
-
-- More caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
-- Simple account system with customizable feed
-- Json API endpoints
-- Themes
-- Nitter logo
-- Emoji support (WIP, uses native font for now)
-
-## Why?
-
-It's basically impossible to use Twitter without JavaScript enabled. If you try,
-you're redirected to the legacy mobile version which is awful both functionally
-and aesthetically. For privacy-minded folks, preventing JavaScript analytics and
-potential IP-based tracking is important, but apart from using the legacy mobile
-version and a VPN, it's impossible.
-
-Using an instance of Nitter (hosted on a VPS
-for example), you can browse Twitter without JavaScript while retaining your
-privacy. In addition to respecting your privacy, Nitter is on average around 15
-times lighter than Twitter, and in some cases serves pages faster.
-
-In the future
-a simple account system will be added that lets you follow Twitter users,
-allowing you to have a clean chronological timeline without needing a Twitter
-account.
-
 ## Contact
 
 Feel free to join our Freenode IRC channel at #nitter, or our
 [Matrix server](https://riot.im/app/#/room/#nitter:matrix.org).
-
-## Screenshot
-
-![nitter](/screenshot.png)
+You can email me at zedeus@pm.me if you wish to contact me personally.
