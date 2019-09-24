@@ -32,6 +32,12 @@ proc renderMain*(body: VNode; req: Request; title="Nitter"; titleText=""; desc="
       link(rel="stylesheet", `type`="text/css", href="/css/style.css")
       link(rel="stylesheet", `type`="text/css", href="/css/fontello.css")
 
+      link(rel="apple-touch-icon", sizes="180x180", href="/apple-touch-icon.png")
+      link(rel="icon", type="image/png", sizes="32x32", href="/favicon-32x32.png")
+      link(rel="icon", type="image/png", sizes="16x16", href="/favicon-16x16.png")
+      link(rel="manifest", href="/site.webmanifest")
+      link(rel="mask-icon", href="/safari-pinned-tab.svg", color="#ff6c60")
+
       if rss.len > 0:
         link(rel="alternate", `type`="application/rss+xml", href=rss, title="RSS feed")
 
