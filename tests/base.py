@@ -32,7 +32,7 @@ class Tweet(object):
         self.username = namerow + '.username'
         self.date = namerow + '.tweet-date'
         self.text = tweet + '.tweet-content.media-body'
-        self.retweet = tweet + '.retweet'
+        self.retweet = tweet + '.retweet-header'
         self.reply = tweet + '.replying-to'
 
 
