@@ -25,7 +25,7 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 ## Resources
 
 The wiki contains a list of
-[Nitter instances](https://github.com/zedeus/nitter/wiki/Nitter-Instances) and
+[Nitter instances](https://github.com/zedeus/nitter/wiki/Instances) and
 a list of [browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
 maintained by the community.
 

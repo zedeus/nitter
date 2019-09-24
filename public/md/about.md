@@ -12,7 +12,7 @@ privacy. The source is available on GitHub at <https://github.com/zedeus/nitter>
 * Native RSS feeds
 
 Nitter's GitHub wiki contains a list of
-[instances](https://github.com/zedeus/nitter/wiki/Nitter-Instances) and
+[instances](https://github.com/zedeus/nitter/wiki/Instances) and
 a [browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
 maintained by the community.
 
