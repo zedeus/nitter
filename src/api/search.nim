@@ -7,9 +7,9 @@ import utils, consts, timeline
 proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
   if json == nil: return Result[T](beginning: true, query: query)
   Result[T](
-    hasMore: json.getOrDefault("has_more_items").getBool(false),
-    maxId: json.getOrDefault("max_position").getStr(""),
-    minId: json.getOrDefault("min_position").getStr("").cleanPos(),
+    hasMore: json{"has_more_items"}.getBool(false),
+    maxId: json{"max_position"}.getStr(""),
+    minId: json{"min_position"}.getStr("").cleanPos(),
     query: query,
     beginning: after.len == 0
   )

@@ -1,7 +1,7 @@
 import karax/[karaxdsl, vdom]
 
-import ../types
-import tweet
+import ".."/[types, formatters]
+import tweet, timeline
 
 proc renderMoreReplies(thread: Thread): VNode =
   let num = if thread.more != -1: $thread.more & " " else: ""
@@ -42,8 +42,14 @@ proc renderConversation*(conversation: Conversation; prefs: Prefs; path: string)
           if more != 0:
             renderMoreReplies(conversation.after)
 
-    if conversation.replies.len > 0:
+    if not conversation.replies.beginning:
+      renderNewer(Query(), getLink(conversation.tweet))
+
+    if conversation.replies.content.len > 0:
       tdiv(class="replies"):
-        for thread in conversation.replies:
+        for thread in conversation.replies.content:
           if thread == nil: continue
           renderReplyThread(thread, prefs, path)
+
+    if conversation.replies.hasMore:
+      renderMore(Query(), conversation.replies.minId)

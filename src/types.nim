@@ -164,7 +164,7 @@ type
     tweet*: Tweet
     before*: Thread
     after*: Thread
-    replies*: seq[Thread]
+    replies*: Result[Thread]
 
   Timeline* = Result[Tweet]
 

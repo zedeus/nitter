@@ -3,7 +3,7 @@ import httpclient, asyncdispatch, strutils, uri
 import ".."/[types, parser]
 import utils, consts, media
 
-proc getTweet*(username, id, agent: string): Future[Conversation] {.async.} =
+proc getTweet*(username, id, after, agent: string): Future[Conversation] {.async.} =
   let headers = newHttpHeaders({
     "Accept": jsonAccept,
     "Referer": $base,
@@ -11,17 +11,17 @@ proc getTweet*(username, id, agent: string): Future[Conversation] {.async.} =
     "X-Twitter-Active-User": "yes",
     "X-Requested-With": "XMLHttpRequest",
     "Accept-Language": lang,
-    "pragma": "no-cache",
-    "x-previous-page-name": "profile"
+    "Pragma": "no-cache",
+    "X-Previous-Page-Name": "profile"
   })
 
   let
-    url = base / username / tweetUrl / id
+    url = base / username / tweetUrl / id ? {"max_position": after}
     html = await fetchHtml(url, headers)
 
   if html == nil: return
 
-  result = parseConversation(html)
+  result = parseConversation(html, after)
 
   let
     vidsFut = getConversationVideos(result, agent)

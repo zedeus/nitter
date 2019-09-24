@@ -141,7 +141,7 @@ proc parseThread*(nodes: XmlNode): Thread =
     else:
       result.content.add parseTweet(n)
 
-proc parseConversation*(node: XmlNode): Conversation =
+proc parseConversation*(node: XmlNode; after: string): Conversation =
   let tweet = node.select(".permalink-tweet-container")
 
   if tweet == nil:
@@ -149,8 +149,20 @@ proc parseConversation*(node: XmlNode): Conversation =
 
   result = Conversation(
     tweet:  parseTweet(tweet),
-    before: parseThread(node.select(".in-reply-to .stream-items"))
+    before: parseThread(node.select(".in-reply-to .stream-items")),
+    replies: Result[Thread](
+      minId: node.selectAttr(".replies-to .stream-container", "data-min-position"),
+      hasMore: node.select(".stream-footer .has-more-items") != nil,
+      beginning: after.len == 0
+    )
   )
+
+  let showMore = node.selectAttr(".ThreadedConversation-showMoreThreads button",
+                                 "data-cursor")
+
+  if showMore.len > 0:
+    result.replies.minId = showMore
+    result.replies.hasMore = true
 
   let replies = node.select(".replies-to .stream-items")
   if replies == nil: return
@@ -162,9 +174,9 @@ proc parseConversation*(node: XmlNode): Conversation =
     if i == 0 and "self" in class:
       result.after = parseThread(thread)
     elif "lone" in class:
-      result.replies.add parseThread(reply)
+      result.replies.content.add parseThread(reply)
     else:
-      result.replies.add parseThread(thread)
+      result.replies.content.add parseThread(thread)
 
 proc parseTimeline*(node: XmlNode; after: string): Timeline =
   if node == nil: return Timeline()

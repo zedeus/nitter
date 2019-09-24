@@ -3,6 +3,10 @@
 
 .conversation {
     @include panel(100%, 600px);
+
+    .show-more {
+        margin-bottom: 10px;
+    }
 }
 
 .main-thread {
