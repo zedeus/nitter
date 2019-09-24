@@ -6,10 +6,10 @@ import tweet, timeline
 proc renderMoreReplies(thread: Thread): VNode =
   let num = if thread.more != -1: $thread.more & " " else: ""
   let reply = if thread.more == 1: "reply" else: "replies"
-  let link = getLink(thread.content[0])
+  let link = getLink(thread.content[^1])
   buildHtml(tdiv(class="timeline-item more-replies")):
     if link.len > 0:
-      a(class="more-replies-text", href=getLink(thread.content[0])):
+      a(class="more-replies-text", href=link):
         text $num & "more " & reply
     else:
       a(class="more-replies-text"):
