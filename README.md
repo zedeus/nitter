@@ -69,8 +69,8 @@ $ mkdir ./tmp
 
 Change `-d:hostname="..."` to your instance's domain, eg. `-d:hostname:"nitter.net"`.
 Set your port and page title in `nitter.conf`, then run Nitter by executing `./nitter`.
-You should run Nitter behind a reverse proxy such as nginx or Apache for better
-security.
+You should run Nitter behind a reverse proxy such as
+[Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for better security.
 
 To run Nitter via systemd you can use this service file:
 
