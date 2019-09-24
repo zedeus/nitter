@@ -131,6 +131,7 @@ proc getRfc822Time*(tweet: Tweet): string =
   tweet.time.format("ddd', 'd MMM yyyy HH:mm:ss 'GMT'")
 
 proc getLink*(tweet: Tweet | Quote): string =
+  if tweet.id.len == 0: return
   &"/{tweet.profile.username}/status/{tweet.id}"
 
 proc getTombstone*(text: string): string =
