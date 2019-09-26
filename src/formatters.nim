@@ -11,7 +11,7 @@ const
   usernameRegex = re"(^|[^A-z0-9_?\/])@([A-z0-9_]+)"
   picRegex = re"pic.twitter.com/[^ ]+"
   ellipsisRegex = re" ?…"
-  hashtagRegex = re"([^\S]|^)([#$][A-z0-9]+)"
+  hashtagRegex = re"([^\S]|^)([#$]\w+)"
   ytRegex = re"(www.|m.)?youtu(be.com|.be)"
   twRegex = re"(www.|mobile.)?twitter.com"
   nbsp = $Rune(0x000A0)
