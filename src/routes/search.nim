@@ -10,7 +10,7 @@ export search
 
 proc createSearchRouter*(cfg: Config) =
   router search:
-    get "/search":
+    get "/search/?":
       if @"text".len > 200:
         resp Http400, showError("Search input too long.", cfg.title)
 
@@ -25,7 +25,9 @@ proc createSearchRouter*(cfg: Config) =
         resp renderMain(renderUserSearch(users, prefs), request, cfg.title)
       of custom:
         let tweets = await getSearch[Tweet](query, @"after", getAgent())
-        resp renderMain(renderTweetSearch(tweets, prefs, getPath()), request, cfg.title)
+        let rss = "/search/rss?" & genQueryUrl(query)
+        resp renderMain(renderTweetSearch(tweets, prefs, getPath()), request,
+                        cfg.title, rss=rss)
       else:
         resp Http404, showError("Invalid search.", cfg.title)
 

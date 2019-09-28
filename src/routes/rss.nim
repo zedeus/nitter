@@ -19,6 +19,17 @@ template respRss*(rss: typed) =
 
 proc createRssRouter*(cfg: Config) =
   router rss:
+    get "/search/rss":
+      if @"text".len > 200:
+        resp Http400, showError("Search input too long.", cfg.title)
+
+      let query = initQuery(params(request))
+      if query.kind != custom:
+        resp Http400, showError("Only Tweet searches are allowed for RSS feeds.", cfg.title)
+
+      let tweets = await getSearch[Tweet](query, "", getAgent())
+      respRss(renderSearchRss(tweets.content, query.text, genQueryUrl(query)))
+
     get "/@name/rss":
       cond '.' notin @"name"
       respRss(await showRss(@"name", Query()))
