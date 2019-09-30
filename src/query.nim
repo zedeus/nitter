@@ -25,7 +25,7 @@ template `@`(param: string): untyped =
 proc initQuery*(pms: Table[string, string]; name=""): Query =
   result = Query(
     kind: parseEnum[QueryKind](@"kind", custom),
-    text: @"text",
+    text: @"q",
     filters: validFilters.filterIt("f-" & it in pms),
     excludes: validFilters.filterIt("e-" & it in pms),
     since: @"since",
@@ -88,7 +88,7 @@ proc genQueryUrl*(query: Query): string =
 
   var params = @[&"kind={query.kind}"]
   if query.text.len > 0:
-    params.add "text=" & encodeUrl(query.text)
+    params.add "q=" & encodeUrl(query.text)
   for f in query.filters:
     params.add "f-" & f & "=on"
   for e in query.excludes:

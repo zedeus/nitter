@@ -24,7 +24,7 @@ proc renderSearch*(): VNode =
     tdiv(class="search-bar"):
       form(`method`="get", action="/search"):
         hiddenField("kind", "userSearch")
-        input(`type`="text", name="text", autofocus="", placeholder="Enter username...")
+        input(`type`="text", name="q", autofocus="", placeholder="Enter username...")
         button(`type`="submit"): icon "search"
 
 proc renderProfileTabs*(query: Query; username: string): VNode =
@@ -58,7 +58,7 @@ proc renderSearchPanel*(query: Query): VNode =
   let action = if user.len > 0: &"/{user}/search" else: "/search"
   buildHtml(form(`method`="get", action=action, class="search-field")):
     hiddenField("kind", "custom")
-    genInput("text", "", query.text, "Enter search...",
+    genInput("q", "", query.text, "Enter search...",
              class="pref-inline", autofocus=true)
     button(`type`="submit"): icon "search"
     if isPanelOpen(query):
@@ -110,7 +110,7 @@ proc renderUserSearch*(users: Result[Profile]; prefs: Prefs): VNode =
     tdiv(class="timeline-header"):
       form(`method`="get", action="/search", class="search-field"):
         hiddenField("kind", "userSearch")
-        genInput("text", "", users.query.text, "Enter username...", class="pref-inline")
+        genInput("q", "", users.query.text, "Enter username...", class="pref-inline")
         button(`type`="submit"): icon "search"
 
     renderSearchTabs(users.query)

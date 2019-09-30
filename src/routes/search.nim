@@ -11,7 +11,7 @@ export search
 proc createSearchRouter*(cfg: Config) =
   router search:
     get "/search/?":
-      if @"text".len > 200:
+      if @"q".len > 200:
         resp Http400, showError("Search input too long.", cfg.title)
 
       let prefs = cookiePrefs()
@@ -19,8 +19,8 @@ proc createSearchRouter*(cfg: Config) =
 
       case query.kind
       of userSearch:
-        if "," in @"text":
-          redirect("/" & @"text")
+        if "," in @"q":
+          redirect("/" & @"q")
         let users = await getSearch[Profile](query, @"after", getAgent())
         resp renderMain(renderUserSearch(users, prefs), request, cfg.title)
       of custom:
@@ -32,4 +32,4 @@ proc createSearchRouter*(cfg: Config) =
         resp Http404, showError("Invalid search.", cfg.title)
 
     get "/hashtag/@hash":
-      redirect("/search?text=" & encodeUrl("#" & @"hash"))
+      redirect("/search?q=" & encodeUrl("#" & @"hash"))

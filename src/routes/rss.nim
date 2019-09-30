@@ -20,7 +20,7 @@ template respRss*(rss: typed) =
 proc createRssRouter*(cfg: Config) =
   router rss:
     get "/search/rss":
-      if @"text".len > 200:
+      if @"q".len > 200:
         resp Http400, showError("Search input too long.", cfg.title)
 
       let query = initQuery(params(request))
