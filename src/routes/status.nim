@@ -43,7 +43,10 @@ proc createStatusRouter*(cfg: Config) =
         resp renderMain(html, request, cfg.title, title, desc,
                         images=conversation.tweet.photos, `type`="photo")
 
-    get "/@name/status/@id/photo/1":
+    get "/@name/status/@id/photo/@i":
+      redirect("/$1/status/$2" % [@"name", @"id"])
+
+    get "/@name/statuses/@id":
       redirect("/$1/status/$2" % [@"name", @"id"])
 
     get "/i/web/status/@id":
