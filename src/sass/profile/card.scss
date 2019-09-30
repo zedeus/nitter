@@ -59,7 +59,8 @@
         @include breakable;
         width: 100%;
         margin: 4px -6px 6px 0;
-
+        white-space: pre-wrap;
+        
         p {
             margin: 0;
         }
