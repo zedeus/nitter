@@ -1,8 +1,13 @@
 import httpclient, asyncdispatch, htmlparser, strformat
-import sequtils, strutils, json, xmltree, uri
+import sequtils, strutils, json, uri
 
 import ".."/[types, parser, parserutils, formatters, query]
 import utils, consts, media, search
+
+proc getMedia(thread: Thread | Timeline; agent: string) {.async.} =
+  await all(getVideos(thread, agent),
+            getCards(thread, agent),
+            getPolls(thread, agent))
 
 proc finishTimeline*(json: JsonNode; query: Query; after, agent: string): Future[Timeline] {.async.} =
   result = getResult[Tweet](json, query, after)
@@ -11,19 +16,13 @@ proc finishTimeline*(json: JsonNode; query: Query; after, agent: string): Future
   if json["new_latent_count"].to(int) == 0: return
   if not json.hasKey("items_html"): return
 
-  let
-    html = parseHtml(json["items_html"].to(string))
-    thread = parseThread(html)
-    vidsFut = getVideos(thread, agent)
-    pollFut = getPolls(thread, agent)
-    cardFut = getCards(thread, agent)
+  let html = parseHtml(json["items_html"].to(string))
+  let thread = parseThread(html)
 
-  await all(vidsFut, pollFut, cardFut)
+  await getMedia(thread, agent)
   result.content = thread.content
 
 proc getTimeline*(username, after, agent: string): Future[Timeline] {.async.} =
-  let headers = genHeaders(agent, base / username, xml=true)
-
   var params = toSeq({
     "include_available_features": "1",
     "include_entities": "1",
@@ -34,7 +33,9 @@ proc getTimeline*(username, after, agent: string): Future[Timeline] {.async.} =
   if after.len > 0:
     params.add {"max_position": after}
 
+  let headers = genHeaders(agent, base / username, xml=true)
   let json = await fetchJson(base / (timelineUrl % username) ? params, headers)
+
   result = await finishTimeline(json, Query(), after, agent)
 
 proc getProfileAndTimeline*(username, agent, after: string): Future[(Profile, Timeline)] {.async.} =
@@ -48,9 +49,5 @@ proc getProfileAndTimeline*(username, agent, after: string): Future[(Profile, Ti
     timeline = parseTimeline(html.select("#timeline > .stream-container"), after)
     profile = parseTimelineProfile(html)
 
-    vidsFut = getVideos(timeline, agent)
-    pollFut = getPolls(timeline, agent)
-    cardFut = getCards(timeline, agent)
-
-  await all(vidsFut, pollFut, cardFut)
+  await getMedia(timeline, agent)
   result = (profile, timeline)

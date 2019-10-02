@@ -1,4 +1,4 @@
-import httpclient, asyncdispatch, htmlparser, strformat
+import httpclient, asyncdispatch, htmlparser
 import sequtils, strutils, json, uri
 
 import ".."/[types, parser, parserutils, query]
@@ -29,8 +29,7 @@ proc getListTimeline*(username, list, agent, after: string): Future[Timeline] {.
 proc getListMembers*(username, list, agent: string): Future[Result[Profile]] {.async.} =
   let
     url = base / (listMembersUrl % [username, list])
-    referer = base / &"{username}/lists/{list}/members"
-    html = await fetchHtml(url, genHeaders(agent, referer))
+    html = await fetchHtml(url, genHeaders(agent, url))
 
   result = Result[Profile](
     minId: html.selectAttr(".stream-container", "data-min-position"),
@@ -42,8 +41,8 @@ proc getListMembers*(username, list, agent: string): Future[Result[Profile]] {.a
 
 proc getListMembersSearch*(username, list, agent, after: string): Future[Result[Profile]] {.async.} =
   let
-    url = base / ((listMembersUrl & "/timeline") % [username, list])
-    referer = base / &"{username}/lists/{list}/members"
+    referer = base / (listMembersUrl % [username, list])
+    url = referer / "timeline"
     headers = genHeaders({"x-push-with": "XMLHttpRequest"}, agent, referer, xml=true)
 
   var params = toSeq({

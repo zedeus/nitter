@@ -17,9 +17,6 @@ proc getTweet*(username, id, after, agent: string): Future[Conversation] {.async
 
   result = parseConversation(html, after)
 
-  let
-    vidsFut = getConversationVideos(result, agent)
-    pollFut = getConversationPolls(result, agent)
-    cardFut = getConversationCards(result, agent)
-
-  await all(vidsFut, pollFut, cardFut)
+  await all(getConversationVideos(result, agent),
+            getConversationCards(result, agent),
+            getConversationPolls(result, agent))
