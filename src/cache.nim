@@ -39,7 +39,7 @@ proc getCachedProfile*(username, agent: string; force=false): Future[Profile] {.
       result.getOne("lower(username) = ?", toLower(username))
       doAssert not result.isOutdated
     except AssertionError, KeyError:
-      result = await getProfileFull(username)
+      result = await getProfileFull(username, agent)
       cache(result)
 
 proc setProfileCacheTime*(minutes: int) =

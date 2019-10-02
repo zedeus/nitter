@@ -51,35 +51,23 @@ proc getGuestToken(agent: string; force=false): Future[string] {.async.} =
   tokenUpdated = getTime()
   tokenUses = 0
 
-  let headers = newHttpHeaders({
-    "Accept": jsonAccept,
-    "Referer": $base,
-    "User-Agent": agent,
-    "Authorization": auth
-  })
-
-  newClient()
-
   let
+    headers = genHeaders({"authorization": auth}, agent, base, lang=false)
     url = apiBase / tokenUrl
-    json = parseJson(await client.postContent($url))
+    json = await fetchJson(url, headers)
 
-  result = json["guest_token"].to(string)
-  guestToken = result
+  if json != nil:
+    result = json["guest_token"].to(string)
+    guestToken = result
 
 proc getVideoFetch(tweet: Tweet; agent, token: string) {.async.} =
   if tweet.video.isNone(): return
 
-  let headers = newHttpHeaders({
-    "Accept": jsonAccept,
-    "Referer": $(base / getLink(tweet)),
-    "User-Agent": agent,
-    "Authorization": auth,
-    "x-guest-token": token
-  })
-
-  let url = apiBase / (videoUrl % tweet.id)
-  let json = await fetchJson(url, headers)
+  let
+    headers = genHeaders({"authorization": auth, "x-guest-token": token},
+                         agent, base / getLink(tweet), lang=false)
+    url = apiBase / (videoUrl % tweet.id)
+    json = await fetchJson(url, headers)
 
   if json == nil:
     if getTime() - tokenUpdated > initDuration(seconds=1):
@@ -114,52 +102,31 @@ proc getVideo*(tweet: Tweet; agent, token: string; force=false) {.async.} =
 proc getPoll*(tweet: Tweet; agent: string) {.async.} =
   if tweet.poll.isNone(): return
 
-  let headers = newHttpHeaders({
-    "Accept": htmlAccept,
-    "Referer": $(base / getLink(tweet)),
-    "User-Agent": agent,
-    "Authority": "twitter.com",
-    "Accept-Language": lang,
-  })
+  let
+    headers = genHeaders(agent, base / getLink(tweet), auth=true)
+    url = base / (pollUrl % tweet.id)
+    html = await fetchHtml(url, headers)
 
-  let url = base / (pollUrl % tweet.id)
-  let html = await fetchHtml(url, headers)
   if html == nil: return
-
   tweet.poll = some parsePoll(html)
 
 proc getCard*(tweet: Tweet; agent: string) {.async.} =
   if tweet.card.isNone(): return
 
-  let headers = newHttpHeaders({
-    "Accept": htmlAccept,
-    "Referer": $(base / getLink(tweet)),
-    "User-Agent": agent,
-    "Authority": "twitter.com",
-    "Accept-Language": lang,
-  })
+  let
+    headers = genHeaders(agent, base / getLink(tweet), auth=true)
+    query = get(tweet.card).query.replace("sensitive=true", "sensitive=false")
+    html = await fetchHtml(base / query, headers)
 
-  let query = get(tweet.card).query.replace("sensitive=true", "sensitive=false")
-  let html = await fetchHtml(base / query, headers)
   if html == nil: return
-
   parseCard(get(tweet.card), html)
 
 proc getPhotoRail*(username, agent: string): Future[seq[GalleryPhoto]] {.async.} =
-  let headers = newHttpHeaders({
-    "Accept": jsonAccept,
-    "Referer": $(base / username),
-    "User-Agent": agent,
-    "X-Requested-With": "XMLHttpRequest"
-  })
-
-  let params = {
-    "for_photo_rail": "true",
-    "oldest_unread_id": "0"
-  }
-
-  let url = base / (timelineMediaUrl % username) ? params
-  let html = await fetchHtml(url, headers, jsonKey="items_html")
+  let
+    headers = genHeaders({"x-requested-with": "XMLHttpRequest"}, agent, base / username)
+    params = {"for_photo_rail": "true", "oldest_unread_id": "0"}
+    url = base / (timelineMediaUrl % username) ? params
+    html = await fetchHtml(url, headers, jsonKey="items_html")
 
   result = parsePhotoRail(html)
 

@@ -7,15 +7,6 @@ import utils, consts, timeline, search
 proc getListTimeline*(username, list, agent, after: string): Future[Timeline] {.async.} =
   let url = base / (listUrl % [username, list])
 
-  let headers = newHttpHeaders({
-    "Accept": jsonAccept,
-    "Referer": $url,
-    "User-Agent": agent,
-    "X-Twitter-Active-User": "yes",
-    "X-Requested-With": "XMLHttpRequest",
-    "Accept-Language": lang
-  })
-
   var params = toSeq({
     "include_available_features": "1",
     "include_entities": "1",
@@ -25,7 +16,7 @@ proc getListTimeline*(username, list, agent, after: string): Future[Timeline] {.
   if after.len > 0:
     params.add {"max_position": after}
 
-  let json = await fetchJson(url ? params, headers)
+  let json = await fetchJson(url ? params, genHeaders(agent, url))
   result = await finishTimeline(json, Query(), after, agent)
   if result.content.len == 0:
     return
@@ -36,16 +27,10 @@ proc getListTimeline*(username, list, agent, after: string): Future[Timeline] {.
     else: get(last.retweet).id
 
 proc getListMembers*(username, list, agent: string): Future[Result[Profile]] {.async.} =
-  let url = base / (listMembersUrl % [username, list])
-
-  let headers = newHttpHeaders({
-    "Accept": htmlAccept,
-    "Referer": $(base / &"{username}/lists/{list}/members"),
-    "User-Agent": agent,
-    "Accept-Language": lang
-  })
-
-  let html = await fetchHtml(url, headers)
+  let
+    url = base / (listMembersUrl % [username, list])
+    referer = base / &"{username}/lists/{list}/members"
+    html = await fetchHtml(url, genHeaders(agent, referer))
 
   result = Result[Profile](
     minId: html.selectAttr(".stream-container", "data-min-position"),
@@ -56,17 +41,10 @@ proc getListMembers*(username, list, agent: string): Future[Result[Profile]] {.a
   )
 
 proc getListMembersSearch*(username, list, agent, after: string): Future[Result[Profile]] {.async.} =
-  let url = base / ((listMembersUrl & "/timeline") % [username, list])
-
-  let headers = newHttpHeaders({
-    "Accept": jsonAccept,
-    "Referer": $(base / &"{username}/lists/{list}/members"),
-    "User-Agent": agent,
-    "X-Twitter-Active-User": "yes",
-    "X-Requested-With": "XMLHttpRequest",
-    "X-Push-With": "XMLHttpRequest",
-    "Accept-Language": lang
-  })
+  let
+    url = base / ((listMembersUrl & "/timeline") % [username, list])
+    referer = base / &"{username}/lists/{list}/members"
+    headers = genHeaders({"x-push-with": "XMLHttpRequest"}, agent, referer, xml=true)
 
   var params = toSeq({
     "include_available_features": "1",

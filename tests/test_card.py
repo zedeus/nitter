@@ -9,8 +9,8 @@ card = [
      'github.com', False],
 
     ['lorenlugosch/status/1115440394148487168',
-     'lorenlugosch/pretrain_speech_model',
-     'Speech Model Pre-training for End-to-End Spoken Language Understanding - lorenlugosch/pretrain_speech_model',
+     'lorenlugosch/end-to-end-SLU',
+     'PyTorch code for end-to-end spoken language understanding (SLU) with ASR-based transfer learning - lorenlugosch/end-to-end-SLU',
      'github.com', False],
 
     ['PyTorch/status/1123379369672450051',
@@ -85,12 +85,7 @@ playable = [
     ['nim_lang/status/1121090879823986688',
      'Nim - First natively compiled language w/ hot code-reloading at...',
      '#nim #c++ #ACCUConf Nim is a statically typed systems and applications programming language which offers perhaps some of the most powerful metaprogramming ca...',
-     'youtube.com'],
-
-    ['lele/status/819930645145288704',
-     'Eurocrash presents Open Decks - emerging dj #4: E-Musik',
-     "OPEN DECKS is Eurocrash's new project about discovering new and emerging dj talents. Every selected dj will have the chance to perform the first dj-set in front of an actual audience. The best dj...",
-     'mixcloud.com']
+     'youtube.com']
 ]
 
 promo = [

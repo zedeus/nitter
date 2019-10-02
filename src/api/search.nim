@@ -22,14 +22,8 @@ proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.asyn
     param = genQueryParam(query)
     encoded = encodeUrl(param, usePlus=false)
 
-    headers = newHttpHeaders({
-      "Accept": jsonAccept,
-      "Referer": $(base / ("search?f=$1&q=$2&src=typd" % [kind, encoded])),
-      "User-Agent": agent,
-      "X-Requested-With": "XMLHttpRequest",
-      "Authority": "twitter.com",
-      "Accept-Language": lang
-    })
+    referer = base / ("search?f=$1&q=$2&src=typd" % [kind, encoded])
+    headers = genHeaders(agent, referer, auth=true, xml=true)
 
     params = {
       "f": kind,

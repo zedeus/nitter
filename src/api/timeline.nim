@@ -22,14 +22,7 @@ proc finishTimeline*(json: JsonNode; query: Query; after, agent: string): Future
   result.content = thread.content
 
 proc getTimeline*(username, after, agent: string): Future[Timeline] {.async.} =
-  let headers = newHttpHeaders({
-    "Accept": jsonAccept,
-    "Referer": $(base / username),
-    "User-Agent": agent,
-    "X-Twitter-Active-User": "yes",
-    "X-Requested-With": "XMLHttpRequest",
-    "Accept-Language": lang
-  })
+  let headers = genHeaders(agent, base / username, xml=true)
 
   var params = toSeq({
     "include_available_features": "1",
@@ -45,18 +38,12 @@ proc getTimeline*(username, after, agent: string): Future[Timeline] {.async.} =
   result = await finishTimeline(json, Query(), after, agent)
 
 proc getProfileAndTimeline*(username, agent, after: string): Future[(Profile, Timeline)] {.async.} =
-  let headers = newHttpHeaders({
-    "authority": "twitter.com",
-    "accept": htmlAccept,
-    "referer": "https://twitter.com/" & username,
-    "accept-language": lang
-  })
-
   var url = base / username
   if after.len > 0:
     url = url ? {"max_position": after}
 
   let
+    headers = genHeaders(agent, base / username, auth=true)
     html = await fetchHtml(url, headers)
     timeline = parseTimeline(html.select("#timeline > .stream-container"), after)
     profile = parseTimelineProfile(html)

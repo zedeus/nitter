@@ -4,18 +4,12 @@ import ".."/[types, parser]
 import utils, consts, media
 
 proc getTweet*(username, id, after, agent: string): Future[Conversation] {.async.} =
-  let headers = newHttpHeaders({
-    "Accept": jsonAccept,
-    "Referer": $base,
-    "User-Agent": agent,
-    "X-Twitter-Active-User": "yes",
-    "X-Requested-With": "XMLHttpRequest",
-    "Accept-Language": lang,
-    "Pragma": "no-cache",
-    "X-Previous-Page-Name": "profile"
-  })
-
   let
+    headers = genHeaders({
+      "pragma": "no-cache",
+      "x-previous-page-name": "profile"
+    }, agent, base, xml=true)
+
     url = base / username / tweetUrl / id ? {"max_position": after}
     html = await fetchHtml(url, headers)
 

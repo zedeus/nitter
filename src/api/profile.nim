@@ -12,21 +12,15 @@ proc getProfileFallback(username: string; headers: HttpHeaders): Future[Profile]
   result = parseIntentProfile(html)
 
 proc getProfile*(username, agent: string): Future[Profile] {.async.} =
-  let headers = newHttpHeaders({
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
-    "Referer": $(base / username),
-    "User-Agent": agent,
-    "X-Twitter-Active-User": "yes",
-    "X-Requested-With": "XMLHttpRequest",
-    "Accept-Language": lang
-  })
-
   let
+    headers = genHeaders(agent, base / username, xml=true)
+
     params = {
       "screen_name": username,
       "wants_hovercard": "true",
       "_": $(epochTime().int)
     }
+
     url = base / profilePopupUrl ? params
     html = await fetchHtml(url, headers, jsonKey="html")
 
@@ -37,14 +31,11 @@ proc getProfile*(username, agent: string): Future[Profile] {.async.} =
 
   result = parsePopupProfile(html)
 
-proc getProfileFull*(username: string): Future[Profile] {.async.} =
-  let headers = newHttpHeaders({
-    "authority": "twitter.com",
-    "accept": htmlAccept,
-    "referer": "https://twitter.com/" & username,
-    "accept-language": lang
-  })
+proc getProfileFull*(username, agent: string): Future[Profile] {.async.} =
+  let
+    url = base / username
+    headers = genHeaders(agent, url, auth=true)
+    html = await fetchHtml(url, headers)
 
-  let html = await fetchHtml(base / username, headers)
   if html == nil: return
   result = parseTimelineProfile(html)
