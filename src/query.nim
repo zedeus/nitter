@@ -110,6 +110,7 @@ proc cleanPos*(pos: string): string =
   pos.multiReplace((posPrefix, ""), (posSuffix, ""))
 
 proc genPos*(pos: string): string =
+  if pos.len == 0: return
   result = posPrefix & pos
   if "A==" notin result:
     result &= posSuffix
