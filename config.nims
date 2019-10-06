@@ -1,4 +1,3 @@
 --define:ssl
-
-# workaround httpbeast file upload bug
+--define:useStdLib
 --assertions:off
