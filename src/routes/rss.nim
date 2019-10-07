@@ -10,7 +10,8 @@ include "../views/rss.nimf"
 
 proc showRss*(name: string; query: Query): Future[string] {.async.} =
   let (profile, timeline, _) = await fetchSingleTimeline(name, "", getAgent(), query)
-  return renderTimelineRss(timeline.content, profile)
+  if timeline != nil:
+    return renderTimelineRss(timeline, profile)
 
 template respRss*(rss: typed) =
   if rss.len == 0:

@@ -57,7 +57,7 @@
 #end for
 #end proc
 #
-#proc renderTimelineRss*(tweets: seq[Tweet]; profile: Profile): string =
+#proc renderTimelineRss*(timeline: Timeline; profile: Profile): string =
 #let prefs = Prefs(replaceTwitter: hostname)
 #result = ""
 <?xml version="1.0" encoding="UTF-8"?>
@@ -76,7 +76,9 @@
       <width>128</width>
       <height>128</height>
     </image>
-    ${renderRssTweets(tweets, prefs)}
+    #if timeline != nil:
+    ${renderRssTweets(timeline.content, prefs)}
+    #end if
   </channel>
 </rss>
 #end proc
