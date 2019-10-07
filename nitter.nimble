@@ -12,6 +12,7 @@ bin           = @["nitter"]
 
 requires "nim >= 0.19.9"
 requires "norm >= 1.0.17"
+requires "https://github.com/zedeus/httpbeast#fix-crash"
 requires "jester >= 0.4.3"
 requires "regex >= 0.11.2"
 requires "q >= 0.0.7"
