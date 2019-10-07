@@ -1,4 +1,4 @@
-import uri
+import uri, strutils
 import karax/[karaxdsl, vdom]
 
 import renderutils
@@ -9,7 +9,9 @@ import jester
 const doctype = "<!DOCTYPE html>\n"
 
 proc renderNavbar*(title, rss: string; req: Request): VNode =
-  let path = $(parseUri(req.path) ? filterParams(req.params))
+  var path = $(parseUri(req.path) ? filterParams(req.params))
+  path = "https://twitter.com" & path.replace("after=", "max_position=")
+
   buildHtml(nav):
     tdiv(class="inner-nav"):
       tdiv(class="nav-item"):
@@ -21,6 +23,8 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
         icon "search", title="Search", href="/search"
         if rss.len > 0:
           icon "rss-feed", title="RSS Feed", href=rss
+        if "/search" notin path:
+          icon "bird", title="Open in Twitter", href=path
         icon "info-circled", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 
