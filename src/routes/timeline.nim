@@ -84,9 +84,9 @@ proc createTimelineRouter*(cfg: Config) =
       let rss = "/$1/rss" % @"name"
       respTimeline(await showTimeline(request, Query(), cfg.title, rss))
 
-    get "/@name/replies":
+    get "/@name/with_replies":
       cond '.' notin @"name"
-      let rss = "/$1/replies/rss" % @"name"
+      let rss = "/$1/with_replies/rss" % @"name"
       respTimeline(await showTimeline(request, getReplyQuery(@"name"), cfg.title, rss))
 
     get "/@name/media":

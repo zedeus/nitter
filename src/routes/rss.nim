@@ -35,7 +35,7 @@ proc createRssRouter*(cfg: Config) =
       cond '.' notin @"name"
       respRss(await showRss(@"name", Query()))
 
-    get "/@name/replies/rss":
+    get "/@name/with_replies/rss":
       cond '.' notin @"name"
       respRss(await showRss(@"name", getReplyQuery(@"name")))
 
