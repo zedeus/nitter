@@ -38,6 +38,9 @@ routes:
   get "/help":
     redirect("/about")
 
+  error Http404:
+    resp showError("Page not found", cfg.title)
+
   extend unsupported, ""
   extend preferences, ""
   extend rss, ""

@@ -72,7 +72,7 @@ proc showTimeline*(request: Request; query: Query; title, rss: string): Future[s
 
 template respTimeline*(timeline: typed) =
   if timeline.len == 0:
-    resp Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
+    halt Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
   resp timeline
 
 proc createTimelineRouter*(cfg: Config) =

@@ -33,7 +33,7 @@ proc createMediaRouter*(cfg: Config) =
           discard
 
       if not existsFile(filename):
-        resp Http404
+        halt Http404
 
       let file = openAsync(filename)
       let buf = await readAll(file)
@@ -58,7 +58,7 @@ proc createMediaRouter*(cfg: Config) =
         discard
 
       if content.len == 0:
-        resp Http404
+        halt Http404
 
       resp content, mimetype(url)
 

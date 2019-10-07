@@ -19,10 +19,10 @@ proc createStatusRouter*(cfg: Config) =
 
       let conversation = await getTweet(@"name", @"id", @"after", getAgent())
       if conversation == nil or conversation.tweet.id.len == 0:
+        var error = "Tweet not found"
         if conversation != nil and conversation.tweet.tombstone.len > 0:
-          resp Http404, showError(conversation.tweet.tombstone, cfg.title)
-        else:
-          resp Http404, showError("Tweet not found", cfg.title)
+          error = conversation.tweet.tombstone
+        halt Http404, showError(error, cfg.title)
 
       let
         title = pageTitle(conversation.tweet.profile)
