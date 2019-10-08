@@ -35,12 +35,14 @@ macro genMediaGet(media: untyped; token=false) =
         futs.add `single`(convo.tweet, agent, token)
         futs.add `multi`(convo.before, agent, token=token)
         futs.add `multi`(convo.after, agent, token=token)
-        futs.add convo.replies.content.mapIt(`multi`(it, agent, token=token))
+        if convo.replies != nil:
+          futs.add convo.replies.content.mapIt(`multi`(it, agent, token=token))
       else:
         futs.add `single`(convo.tweet, agent)
         futs.add `multi`(convo.before, agent)
         futs.add `multi`(convo.after, agent)
-        futs.add convo.replies.content.mapIt(`multi`(it, agent))
+        if convo.replies != nil:
+          futs.add convo.replies.content.mapIt(`multi`(it, agent))
       await all(futs)
 
 proc getGuestToken(agent: string; force=false): Future[string] {.async.} =
