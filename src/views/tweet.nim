@@ -222,7 +222,8 @@ proc renderQuote(quote: Quote; prefs: Prefs): VNode =
         text "Show this thread"
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
-                  index=0; total=(-1); last=false; showThread=false): VNode =
+                  index=0; total=(-1); last=false; showThread=false;
+                  mainTweet=false): VNode =
   var divClass = class
   if index == total or last:
     divClass = "thread-last " & class
@@ -261,6 +262,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
         renderGif(tweet.gif.get(), prefs)
       elif tweet.poll.isSome:
         renderPoll(tweet.poll.get())
+
+      if mainTweet:
+        p(class="tweet-published"): text getTweetTime(tweet)
 
       if not prefs.hideTweetStats:
         renderStats(tweet.stats, views)
