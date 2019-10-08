@@ -23,8 +23,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
         icon "search", title="Search", href="/search"
         if rss.len > 0:
           icon "rss-feed", title="RSS Feed", href=rss
-        if "/search" notin path:
-          icon "bird", title="Open in Twitter", href=twitPath
+        icon "bird", title="Open in Twitter", href=twitPath
         icon "info-circled", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 

@@ -24,7 +24,7 @@ template `@`(param: string): untyped =
 
 proc initQuery*(pms: Table[string, string]; name=""): Query =
   result = Query(
-    kind: parseEnum[QueryKind](@"f", custom),
+    kind: parseEnum[QueryKind](@"f", tweets),
     text: @"q",
     filters: validFilters.filterIt("f-" & it in pms),
     excludes: validFilters.filterIt("e-" & it in pms),
@@ -84,7 +84,7 @@ proc genQueryParam*(query: Query): string =
     result &= " " & query.text
 
 proc genQueryUrl*(query: Query): string =
-  if query.kind notin {custom, users}: return
+  if query.kind notin {tweets, users}: return
 
   var params = @[&"f={query.kind}"]
   if query.text.len > 0:

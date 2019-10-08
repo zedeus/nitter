@@ -25,7 +25,7 @@ proc createRssRouter*(cfg: Config) =
         resp Http400, showError("Search input too long.", cfg.title)
 
       let query = initQuery(params(request))
-      if query.kind != custom:
+      if query.kind != tweets:
         resp Http400, showError("Only Tweet searches are allowed for RSS feeds.", cfg.title)
 
       let tweets = await getSearch[Tweet](query, "", getAgent())
