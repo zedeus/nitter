@@ -44,8 +44,8 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
       tdiv(class="profile-card-extra-links"):
         ul(class="profile-statlist"):
           renderStat(profile.tweets, "posts", text="Tweets")
-          renderStat(profile.followers, "followers")
           renderStat(profile.following, "following")
+          renderStat(profile.followers, "followers")
           renderStat(profile.likes, "likes")
 
 proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
