@@ -9,8 +9,8 @@ import jester
 const doctype = "<!DOCTYPE html>\n"
 
 proc renderNavbar*(title, rss: string; req: Request): VNode =
-  var path = $(parseUri(req.path) ? filterParams(req.params))
-  path = "https://twitter.com" & path.replace("after=", "max_position=")
+  let path = $(parseUri(req.path) ? filterParams(req.params))
+  let twitPath = "https://twitter.com" & path.replace("after=", "max_position=")
 
   buildHtml(nav):
     tdiv(class="inner-nav"):
@@ -24,7 +24,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
         if rss.len > 0:
           icon "rss-feed", title="RSS Feed", href=rss
         if "/search" notin path:
-          icon "bird", title="Open in Twitter", href=path
+          icon "bird", title="Open in Twitter", href=twitPath
         icon "info-circled", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 
