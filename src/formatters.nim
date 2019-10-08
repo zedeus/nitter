@@ -1,7 +1,7 @@
-import strutils, strformat, sequtils, htmlgen, xmltree, times, uri
+import strutils, strformat, sequtils, htmlgen, xmltree, times, uri, tables
 import regex
 
-import types, utils
+import types, utils, query
 
 from unicode import Rune, `$`
 
@@ -139,3 +139,30 @@ proc getLink*(tweet: Tweet | Quote): string =
 
 proc getTombstone*(text: string): string =
   text.replace(re"\n* *Learn more", "").stripText().strip(chars={' ', '\n'})
+
+proc getTwitterLink*(path: string; params: Table[string, string]): string =
+  let
+    twitter = parseUri("https://twitter.com")
+    username = params.getOrDefault("name")
+    query = initQuery(params, username)
+
+  var after = params.getOrDefault("after", "0")
+  if query.kind notin {userList, users} and "/members" notin path:
+    after = after.genPos()
+
+  var paramList = filterParams(params).mapIt(
+    if it[0] == "after": ("max_position", after) else: it)
+
+  if "/search" notin path:
+    return $(twitter / path ? paramList)
+
+  let p = {
+    "f": $query.kind,
+    "q": genQueryParam(query),
+    "src": "typd",
+    "max_position": after
+  }
+
+  result = $(parseUri("https://twitter.com") / path ? p)
+  if username.len > 0:
+    result = result.replace("/" & username, "")
