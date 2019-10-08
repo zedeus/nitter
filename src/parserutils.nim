@@ -92,6 +92,14 @@ proc getBio*(profile: XmlNode; selector: string; fallback=""): string =
     bio = profile.selectText(fallback)
   stripText(bio)
 
+proc getLocation*(profile: XmlNode): string =
+  let sel = ".ProfileHeaderCard-locationText"
+  result = profile.selectText(sel).stripText()
+
+  let link = profile.selectAttr(sel & " a", "data-place-id")
+  if link.len > 0:
+    result &= ":" & link
+
 proc getAvatar*(profile: XmlNode; selector: string): string =
   profile.selectAttr(selector, "src").getUserpic()
 
