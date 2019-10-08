@@ -44,7 +44,7 @@ proc reEmailToLink*(m: RegexMatch; s: string): string =
 proc reHashtagToLink*(m: RegexMatch; s: string): string =
   result = if m.group(0).len > 0: s[m.group(0)[0]] else: ""
   let hash = s[m.group(1)[0]]
-  let link = toLink("/search?text=" & encodeUrl(hash), hash)
+  let link = toLink("/search?q=" & encodeUrl(hash), hash)
   if hash.any(isAlphaAscii):
     result &= link
   else:
