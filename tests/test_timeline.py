@@ -8,9 +8,9 @@ after = [['mobile_test', '627635134573862912'],
 
 short = [['mobile_test_6'], ['mobile_test_8'], ['picman']]
 
-no_more = [['mobile_test_8?after=159455542543257601']]
+no_more = [['mobile_test_8?max_position=159455542543257601']]
 
-none_found = [['mobile_test_8?after=159455542543257600']]
+none_found = [['mobile_test_8?max_position=159455542543257600']]
 
 empty = [['maybethis'], ['mobile_test_10']]
 
@@ -28,7 +28,7 @@ class TweetTest(BaseTestCase):
 
     @parameterized.expand(after)
     def test_after(self, username, index):
-        self.open_nitter(f'{username}?after={index}')
+        self.open_nitter(f'{username}?max_position={index}')
         self.assert_element_present(Timeline.newest)
         self.assert_element_present(Timeline.older)
         self.assert_element_absent(Timeline.end)

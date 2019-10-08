@@ -9,7 +9,7 @@ proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
   Result[T](
     hasMore: json{"has_more_items"}.getBool(false),
     maxId: json{"max_position"}.getStr(""),
-    minId: json{"min_position"}.getStr("").cleanPos(),
+    minId: json{"min_position"}.getStr(""),
     query: query,
     beginning: after.len == 0
   )
@@ -17,7 +17,6 @@ proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
 proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.async.} =
   let
     kind = if query.kind == users: "users" else: "tweets"
-    pos = when T is Tweet: genPos(after) else: after
 
     param = genQueryParam(query)
     encoded = encodeUrl(param, usePlus=false)
@@ -32,7 +31,7 @@ proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.asyn
       "src": "typd",
       "include_available_features": "1",
       "include_entities": "1",
-      "max_position": if pos.len > 0: pos else: "0",
+      "max_position": if after.len > 0: after else: "0",
       "reset_error_state": "false"
     }
 

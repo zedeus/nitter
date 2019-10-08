@@ -21,10 +21,10 @@ proc createSearchRouter*(cfg: Config) =
       of users:
         if "," in @"q":
           redirect("/" & @"q")
-        let users = await getSearch[Profile](query, @"after", getAgent())
+        let users = await getSearch[Profile](query, @"max_position", getAgent())
         resp renderMain(renderUserSearch(users, prefs), request, cfg.title)
       of tweets:
-        let tweets = await getSearch[Tweet](query, @"after", getAgent())
+        let tweets = await getSearch[Tweet](query, @"max_position", getAgent())
         let rss = "/search/rss?" & genQueryUrl(query)
         resp renderMain(renderTweetSearch(tweets, prefs, getPath()), request,
                         cfg.title, rss=rss)

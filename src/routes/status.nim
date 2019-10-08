@@ -17,7 +17,7 @@ proc createStatusRouter*(cfg: Config) =
       cond '.' notin @"name"
       let prefs = cookiePrefs()
 
-      let conversation = await getTweet(@"name", @"id", @"after", getAgent())
+      let conversation = await getTweet(@"name", @"id", @"max_position", getAgent())
       if conversation == nil or conversation.tweet.id.len == 0:
         var error = "Tweet not found"
         if conversation != nil and conversation.tweet.tombstone.len > 0:

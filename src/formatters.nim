@@ -146,21 +146,14 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
     username = params.getOrDefault("name")
     query = initQuery(params, username)
 
-  var after = params.getOrDefault("after", "0")
-  if query.kind notin {userList, users} and "/members" notin path:
-    after = after.genPos()
-
-  var paramList = filterParams(params).mapIt(
-    if it[0] == "after": ("max_position", after) else: it)
-
   if "/search" notin path:
-    return $(twitter / path ? paramList)
+    return $(twitter / path ? filterParams(params))
 
   let p = {
     "f": $query.kind,
     "q": genQueryParam(query),
     "src": "typd",
-    "max_position": after
+    "max_position": params.getOrDefault("max_position", "0")
   }
 
   result = $(parseUri("https://twitter.com") / path ? p)

@@ -19,7 +19,7 @@ proc renderNewer*(query: Query; path: string): VNode =
 
 proc renderMore*(query: Query; minId: string): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"?{getQuery(query)}after={minId}")):
+    a(href=(&"?{getQuery(query)}max_position={minId}")):
       text "Load more"
 
 proc renderNoMore(): VNode =

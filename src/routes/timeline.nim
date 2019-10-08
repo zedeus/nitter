@@ -56,7 +56,7 @@ proc showTimeline*(request: Request; query: Query; title, rss: string): Future[s
     agent = getAgent()
     prefs = cookiePrefs()
     name = request.get("name")
-    after = request.get("after")
+    after = request.get("max_position")
     names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
 
   if names.len == 1:

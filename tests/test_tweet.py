@@ -81,8 +81,8 @@ retweet = [
 ]
 
 reply = [
-    ['mobile_test?after=471336696307392513', '@mobile_test', '@mobile_test'],
-    ['mobile_test_2?after=375101899214561280', '@mobile_test_2', '@mobile_test']
+    ['mobile_test?max_position=471336696307392513', '@mobile_test', '@mobile_test'],
+    ['mobile_test_2?max_position=375101899214561280', '@mobile_test_2', '@mobile_test']
 ]
 
 

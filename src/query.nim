@@ -12,12 +12,6 @@ const
     "verified", "safe"
   ]
 
-# Experimental, this might break in the future
-# Till then, it results in shorter urls
-const
-  posPrefix = "thGAVUV0VFVB"
-  posSuffix = "EjUAFQAlAFUAFQAA"
-
 template `@`(param: string): untyped =
   if param in pms: pms[param]
   else: ""
@@ -105,12 +99,3 @@ proc genQueryUrl*(query: Query): string =
 
   if params.len > 0:
     result &= params.join("&")
-
-proc cleanPos*(pos: string): string =
-  pos.multiReplace((posPrefix, ""), (posSuffix, ""))
-
-proc genPos*(pos: string): string =
-  if pos.len == 0 or pos == "0": return pos
-  result = posPrefix & pos
-  if "A==" notin result:
-    result &= posSuffix
