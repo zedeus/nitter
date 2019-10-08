@@ -88,6 +88,9 @@ proc parseQuote*(quote: XmlNode): Quote =
   result.getQuoteMedia(quote)
 
 proc parseTweet*(node: XmlNode): Tweet =
+  if node == nil:
+    return Tweet()
+
   if "withheld" in node.attr("class"):
     return Tweet(tombstone: getTombstone(node.selectText(".Tombstone-label")))
 
