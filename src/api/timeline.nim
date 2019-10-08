@@ -4,7 +4,7 @@ import sequtils, strutils, json, uri
 import ".."/[types, parser, parserutils, formatters, query]
 import utils, consts, media, search
 
-proc getMedia(thread: Thread | Timeline; agent: string) {.async.} =
+proc getMedia(thread: Chain | Timeline; agent: string) {.async.} =
   await all(getVideos(thread, agent),
             getCards(thread, agent),
             getPolls(thread, agent))
@@ -17,7 +17,7 @@ proc finishTimeline*(json: JsonNode; query: Query; after, agent: string): Future
   if not json.hasKey("items_html"): return
 
   let html = parseHtml(json["items_html"].to(string))
-  let thread = parseThread(html)
+  let thread = parseChain(html)
 
   await getMedia(thread, agent)
   result.content = thread.content

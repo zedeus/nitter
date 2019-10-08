@@ -3,7 +3,7 @@ import karax/[karaxdsl, vdom]
 import ".."/[types, formatters]
 import tweet, timeline
 
-proc renderMoreReplies(thread: Thread): VNode =
+proc renderMoreReplies(thread: Chain): VNode =
   let num = if thread.more != -1: $thread.more & " " else: ""
   let reply = if thread.more == 1: "reply" else: "replies"
   let link = getLink(thread.content[^1])
@@ -15,7 +15,7 @@ proc renderMoreReplies(thread: Thread): VNode =
       a(class="more-replies-text"):
         text $num & "more " & reply
 
-proc renderReplyThread(thread: Thread; prefs: Prefs; path: string): VNode =
+proc renderReplyThread(thread: Chain; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="reply thread thread-line")):
     for i, tweet in thread.content:
       let last = (i == thread.content.high and thread.more == 0)

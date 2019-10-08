@@ -18,7 +18,7 @@ macro genMediaGet(media: untyped; token=false) =
     single = ident("get" & mediaName)
 
   quote do:
-    proc `multi`*(thread: Thread | Timeline; agent: string; token="") {.async.} =
+    proc `multi`*(thread: Chain | Timeline; agent: string; token="") {.async.} =
       if thread == nil: return
       var `media` = thread.content.filterIt(it.`media`.isSome)
       when `token`:

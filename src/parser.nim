@@ -132,9 +132,9 @@ proc parseTweet*(node: XmlNode): Tweet =
       let quote = Quote(tombstone: getTombstone(node.selectText(".Tombstone-label")))
       result.quote = some quote
 
-proc parseThread*(nodes: XmlNode): Thread =
+proc parseChain*(nodes: XmlNode): Chain =
   if nodes == nil: return
-  result = Thread()
+  result = Chain()
   for n in nodes.filterIt(it.kind != xnText):
     let class = n.attr("class").toLower()
     if "tombstone" in class or "unavailable" in class or "withheld" in class:
@@ -152,8 +152,8 @@ proc parseConversation*(node: XmlNode; after: string): Conversation =
 
   result = Conversation(
     tweet:  parseTweet(tweet),
-    before: parseThread(node.select(".in-reply-to .stream-items")),
-    replies: Result[Thread](
+    before: parseChain(node.select(".in-reply-to .stream-items")),
+    replies: Result[Chain](
       minId: node.selectAttr(".replies-to .stream-container", "data-min-position"),
       hasMore: node.select(".stream-footer .has-more-items") != nil,
       beginning: after.len == 0
@@ -175,16 +175,16 @@ proc parseConversation*(node: XmlNode; after: string): Conversation =
     let thread = reply.select(".stream-items")
 
     if i == 0 and "self" in class:
-      result.after = parseThread(thread)
+      result.after = parseChain(thread)
     elif "lone" in class:
-      result.replies.content.add parseThread(reply)
+      result.replies.content.add parseChain(reply)
     else:
-      result.replies.content.add parseThread(thread)
+      result.replies.content.add parseChain(thread)
 
 proc parseTimeline*(node: XmlNode; after: string): Timeline =
   if node == nil: return Timeline()
   result = Timeline(
-    content: parseThread(node.select(".stream > .stream-items")).content,
+    content: parseChain(node.select(".stream > .stream-items")).content,
     minId: node.attr("data-min-position"),
     maxId: node.attr("data-max-position"),
     hasMore: node.select(".has-more-items") != nil,

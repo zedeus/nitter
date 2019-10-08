@@ -156,15 +156,15 @@ type
     photos*: seq[string]
     poll*: Option[Poll]
 
-  Thread* = ref object
+  Chain* = ref object
     content*: seq[Tweet]
     more*: int
 
   Conversation* = ref object
     tweet*: Tweet
-    before*: Thread
-    after*: Thread
-    replies*: Result[Thread]
+    before*: Chain
+    after*: Chain
+    replies*: Result[Chain]
 
   Timeline* = Result[Tweet]
 
@@ -177,5 +177,5 @@ type
     cacheDir*: string
     profileCacheTime*: int
 
-proc contains*(thread: Thread; tweet: Tweet): bool =
+proc contains*(thread: Chain; tweet: Tweet): bool =
   thread.content.anyIt(it.id == tweet.id)
