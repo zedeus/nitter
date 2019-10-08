@@ -12,7 +12,7 @@ proc parseTimelineProfile*(node: XmlNode): Profile =
     username:  profile.getUsername(pre & "screenname"),
     joinDate:  profile.getDate(pre & "joinDateText"),
     location:  profile.selectText(pre & "locationText").stripText(),
-    website:   profile.selectText(pre & "url").stripText(),
+    website:   profile.selectAttr(pre & "urlText a", "title"),
     bio:       profile.getBio(pre & "bio"),
     userpic:   node.getAvatar(".profile-picture img"),
     verified:  isVerified(profile),

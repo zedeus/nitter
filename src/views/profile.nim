@@ -35,7 +35,7 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
         tdiv(class="profile-website"):
           span:
             icon "link"
-            linkText(profile.website)
+            verbatim linkifyText(profile.website, prefs)
 
       tdiv(class="profile-joindate"):
         span(title=getJoinDateFull(profile)):
