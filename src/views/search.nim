@@ -110,7 +110,8 @@ proc renderUserSearch*(users: Result[Profile]; prefs: Prefs): VNode =
     tdiv(class="timeline-header"):
       form(`method`="get", action="/search", class="search-field"):
         hiddenField("kind", "userSearch")
-        genInput("q", "", users.query.text, "Enter username...", class="pref-inline")
+        genInput("q", "", users.query.text, "Enter username...",
+                 class="pref-inline", autofocus=true)
         button(`type`="submit"): icon "search"
 
     renderSearchTabs(users.query)
