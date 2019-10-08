@@ -17,6 +17,9 @@ proc createPrefRouter*(cfg: Config) =
       let html = renderPreferences(cookiePrefs(), refPath())
       resp renderMain(html, request, cfg.title, "Preferences")
 
+    get "/settings/@i?":
+      redirect("/settings")
+
     post "/saveprefs":
       var prefs = cookiePrefs()
       genUpdatePrefs()
