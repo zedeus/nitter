@@ -35,7 +35,7 @@ proc getListMembers*(username, list, agent: string): Future[Result[Profile]] {.a
     minId: html.selectAttr(".stream-container", "data-min-position"),
     hasMore: html.select(".has-more-items") != nil,
     beginning: true,
-    query: Query(kind: users),
+    query: Query(kind: userList),
     content: html.selectAll(".account").map(parseListProfile)
   )
 
@@ -56,7 +56,7 @@ proc getListMembersSearch*(username, list, agent, after: string): Future[Result[
 
   let json = await fetchJson(url ? params, headers)
 
-  result = getResult[Profile](json, Query(kind: users), after)
+  result = getResult[Profile](json, Query(kind: userList), after)
   if json == nil or not json.hasKey("items_html"): return
 
   let html = json["items_html"].to(string)

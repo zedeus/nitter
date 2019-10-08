@@ -8,7 +8,7 @@ proc renderListTabs*(query: Query; path: string): VNode =
   buildHtml(ul(class="tab")):
     li(class=query.getTabClass(posts)):
       a(href=(path)): text "Tweets"
-    li(class=query.getTabClass(users)):
+    li(class=query.getTabClass(userList)):
       a(href=(path & "/members")): text "Members"
 
 proc renderList*(body: VNode; query: Query; name, list: string): VNode =

@@ -16,7 +16,7 @@ proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
 
 proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.async.} =
   let
-    kind = if query.kind == userSearch: "users" else: "tweets"
+    kind = if query.kind == users: "users" else: "tweets"
     pos = when T is Tweet: genPos(after) else: after
 
     param = genQueryParam(query)

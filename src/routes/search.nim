@@ -18,7 +18,7 @@ proc createSearchRouter*(cfg: Config) =
       let query = initQuery(params(request))
 
       case query.kind
-      of userSearch:
+      of users:
         if "," in @"q":
           redirect("/" & @"q")
         let users = await getSearch[Profile](query, @"after", getAgent())
