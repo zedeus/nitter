@@ -237,7 +237,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
           text "This tweet is unavailable"
 
   buildHtml(tdiv(class=("timeline-item " & divClass))):
-    a(class="tweet-link", href=getLink(tweet))
+    if not mainTweet:
+      a(class="tweet-link", href=getLink(tweet))
+
     tdiv(class="tweet-body"):
       var views = ""
       renderHeader(tweet)
