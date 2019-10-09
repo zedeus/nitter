@@ -215,7 +215,7 @@ proc renderQuote(quote: Quote; prefs: Prefs): VNode =
       renderReply(quote)
 
     tdiv(class="quote-text"):
-      verbatim linkifyText(quote.text, prefs)
+      verbatim replaceUrl(quote.text, prefs)
 
     if quote.hasThread:
       a(class="show-thread", href=getLink(quote)):
@@ -248,7 +248,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
         renderReply(tweet)
 
       tdiv(class="tweet-content media-body"):
-        verbatim linkifyText(tweet.text, prefs)
+        verbatim replaceUrl(tweet.text, prefs)
 
       if tweet.quote.isSome:
         renderQuote(tweet.quote.get(), prefs)

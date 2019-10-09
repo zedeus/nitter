@@ -1,9 +1,10 @@
-import xmltree, strtabs, strformat, strutils, times
+import xmltree, strtabs, strformat, strutils, times, uri
 import regex
 
 import types, formatters
 
 from q import nil
+from htmlgen import a
 
 const
   thumbRegex = re".+:url\('([^']+)'\)"
@@ -41,29 +42,41 @@ proc isVerified*(profile: XmlNode): bool =
 proc isProtected*(profile: XmlNode): bool =
   getHeader(profile).select(".Icon.Icon--protected") != nil
 
-proc emojify*(node: XmlNode) =
-  for i in node.selectAll(".Emoji"):
-    i.add newText(i.attr("alt"))
+proc parseText*(text: XmlNode; skipLink=""): string =
+  for el in text:
+    case el.kind
+    of xnText:
+      result.add el
+    of xnElement:
+      if el.attrs == nil:
+        if el.tag == "strong":
+          result.add $el
+        continue
+
+      let class = el.attr("class")
+      if "data-expanded-url" in el.attrs:
+        let url = el.attr("data-expanded-url")
+        if url == skipLink: continue
+        elif "u-hidden" in class: result.add "\n"
+        result.add a(shortLink(url), href=url)
+      elif "ashtag" in class:
+        let hash = el.innerText()
+        result.add a(hash, href=("/search?q=" & encodeUrl(hash)))
+      elif "atreply" in class:
+        result.add a(el.innerText(), href=el.attr("href"))
+      elif "Emoji" in class:
+        result.add el.attr("alt")
+    else: discard
 
 proc getQuoteText*(tweet: XmlNode): string =
-  let text = tweet.select(".QuoteTweet-text")
-  emojify(text)
-  result = stripText(text.innerText())
-  result = stripTwitterUrls(result)
+  parseText(tweet.select(".QuoteTweet-text"))
 
 proc getTweetText*(tweet: XmlNode): string =
   let
     quote = tweet.select(".QuoteTweet")
     text = tweet.select(".tweet-text")
     link = text.selectAttr("a.twitter-timeline-link.u-hidden", "data-expanded-url")
-
-  emojify(text)
-  result = stripText(text.innerText())
-
-  if quote != nil and link.len > 0:
-    result = result.replace(link, "")
-
-  result = stripTwitterUrls(result)
+  parseText(text, if quote != nil: link else: "")
 
 proc getTime(tweet: XmlNode): XmlNode =
   tweet.select(".js-short-timestamp")
@@ -87,10 +100,10 @@ proc getUsername*(profile: XmlNode; selector: string): string =
   profile.selectText(selector).strip(chars={'@', ' ', '\n'})
 
 proc getBio*(profile: XmlNode; selector: string; fallback=""): string =
-  var bio = profile.selectText(selector)
-  if bio.len == 0 and fallback.len > 0:
-    bio = profile.selectText(fallback)
-  stripText(bio)
+  var bio = profile.select(selector)
+  if bio == nil and fallback.len > 0:
+    bio = profile.select(fallback)
+  parseText(bio)
 
 proc getLocation*(profile: XmlNode): string =
   let sel = ".ProfileHeaderCard-locationText"

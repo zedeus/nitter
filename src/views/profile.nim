@@ -25,7 +25,7 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
     tdiv(class="profile-card-extra"):
       if profile.bio.len > 0:
         tdiv(class="profile-bio"):
-          p: verbatim linkifyText(profile.bio, prefs)
+          p: verbatim replaceUrl(profile.bio, prefs)
 
       if profile.location.len > 0:
         tdiv(class="profile-location"):
@@ -39,8 +39,9 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
       if profile.website.len > 0:
         tdiv(class="profile-website"):
           span:
+            let url = replaceUrl(profile.website, prefs)
             icon "link"
-            verbatim linkifyText(profile.website, prefs)
+            a(href=url): text shortLink(url)
 
       tdiv(class="profile-joindate"):
         span(title=getJoinDateFull(profile)):

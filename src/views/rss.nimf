@@ -7,7 +7,7 @@
 #if tweet.pinned: result = "Pinned: "
 #elif tweet.retweet.isSome: result = "RT: "
 #end if
-#result &= xmltree.escape(replaceUrl(tweet.text, prefs))
+#result &= xmltree.escape(replaceUrl(tweet.text, prefs, rss=true))
 #if result.len > 0: return
 #end if
 #if tweet.photos.len > 0:
@@ -20,7 +20,7 @@
 #end proc
 #
 #proc renderRssTweet(tweet: Tweet; prefs: Prefs): string =
-#let text = linkifyText(tweet.text, prefs, rss=true)
+#let text = replaceUrl(tweet.text, prefs, rss=true)
 #if tweet.quote.isSome and get(tweet.quote).available:
 #let quoteLink = hostname & getLink(get(tweet.quote))
 <p>${text}<br><a href="https://${quoteLink}">${quoteLink}</a></p>
@@ -58,7 +58,7 @@
 #end proc
 #
 #proc renderTimelineRss*(timeline: Timeline; profile: Profile): string =
-#let prefs = Prefs(replaceTwitter: hostname)
+#let prefs = Prefs(replaceTwitter: hostname, replaceYoutube: "invidio.us")
 #result = ""
 <?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
@@ -84,7 +84,7 @@
 #end proc
 #
 #proc renderListRss*(tweets: seq[Tweet]; name, list: string): string =
-#let prefs = Prefs(replaceTwitter: hostname)
+#let prefs = Prefs(replaceTwitter: hostname, replaceYoutube: "invidio.us")
 #let link = &"https://{hostname}/{name}/lists/{list}"
 #result = ""
 <?xml version="1.0" encoding="UTF-8"?>
@@ -102,7 +102,7 @@
 #end proc
 #
 #proc renderSearchRss*(tweets: seq[Tweet]; name, param: string): string =
-#let prefs = Prefs(replaceTwitter: hostname)
+#let prefs = Prefs(replaceTwitter: hostname, replaceYoutube: "invidio.us")
 #let link = &"https://{hostname}/search"
 #result = ""
 <?xml version="1.0" encoding="UTF-8"?>

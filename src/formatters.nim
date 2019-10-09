@@ -6,12 +6,6 @@ import types, utils, query
 from unicode import Rune, `$`
 
 const
-  urlRegex = re"((https?|ftp)://(-\.)?([^\s/?\.#]+\.?)+([/\?][^\s\)]*)?)"
-  emailRegex = re"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
-  usernameRegex = re"(^|[^A-z0-9_?\/])@([A-z0-9_]+)"
-  picRegex = re"pic.twitter.com/[^ ]+"
-  ellipsisRegex = re" ?…"
-  hashtagRegex = re"([^\S]|^)([#$]\w+)"
   ytRegex = re"(www.|m.)?youtu(be.com|.be)"
   twRegex = re"(www.|mobile.)?twitter.com"
   nbsp = $Rune(0x000A0)
@@ -26,75 +20,14 @@ proc shortLink*(text: string; length=28): string =
   if result.len > length:
     result = result[0 ..< length] & "…"
 
-proc toLink*(url, text: string): string =
-  a(text, href=url)
-
-proc reUrlToShortLink*(m: RegexMatch; s: string): string =
-  let url = s[m.group(0)[0]]
-  toLink(url, shortLink(url))
-
-proc reUrlToLink*(m: RegexMatch; s: string): string =
-  let url = s[m.group(0)[0]]
-  toLink(url, url.replace(re"https?://(www.)?", ""))
-
-proc reEmailToLink*(m: RegexMatch; s: string): string =
-  let url = s[m.group(0)[0]]
-  toLink("mailto://" & url, url)
-
-proc reHashtagToLink*(m: RegexMatch; s: string): string =
-  result = if m.group(0).len > 0: s[m.group(0)[0]] else: ""
-  let hash = s[m.group(1)[0]]
-  let link = toLink("/search?q=" & encodeUrl(hash), hash)
-  if hash.any(isAlphaAscii):
-    result &= link
-  else:
-    result &= hash
-
-proc reUsernameToLink*(m: RegexMatch; s: string): string =
-  var username = ""
-  var pretext = ""
-
-  let pre = m.group(0)
-  let match = m.group(1)
-
-  username = s[match[0]]
-
-  if pre.len > 0:
-    pretext = s[pre[0]]
-
-  pretext & toLink("/" & username, "@" & username)
-
-proc reUsernameToFullLink*(m: RegexMatch; s: string): string =
-  result = reUsernameToLink(m, s)
-  result = result.replace("href=\"/", &"href=\"https://{hostname}/")
-
-proc replaceUrl*(url: string; prefs: Prefs): string =
+proc replaceUrl*(url: string; prefs: Prefs; rss=false): string =
   result = url
   if prefs.replaceYouTube.len > 0:
     result = result.replace(ytRegex, prefs.replaceYouTube)
   if prefs.replaceTwitter.len > 0:
     result = result.replace(twRegex, prefs.replaceTwitter)
-
-proc linkifyText*(text: string; prefs: Prefs; rss=false): string =
-  result = xmltree.escape(stripText(text))
-  result = result.replace(ellipsisRegex, " ")
-  result = result.replace(emailRegex, reEmailToLink)
   if rss:
-    result = result.replace(urlRegex, reUrlToLink)
-    result = result.replace(usernameRegex, reUsernameToFullLink)
-  else:
-    result = result.replace(urlRegex, reUrlToShortLink)
-    result = result.replace(usernameRegex, reUsernameToLink)
-  result = result.replace(hashtagRegex, reHashtagToLink)
-  result = result.replace(re"([^\s\(\n%])<a", "$1 <a")
-  result = result.replace(re"</a>\s+([;.,!\)'%]|&apos;)", "</a>$1")
-  result = result.replace(re"^\. <a", ".<a")
-  result = result.replaceUrl(prefs)
-
-proc stripTwitterUrls*(text: string): string =
-  result = text
-  result = result.replace(picRegex, "")
-  result = result.replace(ellipsisRegex, "")
+    result = result.replace("href=\"/", "href=\"" & hostname & "/")
 
 proc proxifyVideo*(manifest: string; proxy: bool): string =
   proc cb(m: RegexMatch; s: string): string =

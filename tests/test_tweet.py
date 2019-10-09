@@ -51,7 +51,7 @@ link = [
         'old.reddit.com/r/programming…'
     ]],
     ['nim_lang/status/1125887775151140864', [
-        'en.wikipedia.org/wiki/Nim_(p…)'
+        'en.wikipedia.org/wiki/Nim_(p…'
     ]],
     ['hiankun_taioan/status/1086916335215341570', [
         '(hackernoon.com/interview-wit…)'
