@@ -1,4 +1,4 @@
-FROM nimlang/nim:1.0.0-ubuntu-onbuild as build
+FROM nimlang/nim:1.0.0-ubuntu as build
 
 ARG NITTER_HOSTNAME
 
@@ -26,9 +26,9 @@ USER nitter
 WORKDIR /nitter
 
 COPY --from=build /build/nitter /nitter/
+COPY --from=build /build/public /nitter/public/
 
-COPY --chown=nitter:nitter nitter.conf /nitter/
-COPY public /nitter/public/
+COPY nitter.conf /nitter/
 
 # to show commit info on /about page:
 COPY .git /nitter/.git
