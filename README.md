@@ -103,7 +103,7 @@ Then enable and run the service:
 
 ## Build a Docker Image
 
-To build the Docker Image from the repository run:
+To build the Docker Image from the repository:
 ```bash
 docker build -t nitter:latest -t nitter:$(git log -1 --format=%h) --build-arg NITTER_HOSTNAME=mynitter.net .
 ```
