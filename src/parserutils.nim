@@ -233,6 +233,9 @@ proc getTweetCard*(tweet: Tweet; node: XmlNode) =
     tweet.poll = some Poll()
     return
 
+  if "message_me" in cardType:
+    return
+
   let cardDiv = node.select(".card2 > .js-macaw-cards-iframe-container")
   if cardDiv == nil: return
 
