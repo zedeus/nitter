@@ -101,6 +101,18 @@ WantedBy=multi-user.target
 Then enable and run the service:
 `systemctl enable --now nitter.service`
 
+## Build a Docker Image
+
+To build the Docker Image from the repository run:
+```bash
+docker build -t nitter:latest -t nitter:$(git log -1 --format=%h) --build-arg NITTER_HOSTNAME=mynitter.net .
+```
+
+Run the container:
+```bash
+docker run --rm -it -p 8080:8080 nitter:latest
+```
+
 ## Contact
 
 Feel free to join our Freenode IRC channel at #nitter, or our
