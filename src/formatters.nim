@@ -28,7 +28,7 @@ proc replaceUrl*(url: string; prefs: Prefs; rss=false): string =
   if prefs.replaceTwitter.len > 0:
     result = result.replace(twRegex, prefs.replaceTwitter)
   if rss:
-    result = result.replace("href=\"/", "href=\"" & hostname & "/")
+    result = result.replace("href=\"/", "href=\"https://" & hostname & "/")
 
 proc proxifyVideo*(manifest: string; proxy: bool): string =
   proc cb(m: RegexMatch; s: string): string =
