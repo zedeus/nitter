@@ -16,6 +16,10 @@ const hostname {.strdefine.} = "nitter.net"
 proc stripText*(text: string): string =
   text.replace(nbsp, " ").strip()
 
+proc stripHtml*(text: string): string =
+  let html = parseHtml(text)
+  html.innerText()
+
 proc shortLink*(text: string; length=28): string =
   result = text.replace(re"https?://(www.)?", "")
   if result.len > length:
@@ -93,7 +97,3 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
   result = $(parseUri("https://twitter.com") / path ? p)
   if username.len > 0:
     result = result.replace("/" & username, "")
-
-proc getTweetPreview*(text: string): string =
-  let html = parseHtml(text)
-  html.innerText()
