@@ -1,4 +1,5 @@
-import strutils, strformat, sequtils, htmlgen, xmltree, times, uri, tables
+import strutils, strformat, sequtils, times, uri, tables
+import xmltree, htmlparser, htmlgen
 import regex
 
 import types, utils, query
@@ -92,3 +93,7 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
   result = $(parseUri("https://twitter.com") / path ? p)
   if username.len > 0:
     result = result.replace("/" & username, "")
+
+proc getTweetPreview*(text: string): string =
+  let html = parseHtml(text)
+  html.innerText()
