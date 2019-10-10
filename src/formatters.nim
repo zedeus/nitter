@@ -47,7 +47,7 @@ proc getUserpic*(userpic: string; style=""): string =
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
-proc getVideoEmbed*(id: string): string =
+proc getVideoEmbed*(id: int): string =
   &"https://twitter.com/i/videos/{id}?embed_source=facebook"
 
 proc pageTitle*(profile: Profile): string =
@@ -72,7 +72,7 @@ proc getTweetTime*(tweet: Tweet): string =
   tweet.time.format("h:mm tt' · 'MMM d', 'YYYY")
 
 proc getLink*(tweet: Tweet | Quote): string =
-  if tweet.id.len == 0: return
+  if tweet.id == 0: return
   &"/{tweet.profile.username}/status/{tweet.id}"
 
 proc getTombstone*(text: string): string =

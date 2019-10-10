@@ -241,7 +241,7 @@ proc getTweetCard*(tweet: Tweet; node: XmlNode) =
   if cardDiv == nil: return
 
   var card = Card(
-    id: tweet.id,
+    id: $tweet.id,
     query: cardDiv.attr("data-src")
   )
 

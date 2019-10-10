@@ -72,7 +72,7 @@ proc parseTweetProfile*(profile: XmlNode): Profile =
 
 proc parseQuote*(quote: XmlNode): Quote =
   result = Quote(
-    id:    quote.attr("data-item-id"),
+    id:    parseInt(quote.attr("data-item-id")),
     text:  getQuoteText(quote),
     reply: parseTweetReply(quote),
     hasThread: quote.select(".self-thread-context") != nil,
@@ -99,8 +99,8 @@ proc parseTweet*(node: XmlNode): Tweet =
     return Tweet()
 
   result = Tweet(
-    id:        tweet.attr("data-item-id"),
-    threadId:  tweet.attr("data-conversation-id"),
+    id:        parseInt(tweet.attr("data-item-id")),
+    threadId:  parseInt(tweet.attr("data-conversation-id")),
     text:      getTweetText(tweet),
     time:      getTimestamp(tweet),
     shortTime: getShortTime(tweet),
@@ -119,7 +119,7 @@ proc parseTweet*(node: XmlNode): Tweet =
   if by.len > 0:
     result.retweet = some Retweet(
       by: stripText(by),
-      id: tweet.attr("data-retweet-id")
+      id: parseInt(tweet.attr("data-retweet-id"))
     )
 
   let quote = tweet.select(".QuoteTweet-innerContainer")
@@ -191,7 +191,7 @@ proc parseTimeline*(node: XmlNode; after: string): Timeline =
     beginning: after.len == 0
   )
 
-proc parseVideo*(node: JsonNode; tweetId: string): Video =
+proc parseVideo*(node: JsonNode; tweetId: int): Video =
   let
     track = node{"track"}
     cType = track["contentType"].to(string)
@@ -216,7 +216,7 @@ proc parseVideo*(node: JsonNode; tweetId: string): Video =
   else:
     echo "Can't parse video of type ", cType
 
-  result.videoId = tweetId
+  result.videoId = $tweetId
   result.thumb = node["posterImage"].to(string)
 
 proc parsePoll*(node: XmlNode): Poll =

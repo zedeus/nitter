@@ -68,7 +68,7 @@ proc getVideoFetch(tweet: Tweet; agent, token: string) {.async.} =
   let
     headers = genHeaders({"authorization": auth, "x-guest-token": token},
                          agent, base / getLink(tweet), lang=false)
-    url = apiBase / (videoUrl % tweet.id)
+    url = apiBase / (videoUrl % $tweet.id)
     json = await fetchJson(url, headers)
 
   if json == nil:
@@ -106,7 +106,7 @@ proc getPoll*(tweet: Tweet; agent: string) {.async.} =
 
   let
     headers = genHeaders(agent, base / getLink(tweet), auth=true)
-    url = base / (pollUrl % tweet.id)
+    url = base / (pollUrl % $tweet.id)
     html = await fetchHtml(url, headers)
 
   if html == nil: return
