@@ -1,0 +1,8 @@
+sudo: required
+language: minimal
+services:
+- docker
+
+script:
+- sh scripts/deploy.sh
+
