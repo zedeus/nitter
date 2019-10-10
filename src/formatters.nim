@@ -1,4 +1,5 @@
-import strutils, strformat, sequtils, htmlgen, xmltree, times, uri, tables
+import strutils, strformat, sequtils, times, uri, tables
+import xmltree, htmlparser, htmlgen
 import regex
 
 import types, utils, query
@@ -15,6 +16,10 @@ const hostname {.strdefine.} = "nitter.net"
 proc stripText*(text: string): string =
   text.replace(nbsp, " ").strip()
 
+proc stripHtml*(text: string): string =
+  let html = parseHtml(text)
+  html.innerText()
+
 proc shortLink*(text: string; length=28): string =
   result = text.replace(re"https?://(www.)?", "")
   if result.len > length:
@@ -27,7 +32,7 @@ proc replaceUrl*(url: string; prefs: Prefs; rss=false): string =
   if prefs.replaceTwitter.len > 0:
     result = result.replace(twRegex, prefs.replaceTwitter)
   if rss:
-    result = result.replace("href=\"/", "href=\"" & hostname & "/")
+    result = result.replace("href=\"/", "href=\"https://" & hostname & "/")
 
 proc proxifyVideo*(manifest: string; proxy: bool): string =
   proc cb(m: RegexMatch; s: string): string =
@@ -42,7 +47,7 @@ proc getUserpic*(userpic: string; style=""): string =
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
-proc getVideoEmbed*(id: string): string =
+proc getVideoEmbed*(id: int): string =
   &"https://twitter.com/i/videos/{id}?embed_source=facebook"
 
 proc pageTitle*(profile: Profile): string =
@@ -67,7 +72,7 @@ proc getTweetTime*(tweet: Tweet): string =
   tweet.time.format("h:mm tt' · 'MMM d', 'YYYY")
 
 proc getLink*(tweet: Tweet | Quote): string =
-  if tweet.id.len == 0: return
+  if tweet.id == 0: return
   &"/{tweet.profile.username}/status/{tweet.id}"
 
 proc getTombstone*(text: string): string =

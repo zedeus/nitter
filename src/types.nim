@@ -115,7 +115,7 @@ type
     video*: Option[Video]
 
   Quote* = object
-    id*: string
+    id*: int
     profile*: Profile
     text*: string
     reply*: seq[string]
@@ -128,7 +128,7 @@ type
 
   Retweet* = object
     by*: string
-    id*: string
+    id*: int
 
   TweetStats* = object
     replies*: string
@@ -136,8 +136,8 @@ type
     likes*: string
 
   Tweet* = ref object
-    id*: string
-    threadId*: string
+    id*: int
+    threadId*: int
     profile*: Profile
     text*: string
     time*: Time

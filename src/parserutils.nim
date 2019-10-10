@@ -57,7 +57,8 @@ proc parseText*(text: XmlNode; skipLink=""): string =
       if "data-expanded-url" in el.attrs:
         let url = el.attr("data-expanded-url")
         if url == skipLink: continue
-        elif "u-hidden" in class: result.add "\n"
+        if "u-hidden" in class and result.len > 0:
+          result.add "\n"
         result.add a(shortLink(url), href=url)
       elif "ashtag" in class:
         let hash = el.innerText()
@@ -240,7 +241,7 @@ proc getTweetCard*(tweet: Tweet; node: XmlNode) =
   if cardDiv == nil: return
 
   var card = Card(
-    id: tweet.id,
+    id: $tweet.id,
     query: cardDiv.attr("data-src")
   )
 

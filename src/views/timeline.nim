@@ -34,13 +34,13 @@ proc renderNoneFound(): VNode =
 
 proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="thread-line")):
-    for i, threadTweet in thread.sortedByIt(it.time):
+    for i, threadTweet in thread.sortedByIt(it.id):
       let show = i == thread.len and thread[0].id != threadTweet.threadId
       renderTweet(threadTweet, prefs, path, class="thread",
                   index=i, total=thread.high, showThread=show)
 
-proc threadFilter(it: Tweet; tweetThread: string): bool =
-  it.retweet.isNone and it.reply.len == 0 and it.threadId == tweetThread
+proc threadFilter(it: Tweet; thread: int): bool =
+  it.retweet.isNone and it.reply.len == 0 and it.threadId == thread
 
 proc renderUser(user: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-item")):
@@ -81,8 +81,8 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): 
     if results.content.len == 0:
       renderNoneFound()
     else:
-      var threads: seq[string]
-      var retweets: seq[string]
+      var threads: seq[int]
+      var retweets: seq[int]
       for tweet in results.content:
         if tweet.threadId in threads or tweet.id in retweets: continue
         let thread = results.content.filterIt(threadFilter(it, tweet.threadId))
