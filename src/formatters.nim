@@ -54,7 +54,10 @@ proc pageTitle*(profile: Profile): string =
   &"{profile.fullname} (@{profile.username})"
 
 proc pageDesc*(profile: Profile): string =
-  "The latest tweets from " & profile.fullname
+  if profile.bio.len > 0:
+    stripHtml(profile.bio)
+  else:
+    "The latest tweets from " & profile.fullname
 
 proc getJoinDate*(profile: Profile): string =
   profile.joinDate.format("'Joined' MMMM YYYY")
