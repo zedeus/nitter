@@ -17,7 +17,11 @@ proc stripText*(text: string): string =
   text.replace(nbsp, " ").strip()
 
 proc stripHtml*(text: string): string =
-  let html = parseHtml(text)
+  var html = parseHtml(text)
+  for el in html.findAll("a"):
+    let link = el.attr("href")
+    if "http" in link:
+      el[0].text = link
   html.innerText()
 
 proc shortLink*(text: string; length=28): string =
