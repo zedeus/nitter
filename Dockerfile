@@ -7,12 +7,9 @@ COPY . /src/nitter
 WORKDIR /src/nitter
 
 RUN apk update \
-    && apk add python3 python3-dev bash libsass libsass-dev chromium chromium-chromedriver libffi libffi-dev openssl-dev \
-    && pip3 install --upgrade pip && pip3 install -U seleniumbase pytest \
+    && apk add libsass-dev libffi-dev openssl-dev \
     && nimble build -y -d:release -d:hostname=${HOSTNAME} \
-    && nimble scss \
-    && mkdir -p ./tmp \
-    && bash -c "./nitter & cd tests && pytest --headless -n 8 --reruns 5 --reruns-delay 1 && kill %1"
+    && nimble scss
 
 FROM alpine
 WORKDIR /src/

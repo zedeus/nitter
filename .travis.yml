@@ -1,8 +1,40 @@
-sudo: required
-language: minimal
-services:
-- docker
-
-script:
-- sh scripts/deploy.sh
-
+jobs:
+  include:
+    - stage: build
+      language: minimal
+      services:
+        - docker
+      script:
+        - docker build -t $IMAGE_NAME:$TRAVIS_COMMIT .
+        - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+        - docker push $IMAGE_NAME:$TRAVIS_COMMIT
+    - stage: deploy
+      if: (NOT type IN (pull_request)) AND (branch = master)
+      language: minimal
+      services:
+        - docker
+      script:
+        - docker pull $IMAGE_NAME:$TRAVIS_COMMIT
+        - docker tag $IMAGE_NAME:$TRAVIS_COMMIT $IMAGE_NAME:latest
+        - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+        - docker push $IMAGE_NAME:latest
+    - stage: test
+      sudo: required
+      dist: bionic
+      language: python
+      addons:
+        chrome: stable
+      python:
+        - 3.6
+      services:
+        - docker
+        - xvfb
+      script:
+        - sudo apt update
+        - sudo apt install --force-yes chromium-browser chromium-chromedriver
+        - pip3 install --upgrade pip
+        - pip3 install -U seleniumbase pytest
+        - docker run -d -p 127.0.0.1:8080:8080/tcp $IMAGE_NAME:$TRAVIS_COMMIT
+        - sleep 10
+        - cd tests
+        - pytest --headless -n 8 --reruns 10 --reruns-delay 2
