@@ -54,7 +54,7 @@ Twitter account.
 
 To compile Nitter you need a Nim installation, see [nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to install it system-wide or in the user directory you create below.
 
-You also need to install `libsass` to compile the scss files. In Ubuntu and Debian, you can install `libsass-dev`.
+You also need to install `libsass` to compile the scss files. On Ubuntu and Debian, you can use `libsass-dev`.
 
 ```bash
 # useradd -m nitter
