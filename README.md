@@ -52,10 +52,9 @@ Twitter account.
 
 ## Installation
 
-To compile Nitter you need a Nim installation, see here for details: https://nim-lang.org/install.html
+To compile Nitter you need a Nim installation, see [nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to install it system-wide or in the user directory you create below.
 
-You also need to install `libsass` to compile the scss files.
-It is possible to install Nim system-wide or in the user directory you create below.
+You also need to install `libsass` to compile the scss files. In Ubuntu and Debian, you can install `libsass-dev`.
 
 ```bash
 # useradd -m nitter
