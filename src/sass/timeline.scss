@@ -7,8 +7,8 @@
 .timeline {
     background-color: $bg_panel;
 
-    > div:not(:last-child) {
-        border-bottom: 1px solid $border_grey;
+    > div:not(:first-child) {
+        border-top: 1px solid $border_grey;
     }
 }
 
@@ -117,6 +117,26 @@
 
         &:hover {
             background-color: $darker_grey;
+        }
+    }
+}
+
+.top-ref {
+    background-color: #0f0f0f;
+    border-top: none !important;
+
+    .icon-down {
+        font-size: 20px;
+        display: flex;
+        justify-content: center;
+        text-decoration: none;
+
+        &:hover {
+            color: $accent_light;
+        }
+
+        &::before {
+            transform: rotate(180deg) translateY(-1px);
         }
     }
 }

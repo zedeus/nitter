@@ -32,6 +32,10 @@ proc renderNoneFound(): VNode =
     h2(class="timeline-none"):
       text "No items found"
 
+proc renderToTop(): VNode =
+  buildHtml(tdiv(class="top-ref")):
+    icon "down", href="#"
+
 proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="thread-line")):
     for i, threadTweet in thread.sortedByIt(it.id):
@@ -68,6 +72,7 @@ proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs; path=""): VNod
         renderUser(user, prefs)
       if results.minId != "0":
         renderMore(results.query, results.minId)
+      renderToTop()
     elif results.beginning:
       renderNoneFound()
     else:
@@ -98,3 +103,4 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): 
         renderMore(results.query, results.minId)
       else:
         renderNoMore()
+      renderToTop()
