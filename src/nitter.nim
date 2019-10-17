@@ -3,7 +3,7 @@ from net import Port
 
 import jester
 
-import types, config, prefs
+import types, config, prefs, formatters
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, unsupported]
@@ -37,6 +37,11 @@ routes:
 
   get "/help":
     redirect("/about")
+
+  get "/i/redirect":
+    let url = decodeUrl(@"url")
+    if url.len == 0: halt Http404
+    redirect(replaceUrl(url, cookiePrefs()))
 
   error Http404:
     resp showError("Page not found", cfg.title)
