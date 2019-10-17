@@ -91,7 +91,7 @@ class BaseTestCase(BaseCase):
         super(BaseTestCase, self).tearDown()
 
     def open_nitter(self, page=''):
-        self.open(f'http://localhost:5000/{page}')
+        self.open(f'http://localhost:8080/{page}')
 
     def search_username(self, username):
         self.open_nitter()
