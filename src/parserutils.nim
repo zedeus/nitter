@@ -43,6 +43,7 @@ proc isProtected*(profile: XmlNode): bool =
   getHeader(profile).select(".Icon.Icon--protected") != nil
 
 proc parseText*(text: XmlNode; skipLink=""): string =
+  if text == nil: return
   for el in text:
     case el.kind
     of xnText:
