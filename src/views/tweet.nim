@@ -247,7 +247,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
       if index == 0 and tweet.reply.len > 0:
         renderReply(tweet)
 
-      tdiv(class="tweet-content media-body"):
+      tdiv(class="tweet-content media-body", dir="auto"):
         verbatim replaceUrl(tweet.text, prefs)
 
       if tweet.quote.isSome:

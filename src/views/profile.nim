@@ -25,7 +25,8 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
     tdiv(class="profile-card-extra"):
       if profile.bio.len > 0:
         tdiv(class="profile-bio"):
-          p: verbatim replaceUrl(profile.bio, prefs)
+          p(dir="auto"):
+            verbatim replaceUrl(profile.bio, prefs)
 
       if profile.location.len > 0:
         tdiv(class="profile-location"):
