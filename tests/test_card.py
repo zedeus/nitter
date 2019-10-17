@@ -43,11 +43,6 @@ card = [
      '',
      'www.tesla.com', True],
 
-    ['mobile_test/status/490378953744318464',
-     'Nantasket Beach',
-     'Rocks on the beach.',
-     '500px.com', True],
-
     ['voidtarget/status/1094632512926605312',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too)',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too) - obsplugin.nim',
@@ -73,7 +68,12 @@ no_thumb = [
     ['brent_p/status/1088857328680488961',
      'Hts Nim Sugar',
      'hts-nim is a library that allows one to use htslib via the nim programming language. Nim is a garbage-collected language that compiles to C and often has similar performance. I have become very...',
-     'brentp.github.io']
+     'brentp.github.io'],
+
+    ['mobile_test/status/490378953744318464',
+     'Nantasket Beach',
+     'Rocks on the beach.',
+     '500px.com']
 ]
 
 playable = [

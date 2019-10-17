@@ -1,7 +1,8 @@
 FROM nimlang/nim:alpine as nim
 MAINTAINER setenforce@protonmail.com
 EXPOSE 8080
-ENV HOSTNAME nitter.net
+ARG HOSTNAME
+ENV HOSTNAME ${HOSTNAME:-nitter.net}
 
 COPY . /src/nitter
 WORKDIR /src/nitter

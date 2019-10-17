@@ -71,6 +71,12 @@ Set your port and page title in `nitter.conf`, then run Nitter by executing `./n
 You should run Nitter behind a reverse proxy such as
 [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for better security.
 
+To build and run Nitter in Docker:
+```bash
+docker build -t nitter:latest --build-arg HOSTNAME=nitter.net .
+docker run -d -p 8080:8080 nitter:latest
+```
+
 To run Nitter via systemd you can use this service file:
 
 ```bash
