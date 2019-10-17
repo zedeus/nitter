@@ -60,7 +60,7 @@ proc parseText*(text: XmlNode; skipLink=""): string =
         if "u-hidden" in class and result.len > 0:
           result.add "\n"
         result.add a(shortLink(url), href=url)
-      elif "ashtag" in class:
+      elif "ashtag" in class or "hashflag" in class:
         let hash = el.innerText()
         result.add a(hash, href=("/search?q=" & encodeUrl(hash)))
       elif "atreply" in class:
