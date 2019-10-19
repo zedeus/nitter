@@ -254,7 +254,7 @@ proc parseCard*(card: var Card; node: XmlNode) =
   card.dest = node.selectText("span.SummaryCard-destination")
 
   if card.url.len == 0:
-    card.url = node.select("a").attr("href")
+    card.url = node.selectAttr("a", "href")
 
   let image = node.select(".tcu-imageWrapper img")
   if image != nil:
