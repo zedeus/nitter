@@ -1,5 +1,7 @@
 # Nitter (WIP)
 
+[![Build Status](https://travis-ci.org/zedeus/nitter.svg?branch=master)](https://travis-ci.org/zedeus/nitter)
+
 A free and open source alternative Twitter front-end focused on privacy. \
 Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 
