@@ -80,15 +80,12 @@ proc getTweetText*(tweet: XmlNode): string =
     link = text.selectAttr("a.twitter-timeline-link.u-hidden", "data-expanded-url")
   parseText(text, if quote != nil: link else: "")
 
-proc getTime(tweet: XmlNode): XmlNode =
-  tweet.select(".js-short-timestamp")
-
 proc getTimestamp*(tweet: XmlNode): Time =
-  let time = getTime(tweet).attr("data-time")
+  let time = tweet.selectAttr(".js-short-timestamp", "data-time")
   fromUnix(if time.len > 0: parseInt(time) else: 0)
 
 proc getShortTime*(tweet: XmlNode): string =
-  getTime(tweet).innerText()
+  tweet.selectText(".js-short-timestamp")
 
 proc getDate*(node: XmlNode; selector: string): Time =
   let date = node.select(selector)
