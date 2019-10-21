@@ -54,7 +54,3 @@ routes:
   extend list, ""
   extend status, ""
   extend media, ""
-
-settings.mimes.register("jpg?name=orig", "image/jpeg")
-
-runForever()
