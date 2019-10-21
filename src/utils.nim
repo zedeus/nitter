@@ -10,7 +10,8 @@ const
     "pbs.twimg.com",
     "video.twimg.com"
   ]
-  badExts = @["1500x500", "jpgn", "jpg:", "jpg_"]
+  badJpgExts = @["1500x500", "jpgn", "jpg:", "jpg_"]
+  badPngExts = @["pngn", "png:", "png_"]
 
 proc getHmac*(data: string): string =
   ($hmac(sha256, key, data))[0 .. 12]
@@ -30,8 +31,10 @@ proc getPicUrl*(link: string): string =
 proc cleanFilename*(filename: string): string =
   const reg = re"[^A-Za-z0-9._-]"
   result = filename.replace(reg, "_")
-  if badExts.anyIt(it in result):
+  if badJpgExts.anyIt(it in result):
     result &= ".jpg"
+  elif badPngExts.anyIt(it in result):
+    result &= ".png"
 
 proc filterParams*(params: Table): seq[(string, string)] =
   let filter = ["name", "id", "list", "referer"]
