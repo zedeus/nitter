@@ -1,4 +1,4 @@
-import asyncdispatch
+import asyncdispatch, mimetypes
 from net import Port
 
 import jester
@@ -54,5 +54,7 @@ routes:
   extend list, ""
   extend status, ""
   extend media, ""
+
+settings.mimes.register("1500x500", "image/jpeg")
 
 runForever()

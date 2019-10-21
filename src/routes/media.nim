@@ -1,4 +1,4 @@
-import asyncfile, uri, strutils, httpclient, os
+import asyncfile, uri, strutils, httpclient, os, mimetypes
 
 import jester, regex
 
@@ -32,14 +32,7 @@ proc createMediaRouter*(cfg: Config) =
         except:
           discard
 
-      if not existsFile(filename):
-        halt Http404
-
-      let file = openAsync(filename)
-      let buf = await readAll(file)
-      file.close()
-
-      resp buf, mimetype(filename)
+      sendFile(filename)
 
     get "/gif/@url":
       cond "http" in @"url"
@@ -60,7 +53,7 @@ proc createMediaRouter*(cfg: Config) =
       if content.len == 0:
         halt Http404
 
-      resp content, mimetype(url)
+      resp content, settings.mimes.getMimetype(url.split(".")[^1])
 
     get "/video/@sig/@url":
       cond "http" in @"url"
@@ -83,4 +76,5 @@ proc createMediaRouter*(cfg: Config) =
         content = proxifyVideo(content, prefs.proxyVideos)
 
       client.close()
-      resp content, mimetype(url)
+      let ext = parseUri(url).path.split(".")[^1]
+      resp content, settings.mimes.getMimetype(ext)

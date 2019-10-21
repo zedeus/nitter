@@ -11,16 +11,6 @@ const
     "video.twimg.com"
   ]
 
-proc mimetype*(filename: string): string =
-  if ".png" in filename:
-    "image/" & "png"
-  elif ".jpg" in filename or ".jpeg" in filename or "1500x500" in filename:
-    "image/" & "jpg"
-  elif ".mp4" in filename:
-    "video/" & "mp4"
-  else:
-    "text/plain"
-
 proc getHmac*(data: string): string =
   ($hmac(sha256, key, data))[0 .. 12]
 
