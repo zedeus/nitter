@@ -55,6 +55,6 @@ routes:
   extend status, ""
   extend media, ""
 
-settings.mimes.register("1500x500", "image/jpeg")
+settings.mimes.register("jpg?name=orig", "image/jpeg")
 
 runForever()

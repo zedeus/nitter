@@ -28,7 +28,9 @@ proc getPicUrl*(link: string): string =
 
 proc cleanFilename*(filename: string): string =
   const reg = re"[^A-Za-z0-9._-]"
-  filename.replace(reg, "_")
+  result = filename.replace(reg, "_")
+  if "1500x500" in result:
+    result &= ".jpg"
 
 proc filterParams*(params: Table): seq[(string, string)] =
   let filter = ["name", "id", "list", "referer"]
