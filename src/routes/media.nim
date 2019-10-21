@@ -29,8 +29,9 @@ proc createMediaRouter*(cfg: Config) =
         try:
           await client.downloadFile($uri, filename)
           client.close()
-        except:
-          discard
+        except HttpRequestError:
+          removeFile(filename)
+          resp Http404
 
       sendFile(filename)
 
