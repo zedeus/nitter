@@ -6,7 +6,7 @@
 #if tweet.pinned: result = "Pinned: "
 #elif tweet.retweet.isSome: result = "RT: "
 #end if
-#result &= xmltree.escape(replaceUrl(tweet.text, prefs, absolute=hostname))
+#result &= xmltree.escape(stripHtml(tweet.text))
 #if result.len > 0: return
 #end if
 #if tweet.photos.len > 0:
