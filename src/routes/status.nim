@@ -22,7 +22,7 @@ proc createStatusRouter*(cfg: Config) =
         var error = "Tweet not found"
         if conversation != nil and conversation.tweet.tombstone.len > 0:
           error = conversation.tweet.tombstone
-        halt Http404, showError(error, cfg)
+        resp Http404, showError(error, cfg)
 
       let
         title = pageTitle(conversation.tweet.profile)

@@ -29,7 +29,7 @@ proc createSearchRouter*(cfg: Config) =
         resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
                         request, cfg, rss=rss)
       else:
-        halt Http404, showError("Invalid search", cfg)
+        resp Http404, showError("Invalid search", cfg)
 
     get "/hashtag/@hash":
       redirect("/search?q=" & encodeUrl("#" & @"hash"))

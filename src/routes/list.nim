@@ -8,7 +8,7 @@ import ../views/[general, timeline, list]
 
 template respList*(list, timeline: typed) =
   if list.minId.len == 0:
-    halt Http404, showError("List \"" & @"list" & "\" not found", cfg)
+    resp Http404, showError("List \"" & @"list" & "\" not found", cfg)
   let html = renderList(timeline, list.query, @"name", @"list")
   let rss = "/$1/lists/$2/rss" % [@"name", @"list"]
   resp renderMain(html, request, cfg, rss=rss)

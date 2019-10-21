@@ -40,11 +40,11 @@ routes:
 
   get "/i/redirect":
     let url = decodeUrl(@"url")
-    if url.len == 0: halt Http404
+    if url.len == 0: resp Http404
     redirect(replaceUrl(url, cookiePrefs()))
 
   error Http404:
-    resp showError("Page not found", cfg)
+    resp Http404, showError("Page not found", cfg)
 
   extend unsupported, ""
   extend preferences, ""

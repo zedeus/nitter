@@ -51,7 +51,7 @@ proc createMediaRouter*(cfg: Config) =
         discard
 
       if content.len == 0:
-        halt Http404
+        resp Http404
 
       resp content, settings.mimes.getMimetype(url.split(".")[^1])
 

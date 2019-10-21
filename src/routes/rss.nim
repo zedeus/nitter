@@ -15,7 +15,7 @@ proc showRss*(name, hostname: string; query: Query): Future[string] {.async.} =
 
 template respRss*(rss: typed) =
   if rss.len == 0:
-    halt Http404, showError("User \"" & @"name" & "\" not found", cfg)
+    resp Http404, showError("User \"" & @"name" & "\" not found", cfg)
   resp rss, "application/rss+xml;charset=utf-8"
 
 proc createRssRouter*(cfg: Config) =
