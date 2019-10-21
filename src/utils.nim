@@ -10,6 +10,7 @@ const
     "pbs.twimg.com",
     "video.twimg.com"
   ]
+  badExts = @["1500x500", "jpgn", "jpg:", "jpg_"]
 
 proc getHmac*(data: string): string =
   ($hmac(sha256, key, data))[0 .. 12]
@@ -29,7 +30,7 @@ proc getPicUrl*(link: string): string =
 proc cleanFilename*(filename: string): string =
   const reg = re"[^A-Za-z0-9._-]"
   result = filename.replace(reg, "_")
-  if "1500x500" in result or "name_orig" in result:
+  if badExts.anyIt(it in result):
     result &= ".jpg"
 
 proc filterParams*(params: Table): seq[(string, string)] =
