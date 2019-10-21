@@ -14,7 +14,7 @@ proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
     beginning: after.len == 0
   )
 
-proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.async.} =
+proc getSearch*[T](query: Query; after, agent: string; media=true): Future[Result[T]] {.async.} =
   let
     kind = if query.kind == users: "users" else: "tweets"
 
@@ -44,7 +44,7 @@ proc getSearch*[T](query: Query; after, agent: string): Future[Result[T]] {.asyn
   if json == nil or not json.hasKey("items_html"): return
 
   when T is Tweet:
-    result = await finishTimeline(json, query, after, agent)
+    result = await finishTimeline(json, query, after, agent, media)
   elif T is Profile:
     let html = json["items_html"].to(string)
     result.hasMore = html != "\n"

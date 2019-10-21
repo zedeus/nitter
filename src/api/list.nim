@@ -4,7 +4,7 @@ import sequtils, strutils, json, uri
 import ".."/[types, parser, parserutils, query]
 import utils, consts, timeline, search
 
-proc getListTimeline*(username, list, agent, after: string): Future[Timeline] {.async.} =
+proc getListTimeline*(username, list, agent, after: string; media=true): Future[Timeline] {.async.} =
   let url = base / (listUrl % [username, list])
 
   var params = toSeq({
@@ -17,7 +17,7 @@ proc getListTimeline*(username, list, agent, after: string): Future[Timeline] {.
     params.add {"max_position": after}
 
   let json = await fetchJson(url ? params, genHeaders(agent, url))
-  result = await finishTimeline(json, Query(), after, agent)
+  result = await finishTimeline(json, Query(), after, agent, media)
   if result.content.len == 0:
     return
 

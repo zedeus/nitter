@@ -13,8 +13,8 @@ export profile, timeline, status
 
 type ProfileTimeline = (Profile, Timeline, seq[GalleryPhoto])
 
-proc fetchSingleTimeline*(name, after, agent: string;
-                          query: Query): Future[ProfileTimeline] {.async.} =
+proc fetchSingleTimeline*(name, after, agent: string; query: Query;
+                          media=true): Future[ProfileTimeline] {.async.} =
   let railFut = getPhotoRail(name, agent)
 
   var timeline: Timeline
@@ -26,12 +26,12 @@ proc fetchSingleTimeline*(name, after, agent: string;
 
   if query.kind == posts:
     if cachedProfile.isSome:
-      timeline = await getTimeline(name, after, agent)
+      timeline = await getTimeline(name, after, agent, media)
     else:
-      (profile, timeline) = await getProfileAndTimeline(name, agent, after)
+      (profile, timeline) = await getProfileAndTimeline(name, agent, after, media)
       cache(profile)
   else:
-    var timelineFut = getSearch[Tweet](query, after, agent)
+    var timelineFut = getSearch[Tweet](query, after, agent, media)
     if cachedProfile.isNone:
       profile = await getCachedProfile(name, agent)
     timeline = await timelineFut

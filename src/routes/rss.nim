@@ -9,7 +9,9 @@ import ../views/general
 include "../views/rss.nimf"
 
 proc showRss*(name, hostname: string; query: Query): Future[string] {.async.} =
-  let (profile, timeline, _) = await fetchSingleTimeline(name, "", getAgent(), query)
+  let (profile, timeline, _) =
+    await fetchSingleTimeline(name, "", getAgent(), query, media=false)
+
   if timeline != nil:
     return renderTimelineRss(timeline, profile, hostname)
 
@@ -28,7 +30,7 @@ proc createRssRouter*(cfg: Config) =
       if query.kind != tweets:
         resp Http400, showError("Only Tweet searches are allowed for RSS feeds.", cfg)
 
-      let tweets = await getSearch[Tweet](query, "", getAgent())
+      let tweets = await getSearch[Tweet](query, "", getAgent(), media=false)
       respRss(renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg.hostname))
 
     get "/@name/rss":
@@ -49,5 +51,5 @@ proc createRssRouter*(cfg: Config) =
 
     get "/@name/lists/@list/rss":
       cond '.' notin @"name"
-      let list = await getListTimeline(@"name", @"list", getAgent(), "")
+      let list = await getListTimeline(@"name", @"list", getAgent(), "", media=false)
       respRss(renderListRss(list.content, @"name", @"list", cfg.hostname))
