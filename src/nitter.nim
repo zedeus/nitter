@@ -27,10 +27,10 @@ settings:
 
 routes:
   get "/":
-    resp renderMain(renderSearch(), request, cfg.title)
+    resp renderMain(renderSearch(), request, cfg)
 
   get "/about":
-    resp renderMain(renderAbout(), request, cfg.title)
+    resp renderMain(renderAbout(), request, cfg)
 
   get "/explore":
     redirect("/about")
@@ -44,7 +44,7 @@ routes:
     redirect(replaceUrl(url, cookiePrefs()))
 
   error Http404:
-    resp showError("Page not found", cfg.title)
+    resp showError("Page not found", cfg)
 
   extend unsupported, ""
   extend preferences, ""

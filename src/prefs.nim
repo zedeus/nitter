@@ -22,6 +22,10 @@ withDb:
   except DbError:
     discard
 
+proc getDefaultPrefs(hostname: string): Prefs =
+  result = genDefaultPrefs()
+  result.replaceTwitter = hostname
+
 proc cache*(prefs: var Prefs) =
   withDb:
     try:
@@ -31,17 +35,18 @@ proc cache*(prefs: var Prefs) =
     except AssertionError, KeyError:
       prefs.insert()
 
-proc getPrefs*(id: string): Prefs =
-  if id.len == 0: return genDefaultPrefs()
+proc getPrefs*(id, hostname: string): Prefs =
+  if id.len == 0:
+    return getDefaultPrefs(hostname)
 
   withDb:
     try:
       result.getOne("id = ?", id)
     except KeyError:
-      result = genDefaultPrefs()
+      result = getDefaultPrefs(hostname)
 
-proc resetPrefs*(prefs: var Prefs) =
-  var defPrefs = genDefaultPrefs()
+proc resetPrefs*(prefs: var Prefs; hostname: string) =
+  var defPrefs = getDefaultPrefs(hostname)
   defPrefs.id = prefs.id
   cache(defPrefs)
   prefs = defPrefs

@@ -1,7 +1,5 @@
 import macros, tables, strutils, xmltree
 
-const hostname {.strdefine.} = "nitter.net"
-
 type
   PrefKind* = enum
     checkbox, select, input
@@ -24,7 +22,7 @@ const prefList*: OrderedTable[string, seq[Pref]] = {
   "Privacy": @[
     Pref(kind: input, name: "replaceTwitter",
          label: "Replace Twitter links with Nitter (blank to disable)",
-         defaultInput: hostname, placeholder: "Nitter hostname"),
+         defaultInput: "nitter.net", placeholder: "Nitter hostname"),
 
     Pref(kind: input, name: "replaceYouTube",
          label: "Replace YouTube links with Invidious (blank to disable)",

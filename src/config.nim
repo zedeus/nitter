@@ -16,8 +16,9 @@ proc getConfig*(path: string): Config =
     address: cfg.get("Server", "address", "0.0.0.0"),
     port: cfg.get("Server", "port", 8080),
     useHttps: cfg.get("Server", "https", true),
-    title: cfg.get("Server", "title", "Nitter"),
     staticDir: cfg.get("Server", "staticDir", "./public"),
+    title: cfg.get("Server", "title", "Nitter"),
+    hostname: cfg.get("Server", "hostname", "nitter.net"),
 
     cacheDir: cfg.get("Cache", "directory", "/tmp/nitter"),
     profileCacheTime: cfg.get("Cache", "profileMinutes", 10)

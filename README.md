@@ -52,24 +52,27 @@ Twitter account.
 
 ## Installation
 
-To compile Nitter you need a Nim installation, see [nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to install it system-wide or in the user directory you create below.
+To compile Nitter you need a Nim installation, see
+[nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to
+install it system-wide or in the user directory you create below.
 
-You also need to install `libsass` to compile the scss files. On Ubuntu and Debian, you can use `libsass-dev`.
+You also need to install `libsass` to compile the scss files. On Ubuntu and
+Debian, you can use `libsass-dev`.
 
 ```bash
 # useradd -m nitter
 # su nitter
 $ git clone https://github.com/zedeus/nitter
 $ cd nitter
-$ nimble build -d:release -d:hostname="..."
+$ nimble build -d:release
 $ nimble scss
 $ mkdir ./tmp
 ```
 
-Change `-d:hostname="..."` to your instance's domain, eg. `-d:hostname:"nitter.net"`.
-Set your port and page title in `nitter.conf`, then run Nitter by executing `./nitter`.
-You should run Nitter behind a reverse proxy such as
-[Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for better security.
+Set your hostname, port and page title in `nitter.conf`, then run Nitter by
+executing `./nitter`. You should run Nitter behind a reverse proxy such as
+[Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for better
+security.
 
 To build and run Nitter in Docker:
 ```bash

@@ -11,8 +11,6 @@ const
   twRegex = re"(www.|mobile.)?twitter.com"
   nbsp = $Rune(0x000A0)
 
-const hostname {.strdefine.} = "nitter.net"
-
 proc stripText*(text: string): string =
   text.replace(nbsp, " ").strip()
 
@@ -29,14 +27,14 @@ proc shortLink*(text: string; length=28): string =
   if result.len > length:
     result = result[0 ..< length] & "…"
 
-proc replaceUrl*(url: string; prefs: Prefs; rss=false): string =
+proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
   result = url
   if prefs.replaceYouTube.len > 0:
     result = result.replace(ytRegex, prefs.replaceYouTube)
   if prefs.replaceTwitter.len > 0:
     result = result.replace(twRegex, prefs.replaceTwitter)
-  if rss:
-    result = result.replace("href=\"/", "href=\"https://" & hostname & "/")
+  if absolute.len > 0:
+    result = result.replace("href=\"/", "href=\"https://" & absolute & "/")
 
 proc proxifyVideo*(manifest: string; proxy: bool): string =
   proc cb(m: RegexMatch; s: string): string =

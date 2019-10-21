@@ -172,8 +172,9 @@ type
     address*: string
     port*: int
     useHttps*: bool
-    title*: string
     staticDir*: string
+    title*: string
+    hostname*: string
     cacheDir*: string
     profileCacheTime*: int
 

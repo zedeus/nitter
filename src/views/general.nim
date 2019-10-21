@@ -27,9 +27,9 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
         icon "info-circled", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 
-proc renderMain*(body: VNode; req: Request; title="Nitter"; titleText=""; desc="";
+proc renderMain*(body: VNode; req: Request; cfg: Config; titleText=""; desc="";
                  rss=""; `type`="article"; video=""; images: seq[string] = @[]): string =
-  let prefs = getPrefs(req.cookies.getOrDefault("preferences"))
+  let prefs = getPrefs(req.cookies.getOrDefault("preferences"), cfg.hostname)
   let node = buildHtml(html(lang="en")):
     head:
       link(rel="stylesheet", `type`="text/css", href="/css/style.css")
@@ -50,9 +50,9 @@ proc renderMain*(body: VNode; req: Request; title="Nitter"; titleText=""; desc="
 
       title:
         if titleText.len > 0:
-          text titleText & " | " & title
+          text titleText & " | " & cfg.title
         else:
-          text title
+          text cfg.title
 
       meta(name="viewport", content="width=device-width, initial-scale=1.0")
       meta(property="og:type", content=`type`)
@@ -68,7 +68,7 @@ proc renderMain*(body: VNode; req: Request; title="Nitter"; titleText=""; desc="
         meta(property="og:video:secure_url", content=video)
 
     body:
-      renderNavbar(title, rss, req)
+      renderNavbar(cfg.title, rss, req)
 
       tdiv(class="container"):
         body
@@ -80,5 +80,5 @@ proc renderError*(error: string): VNode =
     tdiv(class="error-panel"):
       span: text error
 
-template showError*(error, title: string): string =
-  renderMain(renderError(error), request, title, "Error")
+template showError*(error: string; cfg: Config): string =
+  renderMain(renderError(error), request, cfg, "Error")

@@ -51,7 +51,7 @@ proc get*(req: Request; key: string): string =
   if key in params(req): params(req)[key]
   else: ""
 
-proc showTimeline*(request: Request; query: Query; title, rss: string): Future[string] {.async.} =
+proc showTimeline*(request: Request; query: Query; cfg: Config; rss: string): Future[string] {.async.} =
   let
     agent = getAgent()
     prefs = cookiePrefs()
@@ -63,16 +63,16 @@ proc showTimeline*(request: Request; query: Query; title, rss: string): Future[s
     let (p, t, r) = await fetchSingleTimeline(names[0], after, agent, query)
     if p.username.len == 0: return
     let pHtml = renderProfile(p, t, r, prefs, getPath())
-    return renderMain(pHtml, request, title, pageTitle(p), pageDesc(p), rss=rss)
+    return renderMain(pHtml, request, cfg, pageTitle(p), pageDesc(p), rss=rss)
   else:
     let
       timeline = await fetchMultiTimeline(names, after, agent, query)
       html = renderTweetSearch(timeline, prefs, getPath())
-    return renderMain(html, request, title, "Multi")
+    return renderMain(html, request, cfg, "Multi")
 
 template respTimeline*(timeline: typed) =
   if timeline.len == 0:
-    halt Http404, showError("User \"" & @"name" & "\" not found", cfg.title)
+    halt Http404, showError("User \"" & @"name" & "\" not found", cfg)
   resp timeline
 
 proc createTimelineRouter*(cfg: Config) =
@@ -82,20 +82,20 @@ proc createTimelineRouter*(cfg: Config) =
     get "/@name/?":
       cond '.' notin @"name"
       let rss = "/$1/rss" % @"name"
-      respTimeline(await showTimeline(request, Query(), cfg.title, rss))
+      respTimeline(await showTimeline(request, Query(), cfg, rss))
 
     get "/@name/with_replies":
       cond '.' notin @"name"
       let rss = "/$1/with_replies/rss" % @"name"
-      respTimeline(await showTimeline(request, getReplyQuery(@"name"), cfg.title, rss))
+      respTimeline(await showTimeline(request, getReplyQuery(@"name"), cfg, rss))
 
     get "/@name/media":
       cond '.' notin @"name"
       let rss = "/$1/media/rss" % @"name"
-      respTimeline(await showTimeline(request, getMediaQuery(@"name"), cfg.title, rss))
+      respTimeline(await showTimeline(request, getMediaQuery(@"name"), cfg, rss))
 
     get "/@name/search":
       cond '.' notin @"name"
       let query = initQuery(params(request), name=(@"name"))
       let rss = "/$1/search/rss?$2" % [@"name", genQueryUrl(query)]
-      respTimeline(await showTimeline(request, query, cfg.title, rss))
+      respTimeline(await showTimeline(request, query, cfg, rss))

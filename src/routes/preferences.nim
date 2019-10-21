@@ -15,7 +15,7 @@ proc createPrefRouter*(cfg: Config) =
 
     get "/settings":
       let html = renderPreferences(cookiePrefs(), refPath())
-      resp renderMain(html, request, cfg.title, "Preferences")
+      resp renderMain(html, request, cfg, "Preferences")
 
     get "/settings/@i?":
       redirect("/settings")
@@ -28,7 +28,7 @@ proc createPrefRouter*(cfg: Config) =
 
     post "/resetprefs":
       var prefs = cookiePrefs()
-      resetPrefs(prefs)
+      resetPrefs(prefs, cfg.hostname)
       savePrefs()
       redirect($(parseUri("/settings") ? filterParams(request.params)))
 

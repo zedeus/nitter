@@ -68,7 +68,7 @@ proc createMediaRouter*(cfg: Config) =
       let prefs = cookiePrefs()
 
       if getHmac(url) != @"sig":
-        resp showError("Failed to verify signature", cfg.title)
+        resp showError("Failed to verify signature", cfg)
 
       let client = newAsyncHttpClient()
       var content = await client.getContent(url)

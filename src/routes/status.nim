@@ -22,7 +22,7 @@ proc createStatusRouter*(cfg: Config) =
         var error = "Tweet not found"
         if conversation != nil and conversation.tweet.tombstone.len > 0:
           error = conversation.tweet.tombstone
-        halt Http404, showError(error, cfg.title)
+        halt Http404, showError(error, cfg)
 
       let
         title = pageTitle(conversation.tweet.profile)
@@ -32,15 +32,15 @@ proc createStatusRouter*(cfg: Config) =
       if conversation.tweet.video.isSome():
         let thumb = get(conversation.tweet.video).thumb
         let vidUrl = getVideoEmbed(conversation.tweet.id)
-        resp renderMain(html, request, cfg.title, title, desc, images = @[thumb],
+        resp renderMain(html, request, cfg, title, desc, images = @[thumb],
                         `type`="video", video=vidUrl)
       elif conversation.tweet.gif.isSome():
         let thumb = get(conversation.tweet.gif).thumb
         let vidUrl = getVideoEmbed(conversation.tweet.id)
-        resp renderMain(html, request, cfg.title, title, desc, images = @[thumb],
+        resp renderMain(html, request, cfg, title, desc, images = @[thumb],
                         `type`="video", video=vidUrl)
       else:
-        resp renderMain(html, request, cfg.title, title, desc,
+        resp renderMain(html, request, cfg, title, desc,
                         images=conversation.tweet.photos, `type`="photo")
 
     get "/@name/status/@id/photo/@i":

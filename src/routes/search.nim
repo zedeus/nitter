@@ -12,7 +12,7 @@ proc createSearchRouter*(cfg: Config) =
   router search:
     get "/search/?":
       if @"q".len > 200:
-        resp Http400, showError("Search input too long.", cfg.title)
+        resp Http400, showError("Search input too long.", cfg)
 
       let prefs = cookiePrefs()
       let query = initQuery(params(request))
@@ -22,14 +22,14 @@ proc createSearchRouter*(cfg: Config) =
         if "," in @"q":
           redirect("/" & @"q")
         let users = await getSearch[Profile](query, @"max_position", getAgent())
-        resp renderMain(renderUserSearch(users, prefs), request, cfg.title)
+        resp renderMain(renderUserSearch(users, prefs), request, cfg)
       of tweets:
         let tweets = await getSearch[Tweet](query, @"max_position", getAgent())
         let rss = "/search/rss?" & genQueryUrl(query)
-        resp renderMain(renderTweetSearch(tweets, prefs, getPath()), request,
-                        cfg.title, rss=rss)
+        resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
+                        request, cfg, rss=rss)
       else:
-        halt Http404, showError("Invalid search", cfg.title)
+        halt Http404, showError("Invalid search", cfg)
 
     get "/hashtag/@hash":
       redirect("/search?q=" & encodeUrl("#" & @"hash"))
