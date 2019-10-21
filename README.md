@@ -11,6 +11,7 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - Dark theme
 - Lightweight (for [@nim_lang](https://twitter.com/nim_lang), 36KB vs 580KB from twitter.com)
 - Native RSS feeds
+- Mobile support (responsive design)
 
 ## Todo (roughly in this order)
 
@@ -76,8 +77,13 @@ security.
 
 To build and run Nitter in Docker:
 ```bash
-docker build -t nitter:latest --build-arg HOSTNAME=nitter.net .
-docker run -d -p 8080:8080 nitter:latest
+docker build -t nitter:latest .
+docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d -p 8080:8080 nitter:latest
+```
+
+A prebuilt Docker image is provided as well:
+```bash
+docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d -p 8080:8080 zedeus/nitter:latest
 ```
 
 To run Nitter via systemd you can use this service file:
