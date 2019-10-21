@@ -202,7 +202,11 @@ proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
   if "gif" in player.attr("class"):
     tweet.gif = some getGif(player.select(".PlayableMedia-player"))
   elif "video" in player.attr("class"):
-    tweet.video = some Video()
+    let thumb = player.selectAttr(".PlayableMedia-player", "style").split("'")
+    if thumb.len > 1:
+      tweet.video = some Video(thumb: thumb[^2])
+    else:
+      tweet.video = some Video()
 
 proc getQuoteMedia*(quote: var Quote; node: XmlNode) =
   if node.select(".QuoteTweet--sensitive") != nil:
