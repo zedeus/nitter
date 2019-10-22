@@ -63,7 +63,8 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; rss: string): Fu
     let (p, t, r) = await fetchSingleTimeline(names[0], after, agent, query)
     if p.username.len == 0: return
     let pHtml = renderProfile(p, t, r, prefs, getPath())
-    return renderMain(pHtml, request, cfg, pageTitle(p), pageDesc(p), rss=rss)
+    return renderMain(pHtml, request, cfg, pageTitle(p), pageDesc(p),
+                      rss=rss, images = @[p.getUserpic("_200x200")])
   else:
     let
       timeline = await fetchMultiTimeline(names, after, agent, query)
