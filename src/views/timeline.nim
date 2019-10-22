@@ -17,9 +17,9 @@ proc renderNewer*(query: Query; path: string): VNode =
     a(href=(path & url)):
       text "Load newest"
 
-proc renderMore*(query: Query; minId: string): VNode =
+proc renderMore*(query: Query; minId: string; focus=""): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"?{getQuery(query)}max_position={minId}")):
+    a(href=(&"?{getQuery(query)}max_position={minId}{focus}")):
       text "Load more"
 
 proc renderNoMore(): VNode =

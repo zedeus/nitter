@@ -52,10 +52,10 @@ proc renderConversation*(conversation: Conversation; prefs: Prefs; path: string)
       renderNewer(Query(), getLink(conversation.tweet))
 
     if conversation.replies.content.len > 0:
-      tdiv(class="replies"):
+      tdiv(class="replies", id="r"):
         for thread in conversation.replies.content:
           if thread == nil: continue
           renderReplyThread(thread, prefs, path)
 
     if conversation.replies.hasMore:
-      renderMore(Query(), conversation.replies.minId)
+      renderMore(Query(), conversation.replies.minId, focus="#r")
