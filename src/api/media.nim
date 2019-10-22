@@ -67,7 +67,7 @@ proc getVideoFetch(tweet: Tweet; agent, token: string) {.async.} =
 
   let
     headers = genHeaders({"authorization": auth, "x-guest-token": token},
-                         agent, base / getLink(tweet), lang=false)
+                         agent, base / getLink(tweet, focus=false), lang=false)
     url = apiBase / (videoUrl % $tweet.id)
     json = await fetchJson(url, headers)
 
@@ -105,7 +105,7 @@ proc getPoll*(tweet: Tweet; agent: string) {.async.} =
   if tweet.poll.isNone(): return
 
   let
-    headers = genHeaders(agent, base / getLink(tweet), auth=true)
+    headers = genHeaders(agent, base / getLink(tweet, focus=false), auth=true)
     url = base / (pollUrl % $tweet.id)
     html = await fetchHtml(url, headers)
 
@@ -116,7 +116,7 @@ proc getCard*(tweet: Tweet; agent: string) {.async.} =
   if tweet.card.isNone(): return
 
   let
-    headers = genHeaders(agent, base / getLink(tweet), auth=true)
+    headers = genHeaders(agent, base / getLink(tweet, focus=false), auth=true)
     query = get(tweet.card).query.replace("sensitive=true", "sensitive=false")
     html = await fetchHtml(base / query, headers)
 

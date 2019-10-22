@@ -76,9 +76,10 @@ proc getRfc822Time*(tweet: Tweet): string =
 proc getTweetTime*(tweet: Tweet): string =
   tweet.time.format("h:mm tt' · 'MMM d', 'YYYY")
 
-proc getLink*(tweet: Tweet | Quote): string =
+proc getLink*(tweet: Tweet | Quote; focus=true): string =
   if tweet.id == 0: return
-  &"/{tweet.profile.username}/status/{tweet.id}"
+  result = &"/{tweet.profile.username}/status/{tweet.id}"
+  if focus: result &= "#m"
 
 proc getTombstone*(text: string): string =
   text.replace(re"\n* *Learn more", "").stripText().strip(chars={' ', '\n'})

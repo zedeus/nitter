@@ -33,7 +33,7 @@ proc renderConversation*(conversation: Conversation; prefs: Prefs; path: string)
           for i, tweet in conversation.before.content:
             renderTweet(tweet, prefs, path, index=i)
 
-      tdiv(class="main-tweet"):
+      tdiv(class="main-tweet", id="m"):
         let afterClass = if hasAfter: "thread thread-line" else: ""
         renderTweet(conversation.tweet, prefs, path, class=afterClass,
                     mainTweet=true)
