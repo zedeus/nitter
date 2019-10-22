@@ -23,7 +23,7 @@ proc stripHtml*(text: string): string =
   html.innerText()
 
 proc shortLink*(text: string; length=28): string =
-  result = text.replace(re"https?://(www.)?", "")
+  result = text.replace(re"https?://(www[0-9]?\.)?", "")
   if result.len > length:
     result = result[0 ..< length] & "…"
 
