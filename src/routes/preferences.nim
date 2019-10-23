@@ -33,7 +33,7 @@ proc createPrefRouter*(cfg: Config) =
 
     post "/resetprefs":
       var prefs = cookiePrefs()
-      resetPrefs(prefs, cfg.hostname)
+      resetPrefs(prefs, cfg)
       savePrefs()
       redirect($(parseUri("/settings") ? filterParams(request.params)))
 

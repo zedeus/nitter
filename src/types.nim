@@ -177,6 +177,7 @@ type
     hostname*: string
     cacheDir*: string
     profileCacheTime*: int
+    defaultTheme*: string
 
 proc contains*(thread: Chain; tweet: Tweet): bool =
   thread.content.anyIt(it.id == tweet.id)

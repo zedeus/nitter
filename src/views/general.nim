@@ -29,7 +29,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
 
 proc renderMain*(body: VNode; req: Request; cfg: Config; titleText=""; desc="";
                  rss=""; `type`="article"; video=""; images: seq[string] = @[]): string =
-  let prefs = getPrefs(req.cookies.getOrDefault("preferences"), cfg.hostname)
+  let prefs = getPrefs(req.cookies.getOrDefault("preferences"), cfg)
   let theme = "/css/themes/" & toLowerAscii(prefs.theme) & ".css"
   let node = buildHtml(html(lang="en")):
     head:

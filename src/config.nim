@@ -21,5 +21,7 @@ proc getConfig*(path: string): Config =
     hostname: cfg.get("Server", "hostname", "nitter.net"),
 
     cacheDir: cfg.get("Cache", "directory", "/tmp/nitter"),
-    profileCacheTime: cfg.get("Cache", "profileMinutes", 10)
+    profileCacheTime: cfg.get("Cache", "profileMinutes", 10),
+
+    defaultTheme: cfg.get("Config", "defaultTheme", "Dark")
   )
