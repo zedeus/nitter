@@ -11,12 +11,8 @@ export router_utils
 export api, cache, formatters, query, agents
 export profile, timeline, status
 
-type ProfileTimeline = (Profile, Timeline, seq[GalleryPhoto])
-
 proc fetchSingleTimeline*(name, after, agent: string; query: Query;
-                          media=true): Future[ProfileTimeline] {.async.} =
-  let railFut = getPhotoRail(name, agent)
-
+                          media=true): Future[(Profile, Timeline)] {.async.} =
   var timeline: Timeline
   var profile: Profile
   var cachedProfile = hasCachedProfile(name)
@@ -31,13 +27,17 @@ proc fetchSingleTimeline*(name, after, agent: string; query: Query;
       (profile, timeline) = await getProfileAndTimeline(name, agent, after, media)
       cache(profile)
   else:
-    var timelineFut = getSearch[Tweet](query, after, agent, media)
+    var timelineFut =
+      if query.kind == QueryKind.media:
+        getMediaTimeline(name, after, agent, media)
+      else:
+        getSearch[Tweet](query, after, agent, media)
     if cachedProfile.isNone:
       profile = await getCachedProfile(name, agent)
     timeline = await timelineFut
 
   if profile.username.len == 0: return
-  return (profile, timeline, await railFut)
+  return (profile, timeline)
 
 proc fetchMultiTimeline*(names: seq[string]; after, agent: string;
                          query: Query): Future[Timeline] {.async.} =
@@ -60,7 +60,10 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; rss: string): Fu
     names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
 
   if names.len == 1:
-    let (p, t, r) = await fetchSingleTimeline(names[0], after, agent, query)
+    let
+      rail = getPhotoRail(names[0], agent, skip=(query.kind == media))
+      (p, t) = await fetchSingleTimeline(names[0], after, agent, query)
+      r = await rail
     if p.username.len == 0: return
     let pHtml = renderProfile(p, t, r, prefs, getPath())
     return renderMain(pHtml, request, cfg, pageTitle(p), pageDesc(p),

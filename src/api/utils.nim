@@ -1,6 +1,7 @@
 import httpclient, asyncdispatch, htmlparser
 import strutils, json, xmltree, uri
 
+import ../types
 import consts
 
 proc genHeaders*(headers: openArray[tuple[key: string, val: string]];
@@ -52,3 +53,11 @@ proc fetchJson*(url: Uri; headers: HttpHeaders): Future[JsonNode] {.async.} =
     result = parseJson(resp)
   except:
     return nil
+
+proc getLastId*(tweets: Result[Tweet]): string =
+  if tweets.content.len == 0: return
+  let last = tweets.content[^1]
+  if last.retweet.isNone:
+    $last.id
+  else:
+    $(get(last.retweet).id)

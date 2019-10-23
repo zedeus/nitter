@@ -123,9 +123,10 @@ proc getCard*(tweet: Tweet; agent: string) {.async.} =
   if html == nil: return
   parseCard(get(tweet.card), html)
 
-proc getPhotoRail*(username, agent: string): Future[seq[GalleryPhoto]] {.async.} =
+proc getPhotoRail*(username, agent: string; skip=false): Future[seq[GalleryPhoto]] {.async.} =
+  if skip: return
   let
-    headers = genHeaders({"x-requested-with": "XMLHttpRequest"}, agent, base / username)
+    headers = genHeaders(agent, base / username, xml=true)
     params = {"for_photo_rail": "true", "oldest_unread_id": "0"}
     url = base / (timelineMediaUrl % username) ? params
     html = await fetchHtml(url, headers, jsonKey="items_html")

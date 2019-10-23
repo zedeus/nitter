@@ -21,10 +21,7 @@ proc getListTimeline*(username, list, agent, after: string; media=true): Future[
   if result.content.len == 0:
     return
 
-  let last = result.content[^1]
-  result.minId =
-    if last.retweet.isNone: $last.id
-    else: $(get(last.retweet).id)
+  result.minId = getLastId(result)
 
 proc getListMembers*(username, list, agent: string): Future[Result[Profile]] {.async.} =
   let

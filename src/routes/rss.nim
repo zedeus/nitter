@@ -9,7 +9,7 @@ import ../views/general
 include "../views/rss.nimf"
 
 proc showRss*(name, hostname: string; query: Query): Future[string] {.async.} =
-  let (profile, timeline, _) =
+  let (profile, timeline) =
     await fetchSingleTimeline(name, "", getAgent(), query, media=false)
 
   if timeline != nil:
