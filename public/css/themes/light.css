@@ -3,7 +3,7 @@ body {
     --fg_color: #0F0F0F;
     --fg_faded: #161616;
     --fg_dark: #191919;
-    --fg_nav: #000000;
+    --fg_nav: #1DA1F2;
 
     --bg_panel: #FFFFFF;
     --bg_elements: #FDFDFD;
@@ -16,12 +16,12 @@ body {
     --darkest_grey: #E8E8E8;
     --border_grey: #E6ECF0;
 
-    --accent: #313131;
+    --accent: #4E4E4E;
     --accent_light: #A0EDFF;
     --accent_dark: #1DA1F2;
     --accent_border: #1DA1F296;
 
-    --play_button_red: #4DB8D8;
+    --play_button_red: #d84d4d;
     --more_replies_dots: #0199f7;
     --error_red: #FF7266;
 
