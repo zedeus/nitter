@@ -18,17 +18,13 @@ proc createListRouter*(cfg: Config) =
     get "/@name/lists/@list":
       cond '.' notin @"name"
       let
-        list = await getListTimeline(@"name", @"list", getAgent(), @"max_position")
+        list = await getListTimeline(@"name", @"list", @"max_position", getAgent())
         tweets = renderTimelineTweets(list, cookiePrefs(), request.path)
       respList list, tweets
 
     get "/@name/lists/@list/members":
       cond '.' notin @"name"
-      let list =
-        if @"max_position".len == 0:
-          await getListMembers(@"name", @"list", getAgent())
-        else:
-          await getListMembersSearch(@"name", @"list", getAgent(), @"max_position")
-
-      let users = renderTimelineUsers(list, cookiePrefs(), request.path)
+      let
+        list = await getListMembers(@"name", @"list", @"max_position", getAgent())
+        users = renderTimelineUsers(list, cookiePrefs(), request.path)
       respList list, users

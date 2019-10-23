@@ -23,7 +23,7 @@ proc finishTimeline*(json: JsonNode; query: Query; after, agent: string;
   if media: await getMedia(timeline, agent)
   result.content = timeline.content
 
-proc getProfileAndTimeline*(username, agent, after: string; media=true): Future[(Profile, Timeline)] {.async.} =
+proc getProfileAndTimeline*(username, after, agent: string; media=true): Future[(Profile, Timeline)] {.async.} =
   var url = base / username
   if after.len > 0:
     url = url ? {"max_position": after}
@@ -54,7 +54,6 @@ proc getTimeline*(username, after, agent: string; media=true): Future[Timeline] 
   result = await finishTimeline(json, Query(), after, agent, media)
 
 proc getMediaTimeline*(username, after, agent: string; media=true): Future[Timeline] {.async.} =
-  echo "mediaTimeline"
   var params = toSeq({
     "include_available_features": "1",
     "include_entities": "1",

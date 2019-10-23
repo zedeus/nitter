@@ -4,7 +4,7 @@ import sequtils, strutils, json, uri
 import ".."/[types, parser, parserutils, query]
 import utils, consts, timeline, search
 
-proc getListTimeline*(username, list, agent, after: string; media=true): Future[Timeline] {.async.} =
+proc getListTimeline*(username, list, after, agent: string; media=true): Future[Timeline] {.async.} =
   let url = base / (listUrl % [username, list])
 
   var params = toSeq({
@@ -23,20 +23,7 @@ proc getListTimeline*(username, list, agent, after: string; media=true): Future[
 
   result.minId = getLastId(result)
 
-proc getListMembers*(username, list, agent: string): Future[Result[Profile]] {.async.} =
-  let
-    url = base / (listMembersUrl % [username, list])
-    html = await fetchHtml(url, genHeaders(agent, url))
-
-  result = Result[Profile](
-    minId: html.selectAttr(".stream-container", "data-min-position"),
-    hasMore: html.select(".has-more-items") != nil,
-    beginning: true,
-    query: Query(kind: userList),
-    content: html.selectAll(".account").map(parseListProfile)
-  )
-
-proc getListMembersSearch*(username, list, agent, after: string): Future[Result[Profile]] {.async.} =
+proc getListMembersSearch(username, list, after, agent: string): Future[Result[Profile]] {.async.} =
   let
     referer = base / (listMembersUrl % [username, list])
     url = referer / "timeline"
@@ -60,3 +47,19 @@ proc getListMembersSearch*(username, list, agent, after: string): Future[Result[
   result.hasMore = html != "\n"
   for p in parseHtml(html).selectAll(".account"):
     result.content.add parseListProfile(p)
+
+proc getListMembers*(username, list, after, agent: string): Future[Result[Profile]] {.async.} =
+  if after.len > 0:
+    return await getListMembersSearch(username, list, after, agent)
+
+  let
+    url = base / (listMembersUrl % [username, list])
+    html = await fetchHtml(url, genHeaders(agent, url))
+
+  result = Result[Profile](
+    minId: html.selectAttr(".stream-container", "data-min-position"),
+    hasMore: html.select(".has-more-items") != nil,
+    beginning: true,
+    query: Query(kind: userList),
+    content: html.selectAll(".account").map(parseListProfile)
+  )

@@ -24,7 +24,7 @@ proc fetchSingleTimeline*(name, after, agent: string; query: Query;
     if cachedProfile.isSome:
       timeline = await getTimeline(name, after, agent, media)
     else:
-      (profile, timeline) = await getProfileAndTimeline(name, agent, after, media)
+      (profile, timeline) = await getProfileAndTimeline(name, after, agent, media)
       cache(profile)
   else:
     var timelineFut =
@@ -59,20 +59,20 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; rss: string): Fu
     after = request.get("max_position")
     names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
 
-  if names.len == 1:
-    let
-      rail = getPhotoRail(names[0], agent, skip=(query.kind == media))
-      (p, t) = await fetchSingleTimeline(names[0], after, agent, query)
-      r = await rail
-    if p.username.len == 0: return
-    let pHtml = renderProfile(p, t, r, prefs, getPath())
-    return renderMain(pHtml, request, cfg, pageTitle(p), pageDesc(p),
-                      rss=rss, images = @[p.getUserpic("_200x200")])
-  else:
+  if names.len != 1:
     let
       timeline = await fetchMultiTimeline(names, after, agent, query)
       html = renderTweetSearch(timeline, prefs, getPath())
     return renderMain(html, request, cfg, "Multi")
+
+  let
+    rail = getPhotoRail(names[0], agent, skip=(query.kind == media))
+    (p, t) = await fetchSingleTimeline(names[0], after, agent, query)
+    r = await rail
+  if p.username.len == 0: return
+  let pHtml = renderProfile(p, t, r, prefs, getPath())
+  return renderMain(pHtml, request, cfg, pageTitle(p), pageDesc(p),
+                    rss=rss, images = @[p.getUserpic("_200x200")])
 
 template respTimeline*(timeline: typed) =
   if timeline.len == 0:
