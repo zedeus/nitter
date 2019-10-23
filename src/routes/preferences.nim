@@ -1,4 +1,4 @@
-import strutils, uri
+import strutils, uri, os, algorithm
 
 import jester
 
@@ -8,13 +8,18 @@ import ../views/[general, preferences]
 
 export preferences
 
+proc findThemes*(dir: string): seq[string] =
+  for kind, path in walkDir(dir / "css" / "themes"):
+    result.add path.splitFile.name.capitalizeAscii
+  sort(result)
+
 proc createPrefRouter*(cfg: Config) =
   router preferences:
     template savePrefs(): untyped =
       setCookie("preferences", $prefs.id, daysForward(360), httpOnly=true, secure=cfg.useHttps)
 
     get "/settings":
-      let html = renderPreferences(cookiePrefs(), refPath())
+      let html = renderPreferences(cookiePrefs(), refPath(), findThemes(cfg.staticDir))
       resp renderMain(html, request, cfg, "Preferences")
 
     get "/settings/@i?":
@@ -28,7 +33,7 @@ proc createPrefRouter*(cfg: Config) =
 
     post "/resetprefs":
       var prefs = cookiePrefs()
-      resetPrefs(prefs, cfg.hostname)
+      resetPrefs(prefs, cfg)
       savePrefs()
       redirect($(parseUri("/settings") ? filterParams(request.params)))
 

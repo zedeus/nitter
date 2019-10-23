@@ -26,7 +26,7 @@
     border-radius: 7px;
     overflow: hidden;
     flex-flow: column;
-    background-color: $bg_color;
+    background-color: var(--bg_color);
     align-items: center;
     pointer-events: all;
 
@@ -81,13 +81,13 @@
 
 .overlay-circle {
     border-radius: 50%;
-    background-color: $dark_grey;
+    background-color: var(--dark_grey);
     width: 40px;
     height: 40px;
     align-items: center;
     display: flex;
     border-width: 5px;
-    border-color: $play_button_red;
+    border-color: var(--play_button);
     border-style: solid;
 }
 
@@ -96,7 +96,7 @@
     height: 0;
     border-style: solid;
     border-width: 12px 0 12px 17px;
-    border-color: transparent transparent transparent $play_button_red;
+    border-color: transparent transparent transparent var(--play_button);
     margin-left: 14px;
 }
 

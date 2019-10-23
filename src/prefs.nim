@@ -14,6 +14,10 @@ static:
   if missing.len > 0:
     raiseAssert("{$1} missing from the Prefs type" % missing.join(", "))
 
+template safeAddColumn(field: typedesc): untyped =
+  try: field.addColumn
+  except DbError: discard
+
 dbFromTypes("prefs.db", "", "", "", [Prefs])
 
 withDb:
@@ -21,10 +25,12 @@ withDb:
     createTables()
   except DbError:
     discard
+  Prefs.theme.safeAddColumn
 
-proc getDefaultPrefs(hostname: string): Prefs =
+proc getDefaultPrefs(cfg: Config): Prefs =
   result = genDefaultPrefs()
-  result.replaceTwitter = hostname
+  result.replaceTwitter = cfg.hostname
+  result.theme = cfg.defaultTheme
 
 proc cache*(prefs: var Prefs) =
   withDb:
@@ -35,18 +41,18 @@ proc cache*(prefs: var Prefs) =
     except AssertionError, KeyError:
       prefs.insert()
 
-proc getPrefs*(id, hostname: string): Prefs =
+proc getPrefs*(id: string; cfg: Config): Prefs =
   if id.len == 0:
-    return getDefaultPrefs(hostname)
+    return getDefaultPrefs(cfg)
 
   withDb:
     try:
       result.getOne("id = ?", id)
     except KeyError:
-      result = getDefaultPrefs(hostname)
+      result = getDefaultPrefs(cfg)
 
-proc resetPrefs*(prefs: var Prefs; hostname: string) =
-  var defPrefs = getDefaultPrefs(hostname)
+proc resetPrefs*(prefs: var Prefs; cfg: Config) =
+  var defPrefs = getDefaultPrefs(cfg)
   defPrefs.id = prefs.id
   cache(defPrefs)
   prefs = defPrefs

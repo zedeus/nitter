@@ -1,4 +1,4 @@
-import tables, macros, strutils
+import tables, macros, strutils, os
 import karax/[karaxdsl, vdom, vstyles]
 
 import renderutils
@@ -22,12 +22,16 @@ macro renderPrefs*(): untyped =
 
       case pref.kind
       of checkbox: discard
-      of select: stmt[0].add newLit(pref.options)
       of input: stmt[0].add newLit(pref.placeholder)
+      of select:
+        if pref.name == "theme":
+          stmt[0].add ident("themes")
+        else:
+          stmt[0].add newLit(pref.options)
 
       result[2].add stmt
 
-proc renderPreferences*(prefs: Prefs; path: string): VNode =
+proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string]): VNode =
   buildHtml(tdiv(class="overlay-panel")):
     fieldset(class="preferences"):
       form(`method`="post", action="/saveprefs"):

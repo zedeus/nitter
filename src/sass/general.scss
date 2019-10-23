@@ -7,15 +7,15 @@
 }
 
 .error-panel {
-    @include center-panel($error_red);
+    @include center-panel(var(--error_red));
 }
 
 .search-bar > form {
-    @include center-panel($darkest-grey);
+    @include center-panel(var(--darkest_grey));
 
     button {
-        background: #303030;
-        color: $fg_color;
+        background: var(--bg_elements);
+        color: var(--fg_color);
         border: 0;
         border-radius: 3px;
         cursor: pointer;
@@ -27,8 +27,8 @@
     input {
         font-size: 16px;
         width: 100%;
-        background: $bg_elements;
-        color: $fg_color;
+        background: var(--bg_elements);
+        color: var(--fg_color);
         border: 0;
         border-radius: 4px;
         padding: 4px;

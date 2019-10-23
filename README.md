@@ -10,7 +10,7 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - Prevents Twitter from tracking your IP or JavaScript fingerprint
 - Unofficial API (no rate limits or developer account required)
 - AGPLv3 licensed, no proprietary instances permitted
-- Dark theme
+- Themes
 - Lightweight (for [@nim_lang](https://twitter.com/nim_lang), 36KB vs 580KB from twitter.com)
 - Native RSS feeds
 - Mobile support (responsive design)
@@ -21,7 +21,6 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - More caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
 - Simple account system with customizable feed
 - Json API endpoints
-- Themes
 - Nitter logo
 - Emoji support (WIP, uses native font for now)
 
