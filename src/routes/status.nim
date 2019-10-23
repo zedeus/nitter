@@ -36,7 +36,7 @@ proc createStatusRouter*(cfg: Config) =
                         `type`="video", video=vidUrl)
       elif conversation.tweet.gif.isSome():
         let thumb = get(conversation.tweet.gif).thumb
-        let vidUrl = getVideoEmbed(conversation.tweet.id)
+        let vidUrl = getGifUrl(get(conversation.tweet.gif).url)
         resp renderMain(html, request, cfg, title, desc, images = @[thumb],
                         `type`="video", video=vidUrl)
       else:
