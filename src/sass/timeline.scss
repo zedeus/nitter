@@ -42,7 +42,7 @@
 
     a {
         border-bottom: .1rem solid transparent;
-        color: inherit;
+        color: var(--tab);
         display: block;
         padding: 8px 0;
         text-decoration: none;
@@ -53,14 +53,14 @@
         }
 
         &.active {
-            border-bottom-color: var(--accent);
-            color: var(--accent);
+            border-bottom-color: var(--tab_selected);
+            color: var(--tab_selected);
         }
     }
 
     &.active a {
-        border-bottom-color: var(--accent);
-        color: var(--accent);
+        border-bottom-color: var(--tab_selected);
+        color: var(--tab_selected);
     }
 
     &.wide {

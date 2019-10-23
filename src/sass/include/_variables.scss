@@ -2,7 +2,7 @@
 $bg_color: #0F0F0F;
 $fg_color: #F8F8F2;
 $fg_faded: #F8F8F2CF;
-$fg_dark: #9d9da0;
+$fg_dark: #FF6C60;
 $fg_nav: #FF6C60;
 
 $bg_panel: #161616;
@@ -21,12 +21,17 @@ $accent_light: #FFACA0;
 $accent_dark: #8A3731;
 $accent_border: #FF6C6091;
 
-$play_button_red: #D8574D;
+$play_button: #D8574D;
+$play_button_hover: #FF6C60;
+
 $more_replies_dots: #AD433B;
 $error_red: #420A05;
 
 $verified_blue: #1DA1F2;
-$icon_text: #F8F8F2;
+$icon_text: $fg_color;
+
+$tab: $fg_color;
+$tab_selected: $accent;
 
 $shadow: rgba(0,0,0,.6);
 $shadow_dark: rgba(0,0,0,.2);

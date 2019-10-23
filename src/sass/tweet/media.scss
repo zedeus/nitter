@@ -87,7 +87,7 @@
     align-items: center;
     display: flex;
     border-width: 5px;
-    border-color: var(--play_button_red);
+    border-color: var(--play_button);
     border-style: solid;
 }
 
@@ -96,7 +96,7 @@
     height: 0;
     border-style: solid;
     border-width: 12px 0 12px 17px;
-    border-color: transparent transparent transparent var(--play_button_red);
+    border-color: transparent transparent transparent var(--play_button);
     margin-left: 14px;
 }
 

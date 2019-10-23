@@ -94,10 +94,12 @@
 
 .profile-stat-header {
     font-weight: bold;
+    color: var(--profile_stat);
 }
 
 .profile-stat-num {
     display: block;
+    color: var(--profile_stat);
 }
 
 @media(max-width: 600px) {

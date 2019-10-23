@@ -32,12 +32,19 @@ body {
     --accent_dark: #{$accent_dark};
     --accent_border: #{$accent_border};
 
-    --play_button_red: #{$play_button_red};
+    --play_button: #{$play_button};
+    --play_button_hover: #{$play_button_hover};
+
     --more_replies_dots: #{$more_replies_dots};
     --error_red: #{$error_red};
 
     --verified_blue: #{$verified_blue};
     --icon_text: #{$icon_text};
+
+    --tab: #{$fg_color};
+    --tab_selected: #{$accent};
+
+    --profile_stat: #{$fg_color};
 
     background-color: var(--bg_color);
     color: var(--fg_color);

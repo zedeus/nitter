@@ -68,6 +68,10 @@
     margin-left: 4px;
 }
 
+.tweet-date a, .username, .show-more a {
+    color: var(--fg_dark);
+}
+
 .tweet-published {
     margin: 0;
     margin-top: 5px;
@@ -89,7 +93,7 @@
 }
 
 .replying-to {
-    color: var(--fg_dark);
+    color: var(--fg_faded);
     margin: -2px 0 4px;
 
     a {

@@ -10,10 +10,6 @@
     @include center-panel(var(--error_red));
 }
 
-.search-bar {
-    // background: var(--darkest_grey);
-}
-
 .search-bar > form {
     @include center-panel(var(--darkest_grey));
 
