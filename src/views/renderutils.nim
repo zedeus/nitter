@@ -71,7 +71,7 @@ proc genInput*(pref, label, state, placeholder: string; class=""; autofocus=fals
     verbatim &"<input name={pref} type=\"text\" placeholder=\"{p}\" value=\"{s}\" {a}/>"
 
 proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
-  buildHtml(tdiv(class="pref-group")):
+  buildHtml(tdiv(class="pref-group pref-input")):
     label(`for`=pref): text label
     select(name=pref):
       for opt in options:

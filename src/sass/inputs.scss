@@ -13,7 +13,8 @@ button {
 }
 
 input[type="text"],
-input[type="date"] {
+input[type="date"],
+select {
     @include input-colors;
     background-color: var(--bg_elements);
     padding: 1px 4px;
@@ -141,6 +142,16 @@ input::-webkit-datetime-edit-year-field:focus {
 
     label {
         padding-right: 135px;
+    }
+
+    select {
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: block;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
     }
 
     input[type="text"] {
