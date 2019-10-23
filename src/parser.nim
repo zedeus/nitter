@@ -43,7 +43,7 @@ proc parseListProfile*(profile: XmlNode): Profile =
   result = Profile(
     fullname:  profile.getName(".fullname"),
     username:  profile.getUsername(".username"),
-    bio:       profile.getBio(".bio"),
+    bio:       profile.getBio(".bio").stripText(),
     userpic:   profile.getAvatar(".avatar"),
     verified:  isVerified(profile),
     protected: isProtected(profile),
