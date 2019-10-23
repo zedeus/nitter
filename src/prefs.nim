@@ -14,6 +14,10 @@ static:
   if missing.len > 0:
     raiseAssert("{$1} missing from the Prefs type" % missing.join(", "))
 
+template safeAddColumn(field: typedesc): untyped =
+  try: field.addColumn
+  except DbError: discard
+
 dbFromTypes("prefs.db", "", "", "", [Prefs])
 
 withDb:
@@ -21,6 +25,7 @@ withDb:
     createTables()
   except DbError:
     discard
+  Prefs.theme.safeAddColumn
 
 proc getDefaultPrefs(hostname: string): Prefs =
   result = genDefaultPrefs()
