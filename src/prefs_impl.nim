@@ -51,6 +51,9 @@ const prefList*: OrderedTable[string, seq[Pref]] = {
   ],
 
   "Display": @[
+    Pref(kind: select, name: "theme", label: "Theme",
+         defaultOption: "Dark"),
+
     Pref(kind: checkbox, name: "hideTweetStats",
          label: "Hide tweet stats (replies, retweets, likes)",
          defaultState: false),
@@ -94,10 +97,12 @@ macro genUpdatePrefs*(): untyped =
     of input:
       result.add quote do: prefs.`ident` = xmltree.escape(strip(`value`))
     of select:
+      let name = pref.name
       let options = pref.options
       let default = pref.defaultOption
       result.add quote do:
-        if `value` in `options`: prefs.`ident` = `value`
+        if `name` == "theme": prefs.`ident` = `value`
+        elif `value` in `options`: prefs.`ident` = `value`
         else: prefs.`ident` = `default`
 
   result.add quote do:
