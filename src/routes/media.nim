@@ -21,6 +21,9 @@ proc createMediaRouter*(cfg: Config) =
       let path = uri.path.split("/")[2 .. ^1].join("/")
       let filename = cfg.cacheDir / cleanFilename(path & uri.query)
 
+      if path.len == 0:
+        resp Http404
+
       if not existsDir(cfg.cacheDir):
         createDir(cfg.cacheDir)
 
