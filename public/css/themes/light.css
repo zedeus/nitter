@@ -1,0 +1,30 @@
+body {
+    --bg_color: #e6ecf0;
+    --fg_color: #0F0F0F;
+    --fg_faded: #161616;
+    --fg_dark: #191919;
+    --fg_nav: #000000;
+
+    --bg_panel: #ffffff;
+    --bg_elements: #fdfdfd;
+    --bg_overlays: #ffffff;
+    --bg_hover: #f5f8fa;
+
+    --grey: #657786;
+    --dark_grey: #d6d6d6;
+    --darker_grey: #cecece;
+    --darkest_grey: #e8e8e8;
+    --border_grey: #e6ecf0;
+
+    --accent: #657786;
+    --accent_light: #a0edff;
+    --accent_dark: #1DA1F2;
+    --accent_border: #1da1f296;
+
+    --play_button_red: #4db8d8;
+    --more_replies_dots: #0199f7;
+    --error_red: #ff7266;
+
+    --verified_blue: #1DA1F2;
+    --icon_text: #FFFFFF;
+}
