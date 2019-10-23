@@ -11,6 +11,8 @@ import routes/[
 const configPath {.strdefine.} = "./nitter.conf"
 let cfg = getConfig(configPath)
 
+setHmacKey(cfg.hmacKey)
+
 createUnsupportedRouter(cfg)
 createPrefRouter(cfg)
 createTimelineRouter(cfg)

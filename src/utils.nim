@@ -1,8 +1,11 @@
 import strutils, strformat, sequtils, uri, tables
 import nimcrypto, regex
 
+var hmacKey = "secretkey"
+
 const
-  key = "supersecretkey"
+  badJpgExts = @["1500x500", "jpgn", "jpg:", "jpg_"]
+  badPngExts = @["pngn", "png:", "png_"]
   twitterDomains = @[
     "twitter.com",
     "twimg.com",
@@ -10,11 +13,12 @@ const
     "pbs.twimg.com",
     "video.twimg.com"
   ]
-  badJpgExts = @["1500x500", "jpgn", "jpg:", "jpg_"]
-  badPngExts = @["pngn", "png:", "png_"]
+
+proc setHmacKey*(key: string) =
+  hmacKey = key
 
 proc getHmac*(data: string): string =
-  ($hmac(sha256, key, data))[0 .. 12]
+  ($hmac(sha256, hmacKey, data))[0 .. 12]
 
 proc getVidUrl*(link: string): string =
   let

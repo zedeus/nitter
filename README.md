@@ -71,10 +71,10 @@ $ nimble scss
 $ mkdir ./tmp
 ```
 
-Set your hostname, port and page title in `nitter.conf`, then run Nitter by
-executing `./nitter`. You should run Nitter behind a reverse proxy such as
-[Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for better
-security.
+Set your hostname, port, page title and HMAC key in `nitter.conf`, then run
+Nitter by executing `./nitter`. You should run Nitter behind a reverse proxy
+such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for
+better security.
 
 To build and run Nitter in Docker:
 ```bash

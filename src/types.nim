@@ -178,6 +178,7 @@ type
     cacheDir*: string
     profileCacheTime*: int
     defaultTheme*: string
+    hmacKey*: string
 
 proc contains*(thread: Chain; tweet: Tweet): bool =
   thread.content.anyIt(it.id == tweet.id)
