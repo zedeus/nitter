@@ -11,7 +11,7 @@ bin           = @["nitter"]
 # Dependencies
 
 requires "nim >= 0.19.9"
-requires "norm >= 1.0.17"
+requires "norm#head"
 requires "https://github.com/dom96/httpbeast#head"
 requires "jester >= 0.4.3"
 requires "regex >= 0.11.2"
