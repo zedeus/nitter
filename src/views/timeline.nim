@@ -38,9 +38,10 @@ proc renderToTop(): VNode =
 
 proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="thread-line")):
-    for i, threadTweet in thread.sortedByIt(it.id):
-      let show = i == thread.len and thread[0].id != threadTweet.threadId
-      renderTweet(threadTweet, prefs, path, class="thread",
+    let sortedThread = thread.sortedByIt(it.id)
+    for i, tweet in sortedThread:
+      let show = i == thread.high and sortedThread[0].id != tweet.threadId
+      renderTweet(tweet, prefs, path, class="thread",
                   index=i, total=thread.high, showThread=show)
 
 proc threadFilter(it: Tweet; thread: int): bool =

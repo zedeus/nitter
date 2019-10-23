@@ -272,5 +272,5 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
         renderStats(tweet.stats, views)
 
       if showThread:
-        a(class="show-thread", href=getLink(tweet)):
+        a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
           text "Show this thread"
