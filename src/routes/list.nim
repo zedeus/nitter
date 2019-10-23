@@ -17,14 +17,10 @@ proc createListRouter*(cfg: Config) =
   router list:
     get "/@name/lists/@list":
       cond '.' notin @"name"
-      let
-        list = await getListTimeline(@"name", @"list", @"max_position", getAgent())
-        tweets = renderTimelineTweets(list, cookiePrefs(), request.path)
-      respList list, tweets
+      let list = await getListTimeline(@"name", @"list", @"max_position", getAgent())
+      respList list, renderTimelineTweets(list, cookiePrefs(), request.path)
 
     get "/@name/lists/@list/members":
       cond '.' notin @"name"
-      let
-        list = await getListMembers(@"name", @"list", @"max_position", getAgent())
-        users = renderTimelineUsers(list, cookiePrefs(), request.path)
-      respList list, users
+      let list = await getListMembers(@"name", @"list", @"max_position", getAgent())
+      respList list, renderTimelineUsers(list, cookiePrefs(), request.path)
