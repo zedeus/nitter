@@ -11,7 +11,7 @@ export preferences
 proc findThemes*(dir: string): seq[string] =
   for kind, path in walkDir(dir / "css" / "themes"):
     result.add path.splitFile.name.capitalizeAscii
-  reverse(result)
+  sort(result)
 
 proc createPrefRouter*(cfg: Config) =
   router preferences:
