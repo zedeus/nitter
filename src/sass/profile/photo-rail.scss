@@ -3,7 +3,7 @@
 .photo-rail {
     &-card {
         float: left;
-        background: $bg_panel;
+        background: var(--bg_panel);
         border-radius: 0 0 4px 4px;
         width: 100%;
         margin: 5px 0;
@@ -18,7 +18,7 @@
         display: none;
         width: calc(100% - 24px);
         float: unset;
-        color: $accent;
+        color: var(--accent);
         justify-content: space-between;
     }
 

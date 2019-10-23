@@ -19,11 +19,11 @@
 
     &:hover {
         .overlay-circle {
-            border-color: $accent;
+            border-color: var(--accent);
         }
 
         .overlay-triangle {
-            border-color: transparent transparent transparent $accent;
+            border-color: transparent transparent transparent var(--accent);
         }
     }
 }
@@ -51,11 +51,11 @@
 
 @mixin input-colors {
     &:hover {
-        border-color: $accent;
+        border-color: var(--accent);
     }
 
     &:active {
-        border-color: $accent_light;
+        border-color: var(--accent_light);
     }
 }
 

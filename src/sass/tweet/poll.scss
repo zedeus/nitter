@@ -5,7 +5,7 @@
     position: relative;
     margin: 6px 0;
     height: 26px;
-    background: $bg_color;
+    background: var(--bg_color);
     border-radius: 5px;
     display: flex;
     align-items: center;
@@ -14,7 +14,7 @@
 .poll-choice-bar {
     height: 100%;
     position: absolute;
-    background: $dark_grey;
+    background: var(--dark_grey);
 }
 
 .poll-choice-value {
@@ -33,10 +33,10 @@
 }
 
 .poll-info {
-    color: $grey;
+    color: var(--grey);
     pointer-events: all;
 }
 
 .leader .poll-choice-bar {
-    background: $accent_dark;
+    background: var(--accent_dark);
 }

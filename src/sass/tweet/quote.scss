@@ -2,20 +2,20 @@
 
 .quote {
     margin-top: 10px;
-    border: solid 1px $dark_grey;
+    border: solid 1px var(--dark_grey);
     border-radius: 10px;
-    background-color: $bg_elements;
+    background-color: var(--bg_elements);
     overflow: auto;
     padding: 6px;
     position: relative;
     pointer-events: all;
 
     &:hover {
-        border-color: $grey;
+        border-color: var(--grey);
     }
 
     &.unavailable:hover {
-        border-color: $dark_grey;
+        border-color: var(--dark_grey);
     }
 }
 
@@ -85,7 +85,7 @@
 }
 
 .quote-sensitive {
-    background: $darker_grey;
+    background: var(--darker_grey);
     width: 102px;
     height: 102px;
     border-radius: 12px;
@@ -96,7 +96,7 @@
 
 .quote-sensitive-icon {
     font-size: 40px;
-    color: $grey;
+    color: var(--grey);
 }
 
 @media(max-width: 600px) {

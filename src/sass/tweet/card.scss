@@ -10,15 +10,15 @@
     border-radius: 10px;
     border-width: 1px;
     border-style: solid;
-    border-color: $dark_grey;
-    background-color: $bg_elements;
+    border-color: var(--dark_grey);
+    background-color: var(--bg_elements);
     overflow: hidden;
     color: inherit;
     display: flex;
     text-decoration: none !important;
 
     &:hover {
-        border-color: $grey;
+        border-color: var(--grey);
     }
 
     .attachments {
@@ -43,7 +43,7 @@
 
 .card-destination {
     @include ellipsis;
-    color: $grey;
+    color: var(--grey);
     display: block;
 }
 
@@ -73,7 +73,7 @@
     left: 0;
     bottom: 0;
     right: 0;
-    background-color: $fg_color;
+    background-color: var(--fg_color);
 
     img {
         width: 100%;
@@ -107,7 +107,7 @@
     .card-image {
         position: unset;
         border-style: solid;
-        border-color: $dark_grey;
+        border-color: var(--dark_grey);
         border-width: 0;
         border-bottom-width: 1px;
     }

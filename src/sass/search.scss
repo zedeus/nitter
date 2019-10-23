@@ -29,9 +29,9 @@
 
     > label {
         display: inline;
-        background-color: #121212;
-        color: #F8F8F2;
-        border: 1px solid #FF6C6091;
+        background-color: var(--bg_elements);
+        color: var(--fg_color);
+        border: 1px solid var(--accent_border);
         padding: 1px 6px 2px 6px;
         font-size: 14px;
         cursor: pointer;

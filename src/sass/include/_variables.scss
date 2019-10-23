@@ -3,10 +3,12 @@ $bg_color: #0F0F0F;
 $fg_color: #F8F8F2;
 $fg_faded: #F8F8F2CF;
 $fg_dark: #9d9da0;
+$fg_nav: #000000;
 
 $bg_panel: #161616;
 $bg_elements: #121212;
 $bg_overlays: #1F1F1F;
+$bg_hover: #1A1A1A;
 
 $grey: #888889;
 $dark_grey: #404040;
@@ -24,6 +26,7 @@ $more_replies_dots: #AD433B;
 $error_red: #420A05;
 
 $verified_blue: #1DA1F2;
+$icon_text: #F8F8F2;
 
 $shadow: rgba(0,0,0,.6);
 $shadow_dark: rgba(0,0,0,.2);
@@ -34,3 +37,41 @@ $font_1: Helvetica;
 $font_2: Arial;
 $font_3: sans-serif;
 $font_4: fontello;
+
+//theme
+$variables: (
+    --bg_color: var(--bg_color),
+    --fg_color: var(--fg_color),
+    --fg_faded: var(--fg_faded),
+    --fg_dark: var(--fg_dark),
+    --fg_nav: var(--fg_nav),
+
+    --bg_panel: var(--bg_panel),
+    --bg_elements: var(--bg_elements),
+    --bg_overlays: var(--bg_overlays),
+    --bg_hover: var(--bg_hover),
+
+    --grey: var(--grey),
+    --dark_grey: var(--dark_grey),
+    --darker_grey: var(--darker_grey),
+    --darkest_grey: var(--darkest_grey),
+    --border_grey: var(--border_grey),
+
+    --accent: var(--accent),
+    --accent_light: var(--accent_light),
+    --accent_dark: var(--accent_dark),
+    --accent_border: var(--accent_border),
+
+    --play_button_red: var(--play_button_red),
+    --more_replies_dots: var(--more_replies_dots),
+    --error_red: var(--error_red),
+
+    --verified_blue: var(--verified_blue),
+    --icon_text: var(--icon_text)
+);
+
+/*** theme helper ***/
+
+@function var($variable) {
+    @return map-get($variables, $variable);
+}

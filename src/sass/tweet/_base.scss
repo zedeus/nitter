@@ -52,7 +52,7 @@
     max-width: 80%;
     font-size: 14px;
     font-weight: 700;
-    color: $fg_color;
+    color: var(--fg_color);
 }
 
 .username {
@@ -71,7 +71,7 @@
 .tweet-published {
     margin: 0;
     margin-top: 5px;
-    color: $grey;
+    color: var(--grey);
     pointer-events: all;
 }
 
@@ -89,7 +89,7 @@
 }
 
 .replying-to {
-    color: $fg_dark;
+    color: var(--fg_dark);
     margin: -2px 0 4px;
 
     a {
@@ -99,7 +99,7 @@
 
 .retweet-header, .pinned, .tweet-stats {
     align-content: center;
-    color: $grey;
+    color: var(--grey);
     display: flex;
     flex-shrink: 0;
     flex-wrap: wrap;
@@ -134,9 +134,9 @@
     width: 100%;
     height: 100%;
     padding: 12px;
-    border: solid 1px $dark_grey;
+    border: solid 1px var(--dark_grey);
     border-radius: 10px;
-    background-color: $bg_color;
+    background-color: var(--bg_color);
 }
 
 .tweet-link {
@@ -147,6 +147,6 @@
     position: absolute;
 
     &:hover {
-        background-color: #1a1a1a;
+        background-color: var(--bg_hover);
     }
 }

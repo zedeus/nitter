@@ -5,15 +5,15 @@
 }
 
 .timeline {
-    background-color: $bg_panel;
+    background-color: var(--bg_panel);
 
     > div:not(:first-child) {
-        border-top: 1px solid $border_grey;
+        border-top: 1px solid var(--border_grey);
     }
 }
 
 .timeline-header {
-    background-color: $bg_panel;
+    background-color: var(--bg_panel);
     text-align: center;
     padding: 8px;
     display: block;
@@ -31,7 +31,7 @@
     flex-wrap: wrap;
     list-style: none;
     margin: 0 0 5px 0;
-    background-color: $bg_panel;
+    background-color: var(--bg_panel);
     padding: 0;
 }
 
@@ -53,14 +53,14 @@
         }
 
         &.active {
-            border-bottom-color: $accent;
-            color: $accent;
+            border-bottom-color: var(--accent);
+            color: var(--accent);
         }
     }
 
     &.active a {
-        border-bottom-color: $accent;
-        color: $accent;
+        border-bottom-color: var(--accent);
+        color: var(--accent);
     }
 
     &.wide {
@@ -69,7 +69,7 @@
 }
 
 .timeline-footer {
-    background-color: $bg_panel;
+    background-color: var(--bg_panel);
     padding: 6px 0;
 }
 
@@ -81,48 +81,48 @@
     }
 
     h2 {
-        color: $accent;
+        color: var(--accent);
         font-size: 20px;
         font-weight: 600;
     }
 }
 
 .timeline-none {
-    color: $accent;
+    color: var(--accent);
     font-size: 20px;
     font-weight: 600;
     text-align: center;
 }
 
 .timeline-end {
-    background-color: $bg_panel;
-    color: $accent;
+    background-color: var(--bg_panel);
+    color: var(--accent);
     font-size: 16px;
     font-weight: 600;
     text-align: center;
 }
 
 .show-more {
-    background-color: $bg_panel;
+    background-color: var(--bg_panel);
     text-align: center;
     padding: .75em 0;
     display: block !important;
 
     a {
-        background-color: $darkest_grey;
+        background-color: var(--darkest_grey);
         display: inline-block;
         height: 2em;
         padding: 0 2em;
         line-height: 2em;
 
         &:hover {
-            background-color: $darker_grey;
+            background-color: var(--darker_grey);
         }
     }
 }
 
 .top-ref {
-    background-color: #0f0f0f;
+    background-color: var(--bg_color);
     border-top: none !important;
 
     .icon-down {
@@ -132,7 +132,7 @@
         text-decoration: none;
 
         &:hover {
-            color: $accent_light;
+            color: var(--accent_light);
         }
 
         &::before {

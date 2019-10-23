@@ -11,7 +11,7 @@
 
 .main-thread {
     margin-bottom: 20px;
-    background-color: $bg_panel;
+    background-color: var(--bg_panel);
 }
 
 .main-tweet, .replies {
@@ -24,14 +24,14 @@
 }
 
 .reply {
-    background-color: $bg_panel;
+    background-color: var(--bg_panel);
     margin-bottom: 10px;
 }
 
 .thread-line {
     .timeline-item::before,
     &.timeline-item::before {
-        background: $accent_dark;
+        background: var(--accent_dark);
         content: '';
         position: relative;
         min-width: 3px;
@@ -53,7 +53,7 @@
     .more-replies::before {
         content: '...';
         background: unset;
-        color: $more_replies_dots;
+        color: var(--more_replies_dots);
         font-weight: bold;
         font-size: 20px;
         line-height: 0.25em;
