@@ -9,8 +9,9 @@ import jester
 const doctype = "<!DOCTYPE html>\n"
 
 proc renderNavbar*(title, rss: string; req: Request): VNode =
-  let path = $(parseUri(req.path) ? filterParams(req.params))
   let twitterPath = getTwitterLink(req.path, req.params)
+  var path = $(parseUri(req.path) ? filterParams(req.params))
+  if "/status" in path: path.add "#m"
 
   buildHtml(nav):
     tdiv(class="inner-nav"):

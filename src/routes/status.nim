@@ -27,7 +27,7 @@ proc createStatusRouter*(cfg: Config) =
       let
         title = pageTitle(conversation.tweet.profile)
         desc = conversation.tweet.text
-        html = renderConversation(conversation, prefs, getPath())
+        html = renderConversation(conversation, prefs, getPath() & "#m")
 
       if conversation.tweet.video.isSome():
         let thumb = get(conversation.tweet.video).thumb
