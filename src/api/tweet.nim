@@ -1,4 +1,4 @@
-import httpclient, asyncdispatch, strutils, uri
+import asyncdispatch, strutils, uri
 
 import ".."/[types, parser]
 import utils, consts, media

@@ -3,7 +3,7 @@ import norm/sqlite
 
 import prefs_impl
 
-export sqlite, options
+export options
 
 type
   VideoType* = enum
@@ -53,7 +53,6 @@ dbTypes:
         .}: VideoType
 
 genPrefsType()
-dbFromTypes("cache.db", "", "", "", [Profile, Video])
 
 type
   QueryKind* = enum

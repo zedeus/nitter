@@ -1,5 +1,7 @@
 import asyncdispatch, times, strutils
-import types, api
+import norm/sqlite
+
+import types, api/profile
 
 dbFromTypes("cache.db", "", "", "", [Profile, Video])
 
@@ -44,3 +46,20 @@ proc getCachedProfile*(username, agent: string; force=false): Future[Profile] {.
 
 proc setProfileCacheTime*(minutes: int) =
   profileCacheTime = initDuration(minutes=minutes)
+
+proc cache*(video: var Video) =
+  withDb:
+    try:
+      let v = Video.getOne("videoId = ?", video.videoId)
+      video.id = v.id
+      video.update()
+    except KeyError:
+      if video.videoId.len > 0:
+        video.insert()
+
+proc getCachedVideo*(id: int): Option[Video] =
+  withDb:
+    try:
+      return some Video.getOne("videoId = ?", $id)
+    except KeyError:
+      return none Video

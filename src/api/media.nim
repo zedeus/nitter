@@ -1,6 +1,6 @@
-import httpclient, asyncdispatch, times, sequtils, strutils, json, uri
+import httpclient, asyncdispatch, times, sequtils, strutils, json, uri, macros
 
-import ".."/[types, parser, formatters]
+import ".."/[types, parser, formatters, cache]
 import utils, consts
 
 var
@@ -62,7 +62,13 @@ proc getGuestToken(agent: string; force=false): Future[string] {.async.} =
     result = json["guest_token"].to(string)
     guestToken = result
 
-proc getVideoFetch(tweet: Tweet; agent, token: string) {.async.} =
+proc getVideoVar(tweet: Tweet): var Option[Video] =
+  if tweet.card.isSome():
+    return get(tweet.card).video
+  else:
+    return tweet.video
+
+proc getVideoFetch(tweet: Tweet; agent, token: string): Future[Option[Video]] {.async.} =
   if tweet.video.isNone(): return
 
   let
@@ -75,31 +81,23 @@ proc getVideoFetch(tweet: Tweet; agent, token: string) {.async.} =
     if getTime() - tokenUpdated > initDuration(seconds=1):
       tokenUpdated = getTime()
       discard await getGuestToken(agent, force=true)
-    await getVideoFetch(tweet, agent, guestToken)
+      result = await getVideoFetch(tweet, agent, guestToken)
     return
 
-  if tweet.card.isNone:
-    tweet.video = some parseVideo(json, tweet.id)
-  else:
-    get(tweet.card).video = some parseVideo(json, tweet.id)
-    tweet.video = none Video
+  var video = parseVideo(json, tweet.id)
+  video.title = get(tweet.video).title
+  video.description = get(tweet.video).description
+  cache(video)
+
+  result = some video
   tokenUses.inc
 
-proc getVideoVar(tweet: Tweet): var Option[Video] =
-  if tweet.card.isSome():
-    return get(tweet.card).video
-  else:
-    return tweet.video
-
 proc getVideo*(tweet: Tweet; agent, token: string; force=false) {.async.} =
-  withCustomDb("cache.db", "", "", ""):
-    try:
-      getVideoVar(tweet) = some Video.getOne("videoId = ?", tweet.id)
-    except KeyError:
-      await getVideoFetch(tweet, agent, token)
-      var video = getVideoVar(tweet)
-      if video.isSome():
-        get(video).insert()
+  var video = getCachedVideo(tweet.id)
+  if video.isNone:
+    video = await getVideoFetch(tweet, agent, token)
+  getVideoVar(tweet) = video
+  if tweet.card.isSome: tweet.video = none Video
 
 proc getPoll*(tweet: Tweet; agent: string) {.async.} =
   if tweet.poll.isNone(): return

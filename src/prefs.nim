@@ -1,6 +1,7 @@
 import strutils, sequtils, macros
-import prefs_impl, types
+import norm/sqlite
 
+import prefs_impl, types
 export genUpdatePrefs
 
 static:
