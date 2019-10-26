@@ -1,5 +1,5 @@
 #? stdtmpl(subsChar = '$', metaChad = '#')
-#import strutils, xmltree, strformat
+#import strutils, xmltree, strformat, options
 #import ../types, ../utils, ../formatters
 #
 #proc getTitle(tweet: Tweet; prefs: Prefs; hostname: string): string =

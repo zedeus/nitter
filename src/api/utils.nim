@@ -1,4 +1,4 @@
-import httpclient, asyncdispatch, htmlparser
+import httpclient, asyncdispatch, htmlparser, options
 import strutils, json, xmltree, uri
 
 import ../types

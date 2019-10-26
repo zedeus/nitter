@@ -1,4 +1,4 @@
-import asyncdispatch, strutils, sequtils, uri
+import asyncdispatch, strutils, sequtils, uri, options
 
 import jester
 
@@ -6,7 +6,7 @@ import router_utils
 import ".."/[api, types, formatters, agents]
 import ../views/[general, status]
 
-export uri, sequtils
+export uri, sequtils, options
 export router_utils
 export api, formatters, agents
 export status

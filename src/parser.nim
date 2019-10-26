@@ -1,4 +1,4 @@
-import xmltree, sequtils, strutils, json
+import xmltree, sequtils, strutils, json, options
 
 import types, parserutils, formatters
 

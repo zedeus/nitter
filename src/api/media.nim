@@ -1,4 +1,5 @@
-import httpclient, asyncdispatch, times, sequtils, strutils, json, uri, macros
+import httpclient, asyncdispatch, times, sequtils, strutils, json, uri
+import macros, options
 
 import ".."/[types, parser, formatters, cache]
 import utils, consts

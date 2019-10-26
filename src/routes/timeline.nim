@@ -1,5 +1,4 @@
-import asyncdispatch, strutils, sequtils, uri
-
+import asyncdispatch, strutils, sequtils, uri, options
 import jester
 
 import router_utils

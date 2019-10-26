@@ -1,4 +1,4 @@
-import strutils, sequtils, strformat
+import strutils, sequtils, strformat, options
 import karax/[karaxdsl, vdom, vstyles]
 
 import renderutils

@@ -1,4 +1,4 @@
-import strutils, strformat, sequtils, algorithm, times, uri
+import strutils, strformat, sequtils, algorithm, times, uri, options
 import karax/[karaxdsl, vdom, vstyles]
 
 import ".."/[types, query, formatters]

@@ -3,8 +3,6 @@ import norm/sqlite
 
 import prefs_impl
 
-export options
-
 type
   VideoType* = enum
     vmap, m3u8, mp4

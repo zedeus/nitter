@@ -1,4 +1,4 @@
-import xmltree, strtabs, strformat, strutils, times, uri
+import xmltree, strtabs, strformat, strutils, times, uri, options
 import regex
 
 import types, formatters
