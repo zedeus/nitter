@@ -3,6 +3,10 @@ import norm/sqlite
 
 import types, api/profile
 
+template safeAddColumn(field: typedesc): untyped =
+  try: field.addColumn
+  except DbError: discard
+
 dbFromTypes("cache.db", "", "", "", [Profile, Video])
 
 withDb:
@@ -10,6 +14,8 @@ withDb:
     createTables()
   except DbError:
     discard
+  Video.title.safeAddColumn
+  Video.description.safeAddColumn
 
 var profileCacheTime = initDuration(minutes=10)
 

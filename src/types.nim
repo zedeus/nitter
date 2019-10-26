@@ -44,6 +44,8 @@ dbTypes:
       views*: string
       available*: bool
       reason*: string
+      title*: string
+      description*: string
       playbackType* {.
           dbType: "STRING"
           parseIt: parseEnum[VideoType](it.s)

@@ -76,8 +76,11 @@ proc renderVideoUnavailable(video: Video): VNode =
         p: text "This media is unavailable"
 
 proc renderVideo(video: Video; prefs: Prefs; path: string): VNode =
+  let container =
+    if video.description.len > 0 or video.title.len > 0: " card-container"
+    else: ""
   buildHtml(tdiv(class="attachments")):
-    tdiv(class="gallery-video"):
+    tdiv(class="gallery-video" & container):
       tdiv(class="attachment video-container"):
         let thumb = getPicUrl(video.thumb)
         if not video.available:
@@ -99,6 +102,11 @@ proc renderVideo(video: Video; prefs: Prefs; path: string): VNode =
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
             verbatim "<div class=\"overlay-circle\">"
             verbatim "<span class=\"overlay-triangle\"</span></div></div>"
+      if container.len > 0:
+        tdiv(class="card-content"):
+          h2(class="card-title"): text video.title
+          if video.description.len > 0:
+            p(class="card-description"): text video.description
 
 proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):

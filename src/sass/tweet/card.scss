@@ -15,6 +15,7 @@
     overflow: hidden;
     color: inherit;
     display: flex;
+    flex-direction: column;
     text-decoration: none !important;
 
     &:hover {
