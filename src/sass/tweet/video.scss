@@ -11,6 +11,10 @@ video {
     overflow: hidden;
 }
 
+.gallery-video.card-container {
+    flex-direction: column;
+}
+
 .video-container {
     max-height: 530px;
     margin: 0;
