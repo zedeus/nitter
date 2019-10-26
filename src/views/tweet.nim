@@ -188,6 +188,11 @@ proc renderReply(quote: Quote): VNode =
       if i > 0: text " "
       a(href=("/" & u)): text "@" & u
 
+proc renderAttribution(profile: Profile): VNode =
+  buildHtml(a(class="attribution", href=("/" & profile.username))):
+    img(class="avatar", width="20", height="20", src=profile.getUserpic("_200x200"))
+    strong: text profile.fullname
+
 proc renderQuoteMedia(quote: Quote): VNode =
   buildHtml(tdiv(class="quote-media-container")):
     if quote.thumb.len > 0:
@@ -257,6 +262,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
 
       tdiv(class="tweet-content media-body", dir="auto"):
         verbatim replaceUrl(tweet.text, prefs)
+
+      if tweet.attribution.isSome:
+        renderAttribution(tweet.attribution.get())
 
       if tweet.quote.isSome:
         renderQuote(tweet.quote.get(), prefs)

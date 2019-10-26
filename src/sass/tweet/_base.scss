@@ -88,7 +88,24 @@
         margin-left: -58px;
         width: 48px;
         height: 48px;
-        border-radius: 50%;
+    }
+}
+
+.avatar {
+    border-radius: 50%;
+}
+
+.attribution {
+    display: flex;
+    pointer-events: all;
+    margin: 10px 0;
+
+    .avatar {
+        margin-right: 5px;
+    }
+
+    strong {
+        color: var(--fg_color);
     }
 }
 

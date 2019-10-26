@@ -148,6 +148,7 @@ type
     tombstone*: string
     stats*: TweetStats
     retweet*: Option[Retweet]
+    attribution*: Option[Profile]
     quote*: Option[Quote]
     card*: Option[Card]
     gif*: Option[Gif]

@@ -199,6 +199,14 @@ proc getTweetMedia*(tweet: Tweet; node: XmlNode) =
   let player = node.select(".PlayableMedia")
   if player == nil: return
 
+  let attrib = player.select(".PlayableMedia-attribution")
+  if attrib != nil:
+    tweet.attribution = some Profile(
+      username: attrib.attr("href").strip(chars={'/'}),
+      fullname: attrib.selectText(".fullname"),
+      userpic: attrib.selectAttr(".avatar", "src")
+    )
+
   if "gif" in player.attr("class"):
     tweet.gif = some getGif(player.select(".PlayableMedia-player"))
   elif "video" in player.attr("class"):
