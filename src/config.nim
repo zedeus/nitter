@@ -23,6 +23,6 @@ proc getConfig*(path: string): Config =
     cacheDir: cfg.get("Cache", "directory", "/tmp/nitter"),
     profileCacheTime: cfg.get("Cache", "profileMinutes", 10),
 
-    defaultTheme: cfg.get("Config", "defaultTheme", "Dark"),
+    defaultTheme: cfg.get("Config", "defaultTheme", "Nitter"),
     hmacKey: cfg.get("Config", "hmacKey", "secretkey")
   )

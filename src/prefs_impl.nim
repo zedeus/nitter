@@ -52,7 +52,7 @@ const prefList*: OrderedTable[string, seq[Pref]] = {
 
   "Display": @[
     Pref(kind: select, name: "theme", label: "Theme",
-         defaultOption: "Dark"),
+         defaultOption: "Nitter"),
 
     Pref(kind: checkbox, name: "hideTweetStats",
          label: "Hide tweet stats (replies, retweets, likes)",
