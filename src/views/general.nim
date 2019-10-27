@@ -1,4 +1,4 @@
-import uri, strutils
+import uri, strutils, strformat
 import karax/[karaxdsl, vdom]
 
 import renderutils
@@ -31,12 +31,13 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
 proc renderMain*(body: VNode; req: Request; cfg: Config; titleText=""; desc="";
                  rss=""; `type`="article"; video=""; images: seq[string] = @[]): string =
   let prefs = getPrefs(req.cookies.getOrDefault("preferences"), cfg)
-  let theme = "/css/themes/" & toLowerAscii(prefs.theme) & ".css"
+  let theme = toLowerAscii(prefs.theme).replace(" ", "_")
   let node = buildHtml(html(lang="en")):
     head:
       link(rel="stylesheet", `type`="text/css", href="/css/style.css")
       link(rel="stylesheet", `type`="text/css", href="/css/fontello.css")
-      link(rel="stylesheet", `type`="text/css", href=theme)
+      if theme.len > 0:
+        link(rel="stylesheet", `type`="text/css", href=(&"/css/themes/{theme}.css"))
 
       link(rel="apple-touch-icon", sizes="180x180", href="/apple-touch-icon.png")
       link(rel="icon", type="image/png", sizes="32x32", href="/favicon-32x32.png")

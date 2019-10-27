@@ -10,7 +10,8 @@ export preferences
 
 proc findThemes*(dir: string): seq[string] =
   for kind, path in walkDir(dir / "css" / "themes"):
-    result.add path.splitFile.name.capitalizeAscii
+    let theme = path.splitFile.name
+    result.add theme.capitalizeAscii.replace("_", " ")
   sort(result)
 
 proc createPrefRouter*(cfg: Config) =
