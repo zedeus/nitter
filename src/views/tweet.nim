@@ -189,8 +189,9 @@ proc renderReply(quote: Quote): VNode =
       a(href=("/" & u)): text "@" & u
 
 proc renderAttribution(profile: Profile): VNode =
+  let avatarUrl = getPicUrl(profile.getUserpic("_200x200"))
   buildHtml(a(class="attribution", href=("/" & profile.username))):
-    img(class="avatar", width="20", height="20", src=profile.getUserpic("_200x200"))
+    img(class="avatar", width="20", height="20", src=avatarUrl)
     strong: text profile.fullname
 
 proc renderQuoteMedia(quote: Quote): VNode =
