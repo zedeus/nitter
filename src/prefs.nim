@@ -49,6 +49,8 @@ proc getPrefs*(id: string; cfg: Config): Prefs =
   withDb:
     try:
       result.getOne("id = ?", id)
+      if result.theme.len == 0:
+        result.theme = cfg.defaultTheme
     except KeyError:
       result = getDefaultPrefs(cfg)
 
