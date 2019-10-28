@@ -24,6 +24,15 @@ select {
     font-size: 14px;
 }
 
+input[type="text"] {
+    height: 16px;
+}
+
+select {
+    height: 20px;
+    padding: 0 2px;
+}
+
 input[type="date"]::-webkit-inner-spin-button {
     display: none;
 }
