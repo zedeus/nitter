@@ -26,6 +26,7 @@ proc renderReplyThread(thread: Chain; prefs: Prefs; path: string): VNode =
 
 proc renderConversation*(conversation: Conversation; prefs: Prefs; path: string): VNode =
   let hasAfter = conversation.after != nil
+  let showReplies = not prefs.hideReplies
   buildHtml(tdiv(class="conversation")):
     tdiv(class="main-thread"):
       if conversation.before != nil:
@@ -48,14 +49,14 @@ proc renderConversation*(conversation: Conversation; prefs: Prefs; path: string)
           if more != 0:
             renderMoreReplies(conversation.after)
 
-    if not conversation.replies.beginning:
+    if not conversation.replies.beginning and showReplies:
       renderNewer(Query(), getLink(conversation.tweet))
 
-    if conversation.replies.content.len > 0:
+    if conversation.replies.content.len > 0 and showReplies:
       tdiv(class="replies", id="r"):
         for thread in conversation.replies.content:
           if thread == nil: continue
           renderReplyThread(thread, prefs, path)
 
-    if conversation.replies.hasMore:
+    if conversation.replies.hasMore and showReplies:
       renderMore(Query(), conversation.replies.minId, focus="#r")

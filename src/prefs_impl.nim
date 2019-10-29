@@ -68,6 +68,10 @@ const prefList*: OrderedTable[string, seq[Pref]] = {
     Pref(kind: checkbox, name: "hidePins",
          label: "Hide pinned tweets",
          defaultState: false),
+
+    Pref(kind: checkbox, name: "hideReplies",
+         label: "Hide tweet replies",
+         defaultState: false)
   ]
 }.toOrderedTable
 
