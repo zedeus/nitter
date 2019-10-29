@@ -7,73 +7,86 @@ type
   Pref* = object
     name*: string
     label*: string
-    case kind*: PrefKind
-    of checkbox:
-      defaultState*: bool
-    of select:
-      defaultOption*: string
-      options*: seq[string]
-    of input:
-      defaultInput*: string
-      placeholder*: string
+    kind*: PrefKind
+    options*: seq[string]
+    placeholder*: string
+    defaultState*: bool
+    defaultOption*: string
+    defaultInput*: string
 
-# TODO: write DSL to simplify this
-const prefList*: OrderedTable[string, seq[Pref]] = {
-  "Privacy": @[
-    Pref(kind: input, name: "replaceTwitter",
-         label: "Replace Twitter links with Nitter (blank to disable)",
-         defaultInput: "nitter.net", placeholder: "Nitter hostname"),
+macro genPrefs(prefDsl: untyped) =
+  var table = nnkTableConstr.newTree()
+  for category in prefDsl:
+    table.add nnkExprColonExpr.newTree(newLit($category[0]))
+    table[^1].add nnkPrefix.newTree(newIdentNode("@"), nnkBracket.newTree())
+    for pref in category[1]:
+      let
+        name = newLit($pref[0])
+        kind = pref[1]
+        label = pref[3][0]
+        default = pref[2]
+        defaultField =
+          case parseEnum[PrefKind]($kind)
+          of checkbox: ident("defaultState")
+          of select: ident("defaultOption")
+          of input: ident("defaultInput")
 
-    Pref(kind: input, name: "replaceYouTube",
-         label: "Replace YouTube links with Invidious (blank to disable)",
-         defaultInput: "invidio.us", placeholder: "Invidious hostname")
-  ],
+      var newPref = quote do:
+        Pref(kind: `kind`, name: `name`, label: `label`, `defaultField`: `default`)
 
-  "Media": @[
-    Pref(kind: checkbox, name: "mp4Playback",
-         label: "Enable mp4 video playback",
-         defaultState: true),
+      for node in pref[3]:
+        if node.kind == nnkCall:
+          newPref.add nnkExprColonExpr.newTree(node[0], node[1][0])
+      table[^1][1][1].add newPref
 
-    Pref(kind: checkbox, name: "hlsPlayback",
-         label: "Enable hls video streaming (requires JavaScript)",
-         defaultState: false),
+  let name = ident("prefList")
+  result = quote do:
+    const `name`* = toOrderedTable(`table`)
 
-    Pref(kind: checkbox, name: "proxyVideos",
-         label: "Proxy video streaming through the server (might be slow)",
-         defaultState: true),
+genPrefs:
+  Privacy:
+    replaceTwitter(input, "nitter.net"):
+      "Replace Twitter links with Nitter (blank to disable)"
+      placeholder: "Nitter hostname"
 
-    Pref(kind: checkbox, name: "muteVideos",
-         label: "Mute videos by default",
-         defaultState: false),
+    replaceYouTube(input, "invidio.us"):
+      "Replace YouTube links with Invidious (blank to disable)"
+      placeholder: "Invidious hostname"
 
-    Pref(kind: checkbox, name: "autoplayGifs", label: "Autoplay gifs",
-         defaultState: true)
-  ],
+  Media:
+    mp4Playback(checkbox, true):
+      "Enable mp4 video playback"
 
-  "Display": @[
-    Pref(kind: select, name: "theme", label: "Theme",
-         defaultOption: "Nitter"),
+    hlsPlayback(checkbox, false):
+      "Enable hls video streaming (requires JavaScript)"
 
-    Pref(kind: checkbox, name: "hideTweetStats",
-         label: "Hide tweet stats (replies, retweets, likes)",
-         defaultState: false),
+    proxyVideos(checkbox, true):
+      "Proxy video streaming through the server (might be slow)"
 
-    Pref(kind: checkbox, name: "hideBanner", label: "Hide profile banner",
-         defaultState: false),
+    muteVideos(checkbox, false):
+      "Mute videos by default"
 
-    Pref(kind: checkbox, name: "stickyProfile",
-         label: "Make profile sidebar stick to top",
-         defaultState: true),
+    autoplayGifs(checkbox, true):
+      "Autoplay gifs"
 
-    Pref(kind: checkbox, name: "hidePins",
-         label: "Hide pinned tweets",
-         defaultState: false),
+  Display:
+    theme(select, "Nitter"):
+      "Theme"
 
-    Pref(kind: checkbox, name: "hideReplies",
-         label: "Hide tweet replies",
-         defaultState: false)
-  ]
-}.toOrderedTable
+    stickyProfile(checkbox, true):
+      "Make profile sidebar stick to top"
+
+    hideTweetStats(checkbox, false):
+      "Hide tweet stats (replies, retweets, likes)"
+
+    hideBanner(checkbox, false):
+      "Hide profile banner"
+
+    hidePins(checkbox, false):
+      "Hide pinned tweets"
+
+    hideReplies(checkbox, false):
+      "Hide tweet replies"
 
 iterator allPrefs*(): Pref =
   for k, v in prefList:
