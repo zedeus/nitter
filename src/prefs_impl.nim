@@ -63,7 +63,11 @@ const prefList*: OrderedTable[string, seq[Pref]] = {
 
     Pref(kind: checkbox, name: "stickyProfile",
          label: "Make profile sidebar stick to top",
-         defaultState: true)
+         defaultState: true),
+
+    Pref(kind: checkbox, name: "hidePins",
+         label: "Hide pinned tweets",
+         defaultState: false),
   ]
 }.toOrderedTable
 

@@ -27,6 +27,7 @@ withDb:
   except DbError:
     discard
   Prefs.theme.safeAddColumn
+  Prefs.hidePins.safeAddColumn
 
 proc getDefaultPrefs(cfg: Config): Prefs =
   result = genDefaultPrefs()
