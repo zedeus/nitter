@@ -12,8 +12,13 @@ RUN apk update \
     && nimble scss
 
 FROM alpine
-WORKDIR /src/
 RUN apk --no-cache add pcre-dev sqlite-dev
+RUN addgroup -S -g 1000 nitter
+RUN adduser -S -u 1000 -G nitter -H -h /src nitter
+RUN mkdir -p /src/tmp
+RUN chown -R nitter:nitter /src/
+USER nitter
+WORKDIR /src/
 COPY --from=nim /src/nitter/nitter /src/nitter/nitter.conf ./
 COPY --from=nim /src/nitter/public ./public
 CMD ./nitter
