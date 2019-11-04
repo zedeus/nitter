@@ -79,7 +79,7 @@ proc renderVideo(video: Video; prefs: Prefs; path: string): VNode =
   let container =
     if video.description.len > 0 or video.title.len > 0: " card-container"
     else: ""
-  buildHtml(tdiv(class="attachments")):
+  buildHtml(tdiv(class="attachments card")):
     tdiv(class="gallery-video" & container):
       tdiv(class="attachment video-container"):
         let thumb = getPicUrl(video.thumb)
