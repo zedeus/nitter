@@ -41,7 +41,8 @@ proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
     let sortedThread = thread.sortedByIt(it.id)
     for i, tweet in sortedThread:
       let show = i == thread.high and sortedThread[0].id != tweet.threadId
-      renderTweet(tweet, prefs, path, class="thread",
+      let header = if tweet.pinned or tweet.retweet.isSome: "with-header " else: ""
+      renderTweet(tweet, prefs, path, class=(header & "thread"),
                   index=i, total=thread.high, showThread=show)
 
 proc threadFilter(it: Tweet; thread: int): bool =

@@ -45,6 +45,23 @@
         pointer-events: none;
     }
 
+    .with-header:not(:first-child)::after {
+        background: var(--accent_dark);
+        content: '';
+        position: relative;
+        float: left;
+        min-width: 3px;
+        width: 3px;
+        right: calc(100% - 26px);
+        border-radius: 2px;
+        margin-left: -3px;
+        margin-bottom: 37px;
+        bottom: 10px;
+        height: 30px;
+        z-index: 1;
+        pointer-events: none;
+    }
+
     .unavailable::before {
         top: 48px;
         margin-bottom: 28px;
