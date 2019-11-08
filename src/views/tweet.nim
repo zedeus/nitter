@@ -149,7 +149,8 @@ proc renderCardContent(card: Card): VNode =
     span(class="card-destination"): text card.dest
 
 proc renderCard(card: Card; prefs: Prefs; path: string): VNode =
-  const largeCards = {summaryLarge, liveEvent, promoWebsite, promoVideo}
+  const largeCards = {summaryLarge, liveEvent, promoWebsite,
+                      promoVideo, promoVideoConvo}
   let large = if card.kind in largeCards: " large" else: ""
   let url = replaceUrl(card.url, prefs)
 

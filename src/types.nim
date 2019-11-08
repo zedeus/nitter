@@ -99,6 +99,7 @@ type
     summaryLarge = "summary_large_image"
     promoWebsite = "promo_website"
     promoVideo = "promo_video_website"
+    promoVideoConvo = "promo_video_convo"
     player = "player"
     liveEvent = "live_event"
 
