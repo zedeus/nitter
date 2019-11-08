@@ -69,7 +69,7 @@ proc getVideoVar(tweet: Tweet): var Option[Video] =
   else:
     return tweet.video
 
-proc getVideoFetch(tweet: Tweet; agent, token: string): Future[Option[Video]] {.async.} =
+proc getVideoFetch(tweet: Tweet; agent, token: string; retry=true): Future[Option[Video]] {.async.} =
   if tweet.video.isNone(): return
 
   let
@@ -79,11 +79,11 @@ proc getVideoFetch(tweet: Tweet; agent, token: string): Future[Option[Video]] {.
     json = await fetchJson(url, headers)
 
   if json == nil:
+    if not retry: return
     if getTime() - tokenUpdated > initDuration(seconds=1):
       tokenUpdated = getTime()
       discard await getGuestToken(agent, force=true)
-      result = await getVideoFetch(tweet, agent, guestToken)
-    return
+    return await getVideoFetch(tweet, agent, guestToken, retry=false)
 
   var video = parseVideo(json, tweet.id)
   video.title = get(tweet.video).title
