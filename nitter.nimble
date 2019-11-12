@@ -17,7 +17,7 @@ requires "jester >= 0.4.3"
 requires "regex >= 0.11.2"
 requires "q >= 0.0.7"
 requires "nimcrypto >= 0.3.9"
-requires "karax#b99a543"
+requires "karax#f6bda9a"
 requires "sass"
 requires "markdown"
 

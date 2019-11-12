@@ -1,5 +1,5 @@
-import strutils, strformat, xmltree
-import karax/[karaxdsl, vdom]
+import strutils, xmltree
+import karax/[karaxdsl, vdom, vstyles]
 
 import ../types, ../utils
 
@@ -37,7 +37,7 @@ proc linkText*(text: string; class=""): VNode =
 
 proc hiddenField*(name, value: string): VNode =
   buildHtml():
-    verbatim "<input name=\"$1\" style=\"display: none\" value=\"$2\"/>" % [name, value]
+    input(name=name, style={display: "none"}, value=value)
 
 proc refererField*(path: string): VNode =
   hiddenField("referer", path)
@@ -68,7 +68,7 @@ proc genInput*(pref, label, state, placeholder: string; class=""; autofocus=fals
   buildHtml(tdiv(class=("pref-group pref-input " & class))):
     if label.len > 0:
       label(`for`=pref): text label
-    verbatim &"<input name={pref} type=\"text\" placeholder=\"{p}\" value=\"{s}\" {a}/>"
+    input(name=pref, `type`="text", placeholder=p, value=s): text a
 
 proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
   buildHtml(tdiv(class="pref-group pref-input")):
@@ -82,10 +82,7 @@ proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
 
 proc genDate*(pref, state: string): VNode =
   buildHtml(span(class="date-input")):
-    if state.len > 0:
-      verbatim &"<input name={pref} type=\"date\" value=\"{state}\"/>"
-    else:
-      verbatim &"<input name={pref} type=\"date\"/>"
+    input(name=pref, `type`="date", value=state)
     icon "calendar"
 
 proc genImg*(url: string; class=""): VNode =
