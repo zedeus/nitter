@@ -9,6 +9,7 @@ WORKD=/data
 build_working_dir() {
     [ -f $WORKD/nitter.conf ] || cp -f  $BUILD/nitter.conf $WORKD/.
     [ -d $WORKD/public ]      || cp -rf $BUILD/public      $WORKD/.
+    [ -d $WORKD/tmp ]         || mkdir -p $WOKRD/tmp
 }
 
 # -- program starts

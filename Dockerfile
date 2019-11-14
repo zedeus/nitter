@@ -16,7 +16,7 @@ EXPOSE 8080
 
 ADD  ./entrypoint.sh /entrypoint.sh
 
-RUN mkdir /build \
+RUN mkdir -p /build \
 &&  apk --no-cache add tini pcre-dev sqlite-dev \
 &&  rm -rf /var/cache/apk/*
 
