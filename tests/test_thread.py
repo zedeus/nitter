@@ -18,7 +18,7 @@ thread = [
 
     ['d0m96/status/1141811379407425537', [], 'I\'m',
      ['The', 'The', 'Today', 'Some', 'If', 'There', 'Above'],
-     [['Awesome.']]],
+     [['Thank', 'Also,']]],
 
     ['gmpreussner/status/999766552546299904', [], 'A', [],
      [['I'], ['I']]]
