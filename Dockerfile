@@ -1,6 +1,4 @@
 FROM nimlang/nim:alpine as nim
-MAINTAINER setenforce@protonmail.com
-EXPOSE 8080
 
 COPY . /src/nitter
 WORKDIR /src/nitter
@@ -11,9 +9,23 @@ RUN apk update \
     && strip -s nitter \
     && nimble scss
 
-FROM alpine
-WORKDIR /src/
-RUN apk --no-cache add pcre-dev sqlite-dev
-COPY --from=nim /src/nitter/nitter /src/nitter/nitter.conf ./
-COPY --from=nim /src/nitter/public ./public
-CMD ./nitter
+FROM alpine:latest
+MAINTAINER setenforce@protonmail.com
+
+EXPOSE 8080
+
+ADD  ./entrypoint.sh /entrypoint.sh
+
+RUN mkdir /build \
+&&  apk --no-cache add tini pcre-dev sqlite-dev \
+&&  rm -rf /var/cache/apk/*
+
+COPY --from=nim /src/nitter/nitter /usr/local/bin
+COPY --from=nim /src/nitter/nitter.conf /build
+COPY --from=nim /src/nitter/public /build/public
+
+WORKDIR /data
+VOLUME  /data
+
+ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
+CMD ["nitter"]
