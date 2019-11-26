@@ -62,15 +62,14 @@ proc genCheckbox*(pref, label: string; state: bool): VNode =
     span(class="checkbox")
 
 proc genInput*(pref, label, state, placeholder: string; class=""): VNode =
-  let s = xmltree.escape(state)
-  let p = xmltree.escape(placeholder)
+  let p = placeholder
   buildHtml(tdiv(class=("pref-group pref-input " & class))):
     if label.len > 0:
       label(`for`=pref): text label
-    if s.len == 0:
-      input(name=pref, `type`="text", placeholder=p, value=s, autofocus="")
+    if state.len == 0:
+      input(name=pref, `type`="text", placeholder=p, value=state, autofocus="")
     else:
-      input(name=pref, `type`="text", placeholder=p, value=s)
+      input(name=pref, `type`="text", placeholder=p, value=state)
 
 proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
   buildHtml(tdiv(class="pref-group pref-input")):
