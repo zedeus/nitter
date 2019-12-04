@@ -9,11 +9,23 @@ import ../views/general
 include "../views/rss.nimf"
 
 proc showRss*(name, hostname: string; query: Query): Future[string] {.async.} =
-  let (profile, timeline) =
-    await fetchSingleTimeline(name, "", getAgent(), query, media=false)
+  var profile: Profile
+  var timeline: Timeline
+  let names = getNames(name)
+  if names.len == 1:
+    (profile, timeline) =
+      await fetchSingleTimeline(names[0], "", getAgent(), query, media=false)
+  else:
+    timeline = await fetchMultiTimeline(names, "", getAgent(), query, media=false)
+    # this is kinda dumb
+    profile = Profile(
+      username: name,
+      fullname: names.join(" | "),
+      userpic: "https://abs.twimg.com/sticky/default_profile_images/default_profile.png"
+    )
 
   if timeline != nil:
-    return renderTimelineRss(timeline, profile, hostname)
+    return renderTimelineRss(timeline, profile, hostname, multi=(names.len > 1))
 
 template respRss*(rss: typed) =
   if rss.len == 0:
