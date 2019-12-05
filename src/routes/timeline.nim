@@ -38,13 +38,13 @@ proc fetchSingleTimeline*(name, after, agent: string; query: Query;
   if profile.username.len == 0: return
   return (profile, timeline)
 
-proc fetchMultiTimeline*(names: seq[string]; after, agent: string;
-                         query: Query): Future[Timeline] {.async.} =
+proc fetchMultiTimeline*(names: seq[string]; after, agent: string; query: Query;
+                         media=true): Future[Timeline] {.async.} =
   var q = query
   q.fromUser = names
   if q.kind == posts and "replies" notin q.excludes:
     q.excludes.add "replies"
-  return await getSearch[Tweet](q, after, agent)
+  return await getSearch[Tweet](q, after, agent, media)
 
 proc get*(req: Request; key: string): string =
   if key in params(req): params(req)[key]
@@ -56,13 +56,13 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; rss: string): Fu
     prefs = cookiePrefs()
     name = request.get("name")
     after = request.get("max_position")
-    names = name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
+    names = getNames(name)
 
   if names.len != 1:
     let
       timeline = await fetchMultiTimeline(names, after, agent, query)
       html = renderTweetSearch(timeline, prefs, getPath())
-    return renderMain(html, request, cfg, "Multi")
+    return renderMain(html, request, cfg, "Multi", rss=rss)
 
   let
     rail = getPhotoRail(names[0], agent, skip=(query.kind == media))
