@@ -88,10 +88,6 @@ proc opr(): string =
   ]
   " OPR/" & sample(v)
 
-proc others(): string =
-  const v = ["Version/7.0.3 Safari/7046A194A", "like Gecko"]
-  sample(v)
-
 # Samples
 
 proc product(): string =
@@ -101,7 +97,7 @@ proc product(): string =
 
 proc os(): string =
   let os =
-    case rand(0)
+    case rand(2)
     of 0: linux()
     of 1: windows()
     else: mac()
@@ -113,8 +109,8 @@ proc browser(os: string; prod: string): string =
     else: return appleWebKit() & chrome() & safari() & opr()
 
   let r = rand(100)
-  if r < 20: "like Gecko"
-  elif r < 60 and "CrOS" notin os: appleWebKit() & chrome() & safari()
+  if r < 10: "like Gecko"
+  elif r < 50 and "CrOS" notin os: appleWebKit() & chrome() & safari()
   else: firefox()
 
 # Agent
