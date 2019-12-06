@@ -1,5 +1,5 @@
-import strutils, strformat, sequtils, times, uri, tables
-import xmltree, htmlparser, htmlgen
+import strutils, strformat, times, uri, tables
+import xmltree, htmlparser
 import regex
 
 import types, utils, query
@@ -7,7 +7,7 @@ import types, utils, query
 from unicode import Rune, `$`
 
 const
-  ytRegex = re"(www.|m.)?youtu(be.com|.be)"
+  ytRegex = re"([A-z.]+\.)?youtu(be.com|.be)"
   twRegex = re"(www.|mobile.)?twitter.com"
   nbsp = $Rune(0x000A0)
 
