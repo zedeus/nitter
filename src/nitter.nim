@@ -6,7 +6,7 @@ import jester
 import types, config, prefs, formatters
 import views/[general, about]
 import routes/[
-  preferences, timeline, status, media, search, rss, list, unsupported]
+  preferences, timeline, status, media, search, rss, list, unsupported, embed]
 
 const configPath {.strdefine.} = "./nitter.conf"
 let cfg = getConfig(configPath)
@@ -20,6 +20,7 @@ createListRouter(cfg)
 createStatusRouter(cfg)
 createSearchRouter(cfg)
 createMediaRouter(cfg)
+createEmbedRouter(cfg)
 createRssRouter(cfg)
 
 settings:
@@ -56,3 +57,4 @@ routes:
   extend list, ""
   extend status, ""
   extend media, ""
+  extend embed, ""

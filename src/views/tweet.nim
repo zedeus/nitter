@@ -75,7 +75,7 @@ proc renderVideoUnavailable(video: Video): VNode =
       else:
         p: text "This media is unavailable"
 
-proc renderVideo(video: Video; prefs: Prefs; path: string): VNode =
+proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
   let container =
     if video.description.len > 0 or video.title.len > 0: " card-container"
     else: ""

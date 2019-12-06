@@ -94,6 +94,7 @@ proc getVideoFetch(tweet: Tweet; agent, token: string; retry=true): Future[Optio
   tokenUses.inc
 
 proc getVideo*(tweet: Tweet; agent, token: string; force=false) {.async.} =
+  let token = if token.len == 0: guestToken else: token
   var video = getCachedVideo(tweet.id)
   if video.isNone:
     video = await getVideoFetch(tweet, agent, token)

@@ -49,8 +49,8 @@ proc getUserpic*(userpic: string; style=""): string =
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
-proc getVideoEmbed*(id: int): string =
-  &"https://twitter.com/i/videos/{id}?embed_source=facebook"
+proc getVideoEmbed*(cfg: Config; id: int): string =
+  &"https://{cfg.hostname}/i/videos/{id}"
 
 proc pageTitle*(profile: Profile): string =
   &"{profile.fullname} (@{profile.username})"
