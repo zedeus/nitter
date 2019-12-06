@@ -44,3 +44,10 @@ proc createPrefRouter*(cfg: Config) =
       cache(prefs)
       savePrefs()
       redirect(refPath())
+
+    before:
+      if @"theme".len > 0:
+        var prefs = cookiePrefs()
+        prefs.theme = @"theme".capitalizeAscii.replace("_", " ")
+        cache(prefs)
+        savePrefs()

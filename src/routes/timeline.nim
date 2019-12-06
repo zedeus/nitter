@@ -47,8 +47,7 @@ proc fetchMultiTimeline*(names: seq[string]; after, agent: string; query: Query;
   return await getSearch[Tweet](q, after, agent, media)
 
 proc get*(req: Request; key: string): string =
-  if key in params(req): params(req)[key]
-  else: ""
+  params(req).getOrDefault(key)
 
 proc showTimeline*(request: Request; query: Query; cfg: Config; rss: string): Future[string] {.async.} =
   let
