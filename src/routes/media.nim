@@ -57,7 +57,8 @@ proc createMediaRouter*(cfg: Config) =
       if content.len == 0:
         resp Http404
 
-      resp content, settings.mimes.getMimetype(url.split(".")[^1])
+      let filename = parseUri(url).path.split(".")[^1]
+      resp content, settings.mimes.getMimetype(filename)
 
     get "/video/@sig/@url":
       cond "http" in @"url"
