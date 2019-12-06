@@ -160,6 +160,11 @@ proc parseConversation*(node: XmlNode; after: string): Conversation =
     )
   )
 
+  if result.before != nil:
+    let maxId = node.selectAttr(".in-reply-to .stream-container", "data-max-position")
+    if maxId.len > 0:
+      result.before.more = -1
+
   let showMore = node.selectAttr(".ThreadedConversation-showMoreThreads button",
                                  "data-cursor")
 
