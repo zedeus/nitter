@@ -219,7 +219,7 @@ proc parseVideo*(node: JsonNode; tweetId: int): Video =
       url: track["vmapUrl"].to(string),
       available: true)
   else:
-    echo "Can't parse video of type ", cType
+    echo "Can't parse video of type ", cType, " ", tweetId
 
   result.videoId = $tweetId
   result.thumb = node["posterImage"].to(string)
