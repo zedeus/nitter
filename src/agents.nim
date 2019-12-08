@@ -103,12 +103,15 @@ proc os(): string =
   &"({os}{rv()})"
 
 proc browser(os: string; prod: string): string =
-  if "Opera" in os:
+  if "Opera" in prod:
     if rand(1) == 0: return presto()
     else: return appleWebKit() & chrome() & safari() & opr()
 
+  if "X11" in os and "rv" notin os:
+    return appleWebKit() & chrome() & safari()
+
   let r = rand(100)
-  if r < 10: "like Gecko"
+  if r < 5: "like Gecko"
   elif r < 50: appleWebKit() & chrome() & safari()
   else: firefox()
 
