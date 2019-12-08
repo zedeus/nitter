@@ -23,10 +23,9 @@ proc rv(): string =
 
 proc linux(): string =
   const
-    os = ["Linux", "CrOS"]
-    arch = [" i686", " x86_64"]
+    arch = ["i686", "x86_64"]
     distro = ["", "; Ubuntu/14.10", "; Ubuntu/16.10", "; Ubuntu/19.10", "; Ubuntu"]
-  "X11; " & sample(os) & sample(arch) & sample(distro)
+  "X11; Linux " & sample(arch) & sample(distro)
 
 proc windows(): string =
   const
@@ -110,7 +109,7 @@ proc browser(os: string; prod: string): string =
 
   let r = rand(100)
   if r < 10: "like Gecko"
-  elif r < 50 and "CrOS" notin os: appleWebKit() & chrome() & safari()
+  elif r < 50: appleWebKit() & chrome() & safari()
   else: firefox()
 
 # Agent
