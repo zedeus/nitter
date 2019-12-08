@@ -2,14 +2,6 @@ import random, strformat, strutils
 
 randomize()
 
-const blacklist = [
-  "Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/38.0",
-  "Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/40.1",
-  "Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/43.0",
-  "Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/50.0",
-  "Mozilla/5.0 (X11; Linux x86_64) like Gecko",
-]
-
 const rvs = [
   "11.0", "40.0", "42.0", "43.0", "47.0", "50.0", "52.0", "53.0", "54.0",
   "61.0", "66.0", "67.0"
@@ -121,5 +113,3 @@ proc getAgent*(): string =
   let prod = product()
   let os = os()
   result = &"{prod} {os} {browser(os, prod)}"
-  if result in blacklist:
-    result = getAgent()
