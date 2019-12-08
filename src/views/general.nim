@@ -28,8 +28,13 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
         icon "info-circled", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 
-proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; `type`="article";
-                 video=""; images: seq[string] = @[]): VNode =
+proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
+                 images: seq[string] = @[]): VNode =
+  let ogType =
+    if video.len > 0: "video"
+    elif images.len > 0: "photo"
+    else: "article"
+
   buildHtml(head):
     link(rel="stylesheet", `type`="text/css", href="/css/style.css")
     link(rel="stylesheet", `type`="text/css", href="/css/fontello.css")
@@ -50,7 +55,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; `type`="artic
         text cfg.title
 
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    meta(property="og:type", content=`type`)
+    meta(property="og:type", content=ogType)
     meta(property="og:title", content=titleText)
     meta(property="og:description", content=stripHtml(desc))
     meta(property="og:site_name", content="Nitter")
@@ -64,12 +69,12 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; `type`="artic
       meta(property="og:video:type", content="text/html")
 
 proc renderMain*(body: VNode; req: Request; cfg: Config; titleText=""; desc="";
-                 rss=""; `type`="article"; video=""; images: seq[string] = @[]): string =
+                 rss=""; video=""; images: seq[string] = @[]): string =
   let prefs = getPrefs(req.cookies.getOrDefault("preferences"), cfg)
   let theme = toLowerAscii(prefs.theme).replace(" ", "_")
 
   let node = buildHtml(html(lang="en")):
-    renderHead(prefs, cfg, titleText, desc, `type`, video, images):
+    renderHead(prefs, cfg, titleText, desc, video, images):
       if theme.len > 0:
         link(rel="stylesheet", `type`="text/css", href=(&"/css/themes/{theme}.css"))
 

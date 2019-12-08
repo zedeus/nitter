@@ -59,6 +59,7 @@ proc createRssRouter*(cfg: Config) =
 
     get "/@name/@tab/rss":
       cond '.' notin @"name"
+      cond @"tab" in ["with_replies", "media", "search"]
       let query =
         case @"tab"
         of "with_replies": getReplyQuery(@"name")

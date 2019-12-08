@@ -24,32 +24,25 @@ proc createStatusRouter*(cfg: Config) =
           error = conversation.tweet.tombstone
         resp Http404, showError(error, cfg)
 
-      let
+      var
         title = pageTitle(conversation.tweet.profile)
         desc = conversation.tweet.text
-        html = renderConversation(conversation, prefs, getPath() & "#m")
+        images = conversation.tweet.photos
+        video = ""
 
       if conversation.tweet.video.isSome():
-        let thumb = get(conversation.tweet.video).thumb
-        let vidUrl = getVideoEmbed(cfg, conversation.tweet.id)
-        resp renderMain(html, request, cfg, title, desc, images = @[thumb],
-                        `type`="video", video=vidUrl)
+        images = @[get(conversation.tweet.video).thumb]
+        video = getVideoEmbed(cfg, conversation.tweet.id)
       elif conversation.tweet.gif.isSome():
-        let thumb = get(conversation.tweet.gif).thumb
-        let vidUrl = getGifUrl(get(conversation.tweet.gif).url)
-        resp renderMain(html, request, cfg, title, desc, images = @[thumb],
-                        `type`="video", video=vidUrl)
-      else:
-        resp renderMain(html, request, cfg, title, desc,
-                        images=conversation.tweet.photos, `type`="photo")
+        images = @[get(conversation.tweet.gif).thumb]
+        video = getGifUrl(get(conversation.tweet.gif).url)
 
-    get "/@name/status/@id/photo/@i":
-      redirect("/$1/status/$2" % [@"name", @"id"])
+      let html = renderConversation(conversation, prefs, getPath() & "#m")
+      resp renderMain(html, request, cfg, title, desc, images=images, video=video)
 
-    get "/@name/status/@id/video/@i":
-      redirect("/$1/status/$2" % [@"name", @"id"])
-
-    get "/@name/statuses/@id":
+    get "/@name/@s/@id/@m/?@i?":
+      cond @"s" in ["status", "statuses"]
+      cond @"m" in ["video", "photo"]
       redirect("/$1/status/$2" % [@"name", @"id"])
 
     get "/i/web/status/@id":

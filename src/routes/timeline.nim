@@ -81,23 +81,15 @@ proc createTimelineRouter*(cfg: Config) =
   setProfileCacheTime(cfg.profileCacheTime)
 
   router timeline:
-    get "/@name/?":
+    get "/@name/?@tab?":
       cond '.' notin @"name"
-      let rss = "/$1/rss" % @"name"
-      respTimeline(await showTimeline(request, Query(), cfg, rss))
-
-    get "/@name/with_replies":
-      cond '.' notin @"name"
-      let rss = "/$1/with_replies/rss" % @"name"
-      respTimeline(await showTimeline(request, getReplyQuery(@"name"), cfg, rss))
-
-    get "/@name/media":
-      cond '.' notin @"name"
-      let rss = "/$1/media/rss" % @"name"
-      respTimeline(await showTimeline(request, getMediaQuery(@"name"), cfg, rss))
-
-    get "/@name/search":
-      cond '.' notin @"name"
-      let query = initQuery(params(request), name=(@"name"))
-      let rss = "/$1/search/rss?$2" % [@"name", genQueryUrl(query)]
+      cond @"tab" in ["with_replies", "media", "search", ""]
+      var rss = "/$1/$2/rss" % [@"name", @"tab"]
+      let query =
+        case @"tab"
+        of "with_replies": getReplyQuery(@"name")
+        of "media": getMediaQuery(@"name")
+        of "search": initQuery(params(request), name=(@"name"))
+        else: Query()
+      if @"tab" == "search": rss &= "?" & genQueryUrl(query)
       respTimeline(await showTimeline(request, query, cfg, rss))
