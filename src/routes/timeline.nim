@@ -84,7 +84,10 @@ proc createTimelineRouter*(cfg: Config) =
     get "/@name/?@tab?":
       cond '.' notin @"name"
       cond @"tab" in ["with_replies", "media", "search", ""]
-      var rss = "/$1/$2/rss" % [@"name", @"tab"]
+      var rss = if @"tab" != "":
+                  "/$1/$2/rss" % [@"name", @"tab"]
+                else:
+                  "/$1/rss" % [@"name"]
       let query =
         case @"tab"
         of "with_replies": getReplyQuery(@"name")
