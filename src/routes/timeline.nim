@@ -91,5 +91,6 @@ proc createTimelineRouter*(cfg: Config) =
         of "media": getMediaQuery(@"name")
         of "search": initQuery(params(request), name=(@"name"))
         else: Query()
+      if @"tab" == "": rss = "/" & @"name" & "/rss"
       if @"tab" == "search": rss &= "?" & genQueryUrl(query)
       respTimeline(await showTimeline(request, query, cfg, rss))
