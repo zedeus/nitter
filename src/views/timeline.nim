@@ -45,7 +45,7 @@ proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
       renderTweet(tweet, prefs, path, class=(header & "thread"),
                   index=i, total=thread.high, showThread=show)
 
-proc threadFilter(it: Tweet; thread: int): bool =
+proc threadFilter(it: Tweet; thread: int64): bool =
   it.retweet.isNone and it.reply.len == 0 and it.threadId == thread
 
 proc renderUser(user: Profile; prefs: Prefs): VNode =
@@ -88,8 +88,8 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): 
     if results.content.len == 0:
       renderNoneFound()
     else:
-      var threads: seq[int]
-      var retweets: seq[int]
+      var threads: seq[int64]
+      var retweets: seq[int64]
       for tweet in results.content:
         if tweet.threadId in threads or tweet.id in retweets: continue
         if tweet.pinned and prefs.hidePins: continue

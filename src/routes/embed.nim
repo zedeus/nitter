@@ -11,6 +11,6 @@ export embed
 proc createEmbedRouter*(cfg: Config) =
   router embed:
     get "/i/videos/tweet/@id":
-      let tweet = Tweet(id: @"id".parseInt, video: some Video())
+      let tweet = Tweet(id: @"id".parseBiggestInt, video: some Video())
       await getVideo(tweet, getAgent(), "")
       resp renderVideoEmbed(cfg, tweet)
