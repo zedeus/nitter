@@ -49,7 +49,7 @@ proc getUserpic*(userpic: string; style=""): string =
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
-proc getVideoEmbed*(cfg: Config; id: int): string =
+proc getVideoEmbed*(cfg: Config; id: int64): string =
   &"https://{cfg.hostname}/i/videos/{id}"
 
 proc pageTitle*(profile: Profile): string =
