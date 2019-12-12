@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/zedeus/nitter.svg?branch=master)](https://travis-ci.org/zedeus/nitter)
 
-A free and open source alternative Twitter front-end focused on privacy. \
+A free and open source alternative Twitter front-end focused on privacy. 
 Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 
 - No JavaScript or ads
@@ -76,16 +76,30 @@ Nitter by executing `./nitter`. You should run Nitter behind a reverse proxy
 such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for
 better security.
 
-To build and run Nitter in Docker:
+### Run Nitter under Docker
+
+To build Nitter docker image:
+
 ```bash
-docker build -t nitter:latest .
-docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d -p 8080:8080 nitter:latest
+docker build -t zedeus/nitter:latest .
 ```
 
-A prebuilt Docker image is provided as well:
+A prebuilt image can be pulled from the Docker hub:
+
 ```bash
-docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d -p 8080:8080 zedeus/nitter:latest
+docker pull zedeus/nitter:latest
 ```
+
+To run Nitter in Docker:
+
+```bash
+mkdir -p $(pwd)/data
+docker run -v $(pwd)/data:/data -d -p 8080:8080 zedeus/nitter:latest
+```
+
+All configuration and cache files will be kept under `$(pwd)/data` directory.  One can make custom changes to the instance, such as instance title, hostname, logo, etc., and restart the Nitter docker container.
+
+### Run Nitter with Systemd
 
 To run Nitter via systemd you can use this service file:
 
