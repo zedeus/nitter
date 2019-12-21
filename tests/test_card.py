@@ -56,7 +56,7 @@ card = [
 
 no_thumb = [
     ['Bountysource/status/1141879700639215617',
-     '$1,000 Bounty on kivy/plyer',
+     'Post a bounty on kivy/plyer!',
      'Automation and Screen Reader Support',
      'bountysource.com'],
 
