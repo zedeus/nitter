@@ -150,6 +150,7 @@ type
     stats*: TweetStats
     retweet*: Option[Retweet]
     attribution*: Option[Profile]
+    mediaTags*: seq[Profile]
     quote*: Option[Quote]
     card*: Option[Card]
     gif*: Option[Gif]

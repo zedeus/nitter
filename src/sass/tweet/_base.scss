@@ -110,6 +110,24 @@
     }
 }
 
+.media-tag-block {
+    padding-top: 5px;
+    pointer-events: all;
+    color: var(--fg_faded);
+
+    .icon-container {
+        padding-right: 2px;
+    }
+
+    .media-tag, .icon-container {
+        color: var(--fg_faded);
+    }
+}
+
+.timeline-container .media-tag-block {
+    font-size: 13px;
+}
+
 .replying-to {
     color: var(--fg_faded);
     margin: -2px 0 4px;

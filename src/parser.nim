@@ -107,6 +107,7 @@ proc parseTweet*(node: XmlNode): Tweet =
     profile:   parseTweetProfile(tweet),
     stats:     parseTweetStats(tweet),
     reply:     parseTweetReply(tweet),
+    mediaTags: getMediaTags(tweet),
     hasThread: tweet.select(".content > .self-thread-context") != nil,
     pinned:    "pinned" in tweet.attr("class"),
     available: true

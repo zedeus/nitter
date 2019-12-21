@@ -1,4 +1,4 @@
-import xmltree, strtabs, strformat, strutils, times, uri, options
+import xmltree, strtabs, strformat, strutils, times, uri, options, json
 import regex
 
 import types, formatters
@@ -276,3 +276,12 @@ proc getMoreReplies*(node: XmlNode): int64 =
     result = parseBiggestInt(text.split(" ")[0])
   except:
     result = -1
+
+proc getMediaTags*(node: XmlNode): seq[Profile] =
+  let usernames = node.attr("data-tagged")
+  if usernames.len == 0: return
+  let users = parseJson(node.attr("data-reply-to-users-json"))
+  for user in users:
+    let un = user["screen_name"].getStr
+    if un notin usernames: continue
+    result.add Profile(username: un, fullname: user["name"].getStr)

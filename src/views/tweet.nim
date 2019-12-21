@@ -195,6 +195,15 @@ proc renderAttribution(profile: Profile): VNode =
     img(class="avatar", width="20", height="20", src=avatarUrl)
     strong: text profile.fullname
 
+proc renderMediaTags(tags: seq[Profile]): VNode =
+  buildHtml(tdiv(class="media-tag-block")):
+    icon "user"
+    for i, p in tags:
+      a(class="media-tag", href=("/" & p.username), title=p.username):
+        text p.fullname
+      if i < tags.high:
+        text ", "
+
 proc renderQuoteMedia(quote: Quote): VNode =
   buildHtml(tdiv(class="quote-media-container")):
     if quote.thumb.len > 0:
@@ -285,6 +294,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
 
       if mainTweet:
         p(class="tweet-published"): text getTweetTime(tweet)
+
+      if tweet.mediaTags.len > 0:
+        renderMediaTags(tweet.mediaTags)
 
       if not prefs.hideTweetStats:
         renderStats(tweet.stats, views)
