@@ -285,3 +285,9 @@ proc getMediaTags*(node: XmlNode): seq[Profile] =
     let un = user["screen_name"].getStr
     if un notin usernames: continue
     result.add Profile(username: un, fullname: user["name"].getStr)
+
+proc getTweetLocation*(node: XmlNode): string =
+  let geo = node.select(".js-geo-pivot-link")
+  if geo == nil: return
+  result = geo.innerText().stripText()
+  result &= ":" & geo.attr("data-place-id")

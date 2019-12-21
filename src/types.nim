@@ -147,6 +147,7 @@ type
     hasThread*: bool
     available*: bool
     tombstone*: string
+    location*: string
     stats*: TweetStats
     retweet*: Option[Retweet]
     attribution*: Option[Profile]

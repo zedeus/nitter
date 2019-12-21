@@ -245,6 +245,17 @@ proc renderQuote(quote: Quote; prefs: Prefs): VNode =
       a(class="show-thread", href=getLink(quote)):
         text "Show this thread"
 
+proc renderLocation*(tweet: Tweet): string =
+  let (place, url) = tweet.getLocation()
+  if place.len == 0: return
+  let node = buildHtml(span(class="tweet-geo")):
+    text " – at "
+    if url.len > 1:
+      a(href=url): text place
+    else:
+      text place
+  return $node
+
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
                   index=0; total=(-1); last=false; showThread=false;
                   mainTweet=false): VNode =
@@ -272,7 +283,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
         renderReply(tweet)
 
       tdiv(class="tweet-content media-body", dir="auto"):
-        verbatim replaceUrl(tweet.text, prefs)
+        verbatim replaceUrl(tweet.text, prefs) & renderLocation(tweet)
 
       if tweet.attribution.isSome:
         renderAttribution(tweet.attribution.get())

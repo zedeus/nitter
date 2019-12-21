@@ -103,3 +103,8 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
   result = $(parseUri("https://twitter.com") / path ? p)
   if username.len > 0:
     result = result.replace("/" & username, "")
+
+proc getLocation*(u: Profile | Tweet): (string, string) =
+  let loc = u.location.split(":")
+  let url = if loc.len > 1: "/search?q=place:" & loc[1] else: ""
+  (loc[0], url)
