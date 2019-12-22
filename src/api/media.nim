@@ -93,11 +93,19 @@ proc getVideoFetch(tweet: Tweet; agent, token: string; retry=true): Future[Optio
   result = some video
   tokenUses.inc
 
+proc videoIsInvalid(video: Video): bool =
+  not video.available and video.url.len == 0
+
 proc getVideo*(tweet: Tweet; agent, token: string; force=false) {.async.} =
   let token = if token.len == 0: guestToken else: token
   var video = getCachedVideo(tweet.id)
   if video.isNone:
     video = await getVideoFetch(tweet, agent, token)
+  elif videoIsInvalid(get(video)) and tweet.gif.isSome:
+    # gif was mistakenly parsed as a gif
+    uncache(tweet.id)
+    return
+
   getVideoVar(tweet) = video
   if tweet.card.isSome: tweet.video = none Video
 
