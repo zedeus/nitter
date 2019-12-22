@@ -46,16 +46,8 @@ proc createMediaRouter*(cfg: Config) =
       let url = decodeUrl(@"url")
       cond isTwitterUrl(url) == true
 
-      let client = newAsyncHttpClient()
-      var content: string
-      try:
-        content = await client.getContent(url)
-        client.close
-      except:
-        discard
-
-      if content.len == 0:
-        resp Http404
+      let content = await safeFetch(url)
+      if content.len == 0: resp Http404
 
       let filename = parseUri(url).path.split(".")[^1]
       resp content, settings.mimes.getMimetype(filename)
@@ -68,18 +60,17 @@ proc createMediaRouter*(cfg: Config) =
       if getHmac(url) != @"sig":
         resp showError("Failed to verify signature", cfg)
 
-      let client = newAsyncHttpClient()
-      var content = await client.getContent(url)
+      var content = await safeFetch(url)
+      if content.len == 0: resp Http404
 
       if ".vmap" in url:
         var m: RegexMatch
         discard content.find(re"""url="(.+.m3u8)"""", m)
         url = decodeUrl(content[m.group(0)[0]])
-        content = await client.getContent(url)
+        content = await safeFetch(url)
 
       if ".m3u8" in url:
         content = proxifyVideo(content, prefs.proxyVideos)
 
-      client.close()
       let ext = parseUri(url).path.split(".")[^1]
       resp content, settings.mimes.getMimetype(ext)
