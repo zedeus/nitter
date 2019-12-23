@@ -75,7 +75,7 @@ proc renderVideoUnavailable(video: Video): VNode =
       else:
         p: text "This media is unavailable"
 
-proc renderVideo(video: Video; prefs: Prefs; path: string): VNode =
+proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
   let container =
     if video.description.len > 0 or video.title.len > 0: " card-container"
     else: ""
@@ -195,6 +195,15 @@ proc renderAttribution(profile: Profile): VNode =
     img(class="avatar", width="20", height="20", src=avatarUrl)
     strong: text profile.fullname
 
+proc renderMediaTags(tags: seq[Profile]): VNode =
+  buildHtml(tdiv(class="media-tag-block")):
+    icon "user"
+    for i, p in tags:
+      a(class="media-tag", href=("/" & p.username), title=p.username):
+        text p.fullname
+      if i < tags.high:
+        text ", "
+
 proc renderQuoteMedia(quote: Quote): VNode =
   buildHtml(tdiv(class="quote-media-container")):
     if quote.thumb.len > 0:
@@ -236,6 +245,17 @@ proc renderQuote(quote: Quote; prefs: Prefs): VNode =
       a(class="show-thread", href=getLink(quote)):
         text "Show this thread"
 
+proc renderLocation*(tweet: Tweet): string =
+  let (place, url) = tweet.getLocation()
+  if place.len == 0: return
+  let node = buildHtml(span(class="tweet-geo")):
+    text " – at "
+    if url.len > 1:
+      a(href=url): text place
+    else:
+      text place
+  return $node
+
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
                   index=0; total=(-1); last=false; showThread=false;
                   mainTweet=false): VNode =
@@ -263,7 +283,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
         renderReply(tweet)
 
       tdiv(class="tweet-content media-body", dir="auto"):
-        verbatim replaceUrl(tweet.text, prefs)
+        verbatim replaceUrl(tweet.text, prefs) & renderLocation(tweet)
 
       if tweet.attribution.isSome:
         renderAttribution(tweet.attribution.get())
@@ -285,6 +305,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
 
       if mainTweet:
         p(class="tweet-published"): text getTweetTime(tweet)
+
+      if tweet.mediaTags.len > 0:
+        renderMediaTags(tweet.mediaTags)
 
       if not prefs.hideTweetStats:
         renderStats(tweet.stats, views)

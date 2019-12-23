@@ -55,14 +55,23 @@ proc genQueryParam*(query: Query): string =
   if query.kind == users:
     return query.text
 
+  # improve no-replies result only when searching for less than 7
+  # otherwise multi-timeline limit goes down to 8 users
+  let rewriteReplies = "replies" in query.excludes and query.fromUser.len < 7
+
   for i, user in query.fromUser:
-    param &= &"from:{user} "
+    if rewriteReplies:
+      param &= &"(from:{user} AND (to:{user} OR -filter:replies)) "
+    else:
+      param &= &"from:{user} "
+
     if i < query.fromUser.high:
       param &= "OR "
 
   for f in query.filters:
     filters.add "filter:" & f
   for e in query.excludes:
+    if rewriteReplies and e == "replies": continue
     filters.add "-filter:" & e
   for i in query.includes:
     filters.add "include:" & i

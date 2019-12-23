@@ -23,7 +23,8 @@ proc finishTimeline*(json: JsonNode; query: Query; after, agent: string;
   if media: await getMedia(timeline, agent)
   result.content = timeline.content
 
-proc getProfileAndTimeline*(username, after, agent: string; media=true): Future[(Profile, Timeline)] {.async.} =
+proc getProfileAndTimeline*(username, after, agent: string;
+                            media=true): Future[(Profile, Timeline)] {.async.} =
   var url = base / username
   if after.len > 0:
     url = url ? {"max_position": after}
@@ -37,7 +38,8 @@ proc getProfileAndTimeline*(username, after, agent: string; media=true): Future[
   if media: await getMedia(timeline, agent)
   result = (profile, timeline)
 
-proc getTimeline*(username, after, agent: string; media=true): Future[Timeline] {.async.} =
+proc getTimeline*(username, after, agent: string;
+                  media=true): Future[Timeline] {.async.} =
   var params = toSeq({
     "include_available_features": "1",
     "include_entities": "1",
@@ -53,7 +55,8 @@ proc getTimeline*(username, after, agent: string; media=true): Future[Timeline] 
 
   result = await finishTimeline(json, Query(), after, agent, media)
 
-proc getMediaTimeline*(username, after, agent: string; media=true): Future[Timeline] {.async.} =
+proc getMediaTimeline*(username, after, agent: string;
+                       media=true): Future[Timeline] {.async.} =
   var params = toSeq({
     "include_available_features": "1",
     "include_entities": "1",
@@ -63,8 +66,10 @@ proc getMediaTimeline*(username, after, agent: string; media=true): Future[Timel
   if after.len > 0:
     params.add {"max_position": after}
 
-  let headers = genHeaders(agent, base / username, xml=true)
-  let json = await fetchJson(base / (timelineMediaUrl % username) ? params, headers)
+  let
+    headers = genHeaders(agent, base / username, xml=true)
+    json = await fetchJson(base / (timelineMediaUrl % username) ? params, headers)
+    query = Query(kind: QueryKind.media)
 
-  result = await finishTimeline(json, Query(kind: QueryKind.media), after, agent, media)
+  result = await finishTimeline(json, query, after, agent, media)
   result.minId = getLastId(result)

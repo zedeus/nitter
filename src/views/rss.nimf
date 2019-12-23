@@ -27,7 +27,9 @@
 <p>${text}</p>
 #end if
 #if tweet.photos.len > 0:
-<img src="https://${hostname}${getPicUrl(tweet.photos[0])}" width="250" />
+#for photo in tweet.photos:
+<img src="https://${hostname}${getPicUrl(photo)}" width="250" />
+#end for
 #elif tweet.video.isSome:
 <img src="https://${hostname}${getPicUrl(get(tweet.video).thumb)}" width="250" />
 #elif tweet.gif.isSome:

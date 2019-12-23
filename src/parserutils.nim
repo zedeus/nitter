@@ -1,4 +1,4 @@
-import xmltree, strtabs, strformat, strutils, times, uri, options
+import xmltree, strtabs, strformat, strutils, times, uri, options, json
 import regex
 
 import types, formatters
@@ -82,7 +82,7 @@ proc getTweetText*(tweet: XmlNode): string =
 
 proc getTimestamp*(tweet: XmlNode): Time =
   let time = tweet.selectAttr(".js-short-timestamp", "data-time")
-  fromUnix(if time.len > 0: parseInt(time) else: 0)
+  fromUnix(if time.len > 0: parseBiggestInt(time) else: 0)
 
 proc getShortTime*(tweet: XmlNode): string =
   tweet.selectText(".js-short-timestamp")
@@ -270,9 +270,24 @@ proc getTweetCard*(tweet: Tweet; node: XmlNode) =
 
   tweet.card = some card
 
-proc getMoreReplies*(node: XmlNode): int =
+proc getMoreReplies*(node: XmlNode): int64 =
   let text = node.innerText().strip()
   try:
-    result = parseInt(text.split(" ")[0])
+    result = parseBiggestInt(text.split(" ")[0])
   except:
     result = -1
+
+proc getMediaTags*(node: XmlNode): seq[Profile] =
+  let usernames = node.attr("data-tagged")
+  if usernames.len == 0: return
+  let users = parseJson(node.attr("data-reply-to-users-json"))
+  for user in users:
+    let un = user["screen_name"].getStr
+    if un notin usernames: continue
+    result.add Profile(username: un, fullname: user["name"].getStr)
+
+proc getTweetLocation*(node: XmlNode): string =
+  let geo = node.select(".js-geo-pivot-link")
+  if geo == nil: return
+  result = geo.innerText().stripText()
+  result &= ":" & geo.attr("data-place-id")

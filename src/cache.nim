@@ -63,7 +63,15 @@ proc cache*(video: var Video) =
       if video.videoId.len > 0:
         video.insert()
 
-proc getCachedVideo*(id: int): Option[Video] =
+proc uncache*(id: int64) =
+  withDb:
+    try:
+      var video = Video.getOne("videoId = ?", $id)
+      video.delete()
+    except:
+      discard
+
+proc getCachedVideo*(id: int64): Option[Video] =
   withDb:
     try:
       return some Video.getOne("videoId = ?", $id)

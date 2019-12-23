@@ -72,7 +72,7 @@ proc parseTweetProfile*(profile: XmlNode): Profile =
 
 proc parseQuote*(quote: XmlNode): Quote =
   result = Quote(
-    id:    parseInt(quote.attr("data-item-id")),
+    id:    parseBiggestInt(quote.attr("data-item-id")),
     text:  getQuoteText(quote),
     reply: parseTweetReply(quote),
     hasThread: quote.select(".self-thread-context") != nil,
@@ -99,14 +99,16 @@ proc parseTweet*(node: XmlNode): Tweet =
     return Tweet()
 
   result = Tweet(
-    id:        parseInt(tweet.attr("data-item-id")),
-    threadId:  parseInt(tweet.attr("data-conversation-id")),
+    id:        parseBiggestInt(tweet.attr("data-item-id")),
+    threadId:  parseBiggestInt(tweet.attr("data-conversation-id")),
     text:      getTweetText(tweet),
     time:      getTimestamp(tweet),
     shortTime: getShortTime(tweet),
     profile:   parseTweetProfile(tweet),
     stats:     parseTweetStats(tweet),
     reply:     parseTweetReply(tweet),
+    mediaTags: getMediaTags(tweet),
+    location:  getTweetLocation(tweet),
     hasThread: tweet.select(".content > .self-thread-context") != nil,
     pinned:    "pinned" in tweet.attr("class"),
     available: true
@@ -119,7 +121,7 @@ proc parseTweet*(node: XmlNode): Tweet =
   if by.len > 0:
     result.retweet = some Retweet(
       by: stripText(by),
-      id: parseInt(tweet.attr("data-retweet-id"))
+      id: parseBiggestInt(tweet.attr("data-retweet-id"))
     )
 
   let quote = tweet.select(".QuoteTweet-innerContainer")
@@ -160,6 +162,11 @@ proc parseConversation*(node: XmlNode; after: string): Conversation =
     )
   )
 
+  if result.before != nil:
+    let maxId = node.selectAttr(".in-reply-to .stream-container", "data-max-position")
+    if maxId.len > 0:
+      result.before.more = -1
+
   let showMore = node.selectAttr(".ThreadedConversation-showMoreThreads button",
                                  "data-cursor")
 
@@ -191,7 +198,7 @@ proc parseTimeline*(node: XmlNode; after: string): Timeline =
     beginning: after.len == 0
   )
 
-proc parseVideo*(node: JsonNode; tweetId: int): Video =
+proc parseVideo*(node: JsonNode; tweetId: int64): Video =
   let
     track = node{"track"}
     cType = track["contentType"].to(string)
@@ -214,7 +221,7 @@ proc parseVideo*(node: JsonNode; tweetId: int): Video =
       url: track["vmapUrl"].to(string),
       available: true)
   else:
-    echo "Can't parse video of type ", cType
+    echo "Can't parse video of type ", cType, " ", tweetId
 
   result.videoId = $tweetId
   result.thumb = node["posterImage"].to(string)

@@ -47,9 +47,8 @@ proc fetchJson*(url: Uri; headers: HttpHeaders): Future[JsonNode] {.async.} =
   headers["accept"] = jsonAccept
   newClient()
 
-  var resp = ""
   try:
-    resp = await client.getContent($url)
+    let resp = await client.getContent($url)
     result = parseJson(resp)
   except:
     return nil

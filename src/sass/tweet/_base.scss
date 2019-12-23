@@ -3,6 +3,7 @@
 @import 'thread';
 @import 'media';
 @import 'video';
+@import 'embed';
 @import 'card';
 @import 'poll';
 @import 'quote';
@@ -109,6 +110,28 @@
     }
 }
 
+.media-tag-block {
+    padding-top: 5px;
+    pointer-events: all;
+    color: var(--fg_faded);
+
+    .icon-container {
+        padding-right: 2px;
+    }
+
+    .media-tag, .icon-container {
+        color: var(--fg_faded);
+    }
+}
+
+.timeline-container .media-tag-block {
+    font-size: 13px;
+}
+
+.tweet-geo {
+    color: var(--fg_faded);
+}
+
 .replying-to {
     color: var(--fg_faded);
     margin: -2px 0 4px;
@@ -149,6 +172,7 @@
 .show-thread {
     display: block;
     pointer-events: all;
+    padding-top: 2px;
 }
 
 .unavailable-box {

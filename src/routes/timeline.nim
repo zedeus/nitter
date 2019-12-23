@@ -47,8 +47,7 @@ proc fetchMultiTimeline*(names: seq[string]; after, agent: string; query: Query;
   return await getSearch[Tweet](q, after, agent, media)
 
 proc get*(req: Request; key: string): string =
-  if key in params(req): params(req)[key]
-  else: ""
+  params(req).getOrDefault(key)
 
 proc showTimeline*(request: Request; query: Query; cfg: Config; rss: string): Future[string] {.async.} =
   let
@@ -82,23 +81,18 @@ proc createTimelineRouter*(cfg: Config) =
   setProfileCacheTime(cfg.profileCacheTime)
 
   router timeline:
-    get "/@name/?":
+    get "/@name/?@tab?":
       cond '.' notin @"name"
-      let rss = "/$1/rss" % @"name"
-      respTimeline(await showTimeline(request, Query(), cfg, rss))
-
-    get "/@name/with_replies":
-      cond '.' notin @"name"
-      let rss = "/$1/with_replies/rss" % @"name"
-      respTimeline(await showTimeline(request, getReplyQuery(@"name"), cfg, rss))
-
-    get "/@name/media":
-      cond '.' notin @"name"
-      let rss = "/$1/media/rss" % @"name"
-      respTimeline(await showTimeline(request, getMediaQuery(@"name"), cfg, rss))
-
-    get "/@name/search":
-      cond '.' notin @"name"
-      let query = initQuery(params(request), name=(@"name"))
-      let rss = "/$1/search/rss?$2" % [@"name", genQueryUrl(query)]
+      cond @"tab" in ["with_replies", "media", "search", ""]
+      let query =
+        case @"tab"
+        of "with_replies": getReplyQuery(@"name")
+        of "media": getMediaQuery(@"name")
+        of "search": initQuery(params(request), name=(@"name"))
+        else: Query()
+      var rss = "/$1/$2/rss" % [@"name", @"tab"]
+      if @"tab".len == 0:
+        rss = "/$1/rss" % @"name"
+      elif @"tab" == "search":
+        rss &= "?" & genQueryUrl(query)
       respTimeline(await showTimeline(request, query, cfg, rss))

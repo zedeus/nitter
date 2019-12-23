@@ -31,6 +31,7 @@ input[type="text"] {
 select {
     height: 20px;
     padding: 0 2px;
+    line-height: 1;
 }
 
 input[type="date"]::-webkit-inner-spin-button {
@@ -81,7 +82,6 @@ input::-webkit-datetime-edit-year-field:focus {
     float: none;
     padding: unset;
     padding-left: 4px;
-    margin-top: 17px;
 
     &:hover {
         color: var(--accent_light);

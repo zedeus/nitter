@@ -31,11 +31,11 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
       if profile.location.len > 0:
         tdiv(class="profile-location"):
           span: icon "location"
-          let loc = profile.location.split(":")
-          if loc.len > 1:
-            a(href=("/search?q=place:" & loc[1])): text loc[0]
+          let (place, url) = profile.getLocation()
+          if url.len > 1:
+            a(href=url): text place
           else:
-            span: text loc[0]
+            span: text place
 
       if profile.website.len > 0:
         tdiv(class="profile-website"):

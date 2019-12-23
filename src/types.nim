@@ -115,7 +115,7 @@ type
     video*: Option[Video]
 
   Quote* = object
-    id*: int
+    id*: int64
     profile*: Profile
     text*: string
     reply*: seq[string]
@@ -128,7 +128,7 @@ type
 
   Retweet* = object
     by*: string
-    id*: int
+    id*: int64
 
   TweetStats* = object
     replies*: string
@@ -136,8 +136,8 @@ type
     likes*: string
 
   Tweet* = ref object
-    id*: int
-    threadId*: int
+    id*: int64
+    threadId*: int64
     profile*: Profile
     text*: string
     time*: Time
@@ -147,9 +147,11 @@ type
     hasThread*: bool
     available*: bool
     tombstone*: string
+    location*: string
     stats*: TweetStats
     retweet*: Option[Retweet]
     attribution*: Option[Profile]
+    mediaTags*: seq[Profile]
     quote*: Option[Quote]
     card*: Option[Card]
     gif*: Option[Gif]
@@ -159,7 +161,7 @@ type
 
   Chain* = ref object
     content*: seq[Tweet]
-    more*: int
+    more*: int64
 
   Conversation* = ref object
     tweet*: Tweet

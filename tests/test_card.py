@@ -3,11 +3,6 @@ from parameterized import parameterized
 
 
 card = [
-    ['voidtarget/status/1133028231672582145',
-     'sinkingsugar/nimqt-example',
-     'A sample of a Qt app written using mostly nim. Contribute to sinkingsugar/nimqt-example development by creating an account on GitHub.',
-     'github.com', False],
-
     ['lorenlugosch/status/1115440394148487168',
      'lorenlugosch/end-to-end-SLU',
      'PyTorch code for end-to-end spoken language understanding (SLU) with ASR-based transfer learning - lorenlugosch/end-to-end-SLU',
@@ -61,7 +56,7 @@ card = [
 
 no_thumb = [
     ['Bountysource/status/1141879700639215617',
-     '$1,000 Bounty on kivy/plyer',
+     'Post a bounty on kivy/plyer!',
      'Automation and Screen Reader Support',
      'bountysource.com'],
 
@@ -69,6 +64,11 @@ no_thumb = [
      'Hts Nim Sugar',
      'hts-nim is a library that allows one to use htslib via the nim programming language. Nim is a garbage-collected language that compiles to C and often has similar performance. I have become very...',
      'brentp.github.io'],
+
+    ['voidtarget/status/1133028231672582145',
+     'sinkingsugar/nimqt-example',
+     'A sample of a Qt app written using mostly nim. Contribute to sinkingsugar/nimqt-example development by creating an account on GitHub.',
+     'github.com'],
 
     ['mobile_test/status/490378953744318464',
      'Nantasket Beach',

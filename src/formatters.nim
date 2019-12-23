@@ -1,5 +1,5 @@
-import strutils, strformat, sequtils, times, uri, tables
-import xmltree, htmlparser, htmlgen
+import strutils, strformat, times, uri, tables
+import xmltree, htmlparser
 import regex
 
 import types, utils, query
@@ -7,7 +7,7 @@ import types, utils, query
 from unicode import Rune, `$`
 
 const
-  ytRegex = re"(www.|m.)?youtu(be.com|.be)"
+  ytRegex = re"([A-z.]+\.)?youtu(be.com|.be)"
   twRegex = re"(www.|mobile.)?twitter.com"
   nbsp = $Rune(0x000A0)
 
@@ -49,8 +49,8 @@ proc getUserpic*(userpic: string; style=""): string =
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
-proc getVideoEmbed*(id: int): string =
-  &"https://twitter.com/i/videos/{id}?embed_source=facebook"
+proc getVideoEmbed*(cfg: Config; id: int64): string =
+  &"https://{cfg.hostname}/i/videos/{id}"
 
 proc pageTitle*(profile: Profile): string =
   &"{profile.fullname} (@{profile.username})"
@@ -103,3 +103,8 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
   result = $(parseUri("https://twitter.com") / path ? p)
   if username.len > 0:
     result = result.replace("/" & username, "")
+
+proc getLocation*(u: Profile | Tweet): (string, string) =
+  let loc = u.location.split(":")
+  let url = if loc.len > 1: "/search?q=place:" & loc[1] else: ""
+  (loc[0], url)

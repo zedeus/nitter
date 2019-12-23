@@ -3,6 +3,11 @@ import karax/[karaxdsl, vdom]
 import ".."/[types, formatters]
 import tweet, timeline
 
+proc renderEarlier(thread: Chain): VNode =
+  buildHtml(tdiv(class="timeline-item more-replies earlier-replies")):
+    a(class="more-replies-text", href=getLink(thread.content[0])):
+      text "earlier replies"
+
 proc renderMoreReplies(thread: Chain): VNode =
   let num = if thread.more != -1: $thread.more & " " else: ""
   let reply = if thread.more == 1: "reply" else: "replies"
@@ -31,6 +36,8 @@ proc renderConversation*(conversation: Conversation; prefs: Prefs; path: string)
     tdiv(class="main-thread"):
       if conversation.before != nil:
         tdiv(class="before-tweet thread-line"):
+          if conversation.before.more == -1:
+            renderEarlier(conversation.before)
           for i, tweet in conversation.before.content:
             renderTweet(tweet, prefs, path, index=i)
 
