@@ -4,16 +4,18 @@ Nitter is a free and open source alternative Twitter front-end focused on
 privacy. The source is available on GitHub at <https://github.com/zedeus/nitter>
 
 * No JavaScript or ads
-* All requests go through the backend, clients never talk to Twitter
+* All requests go through the backend, client never talks to Twitter
 * Prevents Twitter from tracking your IP or JavaScript fingerprint
-* Uses unofficial API (no developer account required)
-* AGPLv3 licensed, no proprietary instances permitted
+* Unofficial API (no rate limits or developer account required)
 * Lightweight (for [@nim_lang](/nim_lang), 36KB vs 580KB from twitter.com)
-* Native RSS feeds
+* RSS feeds
+* Themes
+* Mobile support (responsive design)
+* AGPLv3 licensed, no proprietary instances permitted
 
-Nitter's GitHub wiki contains a list of
+Nitter's GitHub wiki contains
 [instances](https://github.com/zedeus/nitter/wiki/Instances) and
-a list of [browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
+[browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
 maintained by the community.
 
 ## Why use Nitter?
@@ -32,6 +34,14 @@ Twitter, and in some cases serves pages faster.
 In the future a simple account system will be added that lets you follow Twitter
 users, allowing you to have a clean chronological timeline without needing a
 Twitter account.
+
+## Donating
+
+LiberaPay: <https://liberapay.com/zedeus/donate> \
+BTC: bc1qp7q4qz0fgfvftm5hwz3vy284nue6jedt44kxya \
+ETH: 0x66d84bc3fd031b62857ad18c62f1ba072b011925 \
+LTC: ltc1qhsz5nxw6jw9rdtw9qssjeq2h8hqk2f85rdgpkr \
+XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscWGWJCczFLe9RFhM3d1zpL
 
 ## Contact
 

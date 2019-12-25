@@ -9,19 +9,18 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - All requests go through the backend, client never talks to Twitter
 - Prevents Twitter from tracking your IP or JavaScript fingerprint
 - Unofficial API (no rate limits or developer account required)
-- AGPLv3 licensed, no proprietary instances permitted
+- Lightweight (for [@nim_lang](https://nitter.net/nim_lang), 36KB vs 580KB from twitter.com)
+- RSS feeds
 - Themes
-- Lightweight (for [@nim_lang](https://twitter.com/nim_lang), 36KB vs 580KB from twitter.com)
-- Native RSS feeds
 - Mobile support (responsive design)
+- AGPLv3 licensed, no proprietary instances permitted
 
 ## Todo (roughly in this order)
 
 - Embeds
-- More caching (waiting for [moigagoo/norm#19](https://github.com/moigagoo/norm/pull/19))
+- Caching + archiving tweets/profiles
 - Simple account system with customizable feed
 - Json API endpoints
-- Nitter logo
 - Emoji support (WIP, uses native font for now)
 
 ## Resources
@@ -115,6 +114,13 @@ WantedBy=multi-user.target
 
 Then enable and run the service:
 `systemctl enable --now nitter.service`
+
+## Donating <a href="https://liberapay.com/zedeus/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
+
+BTC: bc1qp7q4qz0fgfvftm5hwz3vy284nue6jedt44kxya \
+ETH: 0x66d84bc3fd031b62857ad18c62f1ba072b011925 \
+LTC: ltc1qhsz5nxw6jw9rdtw9qssjeq2h8hqk2f85rdgpkr \
+XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscWGWJCczFLe9RFhM3d1zpL
 
 ## Contact
 
