@@ -1,2 +1,2 @@
-import api/[profile, timeline, tweet, search, media, list]
-export profile, timeline, tweet, search, media, list
+import api/[profile, timeline, tweet, search, media, list, resolver]
+export profile, timeline, tweet, search, media, list, resolver

@@ -6,7 +6,8 @@ import jester
 import types, config, prefs, formatters
 import views/[general, about]
 import routes/[
-  preferences, timeline, status, media, search, rss, list, unsupported, embed]
+  preferences, timeline, status, media, search, rss, list,
+  unsupported, embed, resolver]
 
 const configPath {.strdefine.} = "./nitter.conf"
 let cfg = getConfig(configPath)
@@ -14,6 +15,7 @@ let cfg = getConfig(configPath)
 setHmacKey(cfg.hmacKey)
 
 createUnsupportedRouter(cfg)
+createResolverRouter(cfg)
 createPrefRouter(cfg)
 createTimelineRouter(cfg)
 createListRouter(cfg)
@@ -51,6 +53,7 @@ routes:
 
   extend unsupported, ""
   extend preferences, ""
+  extend resolver, ""
   extend rss, ""
   extend search, ""
   extend timeline, ""

@@ -1,0 +1,23 @@
+import strutils
+
+import jester
+
+import router_utils
+import ".."/[query, types, api, agents]
+import ../views/general
+
+template respResolved*(url, kind: string): untyped =
+  if url.len == 0:
+    resp showError("Invalid $1 link" % kind, cfg)
+  else:
+    redirect(url)
+
+proc createResolverRouter*(cfg: Config) =
+  router resolver:
+    get "/cards/@card/@id":
+      let url = "https://cards.twitter.com/cards/$1/$2" % [@"card", @"id"]
+      respResolved(await resolve(url, cookiePrefs()), "card")
+
+    get "/t.co/@url":
+      let url = "https://t.co/" & @"url"
+      respResolved(await resolve(url, cookiePrefs()), "t.co")
