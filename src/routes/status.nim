@@ -45,5 +45,8 @@ proc createStatusRouter*(cfg: Config) =
       cond @"m" in ["video", "photo"]
       redirect("/$1/status/$2" % [@"name", @"id"])
 
+    get "/@name/statuses/@id":
+      redirect("/$1/status/$2" % [@"name", @"id"])
+
     get "/i/web/status/@id":
       redirect("/i/status/" & @"id")
