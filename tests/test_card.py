@@ -28,11 +28,6 @@ card = [
      'We are very proud to announce Nim version 0.20. This is a massive release, both literally and figuratively. It contains more than 1,000 commits and it marks our release candidate for version 1.0!',
      'nim-lang.org', True],
 
-    ['nim_lang/status/1082989146040340480',
-     'Nim in 2018: A short recap',
-     'Posted in r/programming by u/miran1',
-     'reddit.com', False],
-
     ['Tesla/status/1141041022035623936',
      'Experience the Tesla Arcade',
      '',
@@ -73,7 +68,12 @@ no_thumb = [
     ['mobile_test/status/490378953744318464',
      'Nantasket Beach',
      'Rocks on the beach.',
-     '500px.com']
+     '500px.com'],
+
+    ['nim_lang/status/1082989146040340480',
+     'Nim in 2018: A short recap',
+     'Posted in r/programming by u/miran1',
+     'reddit.com'],
 ]
 
 playable = [
