@@ -26,7 +26,9 @@ proc genHeaders*(agent: string; referer: Uri; lang=true;
 
 template newClient*() {.dirty.} =
   var client = newAsyncHttpClient()
-  defer: client.close()
+  defer:
+    try: client.close()
+    except: discard
   client.headers = headers
 
 proc fetchHtml*(url: Uri; headers: HttpHeaders; jsonKey = ""): Future[XmlNode] {.async.} =
