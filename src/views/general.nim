@@ -43,6 +43,8 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     link(rel="icon", type="image/png", sizes="16x16", href="/favicon-16x16.png")
     link(rel="manifest", href="/site.webmanifest")
     link(rel="mask-icon", href="/safari-pinned-tab.svg", color="#ff6c60")
+    link(rel="search", type="application/opensearchdescription+xml", title=cfg.title,
+                            href="http://localhost:8080/opensearch")
 
     if prefs.hlsPlayback:
       script(src="/js/hls.light.min.js")

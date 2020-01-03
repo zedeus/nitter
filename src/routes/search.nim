@@ -6,6 +6,8 @@ import router_utils
 import ".."/[query, types, api, agents]
 import ../views/[general, search]
 
+include "../views/opensearch.nimf"
+
 export search
 
 proc createSearchRouter*(cfg: Config) =
@@ -33,3 +35,12 @@ proc createSearchRouter*(cfg: Config) =
 
     get "/hashtag/@hash":
       redirect("/search?q=" & encodeUrl("#" & @"hash"))
+
+    get "/opensearch":
+      var url = ""
+      if cfg.useHttps:
+        url = "https://" & cfg.hostname & "/search?q="
+      else:
+        url = "http://" & cfg.hostname & "/search?q="
+      resp Http200, {"Content-Type": "application/opensearchdescription+xml"},
+                    generateOpenSearchXML(cfg.title, cfg.hostname, url)

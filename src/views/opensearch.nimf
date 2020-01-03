@@ -1,0 +1,12 @@
+#? stdtmpl(subsChar = '$', metaChar = '#')
+#proc generateOpenSearchXML*(name, hostname, url: string): string =
+#  result = ""
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>${name}</ShortName>
+  <Description>Twitter search via ${hostname}</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Url type="text/html" template="${url}{searchTerms}" />
+</OpenSearchDescription>
+#end proc
