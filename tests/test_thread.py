@@ -21,7 +21,7 @@ thread = [
      [['Thank', 'Also,']]],
 
     ['gmpreussner/status/999766552546299904', [], 'A', [],
-     [['I'], ['I']]]
+     [['I', 'Especially'], ['I']]]
 ]
 
 
