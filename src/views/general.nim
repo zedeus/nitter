@@ -35,6 +35,12 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     elif images.len > 0: "photo"
     else: "article"
 
+  var opensearchUrl = ""
+  if cfg.useHttps:
+    opensearchUrl = "https://" & cfg.hostname & "/opensearch"
+  else:
+    opensearchUrl = "http://" & cfg.hostname & "/opensearch"
+
   buildHtml(head):
     link(rel="stylesheet", `type`="text/css", href="/css/style.css")
     link(rel="stylesheet", `type`="text/css", href="/css/fontello.css")
@@ -44,7 +50,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     link(rel="manifest", href="/site.webmanifest")
     link(rel="mask-icon", href="/safari-pinned-tab.svg", color="#ff6c60")
     link(rel="search", type="application/opensearchdescription+xml", title=cfg.title,
-                            href="http://localhost:8080/opensearch")
+                            href=opensearchUrl)
 
     if prefs.hlsPlayback:
       script(src="/js/hls.light.min.js")
