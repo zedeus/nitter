@@ -1,10 +1,11 @@
 import asyncdispatch, strutils, sequtils, uri, options
-import jester
+import jester, karax/vdom
 
 import router_utils
 import ".."/[api, types, cache, formatters, agents, query]
 import ../views/[general, profile, timeline, status, search]
 
+export vdom
 export uri, sequtils
 export router_utils
 export api, cache, formatters, query, agents
@@ -55,13 +56,10 @@ proc fetchMultiTimeline*(names: seq[string]; after, agent: string; query: Query;
 proc get*(req: Request; key: string): string =
   params(req).getOrDefault(key)
 
-proc showTimeline*(request: Request; query: Query; cfg: Config; rss: string): Future[string] {.async.} =
-  let
-    agent = getAgent()
-    prefs = cookiePrefs()
-    name = request.get("name")
-    after = request.get("max_position")
-    names = getNames(name)
+proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
+                   rss, after: string): Future[string] {.async.} =
+  let agent = getAgent()
+  let names = getNames(request.get("name"))
 
   if names.len != 1:
     let timeline = await fetchMultiTimeline(names, after, agent, query)
@@ -82,6 +80,10 @@ template respTimeline*(timeline: typed) =
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg)
   resp timeline
 
+template respScroll*(timeline: typed) =
+  timeline.beginning = true # don't render "load newest"
+  resp $renderTimelineTweets(timeline, prefs, getPath())
+
 proc createTimelineRouter*(cfg: Config) =
   setProfileCacheTime(cfg.profileCacheTime)
 
@@ -89,10 +91,18 @@ proc createTimelineRouter*(cfg: Config) =
     get "/@name/?@tab?":
       cond '.' notin @"name"
       cond @"tab" in ["with_replies", "media", "search", ""]
-      let query = request.getQuery(@"tab", @"name")
+      let
+        prefs = cookiePrefs()
+        after = @"max_position"
+        query = request.getQuery(@"tab", @"name")
+
+      if @"scroll".len > 0:
+        respScroll(await fetchTimeline(@"name", after, getAgent(), query))
+
       var rss = "/$1/$2/rss" % [@"name", @"tab"]
       if @"tab".len == 0:
         rss = "/$1/rss" % @"name"
       elif @"tab" == "search":
         rss &= "?" & genQueryUrl(query)
-      respTimeline(await showTimeline(request, query, cfg, rss))
+
+      respTimeline(await showTimeline(request, query, cfg, prefs, rss, after))

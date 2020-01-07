@@ -73,6 +73,9 @@ genPrefs:
     theme(select, "Nitter"):
       "Theme"
 
+    infiniteScroll(checkbox, false):
+      "Infinite scrolling (requires JavaScript, experimental!)"
+
     stickyProfile(checkbox, true):
       "Make profile sidebar stick to top"
 

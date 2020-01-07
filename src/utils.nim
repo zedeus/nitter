@@ -41,7 +41,7 @@ proc cleanFilename*(filename: string): string =
     result &= ".png"
 
 proc filterParams*(params: Table): seq[(string, string)] =
-  let filter = ["name", "id", "list", "referer"]
+  let filter = ["name", "id", "list", "referer", "scroll"]
   toSeq(params.pairs()).filterIt(it[0] notin filter and it[1].len > 0)
 
 proc isTwitterUrl*(url: string): bool =

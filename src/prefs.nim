@@ -18,6 +18,7 @@ withDb:
   Prefs.theme.safeAddColumn
   Prefs.hidePins.safeAddColumn
   Prefs.hideReplies.safeAddColumn
+  Prefs.infiniteScroll.safeAddColumn
 
 proc getDefaultPrefs(cfg: Config): Prefs =
   result = genDefaultPrefs()

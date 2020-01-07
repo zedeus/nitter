@@ -56,6 +56,9 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
       script(src="/js/hls.light.min.js")
       script(src="/js/hlsPlayback.js")
 
+    if prefs.infiniteScroll:
+      script(src="/js/infiniteScroll.js")
+
     title:
       if titleText.len > 0:
         text titleText & " | " & cfg.title
