@@ -10,6 +10,19 @@ export router_utils
 export api, cache, formatters, query, agents
 export profile, timeline, status
 
+proc getQuery*(request: Request; tab, name: string): Query =
+  case tab
+  of "with_replies": getReplyQuery(name)
+  of "media": getMediaQuery(name)
+  of "search": initQuery(params(request), name=name)
+  else: Query()
+
+proc fetchTimeline*(name, after, agent: string; query: Query): Future[Timeline] =
+  case query.kind
+  of QueryKind.media: getMediaTimeline(name, after, agent)
+  of posts: getTimeline(name, after, agent)
+  else: getSearch[Tweet](query, after, agent)
+
 proc fetchSingleTimeline*(name, after, agent: string; query: Query;
                           media=true): Future[(Profile, Timeline)] {.async.} =
   var timeline: Timeline
@@ -19,18 +32,11 @@ proc fetchSingleTimeline*(name, after, agent: string; query: Query;
   if cachedProfile.isSome:
     profile = get(cachedProfile)
 
-  if query.kind == posts:
-    if cachedProfile.isSome:
-      timeline = await getTimeline(name, after, agent, media)
-    else:
-      (profile, timeline) = await getProfileAndTimeline(name, after, agent, media)
-      cache(profile)
+  if query.kind == posts and cachedProfile.isNone:
+    (profile, timeline) = await getProfileAndTimeline(name, after, agent, media)
+    cache(profile)
   else:
-    var timelineFut =
-      if query.kind == QueryKind.media:
-        getMediaTimeline(name, after, agent, media)
-      else:
-        getSearch[Tweet](query, after, agent, media)
+    let timelineFut = fetchTimeline(name, after, agent, query)
     if cachedProfile.isNone:
       profile = await getCachedProfile(name, agent)
     timeline = await timelineFut
@@ -58,9 +64,8 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; rss: string): Fu
     names = getNames(name)
 
   if names.len != 1:
-    let
-      timeline = await fetchMultiTimeline(names, after, agent, query)
-      html = renderTweetSearch(timeline, prefs, getPath())
+    let timeline = await fetchMultiTimeline(names, after, agent, query)
+    let html = renderTweetSearch(timeline, prefs, getPath())
     return renderMain(html, request, cfg, "Multi", rss=rss)
 
   let
@@ -84,12 +89,7 @@ proc createTimelineRouter*(cfg: Config) =
     get "/@name/?@tab?":
       cond '.' notin @"name"
       cond @"tab" in ["with_replies", "media", "search", ""]
-      let query =
-        case @"tab"
-        of "with_replies": getReplyQuery(@"name")
-        of "media": getMediaQuery(@"name")
-        of "search": initQuery(params(request), name=(@"name"))
-        else: Query()
+      let query = request.getQuery(@"tab", @"name")
       var rss = "/$1/$2/rss" % [@"name", @"tab"]
       if @"tab".len == 0:
         rss = "/$1/rss" % @"name"
