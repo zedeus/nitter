@@ -17,7 +17,7 @@ image = [
 ]
 
 gif = [
-    ['hot_pengu/status/1142904127594401797', 'D9xpM5eW4AIXfUl'],
+    ['elonmusk/status/1141367104702038016', 'D9bzUqoUcAAfUgf'],
     ['Proj_Borealis/status/1136595194621677568', 'D8X_PJAXUAAavPT']
 ]
 

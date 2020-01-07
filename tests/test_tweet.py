@@ -28,11 +28,19 @@ invalid = [
 ]
 
 multiline = [
-    [1142904127594401797, 'hot_pengu',
+    [1102965189392113665, 'piIIowhugs',
      """
-New tileset, dust effects, background. The 'sea' has per-line parallax and wavey fx which we think is really cool even tho u didn't notice 🐶.  code: 
-@exelotl
-  #pixelart #gbadev #gba #indiedev"""],
+summoning circle, hope this works 
+
+                       🕯
+              🕯              🕯
+        🕯                         🕯
+ 
+   🕯         serotonin        🕯
+
+        🕯                          🕯
+              🕯              🕯
+                        🕯"""],
 
     [400897186990284800, 'mobile_test_3',
      """
