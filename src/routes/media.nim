@@ -31,10 +31,12 @@ proc createMediaRouter*(cfg: Config) =
         let client = newAsyncHttpClient()
         try:
           await client.downloadFile($uri, filename)
-          client.safeClose()
         except HttpRequestError:
+          client.safeClose()
           removeFile(filename)
           resp Http404
+        finally:
+          client.safeClose()
 
       sendFile(filename)
 

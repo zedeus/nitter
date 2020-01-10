@@ -57,7 +57,11 @@ proc getGuestToken(agent: string; force=false): Future[string] {.async.} =
   let headers = genHeaders({"authorization": auth}, agent, base, lang=false)
   newClient()
 
-  let json = parseJson(await client.postContent($(apiBase / tokenUrl)))
+  var res: string
+  try: res = await client.postContent($(apiBase / tokenUrl))
+  except: return
+
+  let json = parseJson(res)
 
   if json != nil:
     result = json["guest_token"].to(string)
