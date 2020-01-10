@@ -69,7 +69,7 @@ proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:
         if i == 16: break
-        a(href=(&"/{profile.username}/status/{photo.tweetId}"),
+        a(href=(&"/{profile.username}/status/{photo.tweetId}#m"),
           style={backgroundColor: photo.color}):
           genImg(photo.url & ":thumb")
 
