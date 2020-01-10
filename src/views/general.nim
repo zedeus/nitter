@@ -70,6 +70,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     meta(property="og:title", content=titleText)
     meta(property="og:description", content=stripHtml(desc))
     meta(property="og:site_name", content="Nitter")
+    meta(property="og:locale", content="en_US")
 
     for url in images:
       meta(property="og:image", content=getPicUrl(url))
