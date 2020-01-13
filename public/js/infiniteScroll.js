@@ -19,7 +19,6 @@ window.onload = function() {
         if (loading) return;
         if (html.scrollTop + html.clientHeight >= html.scrollHeight - 3000) {
             loading = true;
-            var topRef = document.querySelector('.top-ref');
             var loadMore = getLoadMore(document);
             if (loadMore == null) return;
 
@@ -30,7 +29,7 @@ window.onload = function() {
             url.searchParams.append('scroll', 'true');
 
             fetch(url.toString()).then(function (response) {
-	            return response.text();
+                return response.text();
             }).then(function (html) {
                 var parser = new DOMParser();
                 var doc = parser.parseFromString(html, 'text/html');
@@ -46,7 +45,7 @@ window.onload = function() {
                 else insertBeforeLast(container, getLoadMore(doc));
                 loading = false;
             }).catch(function (err) {
-	            console.warn('Something went wrong.', err);
+                console.warn('Something went wrong.', err);
                 loading = true;
             });
         }
