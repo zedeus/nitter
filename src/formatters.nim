@@ -7,8 +7,8 @@ import types, utils, query
 from unicode import Rune, `$`
 
 const
-  ytRegex = re"([A-z.]+\.)?youtu(be.com|.be)"
-  twRegex = re"(www.|mobile.)?twitter.com"
+  ytRegex = re"([A-z.]+\.)?youtu(be\.com|\.be)"
+  twRegex = re"(www\.|mobile\.)?twitter\.com"
   cards = "https://cards.twitter.com/cards"
   tco = "https://t.co"
   nbsp = $Rune(0x000A0)
