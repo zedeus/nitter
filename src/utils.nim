@@ -4,8 +4,8 @@ import nimcrypto, regex
 var hmacKey = "secretkey"
 
 const
-  badJpgExts = @["1500x500", "jpgn", "jpg:", "jpg_"]
-  badPngExts = @["pngn", "png:", "png_"]
+  badJpgExts = @["1500x500", "jpgn", "jpg:", "jpg_", "_jpg"]
+  badPngExts = @["pngn", "png:", "png_", "_png"]
   twitterDomains = @[
     "twitter.com",
     "twimg.com",
