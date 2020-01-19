@@ -34,7 +34,7 @@ proc getProfile*(username, agent: string): Future[Profile] {.async.} =
 proc getProfileFull*(username, agent: string): Future[Profile] {.async.} =
   let
     url = base / username
-    headers = genHeaders(agent, url, auth=true)
+    headers = genHeaders(agent, url, auth=true, guestId=true)
     html = await fetchHtml(url, headers)
 
   if html == nil: return

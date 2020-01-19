@@ -54,7 +54,7 @@ proc getListMembers*(username, list, after, agent: string): Future[Result[Profil
 
   let
     url = base / (listMembersUrl % [username, list])
-    html = await fetchHtml(url, genHeaders(agent, url))
+    html = await fetchHtml(url, genHeaders(agent, url, guestId=true))
 
   result = Result[Profile](
     minId: html.selectAttr(".stream-container", "data-min-position"),

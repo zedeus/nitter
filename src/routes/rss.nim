@@ -20,7 +20,8 @@ proc showRss*(req: Request; hostname: string; query: Query): Future[(string, str
     (profile, timeline) =
       await fetchSingleTimeline(names[0], after, getAgent(), query, media=false)
   else:
-    timeline = await fetchMultiTimeline(names, after, getAgent(), query, media=false)
+    let multiQuery = query.getMultiQuery(names)
+    timeline = await getSearch[Tweet](multiQuery, after, getAgent(), media=false)
     # this is kinda dumb
     profile = Profile(
       username: name,

@@ -14,7 +14,8 @@ proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
     beginning: after.len == 0
   )
 
-proc getSearch*[T](query: Query; after, agent: string; media=true): Future[Result[T]] {.async.} =
+proc getSearch*[T](query: Query; after, agent: string;
+                   media=true): Future[Result[T]] {.async.} =
   let
     kind = if query.kind == users: "users" else: "tweets"
 
@@ -22,7 +23,7 @@ proc getSearch*[T](query: Query; after, agent: string; media=true): Future[Resul
     encoded = encodeUrl(param, usePlus=false)
 
     referer = base / ("search?f=$1&q=$2&src=typd" % [kind, encoded])
-    headers = genHeaders(agent, referer, auth=true, xml=true)
+    headers = genHeaders(agent, referer, auth=true, xml=true, guestId=true)
 
     params = {
       "f": kind,

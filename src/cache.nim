@@ -41,7 +41,8 @@ proc hasCachedProfile*(username: string): Option[Profile] =
     except AssertionError, KeyError:
       result = none Profile
 
-proc getCachedProfile*(username, agent: string; force=false): Future[Profile] {.async.} =
+proc getCachedProfile*(username, agent: string;
+                       force=false): Future[Profile] {.async.} =
   withDb:
     try:
       result.getOne("lower(username) = ?", toLower(username))

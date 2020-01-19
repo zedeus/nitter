@@ -45,13 +45,11 @@ proc fetchSingleTimeline*(name, after, agent: string; query: Query;
   if profile.username.len == 0: return
   return (profile, timeline)
 
-proc fetchMultiTimeline*(names: seq[string]; after, agent: string; query: Query;
-                         media=true): Future[Timeline] {.async.} =
-  var q = query
-  q.fromUser = names
+proc getMultiQuery*(q: Query; names: seq[string]): Query =
+  result = q
+  result.fromUser = names
   if q.kind == posts and "replies" notin q.excludes:
-    q.excludes.add "replies"
-  return await getSearch[Tweet](q, after, agent, media)
+    result.excludes.add "replies"
 
 proc get*(req: Request; key: string): string =
   params(req).getOrDefault(key)
@@ -62,8 +60,10 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
   let names = getNames(request.get("name"))
 
   if names.len != 1:
-    let timeline = await fetchMultiTimeline(names, after, agent, query)
-    let html = renderTweetSearch(timeline, prefs, getPath())
+    let
+      multiQuery = query.getMultiQuery(names)
+      timeline = await getSearch[Tweet](multiQuery, after, agent)
+      html = renderTweetSearch(timeline, prefs, getPath())
     return renderMain(html, request, cfg, "Multi", rss=rss)
 
   let

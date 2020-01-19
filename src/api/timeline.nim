@@ -30,12 +30,12 @@ proc getProfileAndTimeline*(username, after, agent: string;
     url = url ? {"max_position": after}
 
   let
-    headers = genHeaders(agent, base / username, auth=true)
+    headers = genHeaders(agent, base / username, auth=true, guestId=true)
     html = await fetchHtml(url, headers)
     timeline = parseTimeline(html.select("#timeline > .stream-container"), after)
     profile = parseTimelineProfile(html)
 
-  if media: await getMedia(timeline, agent)
+  if media and profile.username.len > 0: await getMedia(timeline, agent)
   result = (profile, timeline)
 
 proc getTimeline*(username, after, agent: string;
