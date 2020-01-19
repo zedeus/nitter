@@ -18,7 +18,7 @@ proc genHeaders*(headers: openArray[tuple[key: string, val: string]];
   if auth: result["authority"] = "twitter.com"
   if lang: result["accept-language"] = consts.lang
   if xml:  result["x-requested-with"] = "XMLHttpRequest"
-  if guestId: result["cookie"] = guestIdCookie
+  # if guestId: result["cookie"] = guestIdCookie
 
   for (key, val) in headers:
     result[key] = val
