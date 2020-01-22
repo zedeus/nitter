@@ -12,8 +12,7 @@ bin           = @["nitter"]
 
 requires "nim >= 0.19.9"
 requires "norm#head"
-requires "https://github.com/dom96/httpbeast#head"
-requires "jester >= 0.4.3"
+requires "https://github.com/zedeus/jester#asyncify"
 requires "regex >= 0.11.2"
 requires "q >= 0.0.7"
 requires "nimcrypto >= 0.3.9"
