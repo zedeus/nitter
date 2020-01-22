@@ -13,6 +13,12 @@ const
   tco = "https://t.co"
   nbsp = $Rune(0x000A0)
 
+  wwwRegex = re"https?://(www[0-9]?\.)?"
+  manifestRegex = re"(.+(.ts|.m3u8|.vmap))"
+  userpicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
+  extRegex = re"(\.[A-z]+)$"
+  tombstoneRegex = re"\n* *Learn more"
+
 proc stripText*(text: string): string =
   text.replace(nbsp, " ").strip()
 
@@ -25,7 +31,7 @@ proc stripHtml*(text: string): string =
   html.innerText()
 
 proc shortLink*(text: string; length=28): string =
-  result = text.replace(re"https?://(www[0-9]?\.)?", "")
+  result = text.replace(wwwRegex, "")
   if result.len > length:
     result = result[0 ..< length] & "…"
 
@@ -44,11 +50,11 @@ proc proxifyVideo*(manifest: string; proxy: bool): string =
   proc cb(m: RegexMatch; s: string): string =
     result = "https://video.twimg.com" & s[m.group(0)[0]]
     if proxy: result = getVidUrl(result)
-  result = manifest.replace(re"(.+(.ts|.m3u8|.vmap))", cb)
+  result = manifest.replace(manifestRegex, cb)
 
 proc getUserpic*(userpic: string; style=""): string =
-  let pic = userpic.replace(re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$", "$2")
-  pic.replace(re"(\.[A-z]+)$", style & "$1")
+  let pic = userpic.replace(userpicRegex, "$2")
+  pic.replace(extRegex, style & "$1")
 
 proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
@@ -86,7 +92,7 @@ proc getLink*(tweet: Tweet | Quote; focus=true): string =
   if focus: result &= "#m"
 
 proc getTombstone*(text: string): string =
-  text.replace(re"\n* *Learn more", "").stripText().strip(chars={' ', '\n'})
+  text.replace(tombstoneRegex, "").stripText().strip(chars={' ', '\n'})
 
 proc getTwitterLink*(path: string; params: Table[string, string]): string =
   let

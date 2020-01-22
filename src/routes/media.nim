@@ -9,6 +9,8 @@ import ../views/general
 export asyncfile, httpclient, os, strutils
 export regex
 
+const m3u8Regex* = re"""url="(.+.m3u8)""""
+
 proc createMediaRouter*(cfg: Config) =
   router media:
     get "/pic/@url":
@@ -67,7 +69,7 @@ proc createMediaRouter*(cfg: Config) =
 
       if ".vmap" in url:
         var m: RegexMatch
-        discard content.find(re"""url="(.+.m3u8)"""", m)
+        discard content.find(m3u8Regex, m)
         url = decodeUrl(content[m.group(0)[0]])
         content = await safeFetch(url)
 

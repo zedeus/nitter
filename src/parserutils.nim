@@ -9,6 +9,7 @@ from htmlgen import a
 const
   thumbRegex = re".+:url\('([^']+)'\)"
   gifRegex = re".+thumb/([^\.']+)\.[jpng].*"
+  reColor = re"a:active \{\n +color: (#[A-Z0-9]+)"
 
 proc selectAll*(node: XmlNode; selector: string): seq[XmlNode] =
   if node == nil: return
@@ -134,7 +135,7 @@ proc getTimelineBanner*(node: XmlNode): string =
 
   let style = node.select("style").innerText()
   var m: RegexMatch
-  if style.find(re"a:active \{\n +color: (#[A-Z0-9]+)", m):
+  if style.find(reColor, m):
     return style[m.group(0)[0]]
 
 proc getMediaCount*(node: XmlNode): string =
