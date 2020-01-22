@@ -8,7 +8,7 @@ proc getTweet*(username, id, after, agent: string): Future[Conversation] {.async
     headers = genHeaders({
       "pragma": "no-cache",
       "x-previous-page-name": "profile"
-    }, agent, base, xml=true, guestId=true)
+    }, agent, base, xml=true)
 
     url = base / username / tweetUrl / id ? {"max_position": after}
     html = await fetchHtml(url, headers)

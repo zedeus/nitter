@@ -2,13 +2,11 @@ import httpclient, asyncdispatch, htmlparser, options
 import strutils, json, xmltree, uri
 
 import ../types
-import consts, cookie
-
-var guestIdCookie = "guest_id=" & getGuestId()
+import consts
 
 proc genHeaders*(headers: openArray[tuple[key: string, val: string]];
                  agent: string; referer: Uri; lang=true;
-                 auth=false; xml=false; guestId=false): HttpHeaders =
+                 auth=false; xml=false): HttpHeaders =
   result = newHttpHeaders({
     "referer": $referer,
     "user-agent": agent,
@@ -18,14 +16,13 @@ proc genHeaders*(headers: openArray[tuple[key: string, val: string]];
   if auth: result["authority"] = "twitter.com"
   if lang: result["accept-language"] = consts.lang
   if xml:  result["x-requested-with"] = "XMLHttpRequest"
-  # if guestId: result["cookie"] = guestIdCookie
 
   for (key, val) in headers:
     result[key] = val
 
 proc genHeaders*(agent: string; referer: Uri; lang=true;
-                 auth=false; xml=false; guestId=false): HttpHeaders =
-  genHeaders([], agent, referer, lang, auth, xml, guestId)
+                 auth=false; xml=false): HttpHeaders =
+  genHeaders([], agent, referer, lang, auth, xml)
 
 template newClient*() {.dirty.} =
   var client = newAsyncHttpClient()

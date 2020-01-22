@@ -23,7 +23,7 @@ proc getSearch*[T](query: Query; after, agent: string;
     encoded = encodeUrl(param, usePlus=false)
 
     referer = base / ("search?f=$1&q=$2&src=typd" % [kind, encoded])
-    headers = genHeaders(agent, referer, auth=true, xml=true, guestId=true)
+    headers = genHeaders(agent, referer, auth=true, xml=true)
 
     params = {
       "f": kind,

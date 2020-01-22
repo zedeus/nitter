@@ -30,7 +30,7 @@ proc getProfileAndTimeline*(username, after, agent: string;
     url = url ? {"max_position": after}
 
   let
-    headers = genHeaders(agent, base / username, auth=true, guestId=true)
+    headers = genHeaders(agent, base / username, auth=true)
     html = await fetchHtml(url, headers)
     timeline = parseTimeline(html.select("#timeline > .stream-container"), after)
     profile = parseTimelineProfile(html)
