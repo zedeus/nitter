@@ -2,8 +2,6 @@ import strutils, sequtils, asyncdispatch, httpclient
 import ../utils, ../prefs
 export utils, prefs
 
-from net import SslError
-
 template cookiePrefs*(): untyped {.dirty.} =
   getPrefs(request.cookies.getOrDefault("preferences"), cfg)
 
@@ -18,10 +16,10 @@ proc getNames*(name: string): seq[string] =
 
 proc safeClose*(client: AsyncHttpClient) =
   try: client.close()
-  except SslError: discard
+  except: discard
 
 proc safeFetch*(url: string): Future[string] {.async.} =
   let client = newAsyncHttpClient()
   try: result = await client.getContent(url)
   except: discard
-  client.safeClose()
+  finally: client.safeClose()
