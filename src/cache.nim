@@ -10,12 +10,9 @@ template safeAddColumn(field: typedesc): untyped =
 dbFromTypes("cache.db", "", "", "", [Profile, Video])
 
 withDb:
-  try:
-    createTables()
-  except DbError:
-    discard
-  Video.title.safeAddColumn
-  Video.description.safeAddColumn
+  Video.createTable(force=true)
+  try: Profile.createTable()
+  except DbError: discard
 
   safeAddColumn Profile.lowername
 
@@ -80,3 +77,14 @@ proc getCachedVideo*(id: int64): Option[Video] =
       return some Video.getOne("videoId = ?", $id)
     except KeyError:
       return none Video
+
+proc cacheCleaner*() {.async.} =
+  while true:
+    await sleepAsync(profileCacheTime.inMilliseconds.int)
+    withDb:
+      let up = "updated<" & $toUnix(getTime() - profileCacheTime)
+      var profiles = Profile.getMany(10000, cond=up)
+      var videos = Video.getMany(10000, cond=up)
+      transaction:
+        for p in profiles.mitems: delete(p)
+        for v in videos.mitems: delete(v)

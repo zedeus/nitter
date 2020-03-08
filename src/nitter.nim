@@ -3,7 +3,7 @@ from net import Port
 
 import jester
 
-import types, config, prefs, formatters
+import types, config, prefs, formatters, cache
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list,
@@ -24,6 +24,8 @@ createSearchRouter(cfg)
 createMediaRouter(cfg)
 createEmbedRouter(cfg)
 createRssRouter(cfg)
+
+asyncCheck cacheCleaner()
 
 settings:
   port = Port(cfg.port)

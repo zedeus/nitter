@@ -52,6 +52,11 @@ dbTypes:
           parseIt: parseEnum[VideoType](it.s)
           formatIt: dbValue($it)
         .}: VideoType
+      updated* {.
+          dbType: "INTEGER"
+          parseIt: it.i.fromUnix()
+          formatIt: dbValue(getTime().toUnix())
+        .}: Time
 
 genPrefsType()
 
