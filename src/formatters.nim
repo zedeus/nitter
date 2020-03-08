@@ -39,6 +39,8 @@ proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
   result = url
   if prefs.replaceYouTube.len > 0:
     result = result.replace(ytRegex, prefs.replaceYouTube)
+    if prefs.replaceYouTube in result:
+      result = result.replace("/c/", "/")
   if prefs.replaceTwitter.len > 0:
     result = result.replace(tco, "https://" & prefs.replaceTwitter & "/t.co")
     result = result.replace(cards, prefs.replaceTwitter & "/cards")
