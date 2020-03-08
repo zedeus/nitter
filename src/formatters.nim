@@ -9,7 +9,7 @@ from unicode import Rune, `$`
 const
   ytRegex = re"([A-z.]+\.)?youtu(be\.com|\.be)"
   twRegex = re"(www\.|mobile\.)?twitter\.com"
-  cards = "https://cards.twitter.com/cards"
+  cards = "cards.twitter.com/cards"
   tco = "https://t.co"
   nbsp = $Rune(0x000A0)
 
@@ -40,9 +40,9 @@ proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
   if prefs.replaceYouTube.len > 0:
     result = result.replace(ytRegex, prefs.replaceYouTube)
   if prefs.replaceTwitter.len > 0:
-    result = result.replace(twRegex, prefs.replaceTwitter)
     result = result.replace(tco, "https://" & prefs.replaceTwitter & "/t.co")
-    result = result.replace(cards, "https://" & prefs.replaceTwitter & "/cards")
+    result = result.replace(cards, prefs.replaceTwitter & "/cards")
+    result = result.replace(twRegex, prefs.replaceTwitter)
   if absolute.len > 0:
     result = result.replace("href=\"/", "href=\"https://" & absolute & "/")
 
