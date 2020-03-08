@@ -12,6 +12,7 @@ dbTypes:
     Profile* = object
       username*: string
       fullname*: string
+      lowername*: string
       location*: string
       website*: string
       bio*: string
@@ -25,9 +26,9 @@ dbTypes:
       verified*: bool
       protected*: bool
       joinDate* {.
-        dbType: "INTEGER"
-        parseIt: it.i.fromUnix()
-        formatIt: dbValue(it.toUnix())
+          dbType: "INTEGER"
+          parseIt: it.i.fromUnix()
+          formatIt: dbValue(it.toUnix())
         .}: Time
       updated* {.
           dbType: "INTEGER"

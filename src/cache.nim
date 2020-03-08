@@ -17,6 +17,8 @@ withDb:
   Video.title.safeAddColumn
   Video.description.safeAddColumn
 
+  safeAddColumn Profile.lowername
+
 var profileCacheTime = initDuration(minutes=10)
 
 proc isOutdated*(profile: Profile): bool =
@@ -25,7 +27,7 @@ proc isOutdated*(profile: Profile): bool =
 proc cache*(profile: var Profile) =
   withDb:
     try:
-      let p = Profile.getOne("lower(username) = ?", toLower(profile.username))
+      let p = Profile.getOne("lowername = ?", profile.lowername)
       profile.id = p.id
       profile.update()
     except KeyError:
@@ -35,7 +37,7 @@ proc cache*(profile: var Profile) =
 proc hasCachedProfile*(username: string): Option[Profile] =
   withDb:
     try:
-      let p = Profile.getOne("lower(username) = ?", toLower(username))
+      let p = Profile.getOne("lowername = ?", toLower(username))
       doAssert not p.isOutdated
       result = some p
     except AssertionError, KeyError:
@@ -45,7 +47,7 @@ proc getCachedProfile*(username, agent: string;
                        force=false): Future[Profile] {.async.} =
   withDb:
     try:
-      result.getOne("lower(username) = ?", toLower(username))
+      result.getOne("lowername = ?", toLower(username))
       doAssert not result.isOutdated
     except AssertionError, KeyError:
       result = await getProfileFull(username, agent)

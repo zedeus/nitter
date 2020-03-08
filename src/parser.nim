@@ -7,9 +7,11 @@ proc parseTimelineProfile*(node: XmlNode): Profile =
   if profile == nil: return
 
   let pre = ".ProfileHeaderCard-"
+  let username = profile.getUsername(pre & "screenname")
   result = Profile(
     fullname:  profile.getName(pre & "nameLink"),
-    username:  profile.getUsername(pre & "screenname"),
+    username:  username,
+    lowername: toLower(username),
     joinDate:  profile.getDate(pre & "joinDateText"),
     website:   profile.selectAttr(pre & "urlText a", "title"),
     bio:       profile.getBio(pre & "bio"),
@@ -27,9 +29,11 @@ proc parsePopupProfile*(node: XmlNode; selector=".profile-card"): Profile =
   let profile = node.select(selector)
   if profile == nil: return
 
+  let username = profile.getUsername(".username")
   result = Profile(
     fullname:  profile.getName(".fullname"),
-    username:  profile.getUsername(".username"),
+    username:  username,
+    lowername: toLower(username),
     bio:       profile.getBio(".bio", fallback=".ProfileCard-bio"),
     userpic:   profile.getAvatar(".ProfileCard-avatarImage"),
     verified:  isVerified(profile),

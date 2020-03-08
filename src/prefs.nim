@@ -15,10 +15,10 @@ withDb:
     createTables()
   except DbError:
     discard
-  Prefs.theme.safeAddColumn
-  Prefs.hidePins.safeAddColumn
-  Prefs.hideReplies.safeAddColumn
-  Prefs.infiniteScroll.safeAddColumn
+  safeAddColumn Prefs.theme
+  safeAddColumn Prefs.hidePins
+  safeAddColumn Prefs.hideReplies
+  safeAddColumn Prefs.infiniteScroll
 
 proc getDefaultPrefs(cfg: Config): Prefs =
   result = genDefaultPrefs()
