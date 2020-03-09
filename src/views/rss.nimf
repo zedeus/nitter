@@ -28,14 +28,14 @@
 #end if
 #if tweet.photos.len > 0:
 #for photo in tweet.photos:
-<img src="https://${hostname}${getPicUrl(photo)}" width="250" />
+<img src="https://${hostname}${getPicUrl(photo)}" style="max-width:250px;" />
 #end for
 #elif tweet.video.isSome:
-<img src="https://${hostname}${getPicUrl(get(tweet.video).thumb)}" width="250" />
+<img src="https://${hostname}${getPicUrl(get(tweet.video).thumb)}" style="max-width:250px;" />
 #elif tweet.gif.isSome:
 #let thumb = &"https://{hostname}{getPicUrl(get(tweet.gif).thumb)}"
 #let url = &"https://{hostname}{getGifUrl(get(tweet.gif).url)}"
-<video poster="${thumb}" autoplay muted loop width="250">
+<video poster="${thumb}" autoplay muted loop style="max-width:250px;">
   <source src="${url}" type="video/mp4"</source></video>
 #end if
 #end proc
