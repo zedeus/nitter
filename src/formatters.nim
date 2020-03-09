@@ -117,6 +117,7 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
     result = result.replace("/" & username, "")
 
 proc getLocation*(u: Profile | Tweet): (string, string) =
+  if "://" in u.location: return (u.location, "")
   let loc = u.location.split(":")
   let url = if loc.len > 1: "/search?q=place:" & loc[1] else: ""
   (loc[0], url)
