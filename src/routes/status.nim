@@ -26,6 +26,7 @@ proc createStatusRouter*(cfg: Config) =
 
       var
         title = pageTitle(conversation.tweet)
+        ogTitle = pageTitle(conversation.tweet.profile)
         desc = conversation.tweet.text
         images = conversation.tweet.photos
         video = ""
@@ -38,7 +39,8 @@ proc createStatusRouter*(cfg: Config) =
         video = getGifUrl(get(conversation.tweet.gif).url)
 
       let html = renderConversation(conversation, prefs, getPath() & "#m")
-      resp renderMain(html, request, cfg, title, desc, images=images, video=video)
+      resp renderMain(html, request, cfg, title, desc,
+                      images=images, video=video, ogTitle=ogTitle)
 
     get "/@name/@s/@id/@m/?@i?":
       cond @"s" in ["status", "statuses"]

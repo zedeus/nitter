@@ -29,7 +29,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
         iconReferer "cog", "/settings", path, title="Preferences"
 
 proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
-                 images: seq[string] = @[]): VNode =
+                 images: seq[string] = @[]; ogTitle=""): VNode =
   let ogType =
     if video.len > 0: "video"
     elif images.len > 0: "photo"
@@ -67,7 +67,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
 
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     meta(property="og:type", content=ogType)
-    meta(property="og:title", content=titleText)
+    meta(property="og:title", content=(if ogTitle.len > 0: ogTitle else: titleText))
     meta(property="og:description", content=stripHtml(desc))
     meta(property="og:site_name", content="Nitter")
     meta(property="og:locale", content="en_US")
@@ -81,12 +81,12 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
       meta(property="og:video:type", content="text/html")
 
 proc renderMain*(body: VNode; req: Request; cfg: Config; titleText=""; desc="";
-                 rss=""; video=""; images: seq[string] = @[]): string =
+                 rss=""; video=""; images: seq[string] = @[]; ogTitle=""): string =
   let prefs = getPrefs(req.cookies.getOrDefault("preferences"), cfg)
   let theme = toLowerAscii(prefs.theme).replace(" ", "_")
 
   let node = buildHtml(html(lang="en")):
-    renderHead(prefs, cfg, titleText, desc, video, images):
+    renderHead(prefs, cfg, titleText, desc, video, images, ogTitle):
       if theme.len > 0:
         link(rel="stylesheet", `type`="text/css", href=(&"/css/themes/{theme}.css"))
 
