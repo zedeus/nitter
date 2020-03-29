@@ -5,6 +5,7 @@
 #proc getTitle(tweet: Tweet; prefs: Prefs; hostname: string): string =
 #if tweet.pinned: result = "Pinned: "
 #elif tweet.retweet.isSome: result = "RT: "
+#elif tweet.reply.len > 0: result = "R: "
 #end if
 #result &= xmltree.escape(stripHtml(tweet.text))
 #if result.len > 0: return
