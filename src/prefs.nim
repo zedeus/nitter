@@ -19,6 +19,7 @@ withDb:
   safeAddColumn Prefs.hidePins
   safeAddColumn Prefs.hideReplies
   safeAddColumn Prefs.infiniteScroll
+  safeAddColumn Prefs.replaceInstagram
 
 proc getDefaultPrefs(cfg: Config): Prefs =
   result = genDefaultPrefs()

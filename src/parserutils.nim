@@ -1,4 +1,5 @@
-import xmltree, strtabs, strformat, strutils, times, uri, options, json
+import xmltree, times, uri, options, json
+import strtabs, strformat, strutils, sequtils
 import regex
 
 import types, formatters
@@ -183,8 +184,7 @@ proc parseTweetReply*(node: XmlNode): seq[string] =
   let selector = if "Quote" in node.attr("class"): "b"
                  else: "a b"
 
-  for username in reply.selectAll(selector):
-    result.add username.innerText()
+  result = reply.selectAll(selector).map(innerText)
 
 proc getGif(player: XmlNode): Gif =
   let

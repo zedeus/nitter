@@ -53,6 +53,10 @@ genPrefs:
       "Replace YouTube links with Invidious (blank to disable)"
       placeholder: "Invidious hostname"
 
+    replaceInstagram(input, ""):
+      "Replace Instagram links with Bibliogram (blank to disable)"
+      placeholder: "Bibliogram hostname"
+
   Media:
     mp4Playback(checkbox, true):
       "Enable mp4 video playback"
