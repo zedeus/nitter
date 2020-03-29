@@ -70,6 +70,9 @@ proc getVideoEmbed*(cfg: Config; id: int64): string =
 proc pageTitle*(profile: Profile): string =
   &"{profile.fullname} (@{profile.username})"
 
+proc pageTitle*(tweet: Tweet): string =
+  &"{pageTitle(tweet.profile)}: \"{stripHtml(tweet.text)}\""
+
 proc pageDesc*(profile: Profile): string =
   if profile.bio.len > 0:
     stripHtml(profile.bio)

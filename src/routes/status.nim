@@ -25,7 +25,7 @@ proc createStatusRouter*(cfg: Config) =
         resp Http404, showError(error, cfg)
 
       var
-        title = pageTitle(conversation.tweet.profile)
+        title = pageTitle(conversation.tweet)
         desc = conversation.tweet.text
         images = conversation.tweet.photos
         video = ""
