@@ -6,7 +6,7 @@ normal = [['mobile_test'], ['mobile_test_2']]
 after = [['mobile_test', '627635134573862912'],
          ['mobile_test_2', '377196342281388032']]
 
-short = [['mobile_test_6'], ['mobile_test_8'], ['picman']]
+short = [['mobile_test_8'], ['picman']]
 
 no_more = [['mobile_test_8?max_position=159455542543257601']]
 
