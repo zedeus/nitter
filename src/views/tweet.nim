@@ -115,7 +115,7 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
         let thumb = getPicUrl(gif.thumb)
         let url = getGifUrl(gif.url)
         if prefs.autoplayGifs:
-          video(class="gif", poster=thumb, autoplay="", muted="", loop=""):
+          video(class="gif", poster=thumb, controls="", autoplay="", muted="", loop=""):
             source(src=url, `type`="video/mp4")
         else:
           video(class="gif", poster=thumb, controls="", muted="", loop=""):
@@ -300,6 +300,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
         views = tweet.video.get().views
       elif tweet.gif.isSome:
         renderGif(tweet.gif.get(), prefs)
+        views = "GIF"
       elif tweet.poll.isSome:
         renderPoll(tweet.poll.get())
 
