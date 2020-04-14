@@ -29,6 +29,9 @@ proc showRss*(req: Request; hostname: string; query: Query): Future[(string, str
       userpic: "https://abs.twimg.com/sticky/default_profile_images/default_profile.png"
     )
 
+  if profile.suspended:
+    return (profile.username, "suspended")
+
   if timeline != nil:
     let rss = renderTimelineRss(timeline, profile, hostname, multi=(names.len > 1))
     return (rss, timeline.minId)
@@ -36,6 +39,8 @@ proc showRss*(req: Request; hostname: string; query: Query): Future[(string, str
 template respRss*(rss, minId) =
   if rss.len == 0:
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg)
+  elif minId == "suspended":
+    resp Http404, showError(getSuspended(rss), cfg)
   let headers = {"Content-Type": "application/rss+xml;charset=utf-8", "Min-Id": minId}
   resp Http200, headers, rss
 

@@ -2,9 +2,19 @@ import xmltree, sequtils, strutils, json, options
 
 import types, parserutils, formatters
 
+proc parseJsonData*(node: XmlNode): JsonNode =
+  let jsonData = node.selectAttr("input.json-data", "value")
+  if jsonData.len > 0:
+    return parseJson(jsonData)
+
 proc parseTimelineProfile*(node: XmlNode): Profile =
   let profile = node.select(".ProfileHeaderCard")
-  if profile == nil: return
+  if profile == nil:
+    let data = parseJsonData(node)
+    if data != nil and data{"sectionName"}.getStr == "suspended":
+      let username = data{"internalReferer"}.getStr.strip(chars={'/'})
+      return Profile(username: username, suspended: true)
+    return
 
   let pre = ".ProfileHeaderCard-"
   let username = profile.getUsername(pre & "screenname")

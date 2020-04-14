@@ -15,6 +15,7 @@ withDb:
   except DbError: discard
 
   safeAddColumn Profile.lowername
+  safeAddColumn Profile.suspended
 
 var profileCacheTime = initDuration(minutes=10)
 

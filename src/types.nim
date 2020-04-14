@@ -25,6 +25,7 @@ dbTypes:
       media*: string
       verified*: bool
       protected*: bool
+      suspended*: bool
       joinDate* {.
           dbType: "INTEGER"
           parseIt: it.i.fromUnix()

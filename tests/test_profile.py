@@ -71,9 +71,8 @@ class ProfileTest(BaseTestCase):
         self.assert_text(f'User "{username}" not found')
 
     def test_suspended(self):
-        # TODO: detect suspended
         self.open_nitter('test')
-        self.assert_text(f'User "test" not found')
+        self.assert_text(f'User "test" has been suspended')
 
     @parameterized.expand(banner_color)
     def test_banner_color(self, username, color):

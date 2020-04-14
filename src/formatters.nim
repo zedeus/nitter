@@ -127,3 +127,6 @@ proc getLocation*(u: Profile | Tweet): (string, string) =
   let loc = u.location.split(":")
   let url = if loc.len > 1: "/search?q=place:" & loc[1] else: ""
   (loc[0], url)
+
+proc getSuspended*(username: string): string =
+  &"User \"{username}\" has been suspended"
