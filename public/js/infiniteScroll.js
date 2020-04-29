@@ -25,7 +25,6 @@ window.onload = function() {
             loadMore.children[0].text = "Loading...";
 
             var url = new URL(loadMore.children[0].href);
-            window.history.pushState('', '', url.toString());
             url.searchParams.append('scroll', 'true');
 
             fetch(url.toString()).then(function (response) {
