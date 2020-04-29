@@ -51,6 +51,7 @@ proc getReplyQuery*(name: string): Query =
 proc genQueryParam*(query: Query): string =
   var filters: seq[string]
   var param: string
+  let userSearch = query.fromUser.len > 0
 
   if query.kind == users:
     return query.text
@@ -71,7 +72,7 @@ proc genQueryParam*(query: Query): string =
   for f in query.filters:
     filters.add "filter:" & f
   for e in query.excludes:
-    if rewriteReplies and e == "replies": continue
+    if userSearch and rewriteReplies and e == "replies": continue
     filters.add "-filter:" & e
   for i in query.includes:
     filters.add "include:" & i
