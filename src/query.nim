@@ -48,7 +48,7 @@ proc getReplyQuery*(name: string): Query =
     fromUser: @[name]
   )
 
-proc genQueryParam*(query: Query): string =
+proc genQueryParam*(query: Query; rewriteReplies=true): string =
   var filters: seq[string]
   var param: string
   let userSearch = query.fromUser.len > 0
@@ -56,13 +56,9 @@ proc genQueryParam*(query: Query): string =
   if query.kind == users:
     return query.text
 
-  # improve no-replies result only when searching for less than 7
-  # otherwise multi-timeline limit goes down to 8 users
-  let rewriteReplies = "replies" in query.excludes and query.fromUser.len < 7
-
   for i, user in query.fromUser:
     if rewriteReplies:
-      param &= &"(from:{user} AND (to:{user} OR -filter:replies)) "
+      param &= &"(from:{user}(to:{user} OR -filter:replies)) "
     else:
       param &= &"from:{user} "
 
@@ -86,6 +82,9 @@ proc genQueryParam*(query: Query): string =
     result &= &" near:\"{query.near}\" within:15mi"
   if query.text.len > 0:
     result &= " " & query.text
+
+  if userSearch and rewriteReplies and result.len >= 500:
+    return genQueryParam(query, rewriteReplies=false)
 
 proc genQueryUrl*(query: Query): string =
   if query.kind notin {tweets, users}: return
