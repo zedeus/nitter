@@ -28,6 +28,7 @@ nav {
 
 .site-name {
     font-weight: 600;
+    line-height: 1;
 
     &:hover {
         color: var(--accent_light);
@@ -48,6 +49,7 @@ nav {
     height: 50px;
     overflow: hidden;
     flex-wrap: wrap;
+    align-items: center;
 
     &.right {
         text-align: right;
