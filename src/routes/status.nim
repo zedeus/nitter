@@ -1,6 +1,6 @@
 import asyncdispatch, strutils, sequtils, uri, options
 
-import jester
+import jester, karax/vdom
 
 import router_utils
 import ".."/[api, types, formatters, agents]
@@ -16,6 +16,10 @@ proc createStatusRouter*(cfg: Config) =
     get "/@name/status/@id/?":
       cond '.' notin @"name"
       let prefs = cookiePrefs()
+
+      if @"scroll".len > 0:
+        let replies = await getReplies(@"name", @"id", @"max_position", getAgent())
+        resp $renderReplies(replies, prefs, getPath())
 
       let conversation = await getTweet(@"name", @"id", @"max_position", getAgent())
       if conversation == nil or conversation.tweet.id == 0:

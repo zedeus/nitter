@@ -17,6 +17,7 @@ const
   profileIntentUrl* = "intent/user"
   searchUrl* = "i/search/timeline"
   tweetUrl* = "status"
+  repliesUrl* = "i/$1/conversation/$2"
   videoUrl* = "videos/tweet/config/$1.json"
   tokenUrl* = "guest/activate.json"
   cardUrl* = "i/cards/tfw/v1/$1"

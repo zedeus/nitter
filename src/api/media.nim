@@ -16,6 +16,7 @@ macro genMediaGet(media: untyped; token=false) =
     mediaName = capitalizeAscii($media)
     multi = ident("get" & mediaName & "s")
     convo = ident("getConversation" & mediaName & "s")
+    replies = ident("getReplies" & mediaName & "s")
     single = ident("get" & mediaName)
 
   quote do:
@@ -29,6 +30,14 @@ macro genMediaGet(media: untyped; token=false) =
       else:
         await all(`media`.mapIt(`single`(it, agent)))
 
+    proc `replies`*(replies: Result[Chain]; agent: string; token="") {.async.} =
+      when `token`:
+        var gToken = token
+        if gToken.len == 0: gToken = await getGuestToken(agent)
+        await all(replies.content.mapIt(`multi`(it, agent, token=gToken)))
+      else:
+        await all(replies.content.mapIt(`multi`(it, agent)))
+
     proc `convo`*(convo: Conversation; agent: string) {.async.} =
       var futs: seq[Future[void]]
       when `token`:
@@ -37,13 +46,13 @@ macro genMediaGet(media: untyped; token=false) =
         futs.add `multi`(convo.before, agent, token=token)
         futs.add `multi`(convo.after, agent, token=token)
         if convo.replies != nil:
-          futs.add convo.replies.content.mapIt(`multi`(it, agent, token=token))
+          futs.add `replies`(convo.replies, agent, token=token)
       else:
         futs.add `single`(convo.tweet, agent)
         futs.add `multi`(convo.before, agent)
         futs.add `multi`(convo.after, agent)
         if convo.replies != nil:
-          futs.add convo.replies.content.mapIt(`multi`(it, agent))
+          futs.add `replies`(convo.replies, agent)
       await all(futs)
 
 proc getGuestToken(agent: string; force=false): Future[string] {.async.} =

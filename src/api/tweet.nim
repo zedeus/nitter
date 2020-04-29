@@ -30,3 +30,32 @@ proc getTweet*(username, id, after, agent: string): Future[Conversation] {.async
   await all(getConversationVideos(result, agent),
             getConversationCards(result, agent),
             getConversationPolls(result, agent))
+
+proc getReplies*(username, id, after, agent: string): Future[Result[Chain]] {.async.} =
+  let
+    headers = genHeaders({
+      "pragma": "no-cache",
+      "x-previous-page-name": "permalink",
+      "accept": htmlAccept
+      }, agent, base, xml=true)
+
+    params = {
+      "include_available_features": "1",
+      "include_entities": "1",
+      "max_position": after,
+    }
+
+    url = base / (repliesUrl % [username, id]) ? params
+
+  let json = await fetchJson(url, headers)
+  if json == nil or not json.hasKey("items_html"): return
+  let html = parseHtml(json{"items_html"}.getStr)
+
+  result = parseReplies(html)
+  result.minId = json{"min_position"}.getStr(result.minId)
+  if result.minId.len > 0:
+    result.hasMore = true
+
+  await all(getRepliesVideos(result, agent),
+            getRepliesCards(result, agent),
+            getRepliesPolls(result, agent))

@@ -6,8 +6,16 @@ function getLoadMore(doc) {
     return doc.querySelector('.show-more:not(.timeline-item)');
 }
 
+function isDuplicate(item, itemClass) {
+    const tweet = item.querySelector(".tweet-link");
+    if (tweet == null) return false;
+    const href = tweet.getAttribute("href");
+    return document.querySelector(itemClass + " .tweet-link[href='" + href + "']") != null;
+}
+
 window.onload = function() {
-    const isTweet = window.location.pathname.indexOf("/status/") !== -1;
+    const url = window.location.pathname;
+    const isTweet = url.indexOf("/status/") !== -1;
     const containerClass = isTweet ? ".replies" : ".timeline";
     const itemClass = isTweet ? ".thread-line" : ".timeline-item";
 
@@ -36,13 +44,16 @@ window.onload = function() {
 
                 for (var item of doc.querySelectorAll(itemClass)) {
                     if (item.className == "timeline-item show-more") continue;
+                    if (isDuplicate(item, itemClass)) continue;
                     if (isTweet) container.appendChild(item);
                     else insertBeforeLast(container, item);
                 }
 
-                if (isTweet) container.appendChild(getLoadMore(doc));
-                else insertBeforeLast(container, getLoadMore(doc));
                 loading = false;
+                const newLoadMore = getLoadMore(doc);
+                if (newLoadMore == null) return;
+                if (isTweet) container.appendChild(newLoadMore);
+                else insertBeforeLast(container, newLoadMore);
             }).catch(function (err) {
                 console.warn('Something went wrong.', err);
                 loading = true;

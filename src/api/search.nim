@@ -8,8 +8,8 @@ proc getResult*[T](json: JsonNode; query: Query; after: string): Result[T] =
   if json == nil: return Result[T](beginning: true, query: query)
   Result[T](
     hasMore: json{"has_more_items"}.getBool(false),
-    maxId: json{"max_position"}.getStr(""),
-    minId: json{"min_position"}.getStr(""),
+    maxId: json{"max_position"}.getStr,
+    minId: json{"min_position"}.getStr,
     query: query,
     beginning: after.len == 0
   )

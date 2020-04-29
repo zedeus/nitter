@@ -77,14 +77,6 @@ type
     near*: string
     sep*: string
 
-  Result*[T] = ref object
-    content*: seq[T]
-    minId*: string
-    maxId*: string
-    hasMore*: bool
-    beginning*: bool
-    query*: Query
-
   Gif* = object
     url*: string
     thumb*: string
@@ -165,6 +157,14 @@ type
     video*: Option[Video]
     photos*: seq[string]
     poll*: Option[Poll]
+
+  Result*[T] = ref object
+    content*: seq[T]
+    minId*: string
+    maxId*: string
+    hasMore*: bool
+    beginning*: bool
+    query*: Query
 
   Chain* = ref object
     content*: seq[Tweet]

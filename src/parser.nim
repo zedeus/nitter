@@ -160,6 +160,19 @@ proc parseChain*(nodes: XmlNode): Chain =
     else:
       result.content.add parseTweet(n)
 
+proc parseReplies*(replies: XmlNode; skipFirst=false): Result[Chain] =
+  new(result)
+  for i, reply in replies.filterIt(it.kind != xnText):
+    if skipFirst and i == 0: continue
+    let class = reply.attr("class").toLower()
+    if "lone" in class:
+      result.content.add parseChain(reply)
+    elif "showmore" in class:
+      result.minId = reply.selectAttr("button", "data-cursor")
+      result.hasMore = true
+    else:
+      result.content.add parseChain(reply.select(".stream-items"))
+
 proc parseConversation*(node: XmlNode; after: string): Conversation =
   let tweet = node.select(".permalink-tweet-container")
 
@@ -169,11 +182,6 @@ proc parseConversation*(node: XmlNode; after: string): Conversation =
   result = Conversation(
     tweet:  parseTweet(tweet),
     before: parseChain(node.select(".in-reply-to .stream-items")),
-    replies: Result[Chain](
-      minId: node.selectAttr(".replies-to .stream-container", "data-min-position"),
-      hasMore: node.select(".stream-footer .has-more-items") != nil,
-      beginning: after.len == 0
-    )
   )
 
   if result.before != nil:
@@ -181,26 +189,19 @@ proc parseConversation*(node: XmlNode; after: string): Conversation =
     if maxId.len > 0:
       result.before.more = -1
 
-  let showMore = node.selectAttr(".ThreadedConversation-showMoreThreads button",
-                                 "data-cursor")
-
-  if showMore.len > 0:
-    result.replies.minId = showMore
-    result.replies.hasMore = true
-
   let replies = node.select(".replies-to .stream-items")
   if replies == nil: return
 
-  for i, reply in replies.filterIt(it.kind != xnText):
-    let class = reply.attr("class").toLower()
-    let thread = reply.select(".stream-items")
+  let nodes = replies.filterIt(it.kind != xnText and "self" in it.attr("class"))
+  if nodes.len > 0 and "self" in nodes[0].attr("class"):
+    result.after = parseChain(nodes[0].select(".stream-items"))
 
-    if i == 0 and "self" in class:
-      result.after = parseChain(thread)
-    elif "lone" in class:
-      result.replies.content.add parseChain(reply)
-    else:
-      result.replies.content.add parseChain(thread)
+  result.replies = parseReplies(replies, result.after != nil)
+
+  result.replies.beginning = after.len == 0
+  if result.replies.minId.len == 0:
+    result.replies.minId = node.selectAttr(".replies-to .stream-container", "data-min-position")
+    result.replies.hasMore = node.select(".stream-footer .has-more-items") != nil
 
 proc parseTimeline*(node: XmlNode; after: string): Timeline =
   if node == nil: return Timeline()
