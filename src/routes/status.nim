@@ -13,7 +13,7 @@ export status
 
 proc createStatusRouter*(cfg: Config) =
   router status:
-    get "/@name/status/@id":
+    get "/@name/status/@id/?":
       cond '.' notin @"name"
       let prefs = cookiePrefs()
 
@@ -47,7 +47,7 @@ proc createStatusRouter*(cfg: Config) =
       cond @"m" in ["video", "photo"]
       redirect("/$1/status/$2" % [@"name", @"id"])
 
-    get "/@name/statuses/@id":
+    get "/@name/statuses/@id/?":
       redirect("/$1/status/$2" % [@"name", @"id"])
 
     get "/i/web/status/@id":
