@@ -31,6 +31,7 @@ proc renderReplyThread(thread: Chain; prefs: Prefs; path: string): VNode =
 
 proc renderReplies*(replies: Result[Chain]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="replies", id="r")):
+    if replies == nil: return
     for thread in replies.content:
       if thread == nil: continue
       renderReplyThread(thread, prefs, path)
@@ -65,8 +66,8 @@ proc renderConversation*(conversation: Conversation; prefs: Prefs; path: string)
           if more != 0:
             renderMoreReplies(conversation.after)
 
-    if not conversation.replies.beginning and showReplies:
-      renderNewer(Query(), getLink(conversation.tweet))
-
-    if conversation.replies.content.len > 0 and showReplies:
-      renderReplies(conversation.replies, prefs, path)
+    if conversation.replies != nil and showReplies:
+      if not conversation.replies.beginning:
+        renderNewer(Query(), getLink(conversation.tweet))
+      if conversation.replies.content.len > 0:
+        renderReplies(conversation.replies, prefs, path)
