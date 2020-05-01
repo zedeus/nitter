@@ -3,11 +3,6 @@ from parameterized import parameterized
 
 
 card = [
-    ['lorenlugosch/status/1115440394148487168',
-     'lorenlugosch/end-to-end-SLU',
-     'PyTorch code for end-to-end spoken language understanding (SLU) with ASR-based transfer learning - lorenlugosch/end-to-end-SLU',
-     'github.com', False],
-
     ['PyTorch/status/1123379369672450051',
      'PyTorch',
      'An open source deep learning platform that provides a seamless path from research prototyping to production deployment.',
@@ -74,6 +69,12 @@ no_thumb = [
      'Nim in 2018: A short recap',
      'Posted in r/programming by u/miran1',
      'reddit.com'],
+
+    ['lorenlugosch/status/1115440394148487168',
+     'lorenlugosch/end-to-end-SLU',
+     'PyTorch code for end-to-end spoken language understanding (SLU) with ASR-based transfer learning - lorenlugosch/end-to-end-SLU',
+     'github.com'],
+
 ]
 
 playable = [
