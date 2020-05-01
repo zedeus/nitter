@@ -19,6 +19,8 @@ proc createStatusRouter*(cfg: Config) =
 
       if @"scroll".len > 0:
         let replies = await getReplies(@"name", @"id", @"max_position", getAgent())
+        if replies == nil:
+          resp Http404, ""
         resp $renderReplies(replies, prefs, getPath())
 
       let conversation = await getTweet(@"name", @"id", @"max_position", getAgent())

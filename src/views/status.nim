@@ -31,7 +31,6 @@ proc renderReplyThread(thread: Chain; prefs: Prefs; path: string): VNode =
 
 proc renderReplies*(replies: Result[Chain]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="replies", id="r")):
-    if replies == nil: return
     for thread in replies.content:
       if thread == nil: continue
       renderReplyThread(thread, prefs, path)
