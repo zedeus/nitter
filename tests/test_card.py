@@ -107,7 +107,7 @@ class CardTest(BaseTestCase):
         card = Card(Conversation.main + " ")
         self.assert_text(title, card.title)
         self.assert_text(destination, card.destination)
-        self.assertIn('_img', self.get_image_url(card.image + ' img'))
+        self.assertIn('twimg', self.get_image_url(card.image + ' img'))
         if len(description) > 0:
             self.assert_text(description, card.description)
         if large:
@@ -130,7 +130,7 @@ class CardTest(BaseTestCase):
         card = Card(Conversation.main + " ")
         self.assert_text(title, card.title)
         self.assert_text(destination, card.destination)
-        self.assertIn('_img', self.get_image_url(card.image + ' img'))
+        self.assertIn('twimg', self.get_image_url(card.image + ' img'))
         self.assert_element_visible('.card-overlay')
         if len(description) > 0:
             self.assert_text(description, card.description)
