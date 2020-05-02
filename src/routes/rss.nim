@@ -18,7 +18,7 @@ proc showRss*(req: Request; hostname: string; query: Query): Future[(string, str
 
   if names.len == 1:
     (profile, timeline) =
-      await fetchSingleTimeline(names[0], after, getAgent(), query, media=false)
+      await fetchSingleTimeline(after, getAgent(), query, media=false)
   else:
     let multiQuery = query.getMultiQuery(names)
     timeline = await getSearch[Tweet](multiQuery, after, getAgent(), media=false)
@@ -60,18 +60,19 @@ proc createRssRouter*(cfg: Config) =
 
     get "/@name/rss":
       cond '.' notin @"name"
-      let (rss, minId) = await showRss(request, cfg.hostname, Query())
+      let (rss, minId) = await showRss(request, cfg.hostname, Query(fromUser: @[@"name"]))
       respRss(rss, minId)
 
     get "/@name/@tab/rss":
       cond '.' notin @"name"
       cond @"tab" in ["with_replies", "media", "search"]
+      let name = @"name"
       let query =
         case @"tab"
-        of "with_replies": getReplyQuery(@"name")
-        of "media": getMediaQuery(@"name")
-        of "search": initQuery(params(request), name=(@"name"))
-        else: Query()
+        of "with_replies": getReplyQuery(name)
+        of "media": getMediaQuery(name)
+        of "search": initQuery(params(request), name=name)
+        else: Query(fromUser: @[name])
 
       let (rss, minId) = await showRss(request, cfg.hostname, query)
       respRss(rss, minId)
