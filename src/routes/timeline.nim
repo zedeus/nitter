@@ -78,9 +78,10 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
                     rss=rss, images = @[p.getUserpic("_200x200")])
 
 template respTimeline*(timeline: typed) =
-  if timeline.len == 0:
+  let t = timeline
+  if t.len == 0:
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg)
-  resp timeline
+  resp t
 
 proc createTimelineRouter*(cfg: Config) =
   setProfileCacheTime(cfg.profileCacheTime)

@@ -7,10 +7,11 @@ import ".."/[query, types, api, agents]
 import ../views/general
 
 template respResolved*(url, kind: string): untyped =
-  if url.len == 0:
+  let u = url
+  if u.len == 0:
     resp showError("Invalid $1 link" % kind, cfg)
   else:
-    redirect(url)
+    redirect(u)
 
 proc createResolverRouter*(cfg: Config) =
   router resolver:
