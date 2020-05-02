@@ -51,13 +51,14 @@ proc getReplyQuery*(name: string): Query =
 proc genQueryParam*(query: Query; rewriteReplies=true): string =
   var filters: seq[string]
   var param: string
-  let userSearch = query.fromUser.len > 0
+  let rewrite =
+    rewriteReplies and query.fromUser.len > 0 and query.kind != tweets
 
   if query.kind == users:
     return query.text
 
   for i, user in query.fromUser:
-    if rewriteReplies:
+    if rewrite:
       param &= &"(from:{user}(to:{user} OR -filter:replies)) "
     else:
       param &= &"from:{user} "
@@ -68,7 +69,7 @@ proc genQueryParam*(query: Query; rewriteReplies=true): string =
   for f in query.filters:
     filters.add "filter:" & f
   for e in query.excludes:
-    if userSearch and rewriteReplies and e == "replies": continue
+    if rewrite and e == "replies": continue
     filters.add "-filter:" & e
   for i in query.includes:
     filters.add "include:" & i
@@ -83,7 +84,7 @@ proc genQueryParam*(query: Query; rewriteReplies=true): string =
   if query.text.len > 0:
     result &= " " & query.text
 
-  if userSearch and rewriteReplies and result.len >= 500:
+  if rewrite and result.len >= 500:
     return genQueryParam(query, rewriteReplies=false)
 
 proc genQueryUrl*(query: Query): string =
