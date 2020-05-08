@@ -1,9 +1,15 @@
 import strutils, sequtils, asyncdispatch, httpclient
+from jester import Request
 import ../utils, ../prefs
 export utils, prefs
 
+template savePref*(pref, value: string; req: Request; expire=false): typed =
+  if not expire or pref in cookies(req):
+    setCookie(pref, value, daysForward(when expire: -10 else: 360),
+              httpOnly=true, secure=cfg.useHttps)
+
 template cookiePrefs*(): untyped {.dirty.} =
-  getPrefs(request.cookies.getOrDefault("preferences"), cfg)
+  getPrefs(cookies(request))
 
 template getPath*(): untyped {.dirty.} =
   $(parseUri(request.path) ? filterParams(request.params))

@@ -82,8 +82,10 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
 
 proc renderMain*(body: VNode; req: Request; cfg: Config; titleText=""; desc="";
                  rss=""; video=""; images: seq[string] = @[]; ogTitle=""): string =
-  let prefs = getPrefs(req.cookies.getOrDefault("preferences"), cfg)
-  let theme = toLowerAscii(prefs.theme).replace(" ", "_")
+  let prefs = getPrefs(req.cookies)
+  var theme = toLowerAscii(prefs.theme).replace(" ", "_")
+  if "theme" in req.params:
+    theme = toLowerAscii(req.params["theme"]).replace(" ", "_")
 
   let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, titleText, desc, video, images, ogTitle):
