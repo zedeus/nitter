@@ -10,7 +10,9 @@ import routes/[
   unsupported, embed, resolver]
 
 const configPath {.strdefine.} = "./nitter.conf"
-let cfg = getConfig(configPath)
+let (cfg, fullCfg) = getConfig(configPath)
+
+updateDefaultPrefs(fullCfg)
 
 setHmacKey(cfg.hmacKey)
 

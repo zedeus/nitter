@@ -3,6 +3,8 @@ import norm/sqlite
 
 import prefs_impl
 
+genPrefsType()
+
 type
   VideoType* = enum
     vmap, m3u8, mp4
@@ -59,7 +61,6 @@ dbTypes:
           formatIt: dbValue(getTime().toUnix())
         .}: Time
 
-genPrefsType()
 
 type
   QueryKind* = enum
@@ -187,7 +188,6 @@ type
     hostname*: string
     cacheDir*: string
     profileCacheTime*: int
-    defaultTheme*: string
     hmacKey*: string
 
 proc contains*(thread: Chain; tweet: Tweet): bool =

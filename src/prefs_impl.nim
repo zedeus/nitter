@@ -14,7 +14,9 @@ type
     defaultOption*: string
     defaultInput*: string
 
-macro genPrefs(prefDsl: untyped) =
+  PrefList* = OrderedTable[string, seq[Pref]]
+
+macro genPrefs*(prefDsl: untyped) =
   var table = nnkTableConstr.newTree()
   for category in prefDsl:
     table.add nnkExprColonExpr.newTree(newLit($category[0]))
@@ -41,7 +43,7 @@ macro genPrefs(prefDsl: untyped) =
 
   let name = ident("prefList")
   result = quote do:
-    const `name`* = toOrderedTable(`table`)
+    const `name`*: PrefList = toOrderedTable(`table`)
 
 genPrefs:
   Privacy:
@@ -101,46 +103,79 @@ iterator allPrefs*(): Pref =
       yield pref
 
 macro genDefaultPrefs*(): untyped =
-  result = nnkObjConstr.newTree(ident("Prefs"))
-
+  result = nnkStmtList.newTree()
   for pref in allPrefs():
-    let default =
-      case pref.kind
-      of checkbox: newLit(pref.defaultState)
-      of select: newLit(pref.defaultOption)
-      of input: newLit(pref.defaultInput)
+    let
+      ident = ident(pref.name)
+      name = newLit(pref.name)
+      default =
+        case pref.kind
+        of checkbox: newLit(pref.defaultState)
+        of select: newLit(pref.defaultOption)
+        of input: newLit(pref.defaultInput)
 
-    result.add nnkExprColonExpr.newTree(ident(pref.name), default)
+    result.add quote do:
+      defaultPrefs.`ident` = cfg.get("Preferences", `name`, `default`)
+
+macro genCookiePrefs*(): untyped =
+  result = nnkStmtList.newTree()
+  let cookies = ident("cookies")
+  for pref in allPrefs():
+    let
+      name = pref.name
+      ident = ident(pref.name)
+      kind = newLit(pref.kind)
+      options = pref.options
+
+    result.add quote do:
+      if `name` in `cookies`:
+        let value = `cookies`[`name`]
+        when `kind` == input or `name` == "theme":
+          result.`ident` = value
+        elif `kind` == checkbox:
+          result.`ident` = value == "on"
+        else:
+          if value in `options`: result.`ident` = value
 
 macro genUpdatePrefs*(): untyped =
   result = nnkStmtList.newTree()
-
+  let req = ident("request")
   for pref in allPrefs():
-    let ident = ident(pref.name)
-    let value = nnkPrefix.newTree(ident("@"), newLit(pref.name))
+    let
+      name = newLit(pref.name)
+      kind = newLit(pref.kind)
+      options = newLit(pref.options)
+      default = nnkDotExpr.newTree(ident("defaultPrefs"), ident(pref.name))
 
-    case pref.kind
-    of checkbox:
-      result.add quote do: prefs.`ident` = `value` == "on"
-    of input:
-      result.add quote do: prefs.`ident` = xmltree.escape(strip(`value`))
-    of select:
-      let name = pref.name
-      let options = pref.options
-      let default = pref.defaultOption
-      result.add quote do:
-        if `name` == "theme": prefs.`ident` = `value`
-        elif `value` in `options`: prefs.`ident` = `value`
-        else: prefs.`ident` = `default`
+    result.add quote do:
+      let val = @`name`
+      let isDefault =
+        when `kind` == input or `name` == "theme":
+          if `default`.len != val.len: false
+          else: val == `default`
+        elif `kind` == checkbox:
+          (val == "on") == `default`
+        else:
+          val notin `options` or val == `default`
 
-  result.add quote do:
-    cache(prefs)
+      if isDefault:
+        savePref(`name`, "", `req`, expire=true)
+      else:
+        savePref(`name`, val, `req`)
+
+macro genResetPrefs*(): untyped =
+  result = nnkStmtList.newTree()
+  let req = ident("request")
+  for pref in allPrefs():
+    let name = newLit(pref.name)
+    result.add quote do:
+      savePref(`name`, "", `req`, expire=true)
 
 macro genPrefsType*(): untyped =
   let name = nnkPostfix.newTree(ident("*"), ident("Prefs"))
   result = quote do:
     type `name` = object
-      id* {.pk, ro.}: int
+      discard
 
   for pref in allPrefs():
     result[0][2][2].add nnkIdentDefs.newTree(
