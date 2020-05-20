@@ -49,13 +49,15 @@ proc getReplyQuery*(name: string): Query =
   )
 
 proc genQueryParam*(query: Query; rewriteReplies=true): string =
-  var filters: seq[string]
-  var param: string
-  let rewrite =
-    rewriteReplies and query.fromUser.len > 0 and query.kind != tweets
+  var
+    filters: seq[string]
+    param: string
 
   if query.kind == users:
     return query.text
+
+  let rewrite = rewriteReplies and query.fromUser.len > 0 and
+                query.kind notin {tweets, replies}
 
   for i, user in query.fromUser:
     if rewrite:
