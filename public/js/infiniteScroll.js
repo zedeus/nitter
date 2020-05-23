@@ -1,3 +1,4 @@
+// @license http://www.gnu.org/licenses/agpl-3.0.html AGPL-3.0
 function insertBeforeLast(node, elem) {
     node.insertBefore(elem, node.childNodes[node.childNodes.length - 2]);
 }
@@ -61,3 +62,4 @@ window.onload = function() {
         }
     });
 };
+// @license-end
