@@ -24,8 +24,6 @@ jobs:
       sudo: required
       dist: bionic
       language: python
-      addons:
-        chrome: stable
       python:
         - 3.6
       services:
@@ -33,7 +31,13 @@ jobs:
         - xvfb
       script:
         - sudo apt update
-        - sudo apt install --force-yes chromium-browser chromium-chromedriver
+        - sudo apt install --force-yes chromium-chromedriver
+        - wget https://www.dropbox.com/s/ckuoaubd1crrj2k/Linux_x64_737173_chrome-linux.zip -O chrome.zip
+        - unzip chrome.zip
+        - cd chrome-linux
+        - sudo rm /usr/bin/google-chrome
+        - sudo ln -s chrome /usr/bin/google-chrome
+        - cd ..
         - pip3 install --upgrade pip
         - pip3 install -U seleniumbase pytest
         - docker run -d -p 127.0.0.1:8080:8080/tcp $IMAGE_NAME:$TRAVIS_COMMIT
@@ -45,8 +49,6 @@ jobs:
       sudo: required
       dist: bionic
       language: python
-      addons:
-        chrome: stable
       python:
         - 3.6
       services:
@@ -54,7 +56,13 @@ jobs:
         - xvfb
       script:
         - sudo apt update
-        - sudo apt install --force-yes chromium-browser chromium-chromedriver
+        - sudo apt install --force-yes chromium-chromedriver
+        - wget https://www.dropbox.com/s/ckuoaubd1crrj2k/Linux_x64_737173_chrome-linux.zip -O chrome.zip
+        - unzip chrome.zip
+        - cd chrome-linux
+        - sudo rm /usr/bin/google-chrome
+        - sudo ln -s chrome /usr/bin/google-chrome
+        - cd ..
         - pip3 install --upgrade pip
         - pip3 install -U seleniumbase pytest
         - docker build -t $IMAGE_NAME:$TRAVIS_COMMIT .
