@@ -28,19 +28,17 @@ invalid = [
 ]
 
 multiline = [
-    [1102965189392113665, 'piIIowhugs',
+    [1262214452826562567, 'laurenbringe_',
      """
-summoning circle, hope this works 
+Summoning circle
 
-                       🕯
-              🕯              🕯
-        🕯                         🕯
- 
-   🕯         serotonin        🕯
-
-        🕯                          🕯
-              🕯              🕯
-                        🕯"""],
+                   🕯      🕯
+           🕯                       🕯
+                      
+       🕯       Serotonin       🕯
+                        
+          🕯                         🕯
+                   🕯      🕯"""],
 
     [400897186990284800, 'mobile_test_3',
      """
