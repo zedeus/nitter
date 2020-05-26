@@ -87,8 +87,9 @@ proc createTimelineRouter*(cfg: Config) =
   setProfileCacheTime(cfg.profileCacheTime)
 
   router timeline:
-    get "/@name/?@tab?":
+    get "/@name/?@tab?/?":
       cond '.' notin @"name"
+      cond @"name" notin ["pic", "gif", "video"]
       cond @"tab" in ["with_replies", "media", "search", ""]
       let
         prefs = cookiePrefs()

@@ -5,6 +5,7 @@ import jester
 import router_utils
 import ".."/[api, types, agents]
 import ../views/[embed]
+export getVideo
 
 export embed
 

@@ -72,7 +72,7 @@ class ProfileTest(BaseTestCase):
 
     def test_suspended(self):
         self.open_nitter('test')
-        self.assert_text(f'User "test" has been suspended')
+        self.assert_text('User "test" has been suspended')
 
     @parameterized.expand(banner_color)
     def test_banner_color(self, username, color):

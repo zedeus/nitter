@@ -110,7 +110,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
 
 proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
-    tdiv(class="gallery-gif", style=style(maxHeight, "unset")):
+    tdiv(class="gallery-gif", style={maxHeight: "unset"}):
       tdiv(class="attachment"):
         let thumb = getPicUrl(gif.thumb)
         let url = getGifUrl(gif.url)
@@ -124,14 +124,16 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
 proc renderPoll(poll: Poll): VNode =
   buildHtml(tdiv(class="poll")):
     for i in 0 ..< poll.options.len:
-      let leader = if poll.leader == i: " leader" else: ""
-      let perc = $poll.values[i] & "%"
+      let
+        leader = if poll.leader == i: " leader" else: ""
+        perc = poll.values[i] / poll.votes * 100
+        percStr = (&"{perc:>3.0f}").strip(chars={'.'}) & '%'
       tdiv(class=("poll-meter" & leader)):
-        span(class="poll-choice-bar", style=style(width, perc))
-        span(class="poll-choice-value"): text perc
+        span(class="poll-choice-bar", style={width: percStr})
+        span(class="poll-choice-value"): text percStr
         span(class="poll-choice-option"): text poll.options[i]
     span(class="poll-info"):
-      text $poll.votes & " votes • " & poll.status
+      text insertSep($poll.votes, ',') & " votes • " & poll.status
 
 proc renderCardImage(card: Card): VNode =
   buildHtml(tdiv(class="card-image-container")):
@@ -169,11 +171,11 @@ proc renderCard(card: Card; prefs: Prefs; path: string): VNode =
 
 proc renderStats(stats: TweetStats; views: string): VNode =
   buildHtml(tdiv(class="tweet-stats")):
-    span(class="tweet-stat"): icon "comment", $stats.replies
-    span(class="tweet-stat"): icon "retweet", $stats.retweets
-    span(class="tweet-stat"): icon "heart", $stats.likes
+    span(class="tweet-stat"): icon "comment", insertSep($stats.replies, ',')
+    span(class="tweet-stat"): icon "retweet", insertSep($stats.retweets, ',')
+    span(class="tweet-stat"): icon "heart", insertSep($stats.likes, ',')
     if views.len > 0:
-      span(class="tweet-stat"): icon "play", views
+      span(class="tweet-stat"): icon "play", insertSep(views, ',')
 
 proc renderReply(tweet: Tweet): VNode =
   buildHtml(tdiv(class="replying-to")):
@@ -279,7 +281,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
       var views = ""
       renderHeader(tweet)
 
-      if index == 0 and tweet.reply.len > 0:
+      if index == 0 and tweet.reply.len > 0 and
+         (tweet.reply.len > 1 or tweet.reply[0] != tweet.profile.username):
         renderReply(tweet)
 
       tdiv(class="tweet-content media-body", dir="auto"):
@@ -287,9 +290,6 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
 
       if tweet.attribution.isSome:
         renderAttribution(tweet.attribution.get())
-
-      if tweet.quote.isSome:
-        renderQuote(tweet.quote.get(), prefs)
 
       if tweet.card.isSome:
         renderCard(tweet.card.get(), prefs, path)
@@ -303,6 +303,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
         views = "GIF"
       elif tweet.poll.isSome:
         renderPoll(tweet.poll.get())
+
+      if tweet.quote.isSome:
+        renderQuote(tweet.quote.get(), prefs)
 
       if mainTweet:
         p(class="tweet-published"): text getTweetTime(tweet)
