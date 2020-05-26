@@ -5,6 +5,7 @@ import jester
 import router_utils
 import ".."/[query, types, api, agents]
 import ../views/[general, timeline, list]
+export getListTimeline, getListMembers
 
 template respList*(list, timeline: typed) =
   if list.minId.len == 0:

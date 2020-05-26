@@ -87,6 +87,8 @@ type
     tweetId*: string
     color*: string
 
+  PhotoRail* = seq[GalleryPhoto]
+
   Poll* = object
     options*: seq[string]
     values*: seq[int]
@@ -131,9 +133,9 @@ type
     id*: int64
 
   TweetStats* = object
-    replies*: string
-    retweets*: string
-    likes*: string
+    replies*: int
+    retweets*: int
+    likes*: int
 
   Tweet* = ref object
     id*: int64

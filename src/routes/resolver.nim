@@ -5,6 +5,7 @@ import jester
 import router_utils
 import ".."/[query, types, api, agents]
 import ../views/general
+export resolve
 
 template respResolved*(url, kind: string): untyped =
   let u = url

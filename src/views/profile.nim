@@ -9,7 +9,7 @@ proc renderStat(num, class: string; text=""): VNode =
   buildHtml(li(class=class)):
     span(class="profile-stat-header"): text capitalizeAscii(t)
     span(class="profile-stat-num"):
-      text if num.len == 0: "?" else: num
+      text if num.len == 0: "?" else: insertSep(num, ',')
 
 proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-card")):
@@ -57,7 +57,7 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
           renderStat(profile.followers, "followers")
           renderStat(profile.likes, "likes")
 
-proc renderPhotoRail(profile: Profile; photoRail: seq[GalleryPhoto]): VNode =
+proc renderPhotoRail(profile: Profile; photoRail: PhotoRail): VNode =
   buildHtml(tdiv(class="photo-rail-card")):
     tdiv(class="photo-rail-header"):
       a(href=(&"/{profile.username}/media")):
@@ -90,7 +90,7 @@ proc renderProtected(username: string): VNode =
       p: text &"Only confirmed followers have access to @{username}'s tweets."
 
 proc renderProfile*(profile: Profile; timeline: Timeline;
-                    photoRail: seq[GalleryPhoto]; prefs: Prefs; path: string): VNode =
+                    photoRail: PhotoRail; prefs: Prefs; path: string): VNode =
   timeline.query.fromUser = @[profile.username]
   buildHtml(tdiv(class="profile-tabs")):
     if not prefs.hideBanner:

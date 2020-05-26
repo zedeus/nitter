@@ -169,13 +169,13 @@ proc getIntentStats*(profile: var Profile; node: XmlNode) =
     of "following": profile.following = text
 
 proc parseTweetStats*(node: XmlNode): TweetStats =
-  result = TweetStats(replies: "0", retweets: "0", likes: "0")
+  result = TweetStats()
   for action in node.selectAll(".ProfileTweet-actionCountForAria"):
     let text = action.innerText.split()
     case text[1][0 .. 2]
-    of "ret": result.retweets = text[0]
-    of "rep": result.replies = text[0]
-    of "lik": result.likes = text[0]
+    of "ret": result.retweets = text[0].parseInt
+    of "rep": result.replies = text[0].parseInt
+    of "lik": result.likes = text[0].parseInt
 
 proc parseTweetReply*(node: XmlNode): seq[string] =
   let reply = node.select(".ReplyingToContextBelowAuthor")
