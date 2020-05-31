@@ -10,7 +10,7 @@ bin           = @["nitter"]
 
 # Dependencies
 
-requires "nim >= 0.19.9"
+requires "nim >= 1.2.0"
 requires "norm#head"
 requires "jester#head"
 requires "regex == 0.13.1"
@@ -19,6 +19,9 @@ requires "nimcrypto >= 0.4.11"
 requires "karax >= 1.1.2"
 requires "sass"
 requires "markdown#head"
+requires "https://github.com/zedeus/redis#head"
+requires "redpool#head"
+requires "msgpack4nim >= 0.3.1"
 
 
 # Tasks
