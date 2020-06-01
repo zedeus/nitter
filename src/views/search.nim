@@ -1,8 +1,8 @@
 import strutils, strformat, sequtils, unicode, tables
-import karax/[karaxdsl, vdom, vstyles]
+import karax/[karaxdsl, vdom]
 
 import renderutils, timeline
-import ".."/[types, formatters, query]
+import ".."/[types, query]
 
 let toggles = {
   "nativeretweets": "Retweets",
@@ -93,13 +93,15 @@ proc renderTweetSearch*(results: Result[Tweet]; prefs: Prefs; path: string): VNo
     if query.fromUser.len > 1:
       tdiv(class="timeline-header"):
         text query.fromUser.join(" | ")
+
+    if query.fromUser.len > 0:
+      renderProfileTabs(query, query.fromUser.join(","))
+
     if query.fromUser.len == 0 or query.kind == tweets:
       tdiv(class="timeline-header"):
         renderSearchPanel(query)
 
-    if query.fromUser.len > 0:
-      renderProfileTabs(query, query.fromUser.join(","))
-    else:
+    if query.fromUser.len == 0:
       renderSearchTabs(query)
 
     renderTimelineTweets(results, prefs, path)

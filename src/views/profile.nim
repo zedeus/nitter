@@ -58,14 +58,15 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
           renderStat(profile.likes, "likes")
 
 proc renderPhotoRail(profile: Profile; photoRail: PhotoRail): VNode =
+  let count = insertSep($profile.media, ',')
   buildHtml(tdiv(class="photo-rail-card")):
     tdiv(class="photo-rail-header"):
       a(href=(&"/{profile.username}/media")):
-        icon "picture", $profile.media & " Photos and videos"
+        icon "picture", count & " Photos and videos"
 
     input(id="photo-rail-grid-toggle", `type`="checkbox")
     label(`for`="photo-rail-grid-toggle", class="photo-rail-header-mobile"):
-      icon "picture", $profile.media & " Photos and videos"
+      icon "picture", count & " Photos and videos"
       icon "down"
 
     tdiv(class="photo-rail-grid"):
@@ -73,7 +74,7 @@ proc renderPhotoRail(profile: Profile; photoRail: PhotoRail): VNode =
         if i == 16: break
         a(href=(&"/{profile.username}/status/{photo.tweetId}#m"),
           style={backgroundColor: photo.color}):
-          genImg(photo.url & ":thumb")
+          genImg(photo.url & (if "format" in photo.url: "" else: ":thumb"))
 
 proc renderBanner(profile: Profile): VNode =
   buildHtml():
@@ -89,7 +90,7 @@ proc renderProtected(username: string): VNode =
       h2: text "This account's tweets are protected."
       p: text &"Only confirmed followers have access to @{username}'s tweets."
 
-proc renderProfile*(profile: Profile; timeline: Timeline;
+proc renderProfile*(profile: Profile; timeline: var Timeline;
                     photoRail: PhotoRail; prefs: Prefs; path: string): VNode =
   timeline.query.fromUser = @[profile.username]
   buildHtml(tdiv(class="profile-tabs")):

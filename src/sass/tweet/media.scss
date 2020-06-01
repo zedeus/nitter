@@ -13,7 +13,7 @@
 
     .still-image {
         width: 100%;
-        display: block;
+        display: flex;
     }
 }
 
@@ -67,17 +67,17 @@
     display: inline-block;
 }
 
-.single-image {
-    display: inline-block;
-    width: 100%;
-    max-height: 600px;
+// .single-image {
+//     display: inline-block;
+//     width: 100%;
+//     max-height: 600px;
 
-    .attachments {
-        width: unset;
-        max-height: unset;
-        display: inherit;
-    }
-}
+//     .attachments {
+//         width: unset;
+//         max-height: unset;
+//         display: inherit;
+//     }
+// }
 
 .overlay-circle {
     border-radius: 50%;

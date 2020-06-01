@@ -42,7 +42,8 @@
 
     img {
         display: block;
-        width: calc(100% - 8px);
+        box-sizing: border-box;
+        width: 100%;
         height: 100%;
         margin: 0;
         border: 4px solid var(--darker_grey);

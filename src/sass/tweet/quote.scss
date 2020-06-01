@@ -5,10 +5,10 @@
     border: solid 1px var(--dark_grey);
     border-radius: 10px;
     background-color: var(--bg_elements);
-    overflow: auto;
-    padding: 6px;
-    position: relative;
+    overflow: hidden;
     pointer-events: all;
+    position: relative;
+    width: 100%;
 
     &:hover {
         border-color: var(--grey);
@@ -17,91 +17,73 @@
     &.unavailable:hover {
         border-color: var(--dark_grey);
     }
+
+    .tweet-name-row {
+        padding: 6px 6px 0px 6px;
+    }
+
+    .quote-text {
+        overflow: hidden;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        padding: 3px 6px 6px 6px;
+    }
+
+    .show-thread {
+        padding: 0px 6px 3px 6px;
+        margin-top: -3px;
+    }
+
+    .replying-to {
+        padding: 0px 6px;
+        margin: unset;
+    }
 }
 
 .unavailable-quote {
-    padding: 6px;
+    padding: 12px;
 }
 
 .quote-link {
-    height: 100%;
     width: 100%;
+    height: 100%;
     left: 0;
     top: 0;
     position: absolute;
 }
 
-.quote .quote-link {
-    z-index: 1;
-}
-
-.quote-text {
-    overflow: hidden;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
 .quote-media-container {
+    max-height: 300px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: hidden;
-    max-height: 102px;
-    width: 102px;
-    float: left;
-    margin-right: 7px;
-    border-radius: 7px;
-    position: relative;
-}
 
-.quote-media {
-    display: flex;
-    justify-content: center;
-    pointer-events: none;
-
-    img {
-        width: 100%;
-        height: 100%;
-        align-self: center;
+    .card {
+        margin: unset;
     }
-}
 
-.quote-badge {
-    left: 0;
-    bottom: 0;
-    position: absolute;
-    z-index: 1;
-    align-self: flex-end;
-}
+    .media-gif {
+        width: 100%;
+    }
 
-.quote-badge-text {
-    margin: 4px;
-    background: $shadow;
-    border-radius: 4px;
-    color: #fffffff0;
-    padding: 1px 3px;
-    font-size: 12px;
-    font-weight: bold;
-}
+    .attachments {
+        border-radius: 0;
+    }
 
-.quote-sensitive {
-    background: var(--darker_grey);
-    width: 102px;
-    height: 102px;
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    .gallery-gif .attachment {
+        display: flex;
+        justify-content: center;
+        background-color: var(--bg_color);
 
-.quote-sensitive-icon {
-    font-size: 40px;
-    color: var(--grey);
-}
+        video {
+            height: unset;
+            width: unset;
+        }
+    }
 
-@media(max-width: 600px) {
-    .quote-media-container {
-        width: 70px;
-        max-height: 70px;
+    .gallery-video, .gallery-gif {
+        max-height: 300px;
+    }
+
+    .still-image img {
+        max-height: 250px
     }
 }

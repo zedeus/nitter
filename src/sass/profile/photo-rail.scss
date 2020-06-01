@@ -14,9 +14,10 @@
     }
 
     &-header-mobile {
-        padding: 5px 12px 0;
         display: none;
-        width: calc(100% - 24px);
+        box-sizing: border-box;
+        padding: 5px 12px 0;
+        width: 100%;
         float: unset;
         color: var(--accent);
         justify-content: space-between;
