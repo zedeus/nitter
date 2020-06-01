@@ -9,7 +9,7 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - All requests go through the backend, client never talks to Twitter
 - Prevents Twitter from tracking your IP or JavaScript fingerprint
 - Unofficial API (no rate limits or developer account required)
-- Lightweight (for [@nim_lang](https://nitter.net/nim_lang), 36KB vs 580KB from twitter.com)
+- Lightweight (for [@nim_lang](https://nitter.net/nim_lang), 58KB vs 784KB from twitter.com)
 - RSS feeds
 - Themes
 - Mobile support (responsive design)
@@ -18,7 +18,7 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 ## Todo (roughly in this order)
 
 - Embeds
-- Caching + archiving tweets/profiles
+- Archiving tweets/profiles
 - Simple account system with customizable feed
 - Json API endpoints
 - Emoji support (WIP, uses native font for now)
@@ -36,12 +36,14 @@ It's basically impossible to use Twitter without JavaScript enabled. If you try,
 you're redirected to the legacy mobile version which is awful both functionally
 and aesthetically. For privacy-minded folks, preventing JavaScript analytics and
 potential IP-based tracking is important, but apart from using the legacy mobile
-version and a VPN, it's impossible.
+version and a VPN, it's impossible. This is is especially relevant now that Twitter
+[removed the ability](https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws) 
+for users to control whether their data gets sent to advertisers.
 
 Using an instance of Nitter (hosted on a VPS for example), you can browse
 Twitter without JavaScript while retaining your privacy. In addition to
 respecting your privacy, Nitter is on average around 15 times lighter than
-Twitter, and in some cases serves pages faster.
+Twitter, and in most cases serves pages faster (eg. timelines 2-4x faster).
 
 In the future a simple account system will be added that lets you follow Twitter
 users, allowing you to have a clean chronological timeline without needing a
@@ -57,8 +59,16 @@ To compile Nitter you need a Nim installation, see
 [nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to
 install it system-wide or in the user directory you create below.
 
-You also need to install `libsass` to compile the scss files. On Ubuntu and
-Debian, you can use `libsass-dev`.
+To compile the scss files, you need to install `libsass`. On Ubuntu and Debian,
+you can use `libsass-dev`.
+
+Redis is required for caching and in the future for account info. It should be
+available on most distros as `redis` or `redis-server` (Ubuntu/Debian).
+Running it with the default config is fine, Nitter's default config is set to
+use the default Redis port and localhost.
+
+Here's how to create a `nitter` user, clone the repo, and build the project
+along with the scss.
 
 ```bash
 # useradd -m nitter
@@ -70,10 +80,11 @@ $ nimble scss
 $ mkdir ./tmp
 ```
 
-Set your hostname, port, page title and HMAC key in `nitter.conf`, then run
-Nitter by executing `./nitter`. You should run Nitter behind a reverse proxy
-such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for
-better security.
+Set your hostname, port, HMAC key, https (must be correct for cookies), and
+Redis info in `nitter.conf`, run `redis-server --daemonize yes`, then run Nitter
+by executing `./nitter`. You should run Nitter behind a reverse proxy such as
+[Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for security
+reasons.
 
 To build and run Nitter in Docker:
 ```bash
@@ -85,6 +96,8 @@ A prebuilt Docker image is provided as well:
 ```bash
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d -p 8080:8080 zedeus/nitter:latest
 ```
+
+Note the Docker commands expect a `nitter.conf` file in the directory you run them.
 
 To run Nitter via systemd you can use this service file:
 

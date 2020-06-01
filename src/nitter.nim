@@ -15,6 +15,7 @@ let (cfg, fullCfg) = getConfig(configPath)
 updateDefaultPrefs(fullCfg)
 setCacheTimes(cfg)
 setHmacKey(cfg.hmacKey)
+
 initRedisPool(cfg)
 asyncCheck initTokenPool(cfg)
 
