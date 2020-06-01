@@ -19,8 +19,7 @@ template `?`*(js: JsonNode): untyped =
 template `with`*(ident, value, body): untyped =
   block:
     let ident {.inject.} = value
-    if ident != nil:
-      body
+    if ident != nil: body
 
 template `with`*(ident; value: JsonNode; body): untyped =
   block:

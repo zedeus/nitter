@@ -19,11 +19,11 @@ proc fetchToken(): Future[Token] {.async.} =
   except: discard
 
   if pos == -1: echo "token parse fail"; return
-  result = Token(tok: resp[pos+3 .. pos+21], limit: 187, remaining: 187,
+  result = Token(tok: resp[pos+3 .. pos+21], remaining: 187,
                  reset: getTime() + 15.minutes, init: getTime())
 
 proc expired(token: Token): bool {.inline.} =
-  const expirationTime = 1.hours
+  const expirationTime = 2.hours
   result = token.init < getTime() - expirationTime
 
 proc isLimited(token: Token): bool {.inline.} =
@@ -54,6 +54,6 @@ proc poolTokens*(amount: int) {.async.} =
 
 proc initTokenPool*(cfg: Config) {.async.} =
   while true:
-    if tokenPool.filterIt(not it.isLimited).len < cfg.minTokens:
-      await poolTokens(min(5, cfg.minTokens - tokenPool.len))
+    if tokenPool.countIt(not it.isLimited) < cfg.minTokens:
+      await poolTokens(min(3, cfg.minTokens - tokenPool.len))
     await sleepAsync(4000)

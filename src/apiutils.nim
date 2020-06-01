@@ -36,7 +36,6 @@ proc fetch*(url: Uri; retried=false; oldApi=false): Future[JsonNode] {.async.} =
 
     const rl = "x-rate-limit-"
     if not oldApi and resp.headers.hasKey(rl & "limit"):
-      token.limit = parseInt(resp.headers[rl & "limit"])
       token.remaining = parseInt(resp.headers[rl & "remaining"])
       token.reset = fromUnix(parseInt(resp.headers[rl & "reset"]))
 
@@ -54,7 +53,7 @@ proc fetch*(url: Uri; retried=false; oldApi=false): Future[JsonNode] {.async.} =
       echo "bad token"
   except:
     echo "error: ", url
-    return nil
+    result = nil
   finally:
     if keepToken:
       token.release()

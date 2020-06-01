@@ -1,4 +1,4 @@
-import asyncdispatch, httpclient, uri, json, strutils, options
+import asyncdispatch, httpclient, uri, strutils, json
 import types, query, formatters, consts, apiutils, parser
 
 proc getGraphProfile*(username: string): Future[Profile] {.async.} =
