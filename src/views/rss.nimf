@@ -2,9 +2,9 @@
 #import strutils, xmltree, strformat, options
 #import ../types, ../utils, ../formatters
 #
-#proc getTitle(tweet: Tweet; prefs: Prefs; hostname: string): string =
+#proc getTitle(tweet: Tweet; prefs: Prefs; retweet: bool): string =
 #if tweet.pinned: result = "Pinned: "
-#elif tweet.retweet.isSome: result = "RT: "
+#elif retweet: result = "RT: "
 #elif tweet.reply.len > 0: result = "R: "
 #end if
 #result &= xmltree.escape(stripHtml(tweet.text))
@@ -20,6 +20,7 @@
 #end proc
 #
 #proc renderRssTweet(tweet: Tweet; prefs: Prefs; hostname: string): string =
+#let tweet = tweet.retweet.get(tweet)
 #let text = replaceUrl(tweet.text, prefs, absolute=hostname)
 #if tweet.quote.isSome and get(tweet.quote).available:
 #let quoteLink = hostname & getLink(get(tweet.quote))
@@ -43,13 +44,15 @@
 #
 #proc renderRssTweets(tweets: seq[Tweet]; prefs: Prefs; hostname: string): string =
 #var links: seq[string]
-#for tweet in tweets:
+#for t in tweets:
+#let retweet = t.retweet.isSome
+#let tweet = if retweet: t.retweet.get else: t
 #let link = getLink(tweet)
 #if link in links: continue
 #end if
 #links.add link
 <item>
-  <title>${getTitle(tweet, prefs, hostname)}</title>
+  <title>${getTitle(tweet, prefs, retweet)}</title>
   <dc:creator>@${tweet.profile.username}</dc:creator>
   <description><![CDATA[${renderRssTweet(tweet, prefs, hostname).strip(chars={'\n'})}]]></description>
   <pubDate>${getRfc822Time(tweet)}</pubDate>
