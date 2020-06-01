@@ -22,7 +22,7 @@ proc initRedisPool*(cfg: Config) =
                                 host=cfg.redisHost, port=cfg.redisPort)
   except OSError:
     echo "Failed to connect to Redis."
-    quit()
+    quit(1)
 
 template toKey(p: Profile): string = "p:" & toLower(p.username)
 template toKey(v: Video): string = "v:" & v.videoId
