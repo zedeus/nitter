@@ -28,6 +28,7 @@ proc stripHtml*(text: string): string =
   for el in html.findAll("a"):
     let link = el.attr("href")
     if "http" in link:
+      if el.len == 0: continue
       el[0].text = link
   html.innerText()
 
@@ -94,9 +95,32 @@ proc getRfc822Time*(tweet: Tweet): string =
 proc getTweetTime*(tweet: Tweet): string =
   tweet.time.format("h:mm tt' · 'MMM d', 'YYYY")
 
-proc getLink*(tweet: Tweet | Quote; focus=true): string =
+proc getShortTime*(tweet: Tweet): string =
+  let
+    now = now().utc
+    then = tweet.time.utc
+    since = now - then
+
+  if now.year != then.year:
+    result = tweet.time.format("d MMM yyyy")
+  elif since.inDays >= 1:
+    result = tweet.time.format("MMM d")
+  elif since.inHours >= 1:
+    result = $since.inHours & "h"
+  elif since.inMinutes >= 1:
+    result = $since.inMinutes & "m"
+  elif since.inSeconds > 1:
+    result = $since.inSeconds & "s"
+  else:
+    # this shouldn't happen, but just in case
+    result = "now"
+
+proc getLink*(tweet: Tweet; focus=true): string =
   if tweet.id == 0: return
-  result = &"/{tweet.profile.username}/status/{tweet.id}"
+  var username = tweet.profile.username
+  if username.len == 0:
+    username = "i"
+  result = &"/{username}/status/{tweet.id}"
   if focus: result &= "#m"
 
 proc getTombstone*(text: string): string =
@@ -114,8 +138,7 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
   let p = {
     "f": $query.kind,
     "q": genQueryParam(query),
-    "src": "typd",
-    "max_position": params.getOrDefault("max_position", "0")
+    "src": "typed_query"
   }
 
   result = $(parseUri("https://twitter.com") / path ? p)
