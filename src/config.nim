@@ -16,14 +16,21 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     address: cfg.get("Server", "address", "0.0.0.0"),
     port: cfg.get("Server", "port", 8080),
     useHttps: cfg.get("Server", "https", true),
-    staticDir: cfg.get("Server", "staticDir", "./public"),
     title: cfg.get("Server", "title", "Nitter"),
     hostname: cfg.get("Server", "hostname", "nitter.net"),
+    staticDir: cfg.get("Server", "staticDir", "./public"),
 
     cacheDir: cfg.get("Cache", "directory", "/tmp/nitter"),
-    profileCacheTime: cfg.get("Cache", "profileMinutes", 10),
+    listCacheTime: cfg.get("Cache", "listMinutes", 120),
+    rssCacheTime: cfg.get("Cache", "rssMinutes", 10),
 
-    hmacKey: cfg.get("Config", "hmacKey", "secretkey")
+    redisHost: cfg.get("Cache", "redisHost", "localhost"),
+    redisPort: cfg.get("Cache", "redisPort", 6379),
+    redisConns: cfg.get("Cache", "redisConnections", 20),
+    redisMaxConns: cfg.get("Cache", "redisMaxConnections", 30),
+
+    hmacKey: cfg.get("Config", "hmacKey", "secretkey"),
+    minTokens: cfg.get("Config", "tokenCount", 10),
   )
 
   return (conf, cfg)
