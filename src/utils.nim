@@ -22,6 +22,7 @@ proc getHmac*(data: string): string =
   ($hmac(sha256, hmacKey, data))[0 .. 12]
 
 proc getVidUrl*(link: string): string =
+  if link.len == 0: return
   let
     sig = getHmac(link)
     url = encodeUrl(link)
