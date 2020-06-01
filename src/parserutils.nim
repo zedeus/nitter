@@ -27,10 +27,10 @@ template `with`*(ident; value: JsonNode; body): untyped =
     if ident != nil and ident.kind != JNull:
       body
 
-proc getCursor*(js: JsonNode): string =
+template getCursor*(js: JsonNode): string =
   js{"content", "operation", "cursor", "value"}.getStr
 
-proc parseTime(time: string; f: static string; flen: int): Time =
+template parseTime(time: string; f: static string; flen: int): Time =
   if time.len != flen: return
   parseTime(time, f, localTimezone).utc.toTime
 
@@ -40,20 +40,19 @@ proc getDateTime*(js: JsonNode): Time =
 proc getTime*(js: JsonNode): Time =
   parseTime(js.getStr, "ddd MMM dd hh:mm:ss \'+0000\' yyyy", 30)
 
-proc getId*(id: string): string =
+proc getId*(id: string): string {.inline.} =
   let start = id.rfind("-")
   if start < 0: return id
   id[start + 1 ..< id.len]
 
-proc getId*(js: JsonNode): int64 =
+proc getId*(js: JsonNode): int64 {.inline.} =
   if js == nil: return
   case js.kind
   of JString: return parseBiggestInt(js.getStr("0"))
   of JInt: return js.getBiggestInt()
   else: return 0
 
-proc getStrVal*(js: JsonNode; default=""): string =
-  if js == nil: return default
+template getStrVal*(js: JsonNode; default=""): string =
   js{"string_value"}.getStr(default)
 
 proc getCardUrl*(js: JsonNode; kind: CardKind): string =
