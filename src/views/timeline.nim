@@ -10,16 +10,22 @@ proc getQuery(query: Query): string =
   if result.len > 0:
     result &= "&"
 
-proc renderNewer*(query: Query; path: string): VNode =
-  let q = genQueryUrl(query)
-  let url = if q.len > 0: "?" & q else: ""
+proc renderToTop*(focus="#"): VNode =
+  buildHtml(tdiv(class="top-ref")):
+    icon "down", href=focus
+
+proc renderNewer*(query: Query; path: string; focus=""): VNode =
+  let
+    q = genQueryUrl(query)
+    url = if q.len > 0: "?" & q else: ""
+    p = if focus.len > 0: path.replace("#m", focus) else: path
   buildHtml(tdiv(class="timeline-item show-more")):
-    a(href=(path & url)):
+    a(href=(p & url)):
       text "Load newest"
 
-proc renderMore*(query: Query; minId: string; focus=""): VNode =
+proc renderMore*(query: Query; cursor: string; focus=""): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"?{getQuery(query)}max_position={minId}{focus}")):
+    a(href=(&"?{getQuery(query)}cursor={encodeUrl(cursor)}{focus}")):
       text "Load more"
 
 proc renderNoMore(): VNode =
@@ -32,10 +38,6 @@ proc renderNoneFound(): VNode =
     h2(class="timeline-none"):
       text "No items found"
 
-proc renderToTop(): VNode =
-  buildHtml(tdiv(class="top-ref")):
-    icon "down", href="#"
-
 proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="thread-line")):
     let sortedThread = thread.sortedByIt(it.id)
@@ -43,10 +45,16 @@ proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
       let show = i == thread.high and sortedThread[0].id != tweet.threadId
       let header = if tweet.pinned or tweet.retweet.isSome: "with-header " else: ""
       renderTweet(tweet, prefs, path, class=(header & "thread"),
-                  index=i, total=thread.high, showThread=show)
+                  index=i, last=(i == thread.high), showThread=show)
 
-proc threadFilter(it: Tweet; thread: int64): bool =
-  it.retweet.isNone and it.reply.len == 0 and it.threadId == thread
+proc threadFilter(tweets: openArray[Tweet]; threads: openArray[int64]; it: Tweet): seq[Tweet] =
+  result = @[it]
+  if it.retweet.isSome or it.replyId in threads: return
+  for t in tweets:
+    if t.id == result[0].replyId:
+      result.insert t
+    elif t.replyId == result[0].id:
+      result.add t
 
 proc renderUser(user: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-item")):
@@ -72,8 +80,8 @@ proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs; path=""): VNod
     if results.content.len > 0:
       for user in results.content:
         renderUser(user, prefs)
-      if results.minId != "0":
-        renderMore(results.query, results.minId)
+      if results.bottom.len > 0:
+        renderMore(results.query, results.bottom)
       renderToTop()
     elif results.beginning:
       renderNoneFound()
@@ -86,24 +94,31 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): 
       renderNewer(results.query, parseUri(path).path)
 
     if results.content.len == 0:
-      renderNoneFound()
+      if not results.beginning:
+        renderNoMore()
+      else:
+        renderNoneFound()
     else:
-      var threads: seq[int64]
-      var retweets: seq[int64]
+      var
+        threads: seq[int64]
+        retweets: seq[int64]
+
       for tweet in results.content:
-        if tweet.threadId in threads or tweet.id in retweets: continue
-        if tweet.pinned and prefs.hidePins: continue
-        let thread = results.content.filterIt(threadFilter(it, tweet.threadId))
+        let rt = if tweet.retweet.isSome: get(tweet.retweet).id else: 0
+
+        if tweet.id in threads or rt in retweets or
+           tweet.pinned and prefs.hidePins: continue
+
+        let thread = results.content.threadFilter(threads, tweet)
         if thread.len < 2:
-          if tweet.retweet.isSome:
-            retweets &= tweet.id
-          renderTweet(tweet, prefs, path, showThread=tweet.hasThread)
+          var hasThread = tweet.hasThread
+          if rt != 0:
+            retweets &= rt
+            hasThread = get(tweet.retweet).hasThread
+          renderTweet(tweet, prefs, path, showThread=hasThread)
         else:
           renderThread(thread, prefs, path)
-          threads &= tweet.threadId
+          threads &= thread.mapIt(it.id)
 
-      if results.hasMore or results.query.kind != posts:
-        renderMore(results.query, results.minId)
-      else:
-        renderNoMore()
+      renderMore(results.query, results.bottom)
       renderToTop()

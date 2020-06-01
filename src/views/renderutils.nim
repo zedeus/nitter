@@ -1,7 +1,6 @@
-import strutils, xmltree
+import strutils
 import karax/[karaxdsl, vdom, vstyles]
-
-import ../types, ../utils
+import ".."/[types, utils]
 
 proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
   var c = "icon-" & icon

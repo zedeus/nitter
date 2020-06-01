@@ -2,7 +2,7 @@ import strformat
 import karax/[karaxdsl, vdom]
 
 import renderutils
-import ".."/[types]
+import ".."/[types, utils]
 
 proc renderListTabs*(query: Query; path: string): VNode =
   buildHtml(ul(class="tab")):
@@ -11,10 +11,18 @@ proc renderListTabs*(query: Query; path: string): VNode =
     li(class=query.getTabClass(userList)):
       a(href=(path & "/members")): text "Members"
 
-proc renderList*(body: VNode; query: Query; name, list: string): VNode =
+proc renderList*(body: VNode; query: Query; list: List): VNode =
   buildHtml(tdiv(class="timeline-container")):
-    tdiv(class="timeline-header"):
-      text &"\"{list}\" by @{name}"
+    if list.banner.len > 0:
+      tdiv(class="timeline-banner"):
+        a(href=getPicUrl(list.banner), target="_blank"):
+          genImg(list.banner)
 
-    renderListTabs(query, &"/{name}/lists/{list}")
+    tdiv(class="timeline-header"):
+      text &"\"{list.name}\" by @{list.username}"
+
+      tdiv(class="timeline-description"):
+        text list.description
+
+    renderListTabs(query, &"/{list.username}/lists/{list.name}")
     body

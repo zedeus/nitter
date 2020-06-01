@@ -13,16 +13,26 @@
 }
 
 .timeline-header {
+    width: 100%;
     background-color: var(--bg_panel);
     text-align: center;
     padding: 8px;
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
+    box-sizing: border-box;
 
     button {
         float: unset;
     }
+}
+
+.timeline-banner img {
+    width: 100%;
+}
+
+.timeline-description {
+    font-weight: normal;
 }
 
 .tab {

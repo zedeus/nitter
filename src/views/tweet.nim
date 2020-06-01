@@ -4,11 +4,11 @@ import karax/[karaxdsl, vdom, vstyles]
 import renderutils
 import ".."/[types, utils, formatters]
 
-proc renderHeader(tweet: Tweet): VNode =
+proc renderHeader(tweet: Tweet; retweet=""): VNode =
   buildHtml(tdiv):
-    if tweet.retweet.isSome:
+    if retweet.len > 0:
       tdiv(class="retweet-header"):
-        span: icon "retweet", get(tweet.retweet).by & " retweeted"
+        span: icon "retweet", retweet & " retweeted"
 
     if tweet.pinned:
       tdiv(class="pinned"):
@@ -24,31 +24,24 @@ proc renderHeader(tweet: Tweet): VNode =
           linkUser(tweet.profile, class="username")
 
         span(class="tweet-date"):
-          a(href=getLink(tweet), title=tweet.getTime()):
-            text tweet.shortTime
+          a(href=getLink(tweet), title=tweet.getTime):
+            text tweet.getShortTime
 
 proc renderAlbum(tweet: Tweet): VNode =
   let
     groups = if tweet.photos.len < 3: @[tweet.photos]
              else: tweet.photos.distribute(2)
 
-  if groups.len == 1 and groups[0].len == 1:
-    buildHtml(tdiv(class="single-image")):
-      tdiv(class="attachments gallery-row"):
-        a(href=getPicUrl(groups[0][0] & "?name=orig"), class="still-image",
-          target="_blank"):
-            genImg(groups[0][0])
-  else:
-    buildHtml(tdiv(class="attachments")):
-      for i, photos in groups:
-        let margin = if i > 0: ".25em" else: ""
-        let flex = if photos.len > 1 or groups.len > 1: "flex" else: "block"
-        tdiv(class="gallery-row", style={marginTop: margin}):
-          for photo in photos:
-            tdiv(class="attachment image"):
-              a(href=getPicUrl(photo & "?name=orig"), class="still-image",
-                target="_blank", style={display: flex}):
-                genImg(photo)
+  buildHtml(tdiv(class="attachments")):
+    for i, photos in groups:
+      let margin = if i > 0: ".25em" else: ""
+      tdiv(class="gallery-row", style={marginTop: margin}):
+        for photo in photos:
+          tdiv(class="attachment image"):
+            var url = photo
+            if "=orig" notin url: url &= "?name=orig"
+            a(href=getPicUrl(url), class="still-image", target="_blank"):
+              genImg(photo)
 
 proc isPlaybackEnabled(prefs: Prefs; video: Video): bool =
   case video.playbackType
@@ -88,7 +81,8 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
         elif not prefs.isPlaybackEnabled(video):
           renderVideoDisabled(video, path)
         else:
-          let source = getVidUrl(video.url)
+          let vid = video.variants.filterIt(it.videoType == video.playbackType)
+          let source = getVidUrl(vid[0].url)
           case video.playbackType
           of mp4:
             if prefs.muteVideos:
@@ -138,7 +132,7 @@ proc renderPoll(poll: Poll): VNode =
 proc renderCardImage(card: Card): VNode =
   buildHtml(tdiv(class="card-image-container")):
     tdiv(class="card-image"):
-      img(src=getPicUrl(get(card.image)))
+      img(src=getPicUrl(card.image), alt="")
       if card.kind == player:
         tdiv(class="card-overlay"):
           tdiv(class="overlay-circle"):
@@ -151,9 +145,8 @@ proc renderCardContent(card: Card): VNode =
     span(class="card-destination"): text card.dest
 
 proc renderCard(card: Card; prefs: Prefs; path: string): VNode =
-  const largeCards = {summaryLarge, liveEvent, promoWebsite,
-                      promoVideo, promoVideoConvo}
-  let large = if card.kind in largeCards: " large" else: ""
+  const smallCards = {player, summary}
+  let large = if card.kind notin smallCards: " large" else: ""
   let url = replaceUrl(card.url, prefs)
 
   buildHtml(tdiv(class=("card" & large))):
@@ -164,7 +157,7 @@ proc renderCard(card: Card; prefs: Prefs; path: string): VNode =
           renderCardContent(card)
     else:
       a(class="card-container", href=url):
-        if card.image.isSome:
+        if card.image.len > 0:
           renderCardImage(card)
         tdiv(class="card-content-container"):
           renderCardContent(card)
@@ -184,13 +177,6 @@ proc renderReply(tweet: Tweet): VNode =
       if i > 0: text " "
       a(href=("/" & u)): text "@" & u
 
-proc renderReply(quote: Quote): VNode =
-  buildHtml(tdiv(class="replying-to")):
-    text "Replying to "
-    for i, u in quote.reply:
-      if i > 0: text " "
-      a(href=("/" & u)): text "@" & u
-
 proc renderAttribution(profile: Profile): VNode =
   let avatarUrl = getPicUrl(profile.getUserpic("_200x200"))
   buildHtml(a(class="attribution", href=("/" & profile.username))):
@@ -206,19 +192,17 @@ proc renderMediaTags(tags: seq[Profile]): VNode =
       if i < tags.high:
         text ", "
 
-proc renderQuoteMedia(quote: Quote): VNode =
+proc renderQuoteMedia(quote: Tweet; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="quote-media-container")):
-    if quote.thumb.len > 0:
-      tdiv(class="quote-media"):
-        genImg(quote.thumb)
-        if quote.badge.len > 0:
-          tdiv(class="quote-badge"):
-            tdiv(class="quote-badge-text"): text quote.badge
-    elif quote.sensitive:
-      tdiv(class="quote-sensitive"):
-        icon "attention", class="quote-sensitive-icon"
+    if quote.photos.len > 0:
+      renderAlbum(quote)
+      # genImg(quote.photos[0])
+    elif quote.video.isSome:
+      renderVideo(quote.video.get(), prefs, path)
+    elif quote.gif.isSome:
+      renderGif(quote.gif.get(), prefs)
 
-proc renderQuote(quote: Quote; prefs: Prefs): VNode =
+proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
   if not quote.available:
     return buildHtml(tdiv(class="quote unavailable")):
       tdiv(class="unavailable-quote"):
@@ -227,25 +211,31 @@ proc renderQuote(quote: Quote; prefs: Prefs): VNode =
         else:
           text "This tweet is unavailable"
 
-  buildHtml(tdiv(class="quote")):
+  buildHtml(tdiv(class="quote quote-big")):
     a(class="quote-link", href=getLink(quote))
 
-    if quote.thumb.len > 0 or quote.sensitive:
-      renderQuoteMedia(quote)
+    tdiv(class="tweet-name-row"):
+      tdiv(class="fullname-and-username"):
+        linkUser(quote.profile, class="fullname")
+        linkUser(quote.profile, class="username")
 
-    tdiv(class="fullname-and-username"):
-      linkUser(quote.profile, class="fullname")
-      linkUser(quote.profile, class="username")
+      span(class="tweet-date"):
+        a(href=getLink(quote), title=quote.getTime):
+          text quote.getShortTime
 
     if quote.reply.len > 0:
       renderReply(quote)
 
-    tdiv(class="quote-text"):
-      verbatim replaceUrl(quote.text, prefs)
+    if quote.text.len > 0:
+      tdiv(class="quote-text"):
+        verbatim replaceUrl(quote.text, prefs)
 
     if quote.hasThread:
       a(class="show-thread", href=getLink(quote)):
         text "Show this thread"
+
+    if quote.photos.len > 0 or quote.video.isSome or quote.gif.isSome:
+      renderQuoteMedia(quote, prefs, path)
 
 proc renderLocation*(tweet: Tweet): string =
   let (place, url) = tweet.getLocation()
@@ -258,11 +248,10 @@ proc renderLocation*(tweet: Tweet): string =
       text place
   return $node
 
-proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
-                  index=0; total=(-1); last=false; showThread=false;
-                  mainTweet=false): VNode =
+proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
+                  last=false; showThread=false; mainTweet=false; afterTweet=false): VNode =
   var divClass = class
-  if index == total or last:
+  if index == -1 or last:
     divClass = "thread-last " & class
 
   if not tweet.available:
@@ -273,15 +262,22 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
         else:
           text "This tweet is unavailable"
 
+  let fullTweet = tweet
+  var retweet: string
+  var tweet = fullTweet
+  if tweet.retweet.isSome:
+    tweet = tweet.retweet.get
+    retweet = fullTweet.profile.fullname
+
   buildHtml(tdiv(class=("timeline-item " & divClass))):
     if not mainTweet:
       a(class="tweet-link", href=getLink(tweet))
 
     tdiv(class="tweet-body"):
       var views = ""
-      renderHeader(tweet)
+      renderHeader(tweet, retweet)
 
-      if index == 0 and tweet.reply.len > 0 and
+      if not afterTweet and index == 0 and tweet.reply.len > 0 and
          (tweet.reply.len > 1 or tweet.reply[0] != tweet.profile.username):
         renderReply(tweet)
 
@@ -293,7 +289,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
 
       if tweet.card.isSome:
         renderCard(tweet.card.get(), prefs, path)
-      elif tweet.photos.len > 0:
+
+      if tweet.photos.len > 0:
         renderAlbum(tweet)
       elif tweet.video.isSome:
         renderVideo(tweet.video.get(), prefs, path)
@@ -301,11 +298,12 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class="";
       elif tweet.gif.isSome:
         renderGif(tweet.gif.get(), prefs)
         views = "GIF"
-      elif tweet.poll.isSome:
+
+      if tweet.poll.isSome:
         renderPoll(tweet.poll.get())
 
       if tweet.quote.isSome:
-        renderQuote(tweet.quote.get(), prefs)
+        renderQuote(tweet.quote.get(), prefs, path)
 
       if mainTweet:
         p(class="tweet-published"): text getTweetTime(tweet)
