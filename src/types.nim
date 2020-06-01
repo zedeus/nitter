@@ -187,12 +187,21 @@ type
     address*: string
     port*: int
     useHttps*: bool
-    staticDir*: string
     title*: string
     hostname*: string
-    cacheDir*: string
-    profileCacheTime*: int
+    staticDir*: string
+
     hmacKey*: string
+    minTokens*: int
+
+    cacheDir*: string
+    rssCacheTime*: int
+    listCacheTime*: int
+
+    redisHost*: string
+    redisPort*: int
+    redisConns*: int
+    redisMaxConns*: int
 
 proc contains*(thread: Chain; tweet: Tweet): bool =
   thread.content.anyIt(it.id == tweet.id)
