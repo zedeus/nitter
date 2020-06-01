@@ -3,25 +3,43 @@ import strutils
 import jester
 
 import router_utils
-import ".."/[query, types, api, agents]
+import ".."/[query, types, redis_cache, api]
 import ../views/[general, timeline, list]
-export getListTimeline, getListMembers
+export getListTimeline, getGraphList
 
-template respList*(list, timeline: typed) =
-  if list.minId.len == 0:
+template respList*(list, timeline, vnode: typed) =
+  if list.id.len == 0:
     resp Http404, showError("List \"" & @"list" & "\" not found", cfg)
-  let html = renderList(timeline, list.query, @"name", @"list")
-  let rss = "/$1/lists/$2/rss" % [@"name", @"list"]
+
+  let
+    html = renderList(vnode, timeline.query, list)
+    rss = "/$1/lists/$2/rss" % [@"name", @"list"]
+
   resp renderMain(html, request, cfg, rss=rss)
 
 proc createListRouter*(cfg: Config) =
   router list:
     get "/@name/lists/@list":
       cond '.' notin @"name"
-      let list = await getListTimeline(@"name", @"list", @"max_position", getAgent())
-      respList(list, renderTimelineTweets(list, cookiePrefs(), request.path))
+      cond @"name" != "i"
+      let
+        list = await getCachedList(@"name", @"list")
+        timeline = await getListTimeline(list.id, getCursor())
+        vnode = renderTimelineTweets(timeline, cookiePrefs(), request.path)
+      respList(list, timeline, vnode)
 
     get "/@name/lists/@list/members":
       cond '.' notin @"name"
-      let list = await getListMembers(@"name", @"list", @"max_position", getAgent())
-      respList(list, renderTimelineUsers(list, cookiePrefs(), request.path))
+      cond @"name" != "i"
+      let
+        list = await getCachedList(@"name", @"list")
+        members = await getListMembers(list)
+      respList(list, members, renderTimelineUsers(members, cookiePrefs(), request.path))
+
+    get "/i/lists/@id":
+      cond '.' notin @"id"
+      let list = await getCachedList(id=(@"id"))
+      if list.id.len == 0:
+        resp Http404
+      await cache(list, time=listCacheTime)
+      redirect("/" & list.username & "/lists/" & list.name)

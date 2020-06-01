@@ -1,27 +1,28 @@
-import asyncdispatch, strutils
+import asyncdispatch, strutils, tables, times, sequtils
 
 import jester
 
 import router_utils, timeline
-import ".."/[cache, agents, query]
-import ../views/general
+import ".."/[redis_cache, query], ../views/general
 
 include "../views/rss.nimf"
+
+export times
 
 proc showRss*(req: Request; hostname: string; query: Query): Future[(string, string)] {.async.} =
   var profile: Profile
   var timeline: Timeline
   let
     name = req.params.getOrDefault("name")
-    after = req.params.getOrDefault("max_position")
+    after = getCursor(req)
     names = getNames(name)
 
   if names.len == 1:
     (profile, timeline) =
-      await fetchSingleTimeline(after, getAgent(), query, media=false)
+      await fetchSingleTimeline(after, query)
   else:
     let multiQuery = query.getMultiQuery(names)
-    timeline = await getSearch[Tweet](multiQuery, after, getAgent(), media=false)
+    timeline = await getSearch[Tweet](multiQuery, after)
     # this is kinda dumb
     profile = Profile(
       username: name,
@@ -32,16 +33,16 @@ proc showRss*(req: Request; hostname: string; query: Query): Future[(string, str
   if profile.suspended:
     return (profile.username, "suspended")
 
-  if timeline != nil:
+  if timeline.content.len > 0:
     let rss = renderTimelineRss(timeline, profile, hostname, multi=(names.len > 1))
-    return (rss, timeline.minId)
+    return (rss, timeline.bottom)
 
 template respRss*(rss, minId) =
   if rss.len == 0:
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg)
   elif minId == "suspended":
     resp Http404, showError(getSuspended(rss), cfg)
-  let headers = {"Content-Type": "application/rss+xml;charset=utf-8", "Min-Id": minId}
+  let headers = {"Content-Type": "application/rss+xml; charset=utf-8", "Min-Id": minId}
   resp Http200, headers, rss
 
 proc createRssRouter*(cfg: Config) =
@@ -54,14 +55,36 @@ proc createRssRouter*(cfg: Config) =
       if query.kind != tweets:
         resp Http400, showError("Only Tweet searches are allowed for RSS feeds.", cfg)
 
-      let tweets = await getSearch[Tweet](query, @"max_position", getAgent(), media=false)
-      let rss = renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg.hostname)
-      respRss(rss, tweets.minId)
+      let
+        cursor = getCursor()
+        key = genQueryParam(query) & cursor
+        (cRss, cCursor) = await getCachedRss(key)
+
+      if cRss.len > 0:
+        respRss(cRss, cCursor)
+
+      let
+        tweets = await getSearch[Tweet](query, cursor)
+        rss = renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg.hostname)
+
+      await cacheRss(key, rss, tweets.bottom)
+      respRss(rss, tweets.bottom)
 
     get "/@name/rss":
       cond '.' notin @"name"
-      let (rss, minId) = await showRss(request, cfg.hostname, Query(fromUser: @[@"name"]))
-      respRss(rss, minId)
+      let
+        cursor = getCursor()
+        name = @"name"
+        (cRss, cCursor) = await getCachedRss(name & cursor)
+
+      if cRss.len > 0:
+        respRss(cRss, cCursor)
+
+      let (rss, rssCursor) = await showRss(request, cfg.hostname,
+                                           Query(fromUser: @[name]))
+
+      await cacheRss(name & cursor, rss, rssCursor)
+      respRss(rss, rssCursor)
 
     get "/@name/@tab/rss":
       cond '.' notin @"name"
@@ -74,11 +97,31 @@ proc createRssRouter*(cfg: Config) =
         of "search": initQuery(params(request), name=name)
         else: Query(fromUser: @[name])
 
-      let (rss, minId) = await showRss(request, cfg.hostname, query)
-      respRss(rss, minId)
+      let
+        key = @"name" & "/" & @"tab" & getCursor()
+        (cRss, cCursor) = await getCachedRss(key)
+
+      if cRss.len > 0:
+        respRss(cRss, cCursor)
+
+      let (rss, rssCursor) = await showRss(request, cfg.hostname, query)
+      await cacheRss(key, rss, rssCursor)
+      respRss(rss, rssCursor)
 
     get "/@name/lists/@list/rss":
       cond '.' notin @"name"
-      let list = await getListTimeline(@"name", @"list", @"max_position", getAgent(), media=false)
-      let rss = renderListRss(list.content, @"name", @"list", cfg.hostname)
-      respRss(rss, list.minId)
+      let
+        cursor = getCursor()
+        key = @"name" & "/" & @"list" & cursor
+        (cRss, cCursor) = await getCachedRss(key)
+
+      if cRss.len > 0:
+        respRss(cRss, cCursor)
+
+      let
+        list = await getCachedList(@"name", @"list")
+        timeline = await getListTimeline(list.id, cursor)
+        rss = renderListRss(timeline.content, list, cfg.hostname)
+
+      await cacheRss(key, rss, timeline.bottom)
+      respRss(rss, timeline.bottom)

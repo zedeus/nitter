@@ -3,7 +3,7 @@ import strutils, sequtils, uri
 import jester
 
 import router_utils
-import ".."/[query, types, api, agents]
+import ".."/[query, types, api]
 import ../views/[general, search]
 
 include "../views/opensearch.nimf"
@@ -23,10 +23,10 @@ proc createSearchRouter*(cfg: Config) =
       of users:
         if "," in @"q":
           redirect("/" & @"q")
-        let users = await getSearch[Profile](query, @"max_position", getAgent())
+        let users = await getSearch[Profile](query, getCursor())
         resp renderMain(renderUserSearch(users, prefs), request, cfg)
       of tweets:
-        let tweets = await getSearch[Tweet](query, @"max_position", getAgent())
+        let tweets = await getSearch[Tweet](query, getCursor())
         let rss = "/search/rss?" & genQueryUrl(query)
         resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
                         request, cfg, rss=rss)
