@@ -30,6 +30,10 @@ template `with`*(ident; value: JsonNode; body): untyped =
 template getCursor*(js: JsonNode): string =
   js{"content", "operation", "cursor", "value"}.getStr
 
+template getError*(js: JsonNode): Error =
+  if js.kind != JArray or js.len == 0: null
+  else: Error(js[0]{"code"}.getInt)
+
 template parseTime(time: string; f: static string; flen: int): Time =
   if time.len != flen: return
   parseTime(time, f, localTimezone).utc.toTime

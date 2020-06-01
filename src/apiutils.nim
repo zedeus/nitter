@@ -48,7 +48,7 @@ proc fetch*(url: Uri; retried=false; oldApi=false): Future[JsonNode] {.async.} =
 
     result = parseJson(body)
 
-    if result{"errors"} != nil and result{"errors"}[0]{"code"}.getInt == 200:
+    if result{"errors"} != nil and result.getError == forbidden:
       keepToken = false
       echo "bad token"
   except:
