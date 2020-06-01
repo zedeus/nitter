@@ -103,6 +103,7 @@ type
 
   CardKind* = enum
     player = "player"
+    audio = "audio"
     summary = "summary"
     summaryLarge = "summary_large_image"
     promoWebsite = "promo_website"
@@ -111,6 +112,8 @@ type
     promoImageConvo = "promo_image_convo"
     promoVideoApp = "promo_video_app"
     promoImageApp = "promo_image_app"
+    amplify = "amplify"
+    unified = "unified_card"
     liveEvent = "live_event"
     broadcast = "broadcast"
     periscope = "periscope_broadcast"
