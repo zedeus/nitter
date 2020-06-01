@@ -18,7 +18,10 @@ proc fetchToken(): Future[Token] {.async.} =
   try: client.close()
   except: discard
 
-  if pos == -1: echo "token parse fail"; return
+  if pos == -1:
+    echo "token parse fail"
+    return Token()
+
   result = Token(tok: resp[pos+3 .. pos+21], remaining: 187,
                  reset: getTime() + 15.minutes, init: getTime())
 
