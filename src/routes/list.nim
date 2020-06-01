@@ -19,7 +19,7 @@ template respList*(list, timeline, vnode: typed) =
 
 proc createListRouter*(cfg: Config) =
   router list:
-    get "/@name/lists/@list":
+    get "/@name/lists/@list/?":
       cond '.' notin @"name"
       cond @"name" != "i"
       let
@@ -36,7 +36,7 @@ proc createListRouter*(cfg: Config) =
         members = await getListMembers(list)
       respList(list, members, renderTimelineUsers(members, cookiePrefs(), request.path))
 
-    get "/i/lists/@id":
+    get "/i/lists/@id/?":
       cond '.' notin @"id"
       let list = await getCachedList(id=(@"id"))
       if list.id.len == 0:
