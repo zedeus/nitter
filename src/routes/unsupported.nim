@@ -16,5 +16,5 @@ proc createUnsupportedRouter*(cfg: Config) =
       resp renderMain(renderFeature(), request, cfg)
 
     get "/i/@i?/?@j?":
-      cond @"i" != "status"
+      cond @"i" notin ["status", "lists"]
       resp renderMain(renderFeature(), request, cfg)

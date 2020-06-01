@@ -1,17 +1,14 @@
 import asyncdispatch, strutils, sequtils, uri, options
-
 import jester
-
-import router_utils
-import ".."/[api, types, agents]
-import ../views/[embed]
-export getVideo
+import ".."/[types, api], ../views/embed
 
 export embed
 
 proc createEmbedRouter*(cfg: Config) =
   router embed:
     get "/i/videos/tweet/@id":
-      let tweet = Tweet(id: @"id".parseBiggestInt, video: some Video())
-      await getVideo(tweet, getAgent(), "")
-      resp renderVideoEmbed(cfg, tweet)
+      let convo = await getTweet(@"id")
+      if convo == nil or convo.tweet == nil or convo.tweet.video.isNone:
+        resp Http404
+
+      resp renderVideoEmbed(cfg, convo.tweet)

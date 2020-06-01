@@ -14,6 +14,7 @@ const m3u8Regex* = re"""url="(.+.m3u8)""""
 proc createMediaRouter*(cfg: Config) =
   router media:
     get "/pic/?":
+      echo "empty pic"
       resp Http404
 
     get "/pic/@url":

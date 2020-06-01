@@ -3,12 +3,12 @@ import asyncdispatch, strutils, sequtils, uri, options
 import jester, karax/vdom
 
 import router_utils
-import ".."/[api, types, formatters, agents]
+import ".."/[types, formatters, api]
 import ../views/[general, status]
 
 export uri, sequtils, options
 export router_utils
-export api, formatters, agents
+export api, formatters
 export status
 
 proc createStatusRouter*(cfg: Config) =
@@ -18,33 +18,36 @@ proc createStatusRouter*(cfg: Config) =
       let prefs = cookiePrefs()
 
       if @"scroll".len > 0:
-        let replies = await getReplies(@"name", @"id", @"max_position", getAgent())
-        if replies == nil:
+        let replies = await getReplies(@"id", getCursor())
+        if replies.content.len == 0:
           resp Http404, ""
         resp $renderReplies(replies, prefs, getPath())
 
-      let conversation = await getTweet(@"name", @"id", @"max_position", getAgent())
-      if conversation == nil or conversation.tweet.id == 0:
+      let conv = await getTweet(@"id", getCursor())
+      if conv == nil:
+        echo "nil conv"
+
+      if conv == nil or conv.tweet == nil or conv.tweet.id == 0:
         var error = "Tweet not found"
-        if conversation != nil and conversation.tweet.tombstone.len > 0:
-          error = conversation.tweet.tombstone
+        if conv != nil and conv.tweet != nil and conv.tweet.tombstone.len > 0:
+          error = conv.tweet.tombstone
         resp Http404, showError(error, cfg)
 
       var
-        title = pageTitle(conversation.tweet)
-        ogTitle = pageTitle(conversation.tweet.profile)
-        desc = conversation.tweet.text
-        images = conversation.tweet.photos
+        title = pageTitle(conv.tweet)
+        ogTitle = pageTitle(conv.tweet.profile)
+        desc = conv.tweet.text
+        images = conv.tweet.photos
         video = ""
 
-      if conversation.tweet.video.isSome():
-        images = @[get(conversation.tweet.video).thumb]
-        video = getVideoEmbed(cfg, conversation.tweet.id)
-      elif conversation.tweet.gif.isSome():
-        images = @[get(conversation.tweet.gif).thumb]
-        video = getGifUrl(get(conversation.tweet.gif).url)
+      if conv.tweet.video.isSome():
+        images = @[get(conv.tweet.video).thumb]
+        video = getVideoEmbed(cfg, conv.tweet.id)
+      elif conv.tweet.gif.isSome():
+        images = @[get(conv.tweet.gif).thumb]
+        video = getGifUrl(get(conv.tweet.gif).url)
 
-      let html = renderConversation(conversation, prefs, getPath() & "#m")
+      let html = renderConversation(conv, prefs, getPath() & "#m")
       resp renderMain(html, request, cfg, title, desc,
                       images=images, video=video, ogTitle=ogTitle)
 
