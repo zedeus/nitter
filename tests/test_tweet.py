@@ -11,7 +11,7 @@ timeline = [
     [3, 'Test account', 'mobile_test', '3 Mar 2016', '705522133443571712',
      'LIVE on #Periscope pscp.tv/w/aadiTzF6dkVOTXZSbX…'],
 
-    [6, 'mobile test 2', 'mobile_test_2', '2 Oct 2014', '517449200045277184',
+    [6, 'mobile test 2', 'mobile_test_2', '1 Oct 2014', '517449200045277184',
      'Testing. One two three four. Test.']
 ]
 
