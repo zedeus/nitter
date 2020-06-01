@@ -102,6 +102,10 @@ proc getTombstone*(js: JsonNode): string =
     result = "This account owner limits who can view their tweets."
   of "Missing":
     result = "This tweet is unavailable."
+  of "Deactivated":
+    result = "This tweet is from an account that no longer exists."
+  of "Bounced":
+    result = "This tweet violated the Twitter rules."
   else:
     result = js{"tombstoneInfo", "richText", "text"}.getStr
     if epitaph.len > 0 or result.len > 0:
