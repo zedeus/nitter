@@ -3,7 +3,7 @@ import strutils, strformat, sequtils, tables, uri
 import types
 
 const
-  separators = @["AND", "OR"]
+  # separators = @["AND", "OR"]
   validFilters* = @[
     "media", "images", "twimg", "videos",
     "native_video", "consumer_video", "pro_video",

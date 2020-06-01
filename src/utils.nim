@@ -8,6 +8,7 @@ const
   badPngExts = @["pngn", "png:", "png_", "_png"]
   twitterDomains = @[
     "twitter.com",
+    "pic.twitter.com",
     "twimg.com",
     "abs.twimg.com",
     "pbs.twimg.com",

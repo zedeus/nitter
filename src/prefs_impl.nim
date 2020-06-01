@@ -8,11 +8,14 @@ type
     name*: string
     label*: string
     kind*: PrefKind
-    options*: seq[string]
-    placeholder*: string
+    # checkbox
     defaultState*: bool
+    # select
     defaultOption*: string
+    options*: seq[string]
+    # input
     defaultInput*: string
+    placeholder*: string
 
   PrefList* = OrderedTable[string, seq[Pref]]
 

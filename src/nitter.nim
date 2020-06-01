@@ -3,7 +3,7 @@ from net import Port
 
 import jester
 
-import types, config, prefs, formatters, cache
+import types, config, prefs, formatters, redis_cache, tokens
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list,
@@ -13,8 +13,10 @@ const configPath {.strdefine.} = "./nitter.conf"
 let (cfg, fullCfg) = getConfig(configPath)
 
 updateDefaultPrefs(fullCfg)
-
+setCacheTimes(cfg)
 setHmacKey(cfg.hmacKey)
+initRedisPool(cfg)
+asyncCheck initTokenPool(cfg)
 
 createUnsupportedRouter(cfg)
 createResolverRouter(cfg)
@@ -26,8 +28,6 @@ createSearchRouter(cfg)
 createMediaRouter(cfg)
 createEmbedRouter(cfg)
 createRssRouter(cfg)
-
-asyncCheck cacheCleaner()
 
 settings:
   port = Port(cfg.port)

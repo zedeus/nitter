@@ -1,68 +1,72 @@
-import times, sequtils, options
-import norm/sqlite
-
+import times, sequtils, options, tables
 import prefs_impl
 
 genPrefsType()
 
 type
+  Token* = ref object
+    tok*: string
+    limit*: int
+    remaining*: int
+    reset*: Time
+    init*: Time
+    # agent*: string
+
+  Error* = enum
+    protectedUser = 22
+    couldntAuth = 32
+    doesntExist = 34
+    notFound = 50
+    suspended = 63
+    invalidToken = 89
+    listIdOrSlug = 112
+    forbidden = 200
+    noCsrf = 353
+
+  Profile* = object
+    id*: string
+    username*: string
+    fullname*: string
+    lowername*: string
+    location*: string
+    website*: string
+    bio*: string
+    userpic*: string
+    banner*: string
+    following*: string
+    followers*: string
+    tweets*: string
+    likes*: string
+    media*: string
+    verified*: bool
+    protected*: bool
+    suspended*: bool
+    joinDate*: Time
+
   VideoType* = enum
-    vmap, m3u8, mp4
+    m3u8 = "application/x-mpegURL"
+    mp4 = "video/mp4"
+    vmap = "video/vmap"
 
-dbTypes:
-  type
-    Profile* = object
-      username*: string
-      fullname*: string
-      lowername*: string
-      location*: string
-      website*: string
-      bio*: string
-      userpic*: string
-      banner*: string
-      following*: string
-      followers*: string
-      tweets*: string
-      likes*: string
-      media*: string
-      verified*: bool
-      protected*: bool
-      suspended*: bool
-      joinDate* {.
-          dbType: "INTEGER"
-          parseIt: it.i.fromUnix()
-          formatIt: dbValue(it.toUnix())
-        .}: Time
-      updated* {.
-          dbType: "INTEGER"
-          parseIt: it.i.fromUnix()
-          formatIt: dbValue(getTime().toUnix())
-        .}: Time
+  VideoVariant* = object
+    videoType*: VideoType
+    url*: string
+    bitrate*: int
 
-    Video* = object
-      videoId*: string
-      contentId*: string
-      durationMs*: int
-      url*: string
-      thumb*: string
-      views*: string
-      available*: bool
-      reason*: string
-      title*: string
-      description*: string
-      playbackType* {.
-          dbType: "STRING"
-          parseIt: parseEnum[VideoType](it.s)
-          formatIt: dbValue($it)
-        .}: VideoType
-      updated* {.
-          dbType: "INTEGER"
-          parseIt: it.i.fromUnix()
-          formatIt: dbValue(getTime().toUnix())
-        .}: Time
+  Video* = object
+    videoId*: string
+    contentId*: string
+    durationMs*: int
+    url*: string
+    thumb*: string
+    views*: string
+    available*: bool
+    reason*: string
+    title*: string
+    description*: string
+    playbackType*: VideoType
+    variants*: seq[VideoVariant]
 
-
-type
   QueryKind* = enum
     posts, replies, media, users, tweets, userList
 
@@ -92,18 +96,20 @@ type
   Poll* = object
     options*: seq[string]
     values*: seq[int]
-    votes*: string
-    status*: string
+    votes*: int
     leader*: int
+    status*: string
 
   CardKind* = enum
+    player = "player"
     summary = "summary"
     summaryLarge = "summary_large_image"
     promoWebsite = "promo_website"
     promoVideo = "promo_video_website"
     promoVideoConvo = "promo_video_convo"
-    player = "player"
     liveEvent = "live_event"
+    broadcast = "broadcast"
+    periscope = "periscope_broadcast"
 
   Card* = object
     kind*: CardKind
@@ -113,24 +119,8 @@ type
     title*: string
     dest*: string
     text*: string
-    image*: Option[string]
+    image*: string
     video*: Option[Video]
-
-  Quote* = object
-    id*: int64
-    profile*: Profile
-    text*: string
-    reply*: seq[string]
-    hasThread*: bool
-    sensitive*: bool
-    available*: bool
-    tombstone*: string
-    thumb*: string
-    badge*: string
-
-  Retweet* = object
-    by*: string
-    id*: int64
 
   TweetStats* = object
     replies*: int
@@ -140,10 +130,10 @@ type
   Tweet* = ref object
     id*: int64
     threadId*: int64
+    replyId*: int64
     profile*: Profile
     text*: string
     time*: Time
-    shortTime*: string
     reply*: seq[string]
     pinned*: bool
     hasThread*: bool
@@ -151,27 +141,26 @@ type
     tombstone*: string
     location*: string
     stats*: TweetStats
-    retweet*: Option[Retweet]
+    retweet*: Option[Tweet]
     attribution*: Option[Profile]
     mediaTags*: seq[Profile]
-    quote*: Option[Quote]
+    quote*: Option[Tweet]
     card*: Option[Card]
+    poll*: Option[Poll]
     gif*: Option[Gif]
     video*: Option[Video]
     photos*: seq[string]
-    poll*: Option[Poll]
 
-  Result*[T] = ref object
+  Result*[T] = object
     content*: seq[T]
-    minId*: string
-    maxId*: string
-    hasMore*: bool
+    top*, bottom*: string
     beginning*: bool
     query*: Query
 
-  Chain* = ref object
+  Chain* = object
     content*: seq[Tweet]
     more*: int64
+    cursor*: string
 
   Conversation* = ref object
     tweet*: Tweet
@@ -180,6 +169,19 @@ type
     replies*: Result[Chain]
 
   Timeline* = Result[Tweet]
+
+  List* = object
+    id*: string
+    name*: string
+    userId*: string
+    username*: string
+    description*: string
+    members*: int
+    banner*: string
+
+  GlobalObjects* = ref object
+    tweets*: Table[string, Tweet]
+    users*: Table[string, Profile]
 
   Config* = ref object
     address*: string
