@@ -107,6 +107,7 @@ type
     promoWebsite = "promo_website"
     promoVideo = "promo_video_website"
     promoVideoConvo = "promo_video_convo"
+    promoImageConvo = "promo_image_convo"
     liveEvent = "live_event"
     broadcast = "broadcast"
     periscope = "periscope_broadcast"
