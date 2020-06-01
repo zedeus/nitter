@@ -17,8 +17,12 @@ proc setCacheTimes*(cfg: Config) =
   listCacheTime = cfg.listCacheTime * 60
 
 proc initRedisPool*(cfg: Config) =
-  pool = waitFor newRedisPool(cfg.redisConns, maxConns=cfg.redisMaxConns,
-                              host=cfg.redisHost, port=cfg.redisPort)
+  try:
+    pool = waitFor newRedisPool(cfg.redisConns, maxConns=cfg.redisMaxConns,
+                                host=cfg.redisHost, port=cfg.redisPort)
+  except OSError:
+    echo "Failed to connect to Redis."
+    quit()
 
 template toKey(p: Profile): string = "p:" & toLower(p.username)
 template toKey(v: Video): string = "v:" & v.videoId
