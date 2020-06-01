@@ -104,7 +104,7 @@ proc getTombstone*(js: JsonNode): string =
     result = "This tweet is unavailable."
   of "Deactivated":
     result = "This tweet is from an account that no longer exists."
-  of "Bounced":
+  of "Bounced", "BounceDeleted":
     result = "This tweet violated the Twitter rules."
   else:
     result = js{"tombstoneInfo", "richText", "text"}.getStr
