@@ -32,6 +32,12 @@ proc getListMembers*(list: List; after=""): Future[Result[Profile]] {.async.} =
     url = listMembers ? ps
   result = parseListMembers(await fetch(url, oldApi=true), after)
 
+proc getProfile*(username: string): Future[Profile] {.async.} =
+  let
+    ps = genParams({"screen_name": username})
+    url = userLookup ? ps
+  result = parseUserShow(await fetch(url, oldApi=true), username)
+
 proc getTimeline*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
   let
     ps = genParams({"userId": id, "include_tweet_replies": $replies}, after)

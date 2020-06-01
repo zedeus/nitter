@@ -79,7 +79,7 @@ proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} 
   if prof != redisNil:
     result = prof.to(Profile)
   else:
-    result = await getGraphProfile(username)
+    result = await getProfile(username)
     if result.id.len > 0:
       await cache(result)
 

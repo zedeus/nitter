@@ -27,6 +27,16 @@ proc parseProfile(js: JsonNode; id=""): Profile =
 
   result.expandProfileEntities(js)
 
+proc parseUserShow*(js: JsonNode; username: string): Profile =
+  if js == nil: return
+  with error, js{"errors"}:
+    result = Profile(username: username)
+    if parseError(error) == suspended:
+      result.suspended = true
+    return
+
+  result = parseProfile(js)
+
 proc parseGraphProfile*(js: JsonNode; username: string): Profile =
   if js == nil: return
   with error, js{"errors"}:
@@ -301,6 +311,9 @@ proc parseConversation*(js: JsonNode; tweetId: string): Conversation =
   let global = parseGlobalObjects(? js)
 
   let instructions = ? js{"timeline", "instructions"}
+  if instructions.len == 0:
+    return
+
   for e in instructions[0]{"addEntries", "entries"}:
     let entry = e{"entryId"}.getStr
     if "tweet" in entry:
