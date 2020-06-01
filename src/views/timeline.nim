@@ -106,7 +106,7 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): 
       for tweet in results.content:
         let rt = if tweet.retweet.isSome: get(tweet.retweet).id else: 0
 
-        if tweet.id in threads or rt in retweets or
+        if tweet.id in threads or rt in retweets or tweet.id in retweets or
            tweet.pinned and prefs.hidePins: continue
 
         let thread = results.content.threadFilter(threads, tweet)
