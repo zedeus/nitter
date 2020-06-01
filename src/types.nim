@@ -6,7 +6,6 @@ genPrefsType()
 type
   Token* = ref object
     tok*: string
-    limit*: int
     remaining*: int
     reset*: Time
     init*: Time
