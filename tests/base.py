@@ -19,10 +19,8 @@ class Quote(object):
         self.fullname = namerow + '.fullname'
         self.username = namerow + '.username'
         self.text = quote + '.quote-text'
-        self.media = quote + '.quote-media'
+        self.media = quote + '.quote-media-container'
         self.unavailable = quote + '.quote.unavailable'
-        self.sensitive = quote + '.quote-sensitive'
-        self.badge = quote + '.quote-badge'
 
 
 class Tweet(object):
