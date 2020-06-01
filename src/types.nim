@@ -108,9 +108,15 @@ type
     promoVideo = "promo_video_website"
     promoVideoConvo = "promo_video_convo"
     promoImageConvo = "promo_image_convo"
+    promoVideoApp = "promo_video_app"
+    promoImageApp = "promo_image_app"
     liveEvent = "live_event"
     broadcast = "broadcast"
     periscope = "periscope_broadcast"
+    storeLink = "direct_store_link_app"
+    moment = "moment"
+    messageMe = "message_me"
+    app = "app"
 
   Card* = object
     kind*: CardKind
