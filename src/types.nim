@@ -13,10 +13,11 @@ type
     # agent*: string
 
   Error* = enum
+    null = 0
     protectedUser = 22
     couldntAuth = 32
     doesntExist = 34
-    notFound = 50
+    userNotFound = 50
     suspended = 63
     invalidToken = 89
     listIdOrSlug = 112

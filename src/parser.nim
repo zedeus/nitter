@@ -1,6 +1,10 @@
 import json, strutils, options, tables, times, math
 import types, parserutils
 
+proc parseError(js: JsonNode): Error =
+  if js == nil or js.kind != JArray or js.len < 1: return null
+  return Error(js[0]{"code"}.getInt)
+
 proc parseProfile(js: JsonNode; id=""): Profile =
   if js == nil: return
   result = Profile(
@@ -24,12 +28,12 @@ proc parseProfile(js: JsonNode; id=""): Profile =
   result.expandProfileEntities(js)
 
 proc parseGraphProfile*(js: JsonNode; username: string): Profile =
-  with errors, js{"errors"}:
-    for error in errors:
-      case Error(error{"code"}.getInt)
-      of notFound: return Profile(username: username)
-      of suspended: return Profile(username: username, suspended: true)
-      else: discard
+  if js == nil: return
+  with error, js{"errors"}:
+    result = Profile(username: username)
+    if parseError(error) == suspended:
+      result.suspended = true
+    return
 
   let user = js{"data", "user", "legacy"}
   let id = js{"data", "user", "rest_id"}.getStr
