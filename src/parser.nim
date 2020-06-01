@@ -379,5 +379,5 @@ proc parsePhotoRail*(tl: Timeline): PhotoRail =
     result.add GalleryPhoto(
       url: url,
       tweetId: $tweet.id,
-      color: "#161616" # TODO: photo rail specific parser?
+      color: "#161616"
     )
