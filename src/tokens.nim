@@ -58,5 +58,5 @@ proc poolTokens*(amount: int) {.async.} =
 proc initTokenPool*(cfg: Config) {.async.} =
   while true:
     if tokenPool.countIt(not it.isLimited) < cfg.minTokens:
-      await poolTokens(min(3, cfg.minTokens - tokenPool.len))
-    await sleepAsync(4000)
+      await poolTokens(min(4, cfg.minTokens - tokenPool.len))
+    await sleepAsync(2000)
