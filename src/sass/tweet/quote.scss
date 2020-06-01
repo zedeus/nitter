@@ -60,12 +60,14 @@
         margin: unset;
     }
 
-    .media-gif {
-        width: 100%;
-    }
-
     .attachments {
         border-radius: 0;
+    }
+
+    .media-gif {
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 
     .gallery-gif .attachment {
