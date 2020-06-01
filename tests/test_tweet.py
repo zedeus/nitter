@@ -11,15 +11,15 @@ timeline = [
     [3, 'Test account', 'mobile_test', '3 Mar 2016', '705522133443571712',
      'LIVE on #Periscope pscp.tv/w/aadiTzF6dkVOTXZSbX…'],
 
-    [6, 'mobile test 2', 'mobile_test_2', '1 Oct 2014', '517449200045277184',
+    [6, 'mobile test 2', 'mobile_test_2', '2 Oct 2014', '517449200045277184',
      'Testing. One two three four. Test.']
 ]
 
 status = [
     [20, 'jack', 'jack', '21 Mar 2006', 'just setting up my twttr'],
-    [134849778302464000, 'The Twoffice', 'TheTwoffice', '10 Nov 2011', 'test'],
+    [134849778302464000, 'The Twoffice', 'TheTwoffice', '11 Nov 2011', 'test'],
     [105685475985080322, 'The Twoffice', 'TheTwoffice', '22 Aug 2011', 'regular tweet'],
-    [572593440719912960, 'Test account', 'mobile_test', '2 Mar 2015', 'testing test']
+    [572593440719912960, 'Test account', 'mobile_test', '3 Mar 2015', 'testing test']
 ]
 
 invalid = [
@@ -87,8 +87,7 @@ retweet = [
 ]
 
 reply = [
-    ['mobile_test?max_position=471336696307392513', '@mobile_test', '@mobile_test'],
-    ['mobile_test_2?max_position=375101899214561280', '@mobile_test_2', '@mobile_test']
+    ['mobile_test/with_replies', 15]
 ]
 
 
@@ -151,8 +150,7 @@ class TweetTest(BaseTestCase):
         self.assert_text('Tweet not found', '.error-panel')
 
     @parameterized.expand(reply)
-    def test_reply(self, tweet, username, reply):
+    def test_thread(self, tweet, num):
         self.open_nitter(tweet)
-        tweet = get_timeline_tweet(2)
-        self.assert_text(username, tweet.username)
-        self.assert_text('Replying to ' + reply, tweet.reply)
+        thread = self.find_element(f'.timeline > div:nth-child({num})')
+        self.assertIn(thread.get_attribute('class'), 'thread-line')

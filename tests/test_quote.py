@@ -28,7 +28,7 @@ gif = [
 ]
 
 video = [
-    ['bkuensting/status/1067316003200217088', 'IyCaQlzF0q8u9vBd', '1:05']
+    ['bkuensting/status/1067316003200217088', 'IyCaQlzF0q8u9vBd']
 ]
 
 
@@ -46,21 +46,18 @@ class QuoteTest(BaseTestCase):
         self.open_nitter(tweet)
         quote = Quote(Conversation.main + " ")
         self.assert_element_visible(quote.media)
-        self.assert_element_not_visible(quote.badge)
         self.assertIn(url, self.get_image_url(quote.media + ' img'))
 
     @parameterized.expand(gif)
-    def test_gif(self, tweet, thumb):
+    def test_gif(self, tweet, url):
         self.open_nitter(tweet)
         quote = Quote(Conversation.main + " ")
-        self.assert_element_visible(quote.badge)
-        self.assert_text('GIF', quote.badge)
-        self.assertIn(thumb, self.get_image_url(quote.media + ' img'))
+        self.assert_element_visible(quote.media)
+        self.assertIn(url, self.get_attribute(quote.media + ' source', 'src'))
 
     @parameterized.expand(video)
-    def test_video(self, tweet, thumb, length):
+    def test_video(self, tweet, url):
         self.open_nitter(tweet)
         quote = Quote(Conversation.main + " ")
-        self.assert_element_visible(quote.badge)
-        self.assert_text(length, quote.badge)
-        self.assertIn(thumb, self.get_image_url(quote.media + ' img'))
+        self.assert_element_visible(quote.media)
+        self.assertIn(url, self.get_image_url(quote.media + ' img'))

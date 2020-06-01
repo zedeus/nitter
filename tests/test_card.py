@@ -71,9 +71,9 @@ no_thumb = [
      'reddit.com'],
 
     ['lorenlugosch/status/1115440394148487168',
-     'lorenlugosch/end-to-end-SLU',
-     'PyTorch code for end-to-end spoken language understanding (SLU) with ASR-based transfer learning - lorenlugosch/end-to-end-SLU',
-     'github.com'],
+     'Fluent Speech Commands: A dataset for spoken language understanding research',
+     'In recent years, with the advent of deep neural networks, the accuracy of speech recognition models have been notably improved which have made possible the production of speech-to-text systems that...',
+     'fluent.ai'],
 
 ]
 
