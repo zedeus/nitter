@@ -69,4 +69,4 @@ jobs:
         - docker run -d -p 127.0.0.1:8080:8080/tcp $IMAGE_NAME:$TRAVIS_COMMIT
         - sleep 10
         - cd tests
-        - pytest --headless -n 8 --reruns 10 --reruns-delay 2
+        - pytest --headless -n 8 --reruns 3 --reruns-delay 2
