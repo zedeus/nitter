@@ -136,7 +136,7 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
     return $(twitter / path ? filterParams(params))
 
   let p = {
-    "f": $query.kind,
+    "f": if query.kind == users: "user" else: "live",
     "q": genQueryParam(query),
     "src": "typed_query"
   }
