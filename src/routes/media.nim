@@ -3,13 +3,14 @@ import asyncfile, uri, strutils, httpclient, os, mimetypes
 import jester, regex
 
 import router_utils
-import ".."/[types, formatters]
+import ".."/[types, formatters, agents]
 import ../views/general
 
 export asyncfile, httpclient, os, strutils
 export regex
 
 const m3u8Regex* = re"""url="(.+.m3u8)""""
+let mediaAgent* = getAgent()
 
 proc createMediaRouter*(cfg: Config) =
   router media:
@@ -33,18 +34,22 @@ proc createMediaRouter*(cfg: Config) =
         createDir(cfg.cacheDir)
 
       if not existsFile(filename):
-        let client = newAsyncHttpClient()
+        let client = newAsyncHttpClient(userAgent=mediaAgent)
+        var failed = false
+
         try:
           await client.downloadFile($uri, filename)
         except HttpRequestError:
-          client.safeClose()
+          failed = true
           removeFile(filename)
-          resp Http404
-        except OSError:
-          echo "Disk full"
-          resp Http404
+        except OSError as e:
+          echo "Disk full, or network error: ", e.msg
+          failed = true
         finally:
           client.safeClose()
+
+        if failed:
+          resp Http404
 
       sendFile(filename)
 
@@ -56,7 +61,7 @@ proc createMediaRouter*(cfg: Config) =
       let url = decodeUrl(@"url")
       cond isTwitterUrl(url) == true
 
-      let content = await safeFetch(url)
+      let content = await safeFetch(url, mediaAgent)
       if content.len == 0: resp Http404
 
       let filename = parseUri(url).path.split(".")[^1]
@@ -70,14 +75,14 @@ proc createMediaRouter*(cfg: Config) =
       if getHmac(url) != @"sig":
         resp showError("Failed to verify signature", cfg)
 
-      var content = await safeFetch(url)
+      var content = await safeFetch(url, mediaAgent)
       if content.len == 0: resp Http404
 
       if ".vmap" in url:
         var m: RegexMatch
         discard content.find(m3u8Regex, m)
         url = decodeUrl(content[m.group(0)[0]])
-        content = await safeFetch(url)
+        content = await safeFetch(url, mediaAgent)
 
       if ".m3u8" in url:
         content = proxifyVideo(content, prefs.proxyVideos)

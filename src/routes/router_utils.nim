@@ -1,6 +1,6 @@
 import strutils, sequtils, asyncdispatch, httpclient, uri
 from jester import Request
-import ../utils, ../prefs
+import ".."/[utils, prefs]
 export utils, prefs
 
 template savePref*(pref, value: string; req: Request; expire=false) =
@@ -33,8 +33,8 @@ proc safeClose*(client: AsyncHttpClient) =
   try: client.close()
   except: discard
 
-proc safeFetch*(url: string): Future[string] {.async.} =
-  let client = newAsyncHttpClient()
+proc safeFetch*(url, agent: string): Future[string] {.async.} =
+  let client = newAsyncHttpClient(userAgent=agent)
   try: result = await client.getContent(url)
   except: discard
   finally: client.safeClose()
