@@ -115,4 +115,4 @@ proc getCachedRss*(key: string): Future[(string, string)] {.async.} =
     res = await r.hgetall("rss:" & key)
 
   if "rss" in res:
-    result = (res["rss"], res["min"])
+    result = (res["rss"], res.getOrDefault("min"))
