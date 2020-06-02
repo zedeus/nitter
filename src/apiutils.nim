@@ -1,5 +1,6 @@
-import httpclient, asyncdispatch, options, times, strutils, json, uri
-import types, agents, tokens, consts
+import httpclient, asyncdispatch, options, times, strutils, uri
+import packedjson
+import types, agents, tokens, consts, parserutils
 
 proc genParams*(pars: openarray[(string, string)] = @[];
                 cursor=""): seq[(string, string)] =
@@ -41,19 +42,20 @@ proc fetch*(url: Uri; retried=false; oldApi=false): Future[JsonNode] {.async.} =
 
     if resp.status != $Http200:
       if "Bad guest token" in body:
-        return
+        keepToken = false
+        return newJNull()
       elif not body.startsWith('{'):
         echo resp.status, " ", body
-        return
+        return newJNull()
 
     result = parseJson(body)
 
-    if result{"errors"} != nil and result.getError == forbidden:
+    if result{"errors"}.notNull and result.getError == forbidden:
       keepToken = false
       echo "bad token"
   except:
     echo "error: ", url
-    result = nil
+    result = newJNull()
   finally:
     if keepToken:
       token.release()

@@ -1,8 +1,9 @@
-import json, strutils, options, tables, times, math
+import strutils, options, tables, times, math
+import packedjson
 import types, parserutils
 
 proc parseProfile(js: JsonNode; id=""): Profile =
-  if js == nil: return
+  if js.isNull: return
   result = Profile(
     id: if id.len > 0: id else: js{"id_str"}.getStr,
     username: js{"screen_name"}.getStr,
@@ -24,7 +25,7 @@ proc parseProfile(js: JsonNode; id=""): Profile =
   result.expandProfileEntities(js)
 
 proc parseUserShow*(js: JsonNode; username: string): Profile =
-  if js == nil: return
+  if js.isNull: return
   with error, js{"errors"}:
     result = Profile(username: username)
     if error.getError == suspended:
@@ -34,7 +35,7 @@ proc parseUserShow*(js: JsonNode; username: string): Profile =
   result = parseProfile(js)
 
 proc parseGraphProfile*(js: JsonNode; username: string): Profile =
-  if js == nil: return
+  if js.isNull: return
   with error, js{"errors"}:
     result = Profile(username: username)
     if error.getError == suspended:
@@ -46,12 +47,12 @@ proc parseGraphProfile*(js: JsonNode; username: string): Profile =
   parseProfile(user, id)
 
 proc parseGraphList*(js: JsonNode): List =
-  if js == nil: return
+  if js.isNull: return
 
   var list = js{"data", "user_by_screen_name", "list"}
-  if list == nil:
+  if list.isNull:
     list = js{"data", "list"}
-  if list == nil:
+  if list.isNull:
     return
 
   result = List(
@@ -70,7 +71,7 @@ proc parseListMembers*(js: JsonNode; cursor: string): Result[Profile] =
     query: Query(kind: userList)
   )
 
-  if js == nil: return
+  if js.isNull: return
 
   result.top = js{"previous_cursor_str"}.getStr
   result.bottom = js{"next_cursor_str"}.getStr
@@ -116,7 +117,7 @@ proc parseVideo(js: JsonNode): Video =
 
   for v in js{"video_info", "variants"}:
     result.variants.add VideoVariant(
-      videoType: v{"content_type"}.to(VideoType),
+      videoType: parseEnum[VideoType](v{"content_type"}.getStr("summary")),
       bitrate: v{"bitrate"}.getInt,
       url: v{"url"}.getStr
     )
@@ -192,14 +193,14 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
       break
 
 proc parseTweet(js: JsonNode): Tweet =
-  if js == nil: return
+  if js.isNull: return
   result = Tweet(
     id: js{"id_str"}.getId,
     threadId: js{"conversation_id_str"}.getId,
     replyId: js{"in_reply_to_status_id_str"}.getId,
     text: js{"full_text"}.getStr,
     time: js{"created_at"}.getTime,
-    hasThread: js{"self_thread"} != nil,
+    hasThread: js{"self_thread"}.notNull,
     available: true,
     profile: Profile(id: js{"user_id_str"}.getStr),
     stats: TweetStats(
@@ -354,7 +355,7 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
   if instructions.len == 0: return
 
   for i in instructions:
-    if result.beginning and i{"pinEntry"} != nil:
+    if result.beginning and i{"pinEntry"}.notNull:
       with pin, parsePin(i, global):
         result.content.add pin
     else:
