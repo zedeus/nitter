@@ -54,6 +54,11 @@ proc cache*(data: Profile) {.async.} =
     discard await r.hset("p:", toLower(data.username), data.id)
     discard await r.flushPipeline()
 
+proc cacheProfileId*(username, id: string) {.async.} =
+  if username.len == 0 or id.len == 0: return
+  pool.withAcquire(r):
+    discard await r.hset("p:", toLower(username), id)
+
 proc cacheRss*(query, rss, cursor: string) {.async.} =
   let key = "rss:" & query
   pool.withAcquire(r):
@@ -73,10 +78,8 @@ proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} 
   let prof = await get("p:" & toLower(username))
   if prof != redisNil:
     result = prof.to(Profile)
-  else:
+  elif fetch:
     result = await getProfile(username)
-    if result.id.len > 0:
-      await cache(result)
 
 proc getCachedPhotoRail*(id: string): Future[PhotoRail] {.async.} =
   if id.len == 0: return

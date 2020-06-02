@@ -27,15 +27,16 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
     profileId = await getProfileId(name)
 
   if profile.username.len == 0 and profileId.len == 0:
-    profile = await getCachedProfile(name)
+    profile = await getProfile(name)
     profileId = profile.id
+    await cacheProfileId(profile.username, profile.id)
 
-  if profile.suspended or profileId.len == 0:
+  if profile.suspended or profile.protected or profileId.len == 0:
     result[0] = profile
     return
 
   var rail: Future[PhotoRail]
-  if skipRail or query.kind == media or profile.suspended or profile.protected:
+  if skipRail or query.kind == media:
     rail = newFuture[PhotoRail]()
     rail.complete(@[])
   else:
@@ -50,7 +51,7 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
 
   timeline.query = query
 
-  for tweet in timeline.content:
+  for tweet in timeline.content.mitems:
     if tweet.profile.id == profileId or
        tweet.profile.username.cmpIgnoreCase(name) == 0:
       profile = tweet.profile
@@ -58,7 +59,6 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
 
   if profile.username.len == 0:
     profile = await getCachedProfile(name)
-  else:
     await cache(profile)
 
   return (profile, timeline, await rail)
