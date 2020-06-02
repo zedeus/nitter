@@ -1,5 +1,5 @@
-import json, strutils, times, macros, htmlgen, uri, unicode, options
-import regex
+import strutils, times, macros, htmlgen, uri, unicode, options
+import regex, packedjson
 import types, utils, formatters
 
 const
@@ -11,9 +11,12 @@ const
 
 let localTimezone = local()
 
+template isNull*(js: JsonNode): bool = js.kind == JNull
+template notNull*(js: JsonNode): bool = js.kind != JNull
+
 template `?`*(js: JsonNode): untyped =
   let j = js
-  if j == nil: return
+  if j.isNull: return
   else: j
 
 template `with`*(ident, value, body): untyped =
@@ -24,8 +27,7 @@ template `with`*(ident, value, body): untyped =
 template `with`*(ident; value: JsonNode; body): untyped =
   block:
     let ident {.inject.} = value
-    if ident != nil and ident.kind != JNull:
-      body
+    if value.notNull: body
 
 template getCursor*(js: JsonNode): string =
   js{"content", "operation", "cursor", "value"}.getStr
@@ -50,7 +52,6 @@ proc getId*(id: string): string {.inline.} =
   id[start + 1 ..< id.len]
 
 proc getId*(js: JsonNode): int64 {.inline.} =
-  if js == nil: return
   case js.kind
   of JString: return parseBiggestInt(js.getStr("0"))
   of JInt: return js.getBiggestInt()
@@ -117,10 +118,9 @@ template getSlice(text: string; slice: seq[int]): string =
   text.runeSubStr(slice[0], slice[1] - slice[0])
 
 proc getSlice(text: string; js: JsonNode): string =
-  if js == nil or js.kind != JArray or js.len < 2 or
-    js[0].kind != JInt: return text
+  if js.kind != JArray or js.len < 2 or js[0].kind != JInt: return text
 
-  let slice = js.to(seq[int])
+  let slice = @[js{0}.getInt, js{1}.getInt]
   text.getSlice(slice)
 
 proc expandUrl(text: var string; js: JsonNode; tLen: int; hideTwitter=false) =
@@ -130,9 +130,9 @@ proc expandUrl(text: var string; js: JsonNode; tLen: int; hideTwitter=false) =
 
   let
     url = js{"expanded_url"}.getStr
-    slice = js{"indices"}.to(seq[int])
+    slice = js{"indices"}[1].getInt
 
-  if hideTwitter and slice[1] >= tLen and url.isTwitterUrl:
+  if hideTwitter and slice >= tLen and url.isTwitterUrl:
     text = text.replace(u, "")
     text.removeSuffix(' ')
     text.removeSuffix('\n')
@@ -178,7 +178,8 @@ proc expandProfileEntities*(profile: var Profile; js: JsonNode) =
 proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
     orig = tweet.text
-    slice = js{"display_text_range"}.to(seq[int])
+    textRange = js{"display_text_range"}
+    slice = @[textRange{0}.getInt, textRange{1}.getInt]
     hasQuote = js{"is_quote_status"}.getBool
     hasCard = tweet.card.isSome
 
