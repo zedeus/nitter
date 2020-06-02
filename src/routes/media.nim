@@ -14,7 +14,6 @@ const m3u8Regex* = re"""url="(.+.m3u8)""""
 proc createMediaRouter*(cfg: Config) =
   router media:
     get "/pic/?":
-      echo "empty pic"
       resp Http404
 
     get "/pic/@url":
@@ -40,6 +39,9 @@ proc createMediaRouter*(cfg: Config) =
         except HttpRequestError:
           client.safeClose()
           removeFile(filename)
+          resp Http404
+        except OSError:
+          echo "Disk full"
           resp Http404
         finally:
           client.safeClose()
