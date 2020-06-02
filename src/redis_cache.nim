@@ -25,10 +25,7 @@ proc initRedisPool*(cfg: Config) =
     quit(1)
 
 template toKey(p: Profile): string = "p:" & toLower(p.username)
-template toKey(v: Video): string = "v:" & v.videoId
-template toKey(c: Card): string = "c:" & c.id
 template toKey(l: List): string = toLower("l:" & l.username & '/' & l.name)
-template toKey(t: Token): string = "t:" & t.tok
 
 template to(s: string; typ: typedesc): untyped =
   var res: typ
@@ -40,22 +37,20 @@ proc get(query: string): Future[string] {.async.} =
   pool.withAcquire(r):
     result = await r.get(query)
 
-proc uncache*(id: int64) {.async.} =
+proc setex(key: string; time: int; data: string) {.async.} =
   pool.withAcquire(r):
-    discard await r.del("v:" & $id)
+    discard await r.setex(key, time, data)
 
-proc cache*[T](data: T; time=baseCacheTime) {.async.} =
-  pool.withAcquire(r):
-    discard await r.setex(data.toKey, time, pack(data))
+proc cache*(data: List) {.async.} =
+  await setex(data.toKey, listCacheTime, data.pack)
 
 proc cache*(data: PhotoRail; id: string) {.async.} =
-  pool.withAcquire(r):
-    discard await r.setex("pr:" & id, baseCacheTime, pack(data))
+  await setex("pr:" & id, baseCacheTime, data.pack)
 
-proc cache*(data: Profile; time=baseCacheTime) {.async.} =
+proc cache*(data: Profile) {.async.} =
   pool.withAcquire(r):
     r.startPipelining()
-    discard await r.setex(data.toKey, time, pack(data))
+    discard await r.setex(data.toKey, baseCacheTime, pack(data))
     discard await r.hset("p:", toLower(data.username), data.id)
     discard await r.flushPipeline()
 
@@ -63,7 +58,8 @@ proc cacheRss*(query, rss, cursor: string) {.async.} =
   let key = "rss:" & query
   pool.withAcquire(r):
     r.startPipelining()
-    await r.hmset(key, @[("rss", rss), ("min", cursor)])
+    discard await r.hset(key, "rss", rss)
+    discard await r.hset(key, "min", cursor)
     discard await r.expire(key, rssCacheTime)
     discard await r.flushPipeline()
 
@@ -72,11 +68,6 @@ proc getProfileId*(username: string): Future[string] {.async.} =
     result = await r.hget("p:", toLower(username))
     if result == redisNil:
       result.setLen(0)
-
-proc hasCachedProfile*(username: string): Future[Option[Profile]] {.async.} =
-  let prof = await get("p:" & toLower(username))
-  if prof != redisNil:
-    result = some prof.to(Profile)
 
 proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} =
   let prof = await get("p:" & toLower(username))
@@ -107,7 +98,7 @@ proc getCachedList*(username=""; name=""; id=""): Future[List] {.async.} =
       result = await getGraphListById(id)
     else:
       result = await getGraphList(username, name)
-    await cache(result, time=listCacheTime)
+    await cache(result)
 
 proc getCachedRss*(key: string): Future[(string, string)] {.async.} =
   var res: Table[string, string]

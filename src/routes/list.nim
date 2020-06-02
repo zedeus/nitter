@@ -41,5 +41,5 @@ proc createListRouter*(cfg: Config) =
       let list = await getCachedList(id=(@"id"))
       if list.id.len == 0:
         resp Http404
-      await cache(list, time=listCacheTime)
+      await cache(list)
       redirect("/" & list.username & "/lists/" & list.name)
