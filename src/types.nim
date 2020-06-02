@@ -101,6 +101,8 @@ type
     status*: string
 
   CardKind* = enum
+    app = "app"
+    appplayer = "appplayer"
     player = "player"
     audio = "audio"
     summary = "summary"
@@ -119,7 +121,6 @@ type
     storeLink = "direct_store_link_app"
     moment = "moment"
     messageMe = "message_me"
-    app = "app"
 
   Card* = object
     kind*: CardKind
