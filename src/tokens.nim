@@ -12,12 +12,17 @@ proc fetchToken(): Future[Token] {.async.} =
       "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:75.0) Gecko/20100101 Firefox/75.0"
     })
     client = newAsyncHttpClient(headers=headers)
+
+  var resp: string
+
+  try:
     resp = await client.getContent("https://twitter.com")
-    pos = resp.rfind("gt=")
+    client.close()
+  except:
+    echo "fetching token failed"
+    return Token()
 
-  try: client.close()
-  except: discard
-
+  let pos = resp.rfind("gt=")
   if pos == -1:
     echo "token parse fail"
     return Token()
