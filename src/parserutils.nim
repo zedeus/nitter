@@ -36,7 +36,7 @@ template getError*(js: JsonNode): Error =
 
 template parseTime(time: string; f: static string; flen: int): Time =
   if time.len != flen: return
-  parseTime(time, f, utc())
+  parse(time, f).toTime
 
 proc getDateTime*(js: JsonNode): Time =
   parseTime(js.getStr, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", 20)

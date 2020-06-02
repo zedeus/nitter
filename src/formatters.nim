@@ -96,10 +96,11 @@ proc getTweetTime*(tweet: Tweet): string =
   tweet.time.format("h:mm tt' · 'MMM d', 'YYYY")
 
 proc getShortTime*(tweet: Tweet): string =
-  let
-    now = now().utc
-    then = tweet.time.utc
-    since = now - then
+  let now = now()
+  var then = tweet.time.local()
+  then.utcOffset = 0
+
+  let since = now - then
 
   if now.year != then.year:
     result = tweet.time.format("d MMM yyyy")
@@ -112,7 +113,6 @@ proc getShortTime*(tweet: Tweet): string =
   elif since.inSeconds > 1:
     result = $since.inSeconds & "s"
   else:
-    # this shouldn't happen, but just in case
     result = "now"
 
 proc getLink*(tweet: Tweet; focus=true): string =
