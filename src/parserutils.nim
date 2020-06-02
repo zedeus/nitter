@@ -9,8 +9,6 @@ const
   htRegex = re"(^|[^A-z0-9-_./?])#([A-z0-9_]+)"
   htReplace = "$1<a href=\"/search?q=%23$2\">#$2</a>"
 
-let localTimezone = local()
-
 template isNull*(js: JsonNode): bool = js.kind == JNull
 template notNull*(js: JsonNode): bool = js.kind != JNull
 
@@ -38,7 +36,7 @@ template getError*(js: JsonNode): Error =
 
 template parseTime(time: string; f: static string; flen: int): Time =
   if time.len != flen: return
-  parseTime(time, f, localTimezone).utc.toTime
+  parseTime(time, f, utc())
 
 proc getDateTime*(js: JsonNode): Time =
   parseTime(js.getStr, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", 20)
