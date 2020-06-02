@@ -37,7 +37,7 @@ you're redirected to the legacy mobile version which is awful both functionally
 and aesthetically. For privacy-minded folks, preventing JavaScript analytics and
 potential IP-based tracking is important, but apart from using the legacy mobile
 version and a VPN, it's impossible. This is is especially relevant now that Twitter
-[removed the ability](https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws) 
+[removed the ability](https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws)
 for users to control whether their data gets sent to advertisers.
 
 Using an instance of Nitter (hosted on a VPS for example), you can browse
@@ -81,10 +81,12 @@ $ mkdir ./tmp
 ```
 
 Set your hostname, port, HMAC key, https (must be correct for cookies), and
-Redis info in `nitter.conf`, run `redis-server --daemonize yes`, then run Nitter
-by executing `./nitter`. You should run Nitter behind a reverse proxy such as
-[Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for security
-reasons.
+Redis info in `nitter.conf`. To run Redis, either run
+`redis-server --daemonize yes`, or `systemctl enable --now redis` (or
+redis-server depending on the distro). Run Nitter by executing `./nitter` or
+using the systemd service below. You should run Nitter behind a reverse proxy
+such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for
+security reasons.
 
 To build and run Nitter in Docker:
 ```bash
@@ -127,6 +129,12 @@ WantedBy=multi-user.target
 
 Then enable and run the service:
 `systemctl enable --now nitter.service`
+
+Nitter currently prints some errors to stdout, and there is no real logging
+implemented. If you're running Nitter with systemd, you can check stdout like
+this: `journalctl -u nitter.service` (add `--follow` to see just the last 15
+lines). If you're running the Docker image, you can do this:
+`docker logs --follow *nitter conightytainer id*`
 
 ## Donating <a href="https://liberapay.com/zedeus/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
 
