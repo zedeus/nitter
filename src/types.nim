@@ -108,7 +108,7 @@ type
     summary = "summary"
     summaryLarge = "summary_large_image"
     promoWebsite = "promo_website"
-    promoVideoWebsite = "promo_video_website"
+    promoVideo = "promo_video_website"
     promoVideoConvo = "promo_video_convo"
     promoImageConvo = "promo_image_convo"
     promoImageApp = "promo_image_app"
