@@ -176,7 +176,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
     result.url = js{"url"}.getStr
 
   case kind
-  of promoVideoConvo, appPlayer:
+  of promoVideo, promoVideoConvo, appPlayer:
     result.video = some parsePromoVideo(vals)
     if kind == appPlayer:
       result.text = vals{"app_category"}.getStrVal(result.text)
