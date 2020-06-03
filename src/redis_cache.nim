@@ -48,6 +48,7 @@ proc cache*(data: PhotoRail; id: string) {.async.} =
   await setex("pr:" & id, baseCacheTime, data.pack)
 
 proc cache*(data: Profile) {.async.} =
+  if data.username.len == 0: return
   pool.withAcquire(r):
     r.startPipelining()
     discard await r.setex(data.toKey, baseCacheTime, pack(data))
