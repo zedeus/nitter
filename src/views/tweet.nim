@@ -145,7 +145,7 @@ proc renderCardContent(card: Card): VNode =
     span(class="card-destination"): text card.dest
 
 proc renderCard(card: Card; prefs: Prefs; path: string): VNode =
-  const smallCards = {player, summary}
+  const smallCards = {app, player, summary, storeLink}
   let large = if card.kind notin smallCards: " large" else: ""
   let url = replaceUrl(card.url, prefs)
 

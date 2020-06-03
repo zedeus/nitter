@@ -1,6 +1,6 @@
 import strutils, options, tables, times, math
 import packedjson
-import types, parserutils
+import types, parserutils, utils
 
 proc parseProfile(js: JsonNode; id=""): Profile =
   if js.isNull: return
@@ -124,25 +124,28 @@ proc parseVideo(js: JsonNode): Video =
 
 proc parsePromoVideo(js: JsonNode): Video =
   result = Video(
-    videoId: js{"player_content_id"}.getStrVal(js{"card_id"}.getStrVal),
-    thumb: js{"player_image_large", "image_value", "url"}.getStr,
+    thumb: js{"player_image_large"}.getImageVal,
     available: true,
     durationMs: js{"content_duration_seconds"}.getStrVal("0").parseInt * 1000,
+    playbackType: vmap,
+    videoId: js{"player_content_id"}.getStrVal(js{"card_id"}.getStrVal(
+        js{"amplify_content_id"}.getStrVal())),
   )
 
   var variant = VideoVariant(
-    videoType: m3u8,
-    url: js{"player_hls_url"}.getStrVal(js{"player_stream_url"}.getStrVal)
+    videoType: vmap,
+    url: js{"player_hls_url"}.getStrVal(js{"player_stream_url"}.getStrVal(
+        js{"amplify_url_vmap"}.getStrVal()))
   )
 
-  if "vmap" in variant.url:
-    variant.videoType = vmap
+  if "m3u8" in variant.url:
+    variant.videoType = m3u8
+    result.playbackType = m3u8
 
-  result.playbackType = vmap
   result.variants.add variant
 
 proc parseBroadcast(js: JsonNode): Card =
-  let image = js{"broadcast_thumbnail_large", "image_value", "url"}.getStr
+  let image = js{"broadcast_thumbnail_large"}.getImageVal
   result = Card(
     kind: broadcast,
     url: js{"broadcast_url"}.getStrVal,
@@ -153,8 +156,9 @@ proc parseBroadcast(js: JsonNode): Card =
   )
 
 proc parseCard(js: JsonNode; urls: JsonNode): Card =
-  const imageTypes = ["photo_image_full_size", "summary_photo_image",
-                      "thumbnail_image", "promo_image", "player_image"]
+  const imageTypes = ["summary_photo_image", "player_image", "promo_image",
+                      "photo_image_full_size", "thumbnail_image", "thumbnail",
+                      "event_thumbnail"]
   let
     vals = ? js{"binding_values"}
     name = js{"name"}.getStr
@@ -172,25 +176,35 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
     result.url = js{"url"}.getStr
 
   case kind
-  of promoVideo, promoVideoConvo:
+  of promoVideoConvo, appPlayer:
     result.video = some parsePromoVideo(vals)
+    if kind == appPlayer:
+      result.text = vals{"app_category"}.getStrVal(result.text)
   of broadcast:
     result = parseBroadcast(vals)
+  of liveEvent:
+    result.text = vals{"event_title"}.getStrVal
   of player:
     result.url = vals{"player_url"}.getStrVal
     if "youtube.com" in result.url:
       result.url = result.url.replace("/embed/", "/watch?v=")
+  of unified:
+    result.title = "This card type is not supported."
   else: discard
 
   for typ in imageTypes:
     with img, vals{typ & "_large"}:
-      result.image = img{"image_value", "url"}.getStr
+      result.image = img.getImageVal
       break
 
   for u in ? urls:
     if u{"url"}.getStr == result.url:
       result.url = u{"expanded_url"}.getStr
       break
+
+  if kind in {promoImageConvo, promoImageApp} and result.url.len == 0 or
+      result.url.startsWith("card://"):
+    result.url = getPicUrl(result.image)
 
 proc parseTweet(js: JsonNode): Tweet =
   if js.isNull: return
@@ -223,9 +237,11 @@ proc parseTweet(js: JsonNode): Tweet =
     let name = jsCard{"name"}.getStr
     if "poll" in name:
       if "image" in name:
-        result.photos.add jsCard{"binding_values", "image_large", "image_value", "url"}.getStr
+        result.photos.add jsCard{"binding_values", "image_large"}.getImageVal
 
       result.poll = some parsePoll(jsCard)
+    elif name == "amplify":
+      result.video = some(parsePromoVideo(jsCard{"binding_values"}))
     else:
       result.card = some parseCard(jsCard, js{"entities", "urls"})
 

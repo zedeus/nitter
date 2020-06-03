@@ -101,24 +101,21 @@ type
     status*: string
 
   CardKind* = enum
+    amplify = "amplify"
     app = "app"
-    appplayer = "appplayer"
+    appPlayer = "appplayer"
     player = "player"
-    audio = "audio"
     summary = "summary"
     summaryLarge = "summary_large_image"
     promoWebsite = "promo_website"
-    promoVideo = "promo_video_website"
     promoVideoConvo = "promo_video_convo"
     promoImageConvo = "promo_image_convo"
-    promoVideoApp = "promo_video_app"
     promoImageApp = "promo_image_app"
-    amplify = "amplify"
-    unified = "unified_card"
+    storeLink = "direct_store_link_app"
     liveEvent = "live_event"
     broadcast = "broadcast"
     periscope = "periscope_broadcast"
-    storeLink = "direct_store_link_app"
+    unified = "unified_card"
     moment = "moment"
     messageMe = "message_me"
 

@@ -58,10 +58,15 @@ proc getId*(js: JsonNode): int64 {.inline.} =
 template getStrVal*(js: JsonNode; default=""): string =
   js{"string_value"}.getStr(default)
 
+template getImageVal*(js: JsonNode; default=""): string =
+  js{"image_value", "url"}.getStr(default)
+
 proc getCardUrl*(js: JsonNode; kind: CardKind): string =
   result = js{"website_url"}.getStrVal
   if kind == promoVideoConvo:
     result = js{"thank_you_url"}.getStrVal(result)
+  if result.startsWith("card://"):
+    result = ""
 
 proc getCardDomain*(js: JsonNode; kind: CardKind): string =
   result = js{"vanity_url"}.getStrVal(js{"domain"}.getStr)
@@ -72,6 +77,8 @@ proc getCardTitle*(js: JsonNode; kind: CardKind): string =
   result = js{"title"}.getStrVal
   if kind == promoVideoConvo:
     result = js{"thank_you_text"}.getStrVal(result)
+  if kind == liveEvent:
+    result = js{"event_category"}.getStrVal
 
 proc getBanner*(js: JsonNode): string =
   let url = js{"profile_banner_url"}.getStr
