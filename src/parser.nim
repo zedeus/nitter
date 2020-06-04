@@ -352,6 +352,15 @@ proc parseUsers*(js: JsonNode; after=""): Result[Profile] =
   let global = parseGlobalObjects(? js)
 
   let instructions = ? js{"timeline", "instructions"}
+  if instructions.len == 0: return
+
+  for i in instructions:
+    with r, i{"replaceEntry", "entry"}:
+      if "top" in r{"entryId"}.getStr:
+        result.top = r.getCursor
+      elif "bottom" in r{"entryId"}.getStr:
+        result.bottom = r.getCursor
+
   for e in instructions[0]{"addEntries", "entries"}:
     let entry = e{"entryId"}.getStr
     if "sq-I-u" in entry:
@@ -375,7 +384,6 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
       with pin, parsePin(i, global):
         result.content.add pin
     else:
-      # This is necessary for search
       with r, i{"replaceEntry", "entry"}:
         if "top" in r{"entryId"}.getStr:
           result.top = r.getCursor
