@@ -257,7 +257,7 @@ proc parseTweet(js: JsonNode): Tweet =
       else: discard
 
 proc finalizeTweet(global: GlobalObjects; id: string): Tweet =
-  let intId = if id.len > 0: parseInt(id) else: 0
+  let intId = if id.len > 0: parseBiggestInt(id) else: 0
   result = global.tweets.getOrDefault(id, Tweet(id: intId))
 
   if result.quote.isSome:
