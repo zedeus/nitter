@@ -120,7 +120,8 @@ proc renderPoll(poll: Poll): VNode =
     for i in 0 ..< poll.options.len:
       let
         leader = if poll.leader == i: " leader" else: ""
-        perc = poll.values[i] / poll.votes * 100
+        val = poll.values[i]
+        perc = if val > 0: val / poll.votes * 100 else: 0
         percStr = (&"{perc:>3.0f}").strip(chars={'.'}) & '%'
       tdiv(class=("poll-meter" & leader)):
         span(class="poll-choice-bar", style={width: percStr})
