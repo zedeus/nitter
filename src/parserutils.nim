@@ -6,7 +6,7 @@ const
   unRegex = re"(^|[^A-z0-9-_./?])@([A-z0-9_]{1,15})"
   unReplace = "$1<a href=\"/$2\">@$2</a>"
 
-  htRegex = re"(^|[^A-z0-9-_./?])#([A-z0-9_]+)"
+  htRegex = re"(^|[^\w-_./?])#([\w_]+)"
   htReplace = "$1<a href=\"/search?q=%23$2\">#$2</a>"
 
 template isNull*(js: JsonNode): bool = js.kind == JNull
