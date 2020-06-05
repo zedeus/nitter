@@ -1,4 +1,4 @@
-import asyncdispatch, strutils, tables, times, sequtils
+import asyncdispatch, strutils, tables, times, sequtils, hashes
 
 import jester
 
@@ -7,7 +7,7 @@ import ".."/[redis_cache, query], ../views/general
 
 include "../views/rss.nimf"
 
-export times
+export times, hashes
 
 proc showRss*(req: Request; hostname: string; query: Query): Future[(string, string)] {.async.} =
   var profile: Profile
@@ -57,7 +57,7 @@ proc createRssRouter*(cfg: Config) =
 
       let
         cursor = getCursor()
-        key = genQueryParam(query) & cursor
+        key = $hash(genQueryUrl(query)) & cursor
         (cRss, cCursor) = await getCachedRss(key)
 
       if cRss.len > 0:
@@ -97,10 +97,12 @@ proc createRssRouter*(cfg: Config) =
         of "search": initQuery(params(request), name=name)
         else: Query(fromUser: @[name])
 
-      let
-        key = @"name" & "/" & @"tab" & getCursor()
-        (cRss, cCursor) = await getCachedRss(key)
+      var key = @"name" & "/" & @"tab"
+      if @"tab" == "search":
+        key &= hash(genQueryUrl(query))
+      key &= getCursor()
 
+      let (cRss, cCursor) = await getCachedRss(key)
       if cRss.len > 0:
         respRss(cRss, cCursor)
 

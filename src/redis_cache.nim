@@ -1,4 +1,4 @@
-import asyncdispatch, times, strutils, options, tables
+import asyncdispatch, times, strutils, tables
 import redis, redpool, msgpack4nim
 export redpool, msgpack4nim
 
