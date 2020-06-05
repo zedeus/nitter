@@ -19,7 +19,7 @@ proc showRss*(req: Request; hostname: string; query: Query): Future[(string, str
 
   if names.len == 1:
     (profile, timeline) =
-      await fetchSingleTimeline(after, query)
+      await fetchSingleTimeline(after, query, skipRail=true)
   else:
     let multiQuery = query.getMultiQuery(names)
     timeline = await getSearch[Tweet](multiQuery, after)
