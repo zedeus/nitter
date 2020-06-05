@@ -33,7 +33,7 @@ proc showRss*(req: Request; hostname: string; query: Query): Future[(string, str
   if profile.suspended:
     return (profile.username, "suspended")
 
-  if timeline.content.len > 0:
+  if profile.fullname.len > 0:
     let rss = renderTimelineRss(timeline, profile, hostname, multi=(names.len > 1))
     return (rss, timeline.bottom)
 
