@@ -6,8 +6,8 @@ const
   unRegex = re"(^|[^A-z0-9-_./?])@([A-z0-9_]{1,15})"
   unReplace = "$1<a href=\"/$2\">@$2</a>"
 
-  htRegex = re"(^|[^\w-_./?])#([\w_]+)"
-  htReplace = "$1<a href=\"/search?q=%23$2\">#$2</a>"
+  htRegex = re"(^|[^\w-_./?])([#$])([\w_]+)"
+  htReplace = "$1<a href=\"/search?q=%23$3\">$2$3</a>"
 
 template isNull*(js: JsonNode): bool = js.kind == JNull
 template notNull*(js: JsonNode): bool = js.kind != JNull
@@ -144,18 +144,6 @@ proc expandUrl(text: var string; js: JsonNode; tLen: int; hideTwitter=false) =
   else:
     text = text.replace(u, a(shortLink(url), href=url))
 
-proc expandTag(text: var string; js: JsonNode; prefix: char) =
-  let
-    tag = prefix & js{"text"}.getStr
-    html = a(tag, href=("/search?q=" & encodeUrl(tag)))
-    oldLen = text.len
-
-  text = text.replaceWord(tag, html)
-
-  # for edgecases with emojis or other characters around the tag
-  if text.len == oldLen:
-    text = text.replace(tag, html)
-
 proc expandMention(text: var string; orig: string; js: JsonNode) =
   let
     name = js{"name"}.getStr
@@ -207,11 +195,8 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   with media, ent{"media"}:
     for m in media: tweet.text.expandUrl(m, slice[1], hideTwitter=true)
 
-  with hashes, ent{"hashtags"}:
-    for h in hashes: tweet.text.expandTag(h, '#')
-
-  with symbols, ent{"symbols"}:
-    for s in symbols: tweet.text.expandTag(s, '$')
+  if "hashtags" in ent or "symbols" in ent:
+    tweet.text = tweet.text.replace(htRegex, htReplace)
 
   for mention in ? ent{"user_mentions"}:
     let
