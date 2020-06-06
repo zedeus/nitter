@@ -1,4 +1,4 @@
-import asyncdispatch, mimetypes
+import asyncdispatch
 from net import Port
 
 import jester

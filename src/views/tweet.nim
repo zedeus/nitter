@@ -107,7 +107,7 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
     tdiv(class="gallery-gif", style={maxHeight: "unset"}):
       tdiv(class="attachment"):
         let thumb = getPicUrl(gif.thumb)
-        let url = getGifUrl(gif.url)
+        let url = getPicUrl(gif.url)
         if prefs.autoplayGifs:
           video(class="gif", poster=thumb, controls="", autoplay="", muted="", loop=""):
             source(src=url, `type`="video/mp4")

@@ -28,9 +28,6 @@ proc getVidUrl*(link: string): string =
     url = encodeUrl(link)
   &"/video/{sig}/{url}"
 
-proc getGifUrl*(link: string): string =
-  &"/gif/{encodeUrl(link)}"
-
 proc getPicUrl*(link: string): string =
   &"/pic/{encodeUrl(link)}"
 

@@ -36,7 +36,7 @@
 <img src="https://${hostname}${getPicUrl(get(tweet.video).thumb)}" style="max-width:250px;" />
 #elif tweet.gif.isSome:
 #let thumb = &"https://{hostname}{getPicUrl(get(tweet.gif).thumb)}"
-#let url = &"https://{hostname}{getGifUrl(get(tweet.gif).url)}"
+#let url = &"https://{hostname}{getPicUrl(get(tweet.gif).url)}"
 <video poster="${thumb}" autoplay muted loop style="max-width:250px;">
   <source src="${url}" type="video/mp4"</source></video>
 #end if

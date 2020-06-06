@@ -35,7 +35,7 @@ proc expired(token: Token): bool {.inline.} =
   result = token.init < getTime() - expirationTime
 
 proc isLimited(token: Token): bool {.inline.} =
-  token == nil or token.remaining <= 1 and token.reset > getTime() or
+  token == nil or (token.remaining <= 1 and token.reset > getTime()) or
     token.expired
 
 proc release*(token: Token) =
