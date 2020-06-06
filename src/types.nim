@@ -212,5 +212,8 @@ type
     redisConns*: int
     redisMaxConns*: int
 
+  Rss* = object
+    feed*, cursor*: string
+
 proc contains*(thread: Chain; tweet: Tweet): bool =
   thread.content.anyIt(it.id == tweet.id)

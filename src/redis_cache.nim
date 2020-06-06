@@ -16,10 +16,20 @@ proc setCacheTimes*(cfg: Config) =
   rssCacheTime = cfg.rssCacheTime * 60
   listCacheTime = cfg.listCacheTime * 60
 
-proc initRedisPool*(cfg: Config) =
+proc initRedisPool*(cfg: Config) {.async.} =
   try:
-    pool = waitFor newRedisPool(cfg.redisConns, maxConns=cfg.redisMaxConns,
-                                host=cfg.redisHost, port=cfg.redisPort)
+    pool = await newRedisPool(cfg.redisConns, maxConns=cfg.redisMaxConns,
+                              host=cfg.redisHost, port=cfg.redisPort)
+
+    pool.withAcquire(r):
+      let snappyRss = await r.get("snappyRss")
+      if snappyRss == redisNil:
+        let list = await r.scan(newCursor(0), "rss:*", 10000)
+        r.startPipelining()
+        for rss in list:
+          discard await r.del(rss)
+        discard await r.flushPipeline()
+        await r.setk("snappyRss", "true")
   except OSError:
     echo "Failed to connect to Redis."
     quit(1)
@@ -60,12 +70,12 @@ proc cacheProfileId*(username, id: string) {.async.} =
   pool.withAcquire(r):
     discard await r.hset("p:", toLower(username), id)
 
-proc cacheRss*(query, rss, cursor: string) {.async.} =
+proc cacheRss*(query: string; rss: Rss) {.async.} =
   let key = "rss:" & query
   pool.withAcquire(r):
     r.startPipelining()
-    discard await r.hset(key, "rss", rss)
-    discard await r.hset(key, "min", cursor)
+    discard await r.hset(key, "rss", rss.feed)
+    discard await r.hset(key, "min", rss.cursor)
     discard await r.expire(key, rssCacheTime)
     discard await r.flushPipeline()
 
@@ -104,10 +114,11 @@ proc getCachedList*(username=""; name=""; id=""): Future[List] {.async.} =
       result = await getGraphList(username, name)
     await cache(result)
 
-proc getCachedRss*(key: string): Future[(string, string)] {.async.} =
-  var res: Table[string, string]
+proc getCachedRss*(key: string): Future[Rss] {.async.} =
+  let k = "rss:" & key
   pool.withAcquire(r):
-    res = await r.hgetall("rss:" & key)
-
-  if "rss" in res:
-    result = (res["rss"], res.getOrDefault("min"))
+    result.cursor = await r.hget(k, "min")
+    if result.cursor.len > 2:
+      result.feed = await r.hget(k, "rss")
+    else:
+      result.cursor.setLen 0

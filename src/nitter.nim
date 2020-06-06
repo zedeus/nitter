@@ -16,7 +16,7 @@ updateDefaultPrefs(fullCfg)
 setCacheTimes(cfg)
 setHmacKey(cfg.hmacKey)
 
-initRedisPool(cfg)
+waitFor initRedisPool(cfg)
 asyncCheck initTokenPool(cfg)
 
 createUnsupportedRouter(cfg)

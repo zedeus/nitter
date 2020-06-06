@@ -21,6 +21,7 @@ requires "https://github.com/zedeus/redis#head"
 requires "redpool#head"
 requires "msgpack4nim >= 0.3.1"
 requires "packedjson"
+requires "snappy#head"
 
 
 # Tasks
