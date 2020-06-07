@@ -4,6 +4,12 @@ import karax/[karaxdsl, vdom, vstyles]
 import renderutils
 import ".."/[types, utils, formatters]
 
+proc getSmallPic(url: string): string =
+  result = url
+  if "?" notin url:
+    result &= ":small"
+  result = getPicUrl(result)
+
 proc renderHeader(tweet: Tweet; retweet=""): VNode =
   buildHtml(tdiv):
     if retweet.len > 0:
@@ -52,7 +58,7 @@ proc isPlaybackEnabled(prefs: Prefs; video: Video): bool =
 
 proc renderVideoDisabled(video: Video; path: string): VNode =
   buildHtml(tdiv):
-    img(src=getPicUrl(video.thumb))
+    img(src=getSmallPic(video.thumb))
     tdiv(class="video-overlay"):
       case video.playbackType
       of mp4:
@@ -62,7 +68,7 @@ proc renderVideoDisabled(video: Video; path: string): VNode =
 
 proc renderVideoUnavailable(video: Video): VNode =
   buildHtml(tdiv):
-    img(src=getPicUrl(video.thumb))
+    img(src=getSmallPic(video.thumb))
     tdiv(class="video-overlay"):
       case video.reason
       of "dmcaed":
@@ -77,7 +83,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="attachments card")):
     tdiv(class="gallery-video" & container):
       tdiv(class="attachment video-container"):
-        let thumb = getPicUrl(video.thumb)
+        let thumb = getSmallPic(video.thumb)
         if not video.available:
           renderVideoUnavailable(video)
         elif not prefs.isPlaybackEnabled(video):
@@ -108,7 +114,7 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
     tdiv(class="gallery-gif", style={maxHeight: "unset"}):
       tdiv(class="attachment"):
-        let thumb = getPicUrl(gif.thumb)
+        let thumb = getSmallPic(gif.thumb)
         let url = getPicUrl(gif.url)
         if prefs.autoplayGifs:
           video(class="gif", poster=thumb, controls="", autoplay="", muted="", loop=""):
