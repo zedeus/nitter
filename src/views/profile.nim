@@ -16,7 +16,7 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
     tdiv(class="profile-card-info"):
       let url = getPicUrl(profile.getUserPic())
       a(class="profile-card-avatar", href=url, target="_blank"):
-        genImg(profile.getUserpic("_200x200"))
+        genImg(profile.getUserpic("_400x400"))
 
       tdiv(class="profile-card-tabs-name"):
         linkUser(profile, class="profile-card-fullname")
@@ -72,8 +72,9 @@ proc renderPhotoRail(profile: Profile; photoRail: PhotoRail): VNode =
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:
         if i == 16: break
+        let col = if photo.color.len > 0: photo.color else: "#161616"
         a(href=(&"/{profile.username}/status/{photo.tweetId}#m"),
-          style={backgroundColor: photo.color}):
+          style={backgroundColor: col}):
           genImg(photo.url & (if "format" in photo.url: "" else: ":thumb"))
 
 proc renderBanner(profile: Profile): VNode =
