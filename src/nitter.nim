@@ -1,4 +1,4 @@
-import asyncdispatch
+import asyncdispatch, logging, strformat
 from net import Port
 
 import jester
@@ -12,11 +12,22 @@ import routes/[
 const configPath {.strdefine.} = "./nitter.conf"
 let (cfg, fullCfg) = getConfig(configPath)
 
+# Silence Jester's query warning
+addHandler(newConsoleLogger())
+setLogFilter(lvlError)
+
+let http = if cfg.useHttps: "https" else: "http"
+stdout.write &"Starting Nitter at {http}://{cfg.hostname}\n"
+stdout.flushFile
+
 updateDefaultPrefs(fullCfg)
 setCacheTimes(cfg)
 setHmacKey(cfg.hmacKey)
 
 waitFor initRedisPool(cfg)
+stdout.write &"Connected to Redis at {cfg.redisHost}:{cfg.redisPort}\n"
+stdout.flushFile
+
 asyncCheck initTokenPool(cfg)
 
 createUnsupportedRouter(cfg)

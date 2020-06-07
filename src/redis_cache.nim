@@ -36,7 +36,8 @@ proc initRedisPool*(cfg: Config) {.async.} =
     await migrate("frosty", "*")
 
   except OSError:
-    echo "Failed to connect to Redis."
+    stdout.write "Failed to connect to Redis.\n"
+    stdout.flushFile
     quit(1)
 
 template toKey(p: Profile): string = "p:" & toLower(p.username)
