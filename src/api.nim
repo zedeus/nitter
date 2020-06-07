@@ -50,7 +50,8 @@ proc getMediaTimeline*(id: string; after=""): Future[Timeline] {.async.} =
   result = parseTimeline(await fetch(url), after)
 
 proc getPhotoRail*(id: string): Future[PhotoRail] {.async.} =
-  result = parsePhotoRail(await getMediaTimeline(id))
+  let url = mediaTimeline / (id & ".json") ? genParams()
+  result = parsePhotoRail(await fetch(url))
 
 proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
   when T is Profile:

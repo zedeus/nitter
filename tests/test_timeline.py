@@ -12,6 +12,13 @@ empty = [['emptyuser'], ['mobile_test_10']]
 
 protected = [['mobile_test_7'], ['Empty_user']]
 
+photo_rail = [['mobile_test', [
+    'BzUnaDFCUAAmrjs', 'Bo0nDsYIYAIjqVn', 'Bos--KNIQAAA7Li', 'Boq1sDJIYAAxaoi',
+    'BonISmPIEAAhP3G', 'BoQbwJAIUAA0QCY', 'BoQbRQxIIAA3FWD', 'Bn8Qh8iIIAABXrG',
+    'Bn8QIG3IYAA0IGT', 'Bn8O3QeIUAAONai', 'Bn8NGViIAAATNG4', 'BkKovdrCUAAEz79',
+    'BkKoe_oCIAASAqr', 'BkKoRLNCAAAYfDf', 'BkKndxoCQAE1vFt', 'BPEmIbYCMAE44dl'
+]]]
+
 
 class TweetTest(BaseTestCase):
     @parameterized.expand(normal)
@@ -52,3 +59,11 @@ class TweetTest(BaseTestCase):
         self.assert_element_absent(Timeline.newest)
         self.assert_element_absent(Timeline.older)
         self.assert_element_absent(Timeline.end)
+
+    @parameterized.expand(photo_rail)
+    def test_photo_rail(self, username, images):
+        self.open_nitter(username)
+        self.assert_element_visible(Timeline.photo_rail)
+        for i, url in enumerate(images):
+            img = self.get_attribute(Timeline.photo_rail + f' a:nth-child({i + 1}) img', 'src')
+            self.assertIn(url, img)

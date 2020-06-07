@@ -53,6 +53,7 @@ class Timeline(object):
     end = '.timeline-end'
     none = '.timeline-none'
     protected = '.timeline-protected'
+    photo_rail = '.photo-rail-grid'
 
 
 class Conversation(object):
