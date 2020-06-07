@@ -4,7 +4,7 @@ import asynchttpserver, asyncstreams, asyncfile, asyncnet
 import jester, regex
 
 import router_utils
-import ".."/[types, formatters, agents]
+import ".."/[types, formatters, agents, utils]
 import ../views/general
 
 export asynchttpserver, asyncstreams, asyncfile, asyncnet
@@ -66,11 +66,14 @@ proc createMediaRouter*(cfg: Config) =
       resp Http404
 
     get "/pic/@url":
-      cond "http" in @"url"
-      cond "twimg" in @"url"
+      var url = decodeUrl(@"url")
+      if "twimg.com" notin url:
+        url.insert(twimg)
+      if not url.startsWith(https):
+        url.insert(https)
 
-      let uri = parseUri(decodeUrl(@"url"))
-      cond isTwitterUrl($uri) == true
+      let uri = parseUri(url)
+      cond isTwitterUrl(uri) == true
 
       enableRawMode()
       let code = await proxyMedia(request, $uri)

@@ -1,4 +1,4 @@
-import strutils, times, macros, htmlgen, uri, unicode, options
+import strutils, times, macros, htmlgen, unicode, options
 import regex, packedjson
 import types, utils, formatters
 
@@ -58,8 +58,13 @@ proc getId*(js: JsonNode): int64 {.inline.} =
 template getStrVal*(js: JsonNode; default=""): string =
   js{"string_value"}.getStr(default)
 
-template getImageVal*(js: JsonNode; default=""): string =
-  js{"image_value", "url"}.getStr(default)
+proc getImageStr*(js: JsonNode): string =
+  result = js.getStr
+  result.removePrefix(https)
+  result.removePrefix(twimg)
+
+template getImageVal*(js: JsonNode): string =
+  js{"image_value", "url"}.getImageStr
 
 proc getCardUrl*(js: JsonNode; kind: CardKind): string =
   result = js{"website_url"}.getStrVal
@@ -81,7 +86,7 @@ proc getCardTitle*(js: JsonNode; kind: CardKind): string =
     result = js{"event_category"}.getStrVal
 
 proc getBanner*(js: JsonNode): string =
-  let url = js{"profile_banner_url"}.getStr
+  let url = js{"profile_banner_url"}.getImageStr
   if url.len > 0:
     return url & "/1500x500"
 

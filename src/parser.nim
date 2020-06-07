@@ -10,7 +10,7 @@ proc parseProfile(js: JsonNode; id=""): Profile =
     fullname: js{"name"}.getStr,
     location: js{"location"}.getStr,
     bio: js{"description"}.getStr,
-    userpic: js{"profile_image_url_https"}.getStr.replace("_normal", ""),
+    userpic: js{"profile_image_url_https"}.getImageStr.replace("_normal", ""),
     banner: js.getBanner,
     following: $js{"friends_count"}.getInt,
     followers: $js{"followers_count"}.getInt,
@@ -62,7 +62,7 @@ proc parseGraphList*(js: JsonNode): List =
     userId: list{"user", "legacy", "id_str"}.getStr,
     description: list{"description"}.getStr,
     members: list{"member_count"}.getInt,
-    banner: list{"custom_banner_media", "media_info", "url"}.getStr
+    banner: list{"custom_banner_media", "media_info", "url"}.getImageStr
   )
 
 proc parseListMembers*(js: JsonNode; cursor: string): Result[Profile] =
@@ -100,15 +100,15 @@ proc parsePoll(js: JsonNode): Poll =
   result.votes = result.values.sum
 
 proc parseGif(js: JsonNode): Gif =
-  Gif(
-    url: js{"video_info", "variants"}[0]{"url"}.getStr,
-    thumb: js{"media_url_https"}.getStr
+  result = Gif(
+    url: js{"video_info", "variants"}[0]{"url"}.getImageStr,
+    thumb: js{"media_url_https"}.getImageStr
   )
 
 proc parseVideo(js: JsonNode): Video =
   result = Video(
     videoId: js{"id_str"}.getStr,
-    thumb: js{"media_url_https"}.getStr,
+    thumb: js{"media_url_https"}.getImageStr,
     views: js{"ext", "mediaStats", "r", "ok", "viewCount"}.getStr,
     available: js{"ext_media_availability", "status"}.getStr == "available",
     title: js{"ext_alt_text"}.getStr,
@@ -249,7 +249,7 @@ proc parseTweet(js: JsonNode): Tweet =
     for m in jsMedia:
       case m{"type"}.getStr
       of "photo":
-        result.photos.add m{"media_url_https"}.getStr
+        result.photos.add m{"media_url_https"}.getImageStr
       of "video":
         result.video = some(parseVideo(m))
       of "animated_gif":

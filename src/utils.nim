@@ -4,6 +4,8 @@ import nimcrypto, regex
 var hmacKey = "secretkey"
 
 const
+  https* = "https://"
+  twimg* = "pbs.twimg.com/"
   badJpgExts = @["1500x500", "jpgn", "jpg:", "jpg_", "_jpg"]
   badPngExts = @["pngn", "png:", "png_", "_png"]
   twitterDomains = @[
@@ -42,6 +44,9 @@ proc cleanFilename*(filename: string): string =
 proc filterParams*(params: Table): seq[(string, string)] =
   let filter = ["name", "id", "list", "referer", "scroll"]
   toSeq(params.pairs()).filterIt(it[0] notin filter and it[1].len > 0)
+
+proc isTwitterUrl*(uri: Uri): bool =
+  uri.hostname in twitterDomains
 
 proc isTwitterUrl*(url: string): bool =
   parseUri(url).hostname in twitterDomains
