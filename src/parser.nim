@@ -403,21 +403,25 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
     elif "cursor-bottom" in entry:
       result.bottom = e.getCursor
 
-proc parsePhotoRail*(tl: Timeline): PhotoRail =
-  for tweet in tl.content:
+proc parsePhotoRail*(js: JsonNode): PhotoRail =
+  let
+    tweets = ? js{"globalObjects", "tweets"}
+    instructions = ? js{"timeline", "instructions"}
+
+  if instructions.len == 0 or tweets.len == 0: return
+
+  for e in instructions[0]{"addEntries", "entries"}:
     if result.len == 16: break
+    let entry = e{"entryId"}.getStr
+    if "tweet" in entry:
+      let id = entry.getId
+      if id notin tweets: continue
+      let tweet = parseTweet(tweets{id})
+      var url = if tweet.photos.len > 0: tweet.photos[0]
+                elif tweet.video.isSome: get(tweet.video).thumb
+                elif tweet.gif.isSome: get(tweet.gif).thumb
+                elif tweet.card.isSome: get(tweet.card).image
+                else: ""
 
-    let url = if tweet.photos.len > 0: tweet.photos[0]
-              elif tweet.video.isSome: get(tweet.video).thumb
-              elif tweet.gif.isSome: get(tweet.gif).thumb
-              elif tweet.card.isSome: get(tweet.card).image
-              else: ""
-
-    if url.len == 0:
-      continue
-
-    result.add GalleryPhoto(
-      url: url,
-      tweetId: $tweet.id,
-      color: "#161616"
-    )
+      if url.len == 0: continue
+      result.add GalleryPhoto(url: url, tweetId: $tweet.id)
