@@ -19,9 +19,9 @@ requires "sass"
 requires "markdown#head"
 requires "https://github.com/zedeus/redis#head"
 requires "redpool#head"
-requires "msgpack4nim >= 0.3.1"
 requires "packedjson"
 requires "snappy#head"
+requires "https://github.com/disruptek/frosty#0.0.6"
 
 
 # Tasks

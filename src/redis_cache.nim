@@ -1,6 +1,5 @@
 import asyncdispatch, times, strutils, tables
-import redis, redpool, msgpack4nim
-export redpool, msgpack4nim
+import redis, redpool, frosty, snappy
 
 import types, api
 
@@ -16,32 +15,32 @@ proc setCacheTimes*(cfg: Config) =
   rssCacheTime = cfg.rssCacheTime * 60
   listCacheTime = cfg.listCacheTime * 60
 
+proc migrate*(key, match: string) {.async.} =
+  pool.withAcquire(r):
+    let hasKey = await r.get(key)
+    if hasKey == redisNil:
+      let list = await r.scan(newCursor(0), match, 100000)
+      r.startPipelining()
+      for item in list:
+        if item != "p:":
+          discard await r.del(item)
+      await r.setk(key, "true")
+      discard await r.flushPipeline()
+
 proc initRedisPool*(cfg: Config) {.async.} =
   try:
     pool = await newRedisPool(cfg.redisConns, maxConns=cfg.redisMaxConns,
                               host=cfg.redisHost, port=cfg.redisPort)
 
-    pool.withAcquire(r):
-      let snappyRss = await r.get("snappyRss")
-      if snappyRss == redisNil:
-        let list = await r.scan(newCursor(0), "rss:*", 10000)
-        r.startPipelining()
-        for rss in list:
-          discard await r.del(rss)
-        discard await r.flushPipeline()
-        await r.setk("snappyRss", "true")
+    await migrate("snappyRss", "rss:*")
+    await migrate("frosty", "*")
+
   except OSError:
     echo "Failed to connect to Redis."
     quit(1)
 
 template toKey(p: Profile): string = "p:" & toLower(p.username)
 template toKey(l: List): string = toLower("l:" & l.username & '/' & l.name)
-
-template to(s: string; typ: typedesc): untyped =
-  var res: typ
-  if s.len > 0:
-    s.unpack(res)
-  res
 
 proc get(query: string): Future[string] {.async.} =
   pool.withAcquire(r):
@@ -52,16 +51,16 @@ proc setex(key: string; time: int; data: string) {.async.} =
     discard await r.setex(key, time, data)
 
 proc cache*(data: List) {.async.} =
-  await setex(data.toKey, listCacheTime, data.pack)
+  await setex(data.toKey, listCacheTime, compress(freeze(data)))
 
 proc cache*(data: PhotoRail; id: string) {.async.} =
-  await setex("pr:" & id, baseCacheTime, data.pack)
+  await setex("pr:" & id, baseCacheTime, compress(freeze(data)))
 
 proc cache*(data: Profile) {.async.} =
   if data.username.len == 0: return
   pool.withAcquire(r):
     r.startPipelining()
-    discard await r.setex(data.toKey, baseCacheTime, pack(data))
+    discard await r.setex(data.toKey, baseCacheTime, compress(freeze(data)))
     discard await r.hset("p:", toLower(data.username), data.id)
     discard await r.flushPipeline()
 
@@ -88,7 +87,7 @@ proc getProfileId*(username: string): Future[string] {.async.} =
 proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} =
   let prof = await get("p:" & toLower(username))
   if prof != redisNil:
-    result = prof.to(Profile)
+    uncompress(prof).thaw(result)
   elif fetch:
     result = await getProfile(username)
 
@@ -96,7 +95,7 @@ proc getCachedPhotoRail*(id: string): Future[PhotoRail] {.async.} =
   if id.len == 0: return
   let rail = await get("pr:" & toLower(id))
   if rail != redisNil:
-    result = rail.to(PhotoRail)
+    uncompress(rail).thaw(result)
   else:
     result = await getPhotoRail(id)
     await cache(result, id)
@@ -106,7 +105,7 @@ proc getCachedList*(username=""; name=""; id=""): Future[List] {.async.} =
              else: await get(toLower("l:" & username & '/' & name))
 
   if list != redisNil:
-    result = list.to(List)
+    uncompress(list).thaw(result)
   else:
     if id.len > 0:
       result = await getGraphListById(id)
