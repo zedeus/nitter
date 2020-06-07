@@ -347,6 +347,22 @@ proc parseConversation*(js: JsonNode; tweetId: string): Conversation =
     elif "cursor-bottom" in entry:
       result.replies.bottom = e.getCursor
 
+proc parseInstructions[T](res: var Result[T]; global: GlobalObjects; js: JsonNode) =
+  if js.kind != JArray or js.len == 0:
+    return
+
+  for i in js:
+    when T is Tweet:
+      if res.beginning and i{"pinEntry"}.notNull:
+        with pin, parsePin(i, global):
+          res.content.add pin
+
+    with r, i{"replaceEntry", "entry"}:
+      if "top" in r{"entryId"}.getStr:
+        res.top = r.getCursor
+      elif "bottom" in r{"entryId"}.getStr:
+        res.bottom = r.getCursor
+
 proc parseUsers*(js: JsonNode; after=""): Result[Profile] =
   result = Result[Profile](beginning: after.len == 0)
   let global = parseGlobalObjects(? js)
@@ -354,12 +370,7 @@ proc parseUsers*(js: JsonNode; after=""): Result[Profile] =
   let instructions = ? js{"timeline", "instructions"}
   if instructions.len == 0: return
 
-  for i in instructions:
-    with r, i{"replaceEntry", "entry"}:
-      if "top" in r{"entryId"}.getStr:
-        result.top = r.getCursor
-      elif "bottom" in r{"entryId"}.getStr:
-        result.bottom = r.getCursor
+  result.parseInstructions(global, instructions)
 
   for e in instructions[0]{"addEntries", "entries"}:
     let entry = e{"entryId"}.getStr
@@ -379,16 +390,7 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
   let instructions = ? js{"timeline", "instructions"}
   if instructions.len == 0: return
 
-  for i in instructions:
-    if result.beginning and i{"pinEntry"}.notNull:
-      with pin, parsePin(i, global):
-        result.content.add pin
-    else:
-      with r, i{"replaceEntry", "entry"}:
-        if "top" in r{"entryId"}.getStr:
-          result.top = r.getCursor
-        elif "bottom" in r{"entryId"}.getStr:
-          result.bottom = r.getCursor
+  result.parseInstructions(global, instructions)
 
   for e in instructions[0]{"addEntries", "entries"}:
     let entry = e{"entryId"}.getStr
