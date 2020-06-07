@@ -55,7 +55,7 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
       if hasValue:
         await request.client.send(data)
     data.setLen 0
-  except HttpRequestError, OSError:
+  except HttpRequestError, ProtocolError, OSError:
     result = Http404
   finally:
     client.safeClose()
