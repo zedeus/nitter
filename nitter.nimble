@@ -11,8 +11,8 @@ bin           = @["nitter"]
 # Dependencies
 
 requires "nim >= 1.2.0"
-requires "jester#head"
-requires "regex#2d96bab"
+requires "jester#7e8df65"
+requires "regex#2e32fdc"
 requires "nimcrypto >= 0.4.11"
 requires "karax >= 1.1.2"
 requires "sass"
@@ -20,7 +20,7 @@ requires "markdown#head"
 requires "https://github.com/zedeus/redis#head"
 requires "redpool#head"
 requires "packedjson"
-requires "snappy#head"
+requires "snappy#d13e2cc"
 requires "https://github.com/disruptek/frosty#0.0.6"
 
 
