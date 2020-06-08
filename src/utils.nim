@@ -1,3 +1,4 @@
+import base64
 import strutils, strformat, sequtils, uri, tables
 import nimcrypto, regex
 
@@ -35,7 +36,11 @@ proc getVidUrl*(link: string): string =
   &"/video/{sig}/{url}"
 
 proc getPicUrl*(link: string): string =
-  &"/pic/{encodeUrl(link)}"
+  if compatiblePicURL:
+    # Use "safe" encoding mode: https://nim-lang.org/docs/base64.html#encode%2Cstring
+    &"/pic/encoded/{encodeUrl(encode(link, safe = true))}"
+  else:
+    &"/pic/{encodeUrl(link)}"
 
 proc cleanFilename*(filename: string): string =
   const reg = re"[^A-Za-z0-9._-]"

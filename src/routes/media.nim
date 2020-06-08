@@ -1,5 +1,6 @@
 import uri, strutils, httpclient, os, hashes
 import asynchttpserver, asyncstreams, asyncfile, asyncnet
+import base64
 
 import jester, regex
 
@@ -67,6 +68,26 @@ proc createMediaRouter*(cfg: Config) =
 
     get "/pic/@url":
       var url = decodeUrl(@"url")
+      if "twimg.com" notin url:
+        url.insert(twimg)
+      if not url.startsWith(https):
+        url.insert(https)
+
+      let uri = parseUri(url)
+      cond isTwitterUrl(uri) == true
+
+      enableRawMode()
+      let code = await proxyMedia(request, $uri)
+      if code == Http200:
+        enableRawMode()
+        break route
+      else:
+        resp code
+
+    get "/pic/encoded/@encoded":
+      var encodedString = @"encoded"
+      var urlString = decode(encodedString)
+      var url = decodeUrl(urlString)
       if "twimg.com" notin url:
         url.insert(twimg)
       if not url.startsWith(https):
