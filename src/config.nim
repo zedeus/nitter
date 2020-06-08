@@ -30,6 +30,7 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     redisMaxConns: cfg.get("Cache", "redisMaxConnections", 30),
 
     hmacKey: cfg.get("Config", "hmacKey", "secretkey"),
+    compatiblePicURL: cfg.get("Config", "compatiblePicURL", false),
     minTokens: cfg.get("Config", "tokenCount", 10),
   )
 

@@ -201,6 +201,7 @@ type
     staticDir*: string
 
     hmacKey*: string
+    compatiblePicURL*: bool
     minTokens*: int
 
     cacheDir*: string

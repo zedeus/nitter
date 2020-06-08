@@ -2,6 +2,7 @@ import strutils, strformat, sequtils, uri, tables
 import nimcrypto, regex
 
 var hmacKey = "secretkey"
+var compatiblePicURL = false
 
 const
   https* = "https://"
@@ -19,6 +20,9 @@ const
 
 proc setHmacKey*(key: string) =
   hmacKey = key
+
+proc setCompatiblePicUrl*(value: bool) =
+  compatiblePicURL = value
 
 proc getHmac*(data: string): string =
   ($hmac(sha256, hmacKey, data))[0 .. 12]

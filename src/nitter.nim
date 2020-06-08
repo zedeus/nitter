@@ -23,6 +23,7 @@ stdout.flushFile
 updateDefaultPrefs(fullCfg)
 setCacheTimes(cfg)
 setHmacKey(cfg.hmacKey)
+setCompatiblePicUrl(cfg.compatiblePicURL)
 
 waitFor initRedisPool(cfg)
 stdout.write &"Connected to Redis at {cfg.redisHost}:{cfg.redisPort}\n"
