@@ -15,6 +15,7 @@ const
   nbsp = $Rune(0x000A0)
 
   wwwRegex = re"https?://(www[0-9]?\.)?"
+  m3u8Regex = re"""url="(.+.m3u8)""""
   manifestRegex = re"(.+(.ts|.m3u8|.vmap))"
   userpicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
   extRegex = re"(\.[A-z]+)$"
@@ -51,6 +52,11 @@ proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
     result = result.replace(twRegex, prefs.replaceTwitter)
   if absolute.len > 0:
     result = result.replace("href=\"/", "href=\"https://" & absolute & "/")
+
+proc getM3u8Url*(content: string): string =
+  var m: RegexMatch
+  if content.find(m3u8Regex, m):
+    result = content[m.group(0)[0]]
 
 proc proxifyVideo*(manifest: string; proxy: bool): string =
   proc cb(m: RegexMatch; s: string): string =

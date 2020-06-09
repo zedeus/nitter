@@ -1,7 +1,9 @@
-import strutils, strformat, sequtils, uri, tables
+import strutils, strformat, sequtils, uri, tables, base64
 import nimcrypto, regex
 
-var hmacKey = "secretkey"
+var
+  hmacKey = "secretkey"
+  base64Media = false
 
 const
   https* = "https://"
@@ -20,18 +22,25 @@ const
 proc setHmacKey*(key: string) =
   hmacKey = key
 
+proc setProxyEncoding*(state: bool) =
+  base64Media = state
+
 proc getHmac*(data: string): string =
   ($hmac(sha256, hmacKey, data))[0 .. 12]
 
 proc getVidUrl*(link: string): string =
   if link.len == 0: return
-  let
-    sig = getHmac(link)
-    url = encodeUrl(link)
-  &"/video/{sig}/{url}"
+  let sig = getHmac(link)
+  if base64Media:
+    &"/video/enc/{sig}/{encode(link, safe=true)}"
+  else:
+    &"/video/{sig}/{encodeUrl(link)}"
 
 proc getPicUrl*(link: string): string =
-  &"/pic/{encodeUrl(link)}"
+  if base64Media:
+    &"/pic/enc/{encode(link, safe=true)}"
+  else:
+    &"/pic/{encodeUrl(link)}"
 
 proc cleanFilename*(filename: string): string =
   const reg = re"[^A-Za-z0-9._-]"

@@ -1,17 +1,16 @@
-import uri, strutils, httpclient, os, hashes
+import uri, strutils, httpclient, os, hashes, base64, re
 import asynchttpserver, asyncstreams, asyncfile, asyncnet
 
-import jester, regex
+import jester
 
 import router_utils
 import ".."/[types, formatters, agents, utils]
 import ../views/general
 
 export asynchttpserver, asyncstreams, asyncfile, asyncnet
-export httpclient, os, strutils, asyncstreams, regex
+export httpclient, os, strutils, asyncstreams, base64, re
 
 const
-  m3u8Regex* = re"""url="(.+.m3u8)""""
   m3u8Mime* = "application/vnd.apple.mpegurl"
   maxAge* = "max-age=604800"
 
@@ -60,13 +59,27 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   finally:
     client.safeClose()
 
+template check*(code): untyped =
+  if code != Http200:
+    resp code
+  else:
+    enableRawMode()
+    break route
+
+proc decoded*(req: jester.Request; index: int): string =
+  let
+    based = req.matches[0].len > 1
+    encoded = req.matches[index]
+  if based: decode(encoded)
+  else: decodeUrl(encoded)
+
 proc createMediaRouter*(cfg: Config) =
   router media:
     get "/pic/?":
       resp Http404
 
-    get "/pic/@url":
-      var url = decodeUrl(@"url")
+    get re"^\/pic\/(enc)?\/?(.+)":
+      var url = decoded(request, 1)
       if "twimg.com" notin url:
         url.insert(twimg)
       if not url.startsWith(https):
@@ -75,42 +88,32 @@ proc createMediaRouter*(cfg: Config) =
       let uri = parseUri(url)
       cond isTwitterUrl(uri) == true
 
-      enableRawMode()
-      let code = await proxyMedia(request, $uri)
-      if code == Http200:
-        enableRawMode()
-        break route
-      else:
-        resp code
+      let code = await proxyMedia(request, url)
+      check code
 
-    get "/video/@sig/@url":
-      cond "http" in @"url"
-      var url = decodeUrl(@"url")
-      let prefs = cookiePrefs()
+    get re"^\/video\/(enc)?\/?(.+)\/(.+)$":
+      let url = decoded(request, 2)
+      cond "http" in url
 
-      if getHmac(url) != @"sig":
+      if getHmac(url) != request.matches[1]:
         resp showError("Failed to verify signature", cfg)
 
       if ".mp4" in url or ".ts" in url:
         let code = await proxyMedia(request, url)
-        if code == Http200:
-          enableRawMode()
-          break route
-        else:
-          resp code
+        check code
 
       var content: string
       if ".vmap" in url:
-        var m: RegexMatch
-        content = await safeFetch(url, mediaAgent)
-        if content.find(m3u8Regex, m):
-          url = decodeUrl(content[m.group(0)[0]])
+        let m3u8 = getM3u8Url(await safeFetch(url, mediaAgent))
+        if m3u8.len > 0:
           content = await safeFetch(url, mediaAgent)
         else:
           resp Http404
 
       if ".m3u8" in url:
-        let vid = await safeFetch(url, mediaAgent)
+        let
+          vid = await safeFetch(url, mediaAgent)
+          prefs = cookiePrefs()
         content = proxifyVideo(vid, prefs.proxyVideos)
 
       resp content, m3u8Mime

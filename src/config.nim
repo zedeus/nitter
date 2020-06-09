@@ -20,6 +20,10 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     hostname: cfg.get("Server", "hostname", "nitter.net"),
     staticDir: cfg.get("Server", "staticDir", "./public"),
 
+    hmacKey: cfg.get("Config", "hmacKey", "secretkey"),
+    base64Media: cfg.get("Config", "base64Media", false),
+    minTokens: cfg.get("Config", "tokenCount", 10),
+
     cacheDir: cfg.get("Cache", "directory", "/tmp/nitter"),
     listCacheTime: cfg.get("Cache", "listMinutes", 120),
     rssCacheTime: cfg.get("Cache", "rssMinutes", 10),
@@ -27,10 +31,7 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     redisHost: cfg.get("Cache", "redisHost", "localhost"),
     redisPort: cfg.get("Cache", "redisPort", 6379),
     redisConns: cfg.get("Cache", "redisConnections", 20),
-    redisMaxConns: cfg.get("Cache", "redisMaxConnections", 30),
-
-    hmacKey: cfg.get("Config", "hmacKey", "secretkey"),
-    minTokens: cfg.get("Config", "tokenCount", 10),
+    redisMaxConns: cfg.get("Cache", "redisMaxConnections", 30)
   )
 
   return (conf, cfg)

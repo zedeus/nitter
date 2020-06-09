@@ -201,6 +201,7 @@ type
     staticDir*: string
 
     hmacKey*: string
+    base64Media*: bool
     minTokens*: int
 
     cacheDir*: string
