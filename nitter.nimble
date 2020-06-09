@@ -17,10 +17,10 @@ requires "nimcrypto >= 0.4.11"
 requires "karax >= 1.1.2"
 requires "sass"
 requires "markdown#head"
-requires "https://github.com/zedeus/redis#94bcbf1"
-requires "redpool#head"
 requires "packedjson"
 requires "snappy#d13e2cc"
+requires "redpool#57aeb25"
+requires "https://github.com/zedeus/redis#94bcbf1"
 requires "https://github.com/disruptek/frosty#0.0.6"
 
 
