@@ -12,9 +12,10 @@ import routes/[
 const configPath {.strdefine.} = "./nitter.conf"
 let (cfg, fullCfg) = getConfig(configPath)
 
-# Silence Jester's query warning
-addHandler(newConsoleLogger())
-setLogFilter(lvlError)
+when defined(release):
+  # Silence Jester's query warning
+  addHandler(newConsoleLogger())
+  setLogFilter(lvlError)
 
 let http = if cfg.useHttps: "https" else: "http"
 stdout.write &"Starting Nitter at {http}://{cfg.hostname}\n"
