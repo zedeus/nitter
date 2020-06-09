@@ -85,12 +85,14 @@ proc getProfileId*(username: string): Future[string] {.async.} =
     if result == redisNil:
       result.setLen(0)
 
-proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} =
+proc getCachedProfile*(username: string; fetch=true;
+                       cache=false): Future[Profile] {.async.} =
   let prof = await get("p:" & toLower(username))
   if prof != redisNil:
     uncompress(prof).thaw(result)
   elif fetch:
     result = await getProfile(username)
+    if cache: await cache(result)
 
 proc getCachedPhotoRail*(id: string): Future[PhotoRail] {.async.} =
   if id.len == 0: return
