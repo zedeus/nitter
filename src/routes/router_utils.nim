@@ -1,7 +1,9 @@
-import strutils, sequtils, asyncdispatch, httpclient, uri
-from jester import Request
-import ".."/[utils, prefs]
-export utils, prefs
+import strutils, sequtils, uri, tables
+from jester import Request, cookies
+
+import ../views/general
+import ".."/[utils, prefs, types]
+export utils, prefs, types
 
 template savePref*(pref, value: string; req: Request; expire=false) =
   if not expire or pref in cookies(req):
@@ -10,6 +12,17 @@ template savePref*(pref, value: string; req: Request; expire=false) =
 
 template cookiePrefs*(): untyped {.dirty.} =
   getPrefs(cookies(request))
+
+template cookiePref*(pref): untyped {.dirty.} =
+  getPref(cookies(request), pref)
+
+template themePrefs*(): Prefs =
+  var res = defaultPrefs
+  res.theme = cookiePref(theme)
+  res
+
+template showError*(error: string; cfg: Config): string =
+  renderMain(renderError(error), request, cfg, themePrefs(), "Error")
 
 template getPath*(): untyped {.dirty.} =
   $(parseUri(request.path) ? filterParams(request.params))
@@ -28,13 +41,3 @@ template getCursor*(req: Request): string =
 
 proc getNames*(name: string): seq[string] =
   name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
-
-proc safeClose*(client: AsyncHttpClient) =
-  try: client.close()
-  except: discard
-
-proc safeFetch*(url, agent: string): Future[string] {.async.} =
-  let client = newAsyncHttpClient(userAgent=agent)
-  try: result = await client.getContent(url)
-  except: discard
-  finally: client.safeClose()

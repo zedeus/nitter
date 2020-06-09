@@ -17,8 +17,10 @@ proc findThemes*(dir: string): seq[string] =
 proc createPrefRouter*(cfg: Config) =
   router preferences:
     get "/settings":
-      let html = renderPreferences(cookiePrefs(), refPath(), findThemes(cfg.staticDir))
-      resp renderMain(html, request, cfg, "Preferences")
+      let
+        prefs = cookiePrefs()
+        html = renderPreferences(prefs, refPath(), findThemes(cfg.staticDir))
+      resp renderMain(html, request, cfg, prefs, "Preferences")
 
     get "/settings/@i?":
       redirect("/settings")

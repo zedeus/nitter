@@ -12,4 +12,10 @@ proc updateDefaultPrefs*(cfg: parsecfg.Config) =
 
 proc getPrefs*(cookies: Table[string, string]): Prefs =
   result = defaultPrefs
-  genCookiePrefs()
+  genCookiePrefs(cookies)
+
+template getPref*(cookies: Table[string, string], pref): untyped =
+  bind genCookiePref
+  var res = defaultPrefs.`pref`
+  genCookiePref(cookies, pref, res)
+  res

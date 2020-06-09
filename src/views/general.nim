@@ -80,9 +80,9 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
       meta(property="og:video:secure_url", content=video)
       meta(property="og:video:type", content="text/html")
 
-proc renderMain*(body: VNode; req: Request; cfg: Config; titleText=""; desc="";
-                 rss=""; video=""; images: seq[string] = @[]; ogTitle=""): string =
-  let prefs = getPrefs(req.cookies)
+proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
+                 titleText=""; desc=""; ogTitle=""; rss=""; video="";
+                 images: seq[string] = @[]): string =
   var theme = toLowerAscii(prefs.theme).replace(" ", "_")
   if "theme" in req.params:
     theme = toLowerAscii(req.params["theme"]).replace(" ", "_")
@@ -107,6 +107,3 @@ proc renderError*(error: string): VNode =
   buildHtml(tdiv(class="panel-container")):
     tdiv(class="error-panel"):
       span: text error
-
-template showError*(error: string; cfg: Config): string =
-  renderMain(renderError(error), request, cfg, "Error")

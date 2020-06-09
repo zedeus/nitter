@@ -3,7 +3,7 @@ import asyncdispatch, strutils, tables, times, sequtils, hashes, snappy
 import jester
 
 import router_utils, timeline
-import ../query, ../views/general
+import ../query
 
 include "../views/rss.nimf"
 

@@ -7,7 +7,7 @@ import types, config, prefs, formatters, redis_cache, tokens
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list,
-  unsupported, embed, resolver]
+  unsupported, embed, resolver, router_utils]
 
 const configPath {.strdefine.} = "./nitter.conf"
 let (cfg, fullCfg) = getConfig(configPath)
@@ -49,10 +49,10 @@ settings:
 
 routes:
   get "/":
-    resp renderMain(renderSearch(), request, cfg)
+    resp renderMain(renderSearch(), request, cfg, themePrefs())
 
   get "/about":
-    resp renderMain(renderAbout(), request, cfg)
+    resp renderMain(renderAbout(), request, cfg, themePrefs())
 
   get "/explore":
     redirect("/about")

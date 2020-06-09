@@ -48,8 +48,8 @@ proc createStatusRouter*(cfg: Config) =
         video = getPicUrl(get(conv.tweet.gif).url)
 
       let html = renderConversation(conv, prefs, getPath() & "#m")
-      resp renderMain(html, request, cfg, title, desc,
-                      images=images, video=video, ogTitle=ogTitle)
+      resp renderMain(html, request, cfg, prefs, title, desc, ogTitle,
+                      images=images, video=video)
 
     get "/@name/@s/@id/@m/?@i?":
       cond @"s" in ["status", "statuses"]

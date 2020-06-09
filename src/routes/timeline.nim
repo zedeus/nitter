@@ -78,7 +78,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
     let
       timeline = await getSearch[Tweet](query, after)
       html = renderTweetSearch(timeline, prefs, getPath())
-    return renderMain(html, request, cfg, "Multi", rss=rss)
+    return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
   var (p, t, r) = await fetchSingleTimeline(after, query)
 
@@ -86,7 +86,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
   if p.id.len == 0: return
 
   let pHtml = renderProfile(p, t, r, prefs, getPath())
-  result = renderMain(pHtml, request, cfg, pageTitle(p), pageDesc(p),
+  result = renderMain(pHtml, request, cfg, prefs, pageTitle(p), pageDesc(p),
                       rss=rss, images = @[p.getUserpic("_200x200")])
 
 template respTimeline*(timeline: typed) =

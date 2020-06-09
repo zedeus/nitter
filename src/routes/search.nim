@@ -16,20 +16,22 @@ proc createSearchRouter*(cfg: Config) =
       if @"q".len > 200:
         resp Http400, showError("Search input too long.", cfg)
 
-      let prefs = cookiePrefs()
-      let query = initQuery(params(request))
+      let
+        prefs = cookiePrefs()
+        query = initQuery(params(request))
 
       case query.kind
       of users:
         if "," in @"q":
           redirect("/" & @"q")
         let users = await getSearch[Profile](query, getCursor())
-        resp renderMain(renderUserSearch(users, prefs), request, cfg)
+        resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs)
       of tweets:
-        let tweets = await getSearch[Tweet](query, getCursor())
-        let rss = "/search/rss?" & genQueryUrl(query)
+        let
+          tweets = await getSearch[Tweet](query, getCursor())
+          rss = "/search/rss?" & genQueryUrl(query)
         resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
-                        request, cfg, rss=rss)
+                        request, cfg, prefs, rss=rss)
       else:
         resp Http404, showError("Invalid search", cfg)
 

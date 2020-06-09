@@ -5,7 +5,6 @@ import jester
 
 import router_utils
 import ".."/[types, formatters, agents, utils]
-import ../views/general
 
 export asynchttpserver, asyncstreams, asyncfile, asyncnet
 export httpclient, os, strutils, asyncstreams, base64, re
@@ -15,6 +14,12 @@ const
   maxAge* = "max-age=604800"
 
 let mediaAgent* = getAgent()
+
+proc safeFetch*(url, agent: string): Future[string] {.async.} =
+  let client = newAsyncHttpClient(userAgent=agent)
+  try: result = await client.getContent(url)
+  except: discard
+  finally: client.close()
 
 template respond*(req: asynchttpserver.Request; headers) =
   var msg = "HTTP/1.1 200 OK\c\L"
@@ -57,7 +62,7 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   except HttpRequestError, ProtocolError, OSError:
     result = Http404
   finally:
-    client.safeClose()
+    client.close()
 
 template check*(code): untyped =
   if code != Http200:
@@ -111,9 +116,7 @@ proc createMediaRouter*(cfg: Config) =
           resp Http404
 
       if ".m3u8" in url:
-        let
-          vid = await safeFetch(url, mediaAgent)
-          prefs = cookiePrefs()
-        content = proxifyVideo(vid, prefs.proxyVideos)
+        let vid = await safeFetch(url, mediaAgent)
+        content = proxifyVideo(vid, cookiePref(proxyVideos))
 
       resp content, m3u8Mime
