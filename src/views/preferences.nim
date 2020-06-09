@@ -39,6 +39,9 @@ proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string]): VNode 
 
         renderPrefs()
 
+        h4(class="cookie-note"):
+          text "Preferences are stored client-side using cookies without any personal information."
+
         button(`type`="submit", class="pref-submit"):
           text "Save preferences"
 
