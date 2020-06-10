@@ -10,6 +10,11 @@ proc getSmallPic(url: string): string =
     result &= ":small"
   result = getPicUrl(result)
 
+proc renderMiniAvatar(profile: Profile): VNode =
+  let url = getPicUrl(profile.getUserpic("_mini"))
+  buildHtml():
+    img(class="avatar mini", src=url)
+
 proc renderHeader(tweet: Tweet; retweet=""): VNode =
   buildHtml(tdiv):
     if retweet.len > 0:
@@ -189,9 +194,8 @@ proc renderReply(tweet: Tweet): VNode =
       a(href=("/" & u)): text "@" & u
 
 proc renderAttribution(profile: Profile): VNode =
-  let avatarUrl = getPicUrl(profile.getUserpic("_200x200"))
   buildHtml(a(class="attribution", href=("/" & profile.username))):
-    img(class="avatar", width="20", height="20", src=avatarUrl)
+    renderMiniAvatar(profile)
     strong: text profile.fullname
 
 proc renderMediaTags(tags: seq[Profile]): VNode =
@@ -207,7 +211,6 @@ proc renderQuoteMedia(quote: Tweet; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="quote-media-container")):
     if quote.photos.len > 0:
       renderAlbum(quote)
-      # genImg(quote.photos[0])
     elif quote.video.isSome:
       renderVideo(quote.video.get(), prefs, path)
     elif quote.gif.isSome:
@@ -227,6 +230,7 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
 
     tdiv(class="tweet-name-row"):
       tdiv(class="fullname-and-username"):
+        renderMiniAvatar(quote.profile)
         linkUser(quote.profile, class="fullname")
         linkUser(quote.profile, class="username")
 

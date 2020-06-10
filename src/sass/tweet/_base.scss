@@ -96,14 +96,17 @@
     border-radius: 50%;
 }
 
+.avatar.mini {
+    margin-right: 5px;
+    margin-top: -1px;
+    width: 20px;
+    height: 20px;
+}
+
 .attribution {
     display: flex;
     pointer-events: all;
-    margin: 10px 0;
-
-    .avatar {
-        margin-right: 5px;
-    }
+    margin: 5px 0;
 
     strong {
         color: var(--fg_color);
