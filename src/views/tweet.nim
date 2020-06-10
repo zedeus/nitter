@@ -27,7 +27,7 @@ proc renderHeader(tweet: Tweet; retweet=""): VNode =
 
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.profile.username)):
-        genImg(tweet.profile.getUserpic("_bigger"), class="avatar")
+        genImg(tweet.profile.getUserpic("_normal"), class="avatar")
 
       tdiv(class="tweet-name-row"):
         tdiv(class="fullname-and-username"):
