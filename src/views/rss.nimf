@@ -2,10 +2,10 @@
 #import strutils, xmltree, strformat, options
 #import ../types, ../utils, ../formatters
 #
-#proc getTitle(tweet: Tweet; prefs: Prefs; retweet: bool): string =
+#proc getTitle(tweet: Tweet; prefs: Prefs; retweet: string): string =
 #if tweet.pinned: result = "Pinned: "
-#elif retweet: result = "RT: "
-#elif tweet.reply.len > 0: result = "R: "
+#elif retweet.len > 0: result = &"RT by @{retweet}: "
+#elif tweet.reply.len > 0: result = &"R to @{tweet.reply[0]}: "
 #end if
 #result &= xmltree.escape(stripHtml(tweet.text))
 #if result.len > 0: return
@@ -45,8 +45,8 @@
 #proc renderRssTweets(tweets: seq[Tweet]; prefs: Prefs; hostname: string): string =
 #var links: seq[string]
 #for t in tweets:
-#let retweet = t.retweet.isSome
-#let tweet = if retweet: t.retweet.get else: t
+#let retweet = if t.retweet.isSome: t.profile.username else: ""
+#let tweet = if retweet.len > 0: t.retweet.get else: t
 #let link = getLink(tweet)
 #if link in links: continue
 #end if
