@@ -15,8 +15,11 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-card")):
     tdiv(class="profile-card-info"):
       let url = getPicUrl(profile.getUserPic())
+      var size = "_400x400"
+      if prefs.autoplayGifs and profile.userpic.endsWith("gif"):
+        size = ""
       a(class="profile-card-avatar", href=url, target="_blank"):
-        genImg(profile.getUserpic("_400x400"))
+        genImg(profile.getUserpic(size))
 
       tdiv(class="profile-card-tabs-name"):
         linkUser(profile, class="profile-card-fullname")

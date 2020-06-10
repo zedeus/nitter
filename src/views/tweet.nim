@@ -15,7 +15,7 @@ proc renderMiniAvatar(profile: Profile): VNode =
   buildHtml():
     img(class="avatar mini", src=url)
 
-proc renderHeader(tweet: Tweet; retweet=""): VNode =
+proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
   buildHtml(tdiv):
     if retweet.len > 0:
       tdiv(class="retweet-header"):
@@ -27,7 +27,10 @@ proc renderHeader(tweet: Tweet; retweet=""): VNode =
 
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.profile.username)):
-        genImg(tweet.profile.getUserpic("_normal"), class="avatar")
+        var size = "_normal"
+        if not prefs.autoplayGifs and tweet.profile.userpic.endsWith("gif"):
+          size = "_400x400"
+        genImg(tweet.profile.getUserpic(size), class="avatar")
 
       tdiv(class="tweet-name-row"):
         tdiv(class="fullname-and-username"):
@@ -290,7 +293,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
 
     tdiv(class="tweet-body"):
       var views = ""
-      renderHeader(tweet, retweet)
+      renderHeader(tweet, retweet, prefs)
 
       if not afterTweet and index == 0 and tweet.reply.len > 0 and
          (tweet.reply.len > 1 or tweet.reply[0] != tweet.profile.username):

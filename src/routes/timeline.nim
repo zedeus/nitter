@@ -97,7 +97,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
 
   let pHtml = renderProfile(p, t, r, prefs, getPath())
   result = renderMain(pHtml, request, cfg, prefs, pageTitle(p), pageDesc(p),
-                      rss=rss, images = @[p.getUserpic("_200x200")])
+                      rss=rss, images = @[p.getUserpic("_400x400")])
 
 template respTimeline*(timeline: typed) =
   let t = timeline
