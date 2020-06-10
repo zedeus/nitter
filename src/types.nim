@@ -119,6 +119,8 @@ type
     unified = "unified_card"
     moment = "moment"
     messageMe = "message_me"
+    videoDirectMessage = "video_direct_message"
+    imageDirectMessage = "image_direct_message"
 
   Card* = object
     kind*: CardKind

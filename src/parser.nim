@@ -158,7 +158,7 @@ proc parseBroadcast(js: JsonNode): Card =
 proc parseCard(js: JsonNode; urls: JsonNode): Card =
   const imageTypes = ["summary_photo_image", "player_image", "promo_image",
                       "photo_image_full_size", "thumbnail_image", "thumbnail",
-                      "event_thumbnail"]
+                      "event_thumbnail", "image"]
   let
     vals = ? js{"binding_values"}
     name = js{"name"}.getStr
@@ -176,7 +176,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
     result.url = js{"url"}.getStr
 
   case kind
-  of promoVideo, promoVideoConvo, appPlayer:
+  of promoVideo, promoVideoConvo, appPlayer, videoDirectMessage:
     result.video = some parsePromoVideo(vals)
     if kind == appPlayer:
       result.text = vals{"app_category"}.getStrVal(result.text)
@@ -202,8 +202,11 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
       result.url = u{"expanded_url"}.getStr
       break
 
-  if kind in {promoImageConvo, promoImageApp} and result.url.len == 0 or
-      result.url.startsWith("card://"):
+  if kind in {videoDirectMessage, imageDirectMessage}:
+    result.url.setLen 0
+
+  if kind in {promoImageConvo, promoImageApp, imageDirectMessage} and
+     result.url.len == 0 or result.url.startsWith("card://"):
     result.url = getPicUrl(result.image)
 
 proc parseTweet(js: JsonNode): Tweet =

@@ -150,8 +150,10 @@ proc renderCardImage(card: Card): VNode =
 proc renderCardContent(card: Card): VNode =
   buildHtml(tdiv(class="card-content")):
     h2(class="card-title"): text card.title
-    p(class="card-description"): text card.text
-    span(class="card-destination"): text card.dest
+    if card.text.len > 0:
+      p(class="card-description"): text card.text
+    if card.dest.len > 0:
+      span(class="card-destination"): text card.dest
 
 proc renderCard(card: Card; prefs: Prefs; path: string): VNode =
   const smallCards = {app, player, summary, storeLink}

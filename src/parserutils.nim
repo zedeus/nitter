@@ -82,8 +82,10 @@ proc getCardTitle*(js: JsonNode; kind: CardKind): string =
   result = js{"title"}.getStrVal
   if kind == promoVideoConvo:
     result = js{"thank_you_text"}.getStrVal(result)
-  if kind == liveEvent:
+  elif kind == liveEvent:
     result = js{"event_category"}.getStrVal
+  elif kind in {videoDirectMessage, imageDirectMessage}:
+    result = js{"cta1"}.getStrVal
 
 proc getBanner*(js: JsonNode): string =
   let url = js{"profile_banner_url"}.getImageStr
