@@ -255,6 +255,8 @@ proc parseTweet(js: JsonNode): Tweet =
         result.photos.add m{"media_url_https"}.getImageStr
       of "video":
         result.video = some(parseVideo(m))
+        with user, m{"additional_media_info", "source_user"}:
+          result.attribution = some(parseProfile(user))
       of "animated_gif":
         result.gif = some(parseGif(m))
       else: discard
