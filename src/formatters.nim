@@ -1,10 +1,6 @@
-import strutils, strformat, times, uri, tables
-import xmltree, htmlparser
+import strutils, strformat, times, uri, tables, xmltree, htmlparser
 import regex
-
 import types, utils, query
-
-from unicode import Rune, `$`
 
 const
   ytRegex = re"([A-z.]+\.)?youtu(be\.com|\.be)"
@@ -12,17 +8,12 @@ const
   igRegex = re"(www\.)?instagram.com"
   cards = "cards.twitter.com/cards"
   tco = "https://t.co"
-  nbsp = $Rune(0x000A0)
 
   wwwRegex = re"https?://(www[0-9]?\.)?"
   m3u8Regex = re"""url="(.+.m3u8)""""
   manifestRegex = re"(.+(.ts|.m3u8|.vmap))"
   userpicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
   extRegex = re"(\.[A-z]+)$"
-  tombstoneRegex = re"\n* *Learn more"
-
-proc stripText*(text: string): string =
-  text.replace(nbsp, " ").strip()
 
 proc stripHtml*(text: string): string =
   var html = parseHtml(text)
@@ -128,9 +119,6 @@ proc getLink*(tweet: Tweet; focus=true): string =
     username = "i"
   result = &"/{username}/status/{tweet.id}"
   if focus: result &= "#m"
-
-proc getTombstone*(text: string): string =
-  text.replace(tombstoneRegex, "").stripText().strip(chars={' ', '\n'})
 
 proc getTwitterLink*(path: string; params: Table[string, string]): string =
   let

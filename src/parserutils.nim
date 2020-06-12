@@ -109,22 +109,8 @@ proc getBanner*(js: JsonNode): string =
   return "#161616"
 
 proc getTombstone*(js: JsonNode): string =
-  let epitaph = js{"epitaph"}.getStr
-  case epitaph
-  of "Suspended":
-    result = "This tweet is from a suspended account."
-  of "Protected":
-    result = "This account owner limits who can view their tweets."
-  of "Missing":
-    result = "This tweet is unavailable."
-  of "Deactivated":
-    result = "This tweet is from an account that no longer exists."
-  of "Bounced", "BounceDeleted":
-    result = "This tweet violated the Twitter rules."
-  else:
-    result = js{"tombstoneInfo", "richText", "text"}.getStr
-    if epitaph.len > 0 or result.len > 0:
-      echo "Unknown tombstone (", epitaph, "): ", result
+  result = js{"tombstoneInfo", "richText", "text"}.getStr
+  result.removeSuffix(" Learn more")
 
 template getSlice(text: string; slice: seq[int]): string =
   text.runeSubStr(slice[0], slice[1] - slice[0])
