@@ -106,20 +106,6 @@ proc usage*(p: var Pool): string =
   ## a string that conveys the current usage level
   result = $(100 * (p.rate / windowRate))
 
-when false:
-  proc pop[T](p: var Pool[T]): T =
-    ## retrieve a member from the pool
-    while true:
-      if len(p) == 0:                # if there are no tokens,
-        fire p.hungry                # ask for another token, then
-      else:                          # otherwise,
-        if waitfor tryPop(p, result):# if we can pop a token,
-          break                      # we're done.
-
-#
-# nitter api below
-#
-
 var tokenPool* = newPool[Token]()           ## global token pool
 
 proc push(t: var Token) =
