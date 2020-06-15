@@ -26,7 +26,7 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
 
 proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
   var
-    token = if oldApi: nil else: await getToken()
+    token = await getToken()
     client = newAsyncHttpClient(headers=genHeaders(token))
 
   try:
