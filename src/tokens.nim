@@ -1,16 +1,14 @@
-import options, asyncfutures, asyncdispatch, os, strutils, httpcore,
-  httpclient, math, times, std/monotimes, hashes, deques, locks
-
-import asynctools
+import options, asyncfutures, asyncdispatch, strutils, httpcore,
+  httpclient, math, times, std/monotimes, hashes, deques
 
 const
   window* = initDuration(minutes = 15)       ## after which the rate resets
   windowRate* = 187                          ## rate per window of token uses
   watermark* = int(0.80 * windowRate)        ## watermark (%) at which to grow
   lifetime* = initDuration(hours = 3)        ## maximum lifetime of a token
-  minPoolSize* = 1                           ## smallest possible pool
-  maxPoolSize* = 2048                        ## largest possible pool
-  defaultPoolSize* = 8                       ## default pool size, obvs
+  minPoolSize = 1                            ## smallest possible pool
+  maxPoolSize = 4096                         ## largest possible pool
+  defaultPoolSize = 8                        ## default pool size, obvs
   fetchDelay = initDuration(seconds = 2)     ## pause between token fetches
   asyncSpin = initDuration(milliseconds = 1) ## delay while waiting for pool
 
@@ -23,10 +21,10 @@ type
     last: Duration                          # age of token at last fetch
     key: string                             # token value
 
-  Pool[T] = object
+  Pool = object
     size: PoolSize                          # pool size range
-    q: Deque[T]                             # pool contents
-    hungry: AsyncEv                         # pool needs food
+    q: Deque[Token]                         # pool contents
+    hungry: bool                            # pool needs food
     rate: UseCount                          # usage estimate
 
 proc `$`*(t: Token): string =
@@ -52,12 +50,6 @@ proc fetch(): Future[Token] {.async.} =
   finally:
     client.close()
 
-proc hash*(t: Token): Hash =
-  ## a unique hash value for the token
-  var h: Hash = 0
-  h = h !& hash(t.key)
-  result = !$h
-
 proc kill(t: var Token) =
   ## force a token to die for whatever reason
   t.birth = t.birth - lifetime
@@ -70,19 +62,10 @@ proc ready(t: Token): bool =
   ## true if the token is suitable for use
   result = t.uses < UseCount.high and t.age < lifetime
 
-proc `=destroy`[T](p: var Pool[T]) =
-  ## prep a pool for freedom
-  clear p.q                    # clear the tokens cache
-
-proc newPool[T](initialSize = defaultPoolSize): Pool[T] =
+proc newPool(initialSize = defaultPoolSize): Pool =
   ## create a new pool object
-  result = Pool[T](size: initialSize.nextPowerOfTwo)
-  result.q = initDeque[T](initialSize = result.size)
-  result.hungry = newAsyncEv()
-
-proc setLen*(p: var Pool; size: PoolSize) =
-  ## set the maximum size of the pool
-  p.size = size
+  result = Pool(size: initialSize.nextPowerOfTwo)
+  result.q = initDeque[Token](initialSize = result.size)
 
 proc len*(p: Pool): int =
   ## the number of members in the pool
@@ -106,7 +89,7 @@ proc usage*(p: var Pool): string =
   ## a string that conveys the current usage level
   result = $(100 * (p.rate / windowRate))
 
-var tokenPool* = newPool[Token]()           ## global token pool
+var tokenPool = newPool()           ## global token pool
 
 proc push(t: var Token) =
   ## add a token to the pool
@@ -127,7 +110,7 @@ proc push(t: var Token) =
         break                               # then we're done
 
     # we need tokens!
-    fire tokenPool.hungry                   # ask for another token
+    tokenPool.hungry = true                 # ask for another token
 
     echo "pool $1/$3; avg rate: $2" %   # and announce the fact
          [ $len(tokenPool), $tokenPool.usage, $tokenPool.size ]
@@ -165,25 +148,27 @@ proc remove*(t: Token) =
   ## remove a token from the pool
   var item: Token
   var count = len(tokenPool)
-  while count > 0:
-    var t = tryPop()
-    if t.isSome:
-      if item.key == get(t).key:
-        kill item
-      push(item)
-      dec count
+  while count > 0:                    # we know we'll spin at least this much
+    var t = tryPop()                  # pop a token
+    if t.isSome:                      # if successful,
+      if item.key == get(t).key:      # if the key matches,
+        kill item                     # kill the shit out of it
+      push(item)                      # push it in any event;
+      dec count                       # and decrement the counter
     else:
-      break
+      break                           # a failure to pop means we're done
 
-template setTokenPoolSize*(size: int) =
-  setLen(tokenPool, size)
+proc setTokenPoolSize*(size: int) =
+  tokenPool.size = size
 
 proc runTokenPool*() {.async.} =
   if len(tokenPool) < tokenPool.size:    # we will probably start off hungry
-    fire tokenPool.hungry
+    tokenPool.hungry = true
   while true:
-    await wait(tokenPool.hungry)         # if you're hungry,
-    var token = await fetch()            # eat
-    if token.ready:                      # if it's tasty,
-      clear tokenPool.hungry             # you're not hungry.
-      push(token)                        # stuff it in the queue
+    if tokenPool.hungry:                   # if you're hungry,
+      var token = await fetch()            # eat
+      if token.ready:                      # if it's tasty,
+        tokenPool.hungry = false           # hopefully, we're sated
+        push(token)                        # stuff it in the queue
+    if not tokenPool.hungry:               # now take a nap
+      await sleepAsync fetchDelay.inMilliseconds.int
