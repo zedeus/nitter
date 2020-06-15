@@ -9,7 +9,6 @@ type
     remaining*: int
     reset*: Time
     init*: Time
-    # agent*: string
 
   Error* = enum
     null = 0
@@ -18,9 +17,11 @@ type
     doesntExist = 34
     userNotFound = 50
     suspended = 63
+    rateLimited = 88
     invalidToken = 89
     listIdOrSlug = 112
     forbidden = 200
+    badToken = 239
     noCsrf = 353
 
   Profile* = object

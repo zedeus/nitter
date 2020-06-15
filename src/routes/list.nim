@@ -35,7 +35,7 @@ proc createListRouter*(cfg: Config) =
       let
         prefs = cookiePrefs()
         list = await getCachedList(@"name", @"list")
-        members = await getListMembers(list)
+        members = await getListMembers(list, getCursor())
       respList(list, members, renderTimelineUsers(members, prefs, request.path))
 
     get "/i/lists/@id/?":
