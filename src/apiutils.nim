@@ -12,11 +12,11 @@ proc genParams*(pars: openarray[(string, string)] = @[];
   if cursor.len > 0:
     result &= ("cursor", cursor)
 
-proc genHeaders*(token: Token = nil): HttpHeaders =
+proc genHeaders*(token: string): HttpHeaders =
   result = newHttpHeaders({
     "authorization": auth,
     "content-type": "application/json",
-    "x-guest-token": if token == nil: "" else: token.tok,
+    "x-guest-token": token,
     "x-twitter-active-user": "yes",
     "authority": "api.twitter.com",
     "accept-language": "en-US,en;q=0.9",
@@ -24,10 +24,9 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
     "DNT": "1"
   })
 
-proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
+proc fetch(url: Uri; token: Token): Future[JsonNode] {.async.} =
   var
-    token = await getToken()
-    client = newAsyncHttpClient(headers=genHeaders(token))
+    client = newAsyncHttpClient(headers = genHeaders($token))
 
   try:
     let
@@ -40,15 +39,27 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
     else:
       result = parseJson(body)
 
-    if not oldApi and resp.headers.hasKey(rl & "limit"):
-      token.remaining = parseInt(resp.headers[rl & "remaining"])
-      token.reset = fromUnix(parseInt(resp.headers[rl & "reset"]))
+    when false:
+      if resp.headers.hasKey(rl & "limit"):
+        token.setUses parseInt(resp.headers[rl & "remaining"])
+        token.setReset fromUnix(parseInt(resp.headers[rl & "reset"]))
 
-    if result.getError notin {invalidToken, forbidden, badToken}:
-      token.release()
+    if result.getError in {invalidToken, forbidden, badToken}:
+      # exceptional cases call for exceptional code
+      remove token
+
   except Exception:
     echo "error: ", url
     result = newJNull()
   finally:
     try: client.close()
     except: discard
+
+proc fetch*(url: Uri): Future[JsonNode] {.async.} =
+  ## fetch using a token
+  result = await fetch(url, await getToken())
+
+proc fetchOld*(url: Uri): Future[JsonNode] {.async.} =
+  ## fetch using the old api; ie. without a token
+  #result = await fetch(url, emptyToken())
+  result = await fetch(url, await getToken())

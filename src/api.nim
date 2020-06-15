@@ -31,13 +31,13 @@ proc getListMembers*(list: List; after=""): Future[Result[Profile]] {.async.} =
   let
     ps = genParams({"list_id": list.id}, after)
     url = listMembers ? ps
-  result = parseListMembers(await fetch(url, oldApi=true), after)
+  result = parseListMembers(await fetchOld(url), after)
 
 proc getProfile*(username: string): Future[Profile] {.async.} =
   let
     ps = genParams({"screen_name": username})
     url = userLookup ? ps
-  result = parseUserShow(await fetch(url, oldApi=true), username)
+  result = parseUserShow(await fetchOld(url), username)
 
 proc getTimeline*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
   let

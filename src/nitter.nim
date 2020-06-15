@@ -25,13 +25,13 @@ updateDefaultPrefs(fullCfg)
 setCacheTimes(cfg)
 setHmacKey(cfg.hmacKey)
 setProxyEncoding(cfg.base64Media)
+setTokenPoolSize(cfg.minTokens)     # (re)set initial size of pool
 
 waitFor initRedisPool(cfg)
 stdout.write &"Connected to Redis at {cfg.redisHost}:{cfg.redisPort}\n"
 stdout.flushFile
 
-setLen(tokenPool, cfg.minTokens)    # (re)set initial size of pool
-init tokenPool                      # initialize pool
+asyncCheck runTokenPool()           # initialize pool
 
 createUnsupportedRouter(cfg)
 createResolverRouter(cfg)
