@@ -30,7 +30,8 @@ waitFor initRedisPool(cfg)
 stdout.write &"Connected to Redis at {cfg.redisHost}:{cfg.redisPort}\n"
 stdout.flushFile
 
-asyncCheck initTokenPool(cfg)
+setLen(tokenPool, cfg.minTokens)    # (re)set initial size of pool
+init tokenPool                      # initialize pool
 
 createUnsupportedRouter(cfg)
 createResolverRouter(cfg)

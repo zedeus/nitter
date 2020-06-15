@@ -4,12 +4,6 @@ import prefs_impl
 genPrefsType()
 
 type
-  Token* = ref object
-    tok*: string
-    remaining*: int
-    reset*: Time
-    init*: Time
-
   Error* = enum
     null = 0
     protectedUser = 22
