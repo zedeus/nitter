@@ -46,7 +46,7 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
     rail = newFuture[PhotoRail]()
     rail.complete(@[])
   else:
-    rail = getCachedPhotoRail(profileId)
+    rail = getCachedPhotoRail(name)
 
   var timeline =
     case query.kind

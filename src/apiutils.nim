@@ -4,13 +4,17 @@ import types, tokens, consts, parserutils
 
 const rl = "x-rate-limit-"
 
-proc genParams*(pars: openarray[(string, string)] = @[];
-                cursor=""): seq[(string, string)] =
+proc genParams*(pars: openarray[(string, string)] = @[]; cursor="";
+                count="20"; ext=true): seq[(string, string)] =
   result = timelineParams
   for p in pars:
     result &= p
+  if ext:
+    result &= ("ext", "mediaStats")
   if cursor.len > 0:
     result &= ("cursor", cursor)
+  if count.len > 0:
+    result &= ("count", count)
 
 proc genHeaders*(token: Token = nil): HttpHeaders =
   result = newHttpHeaders({
@@ -34,11 +38,11 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
       resp = await client.get($url)
       body = await resp.body
 
-    if not body.startsWith('{'):
+    if body.startsWith('{') or body.startsWith('['):
+      result = parseJson(body)
+    else:
       echo resp.status, ": ", body
       result = newJNull()
-    else:
-      result = parseJson(body)
 
     if not oldApi and resp.headers.hasKey(rl & "limit"):
       token.remaining = parseInt(resp.headers[rl & "remaining"])

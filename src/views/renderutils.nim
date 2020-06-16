@@ -87,7 +87,7 @@ proc genDate*(pref, state: string): VNode =
 
 proc genImg*(url: string; class=""): VNode =
   buildHtml():
-    img(src=getPicUrl(url), class=class, alt="Image")
+    img(src=getPicUrl(url), class=class, alt="")
 
 proc getTabClass*(query: Query; tab: QueryKind): string =
   result = "tab-item"

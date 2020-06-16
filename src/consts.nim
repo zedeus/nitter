@@ -14,6 +14,7 @@ const
   listTimeline* = timelineApi / "list.json"
   listMembers* = api / "1.1/lists/members.json"
   userLookup* = api / "1.1/users/show.json"
+  photoRail* = api / "1.1/statuses/media_timeline.json"
   tweet* = timelineApi / "conversation"
   search* = api / "2/search/adaptive.json"
 
@@ -21,7 +22,7 @@ const
     "include_profile_interstitial_type": "0",
     "include_blocking": "0",
     "include_blocked_by": "0",
-    "include_followed_by": "1",
+    "include_followed_by": "0",
     "include_want_retweets": "0",
     "include_mute_edge": "0",
     "include_can_dm": "0",
@@ -39,8 +40,7 @@ const
     "include_ext_media_availability": "true",
     "send_error_codes": "true",
     "simple_quoted_tweet": "true",
-    "count": "20",
-    "ext": "mediaStats,highlightedLabel,cameraMoment",
+    "ext": "mediaStats",
     "include_quote_count": "true"
   }.toSeq
 

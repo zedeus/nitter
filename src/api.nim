@@ -49,9 +49,12 @@ proc getMediaTimeline*(id: string; after=""): Future[Timeline] {.async.} =
   let url = mediaTimeline / (id & ".json") ? genParams(cursor=after)
   result = parseTimeline(await fetch(url), after)
 
-proc getPhotoRail*(id: string): Future[PhotoRail] {.async.} =
-  let url = mediaTimeline / (id & ".json") ? genParams()
-  result = parsePhotoRail(await fetch(url))
+proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
+  let
+    ps = genParams({"screen_name": name, "trim_user": "true"},
+                   count="18", ext=false)
+    url = photoRail ? ps
+  result = parsePhotoRail(await fetch(url, oldApi=true))
 
 proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
   when T is Profile:

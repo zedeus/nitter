@@ -54,8 +54,8 @@ proc setex(key: string; time: int; data: string) {.async.} =
 proc cache*(data: List) {.async.} =
   await setex(data.toKey, listCacheTime, compress(freeze(data)))
 
-proc cache*(data: PhotoRail; id: string) {.async.} =
-  await setex("pr:" & id, baseCacheTime, compress(freeze(data)))
+proc cache*(data: PhotoRail; name: string) {.async.} =
+  await setex("pr:" & name, baseCacheTime, compress(freeze(data)))
 
 proc cache*(data: Profile) {.async.} =
   if data.username.len == 0: return
@@ -94,14 +94,14 @@ proc getCachedProfile*(username: string; fetch=true;
     result = await getProfile(username)
     if cache: await cache(result)
 
-proc getCachedPhotoRail*(id: string): Future[PhotoRail] {.async.} =
-  if id.len == 0: return
-  let rail = await get("pr:" & toLower(id))
+proc getCachedPhotoRail*(name: string): Future[PhotoRail] {.async.} =
+  if name.len == 0: return
+  let rail = await get("pr:" & toLower(name))
   if rail != redisNil:
     uncompress(rail).thaw(result)
   else:
-    result = await getPhotoRail(id)
-    await cache(result, id)
+    result = await getPhotoRail(name)
+    await cache(result, name)
 
 proc getCachedList*(username=""; name=""; id=""): Future[List] {.async.} =
   let list = if id.len > 0: redisNil
