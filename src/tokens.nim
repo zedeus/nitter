@@ -1,5 +1,5 @@
-import options, asyncfutures, asyncdispatch, strutils, httpcore,
-  httpclient, math, times, std/monotimes, hashes, deques
+import options, asyncfutures, asyncdispatch, strutils, httpcore, strformat,
+  httpclient, math, times, std/monotimes, hashes, deques, stats, logging
 
 const
   window* = initDuration(minutes = 15)       ## after which the rate resets
@@ -26,6 +26,7 @@ type
     q: Deque[Token]                         # pool contents
     hungry: bool                            # pool needs food
     rate: UseCount                          # usage estimate
+    stat: RunningStat                       # token totals
 
 proc `$`*(t: Token): string =
   result = t.key
@@ -46,7 +47,7 @@ proc fetch(): Future[Token] {.async.} =
       raise newException(ValueError, "token parse fail")
     result = Token(key: reply[pos+3 .. pos+21], birth: getMonoTime())
   except Exception as e:
-    echo "token fetch: ", e.msg
+    warn "token fetch: ", e.msg
   finally:
     client.close()
 
@@ -85,24 +86,40 @@ proc newRate(p: Pool; uses: int): UseCount =
   if result == 0:
     result = uses
 
-proc usage*(p: var Pool): string =
+proc resetRate(p: var Pool; t: Token) =
+  ## reset the pool's consumption rate statistic given a used token
+  p.rate = newRate(p, t.uses)    # our running average
+
+proc resetUses(t: var Token) =
+  ## reset the use counter if the token has aged into a new period
+  if t.last != default(Duration):       # is it a used token?
+    if period(t.age) != period(t.last): # has the token been reset since?
+      t.uses = UseCount.low             # okay; reset the use-count and
+
+proc usage*(p: Pool): string =
   ## a string that conveys the current usage level
-  result = $(100 * (p.rate / windowRate))
+  let usage = 100 * (p.rate / windowRate)
+  result = fmt"pool {len(p)}/{p.size}; avg usage: {usage:>3.0f}%    "
+  result.add fmt"calls: {p.stat.n}; avg age: {p.stat.mean:>5.0f}ms"
 
 var tokenPool = newPool()           ## global token pool
+
+proc updateStats(t: Token) =
+  ## update the usage statistics
+  if t.last != default(Duration):                    # is it a used token?
+    let qtime = t.age - t.last                       # time spent in queue
+    push(tokenPool.stat, qtime.inMilliseconds.int)   # add it to the stats
 
 proc push(t: var Token) =
   ## add a token to the pool
   assert len(t.key) > 0
   if len(tokenPool) > maxPoolSize:
-    echo "pool is too large at size ", $len(tokenPool)
+    warn "pool is too large at size " & $len(tokenPool)
   else:
-    if t.age < lifetime:                    # the token yet lives!
-      if t.last != default(Duration):       # is it a used token?
-        if period(t.age) != period(t.last): # has the token been reset since?
-          t.uses = UseCount.low             # okay; reset the use-count and
-      tokenPool.rate = newRate(tokenPool, t.uses) # record new rate of usage
-      addLast(tokenPool.q, t)                     # add the token to the pool
+    if t.age < lifetime:       # the token yet lives!
+      resetUses(t)             # reset uses counter as necessary
+      resetRate(tokenPool, t)  # record new rate of usage
+      addLast(tokenPool.q, t)  # add the token to the pool
 
   block:
     if len(tokenPool) >= tokenPool.size:    # if we've enough tokens and
@@ -112,32 +129,32 @@ proc push(t: var Token) =
     # we need tokens!
     tokenPool.hungry = true                 # ask for another token
 
-    echo "pool $1/$3; avg rate: $2" %   # and announce the fact
-         [ $len(tokenPool), $tokenPool.usage, $tokenPool.size ]
-
 proc tryPop(): Option[Token] =
   ## `true` if we were able to pop into `t`
   var t: Token
   while len(tokenPool) > 0 and result.isNone:
-    t = popFirst(tokenPool.q)   # pop a token;
-    if t.ready:                 # if it's ready to go,
-      result = some(t)          # then we're done.
-    else:                       # otherwise,
-      push(t)                   # recycle it and continue
+    t = popFirst(tokenPool.q)      # pop a token;
+    if t.ready:                    # if it's ready to go,
+      result = some(t)             # then we're done.
+    else:                          # otherwise,
+      push(t)                      # recycle it and continue
 
-  if result.isSome:               # burnish a successful pop
-    inc t.uses                    # increment the use counter
-    t.last = t.age                # record the age at last use
-    push(t)                       # recycle it
+  if result.isSome:                # burnish a successful pop
+    inc t.uses                     # increment the use counter
+    t.last = t.age                 # record the age at last use
+    push(t)                        # recycle it
 
 proc getToken*(): Future[Token] {.async.} =
-  ## an asynchronous pop from the pool
+  ## an asynchronous pop from the pool for the purposes of immediate use
   while true:
     var t = tryPop()
-    if t.isSome:
+    if t.isNone:
+      await sleepAsync(asyncSpin.inMilliseconds.int)
+    else:
       result = get(t)
+      resetUses(result)       # reset uses counter as necessary
+      updateStats(result)     # update average age statistics
       break
-    await sleepAsync(asyncSpin.inMilliseconds.int)
 
 proc emptyToken*(): Token =
   ## an empty token for the old api
@@ -170,5 +187,6 @@ proc runTokenPool*() {.async.} =
       if token.ready:                      # if it's tasty,
         tokenPool.hungry = false           # hopefully, we're sated
         push(token)                        # stuff it in the queue
+        debug tokenPool.usage
     if not tokenPool.hungry:               # now take a nap
       await sleepAsync fetchDelay.inMilliseconds.int
