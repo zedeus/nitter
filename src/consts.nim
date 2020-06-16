@@ -13,7 +13,7 @@ const
   mediaTimeline* = timelineApi / "media"
   listTimeline* = timelineApi / "list.json"
   listMembers* = api / "1.1/lists/members.json"
-  userLookup* = api / "1.1/users/show.json"
+  userLookup* = api / "1.1/users/lookup.json"
   photoRail* = api / "1.1/statuses/media_timeline.json"
   tweet* = timelineApi / "conversation"
   search* = api / "2/search/adaptive.json"
