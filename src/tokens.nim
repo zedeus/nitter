@@ -117,7 +117,6 @@ proc push(t: var Token) =
     warn "pool is too large at size " & $len(tokenPool)
   else:
     if t.age < lifetime:       # the token yet lives!
-      resetUses(t)             # reset uses counter as necessary
       resetRate(tokenPool, t)  # record new rate of usage
       addLast(tokenPool.q, t)  # add the token to the pool
 
@@ -134,6 +133,7 @@ proc tryPop(): Option[Token] =
   var t: Token
   while len(tokenPool) > 0 and result.isNone:
     t = popFirst(tokenPool.q)      # pop a token;
+    resetUses(t)                   # reset uses counter as necessary
     if t.ready:                    # if it's ready to go,
       result = some(t)             # then we're done.
     else:                          # otherwise,
@@ -152,7 +152,6 @@ proc getToken*(): Future[Token] {.async.} =
       await sleepAsync(asyncSpin.inMilliseconds.int)
     else:
       result = get(t)
-      resetUses(result)       # reset uses counter as necessary
       updateStats(result)     # update average age statistics
       break
 
