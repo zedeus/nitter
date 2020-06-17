@@ -12,6 +12,7 @@ type
 
   Error* = enum
     null = 0
+    noUserMatches = 17
     protectedUser = 22
     couldntAuth = 32
     doesntExist = 34
