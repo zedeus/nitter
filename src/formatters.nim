@@ -15,6 +15,8 @@ const
   userpicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
   extRegex = re"(\.[A-z]+)$"
 
+  twitter = parseUri("https://twitter.com")
+
 proc stripHtml*(text: string): string =
   var html = parseHtml(text)
   for el in html.findAll("a"):
@@ -121,12 +123,16 @@ proc getLink*(tweet: Tweet; focus=true): string =
   if focus: result &= "#m"
 
 proc getTwitterLink*(path: string; params: Table[string, string]): string =
-  let
-    twitter = parseUri("https://twitter.com")
+  var
     username = params.getOrDefault("name")
     query = initQuery(params, username)
+    path = path
 
-  if "/search" notin path:
+  if "," in username:
+    query.fromUser = username.split(",")
+    path = "/search"
+
+  if "/search" notin path and query.fromUser.len < 2:
     return $(twitter / path ? filterParams(params))
 
   let p = {
@@ -135,7 +141,7 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
     "src": "typed_query"
   }
 
-  result = $(parseUri("https://twitter.com") / path ? p)
+  result = $(twitter / path ? p)
   if username.len > 0:
     result = result.replace("/" & username, "")
 
