@@ -73,12 +73,6 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
 
   return (profile, timeline, await rail)
 
-proc getMultiQuery*(q: Query; names: seq[string]): Query =
-  result = q
-  result.fromUser = names
-  if q.kind == posts and "replies" notin q.excludes:
-    result.excludes.add "replies"
-
 proc get*(req: Request; key: string): string =
   params(req).getOrDefault(key)
 
@@ -118,7 +112,7 @@ proc createTimelineRouter*(cfg: Config) =
 
       var query = request.getQuery(@"tab", @"name")
       if names.len != 1:
-        query = query.getMultiQuery(names)
+        query.fromUser = names
 
       if @"scroll".len > 0:
         if query.fromUser.len != 1:

@@ -21,8 +21,9 @@ proc showRss*(req: Request; hostname: string; query: Query): Future[Rss] {.async
     (profile, timeline) =
       await fetchSingleTimeline(after, query, skipRail=true)
   else:
-    let multiQuery = query.getMultiQuery(names)
-    timeline = await getSearch[Tweet](multiQuery, after)
+    var q = query
+    q.fromUser = names
+    timeline = await getSearch[Tweet](q, after)
     # this is kinda dumb
     profile = Profile(
       username: name,

@@ -3,7 +3,6 @@ import strutils, strformat, sequtils, tables, uri
 import types
 
 const
-  # separators = @["AND", "OR"]
   validFilters* = @[
     "media", "images", "twimg", "videos",
     "native_video", "consumer_video", "pro_video",
@@ -30,9 +29,6 @@ proc initQuery*(pms: Table[string, string]; name=""): Query =
   if name.len > 0:
     result.fromUser = name.split(",")
 
-  if @"e-nativeretweets".len == 0:
-    result.includes.add "nativeretweets"
-
 proc getMediaQuery*(name: string): Query =
   Query(
     kind: media,
@@ -44,11 +40,10 @@ proc getMediaQuery*(name: string): Query =
 proc getReplyQuery*(name: string): Query =
   Query(
     kind: replies,
-    includes: @["nativeretweets"],
     fromUser: @[name]
   )
 
-proc genQueryParam*(query: Query; rewriteReplies=true): string =
+proc genQueryParam*(query: Query): string =
   var
     filters: seq[string]
     param: string
@@ -67,6 +62,9 @@ proc genQueryParam*(query: Query; rewriteReplies=true): string =
 
     if i < query.fromUser.high:
       param &= "OR "
+
+  if "nativeretweets" notin query.excludes:
+    param &= "include:nativeretweets "
 
   for f in query.filters:
     filters.add "filter:" & f

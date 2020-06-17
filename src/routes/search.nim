@@ -13,7 +13,7 @@ export search
 proc createSearchRouter*(cfg: Config) =
   router search:
     get "/search/?":
-      if @"q".len > 200:
+      if @"q".len > 500:
         resp Http400, showError("Search input too long.", cfg)
 
       let
