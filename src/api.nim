@@ -36,8 +36,8 @@ proc getListMembers*(list: List; after=""): Future[Result[Profile]] {.async.} =
 proc getProfile*(username: string): Future[Profile] {.async.} =
   let
     ps = genParams({"screen_name": username})
-    url = userLookup ? ps
-  result = parseUserLookup(await fetch(url, oldApi=true), username)
+    url = userShow ? ps
+  result = parseUserShow(await fetch(url, oldApi=true), username)
 
 proc getTimeline*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
   let

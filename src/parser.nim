@@ -24,10 +24,17 @@ proc parseProfile(js: JsonNode; id=""): Profile =
 
   result.expandProfileEntities(js)
 
-proc parseUserLookup*(js: JsonNode; username: string): Profile =
-  if js.isNull or js.kind == JArray and js.len == 0 or "error" in js:
+proc parseUserShow*(js: JsonNode; username: string): Profile =
+  if js.isNull:
     return Profile(username: username)
-  result = parseProfile(js[0])
+
+  with error, js{"errors"}:
+    result = Profile(username: username)
+    if error.getError == suspended:
+      result.suspended = true
+    return
+
+  result = parseProfile(js)
 
 proc parseGraphProfile*(js: JsonNode; username: string): Profile =
   if js.isNull: return
