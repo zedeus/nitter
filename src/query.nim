@@ -51,25 +51,22 @@ proc genQueryParam*(query: Query): string =
   if query.kind == users:
     return query.text
 
-  let rewrite = rewriteReplies and query.fromUser.len > 0 and
-                query.kind notin {tweets, replies}
-
   for i, user in query.fromUser:
-    if rewrite:
-      param &= &"(from:{user}(to:{user} OR -filter:replies)) "
-    else:
-      param &= &"from:{user} "
-
+    param &= &"from:{user} "
     if i < query.fromUser.high:
       param &= "OR "
+
+  if query.fromUser.len > 0 and query.kind in {posts, media}:
+    param &= "filter:self_threads OR-filter:replies "
 
   if "nativeretweets" notin query.excludes:
     param &= "include:nativeretweets "
 
+  let rewrite = query.fromUser.len > 0 and query.kind in {posts, media}
   for f in query.filters:
     filters.add "filter:" & f
   for e in query.excludes:
-    if rewrite and e == "replies": continue
+    if e == "nativeretweets": continue
     filters.add "-filter:" & e
   for i in query.includes:
     filters.add "include:" & i
@@ -82,10 +79,10 @@ proc genQueryParam*(query: Query): string =
   if query.near.len > 0:
     result &= &" near:\"{query.near}\" within:15mi"
   if query.text.len > 0:
-    result &= " " & query.text
-
-  if rewrite and result.len >= 500:
-    return genQueryParam(query, rewriteReplies=false)
+    if result.len > 0:
+      result &= " " & query.text
+    else:
+      result = query.text
 
 proc genQueryUrl*(query: Query): string =
   if query.kind notin {tweets, users}: return
