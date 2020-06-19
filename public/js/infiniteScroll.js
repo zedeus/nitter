@@ -18,7 +18,7 @@ window.onload = function() {
     const url = window.location.pathname;
     const isTweet = url.indexOf("/status/") !== -1;
     const containerClass = isTweet ? ".replies" : ".timeline";
-    const itemClass = isTweet ? ".thread-line" : ".timeline-item";
+    const itemClass = containerClass + ' > div:not(.top-ref)';
 
     var html = document.querySelector("html");
     var container = document.querySelector(containerClass);
