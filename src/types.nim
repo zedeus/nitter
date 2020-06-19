@@ -9,6 +9,7 @@ type
     remaining*: int
     reset*: Time
     init*: Time
+    lastUse*: Time
 
   Error* = enum
     null = 0

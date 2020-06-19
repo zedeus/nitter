@@ -27,12 +27,17 @@ proc fetchToken(): Future[Token] {.async.} =
     echo "token parse fail"
     return Token()
 
+  let time = getTime()
   result = Token(tok: resp[pos+3 .. pos+21], remaining: 187,
-                 reset: getTime() + 15.minutes, init: getTime())
+                 reset: time + 15.minutes, init: time, lastUse: time)
 
 proc expired(token: Token): bool {.inline.} =
-  const expirationTime = 2.hours
-  result = token.init < getTime() - expirationTime
+  const
+    expirationTime = 2.hours
+    maxLastUse = 1.hours
+  let time = getTime()
+  result = token.init < time - expirationTime or
+           token.lastUse < time - maxLastUse
 
 proc isLimited(token: Token): bool {.inline.} =
   token == nil or (token.remaining <= 1 and token.reset > getTime()) or
@@ -40,6 +45,7 @@ proc isLimited(token: Token): bool {.inline.} =
 
 proc release*(token: Token) =
   if token != nil and not token.expired:
+    token.lastUse = getTime()
     tokenPool.insert(token)
 
 proc getToken*(): Future[Token] {.async.} =
