@@ -2,7 +2,7 @@ import strutils, strformat, sequtils, uri, tables, base64
 import nimcrypto, regex
 
 var
-  hmacKey = "secretkey"
+  hmacKey {.threadvar.}: string
   base64Media = false
 
 const
@@ -51,7 +51,7 @@ proc cleanFilename*(filename: string): string =
     result &= ".png"
 
 proc filterParams*(params: Table): seq[(string, string)] =
-  let filter = ["name", "id", "list", "referer", "scroll"]
+  const filter = ["name", "id", "list", "referer", "scroll"]
   toSeq(params.pairs()).filterIt(it[0] notin filter and it[1].len > 0)
 
 proc isTwitterUrl*(uri: Uri): bool =

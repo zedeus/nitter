@@ -103,7 +103,7 @@ proc createRssRouter*(cfg: Config) =
 
       var key = @"name" & "/" & @"tab"
       if @"tab" == "search":
-        key &= hash(genQueryUrl(query))
+        key &= $hash(genQueryUrl(query))
       key &= getCursor()
 
       var rss = await getCachedRss(key)

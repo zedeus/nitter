@@ -5,7 +5,7 @@ from parsecfg import nil
 
 export genUpdatePrefs, genResetPrefs
 
-var defaultPrefs*: Prefs
+var defaultPrefs* {.threadvar.}: Prefs
 
 proc updateDefaultPrefs*(cfg: parsecfg.Config) =
   genDefaultPrefs()

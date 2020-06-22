@@ -1,5 +1,5 @@
-import tables, macros, strutils, os
-import karax/[karaxdsl, vdom, vstyles]
+import tables, macros, strutils
+import karax/[karaxdsl, vdom]
 
 import renderutils
 import ../types, ../prefs_impl

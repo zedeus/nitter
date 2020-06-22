@@ -6,7 +6,7 @@ import types, api
 const redisNil = "\0\0"
 
 var
-  pool: RedisPool
+  pool {.threadvar.}: RedisPool
   baseCacheTime = 60 * 60
   rssCacheTime: int
   listCacheTime*: int

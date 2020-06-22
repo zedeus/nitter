@@ -1,7 +1,7 @@
 import asyncdispatch, httpclient, times, sequtils, strutils
 import types
 
-var tokenPool: seq[Token]
+var tokenPool {.threadvar.}: seq[Token]
 
 proc fetchToken(): Future[Token] {.async.} =
   let

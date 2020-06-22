@@ -4,7 +4,7 @@ import karax/[karaxdsl, vdom]
 import renderutils, timeline
 import ".."/[types, query]
 
-let toggles = {
+const toggles = {
   "nativeretweets": "Retweets",
   "media": "Media",
   "videos": "Videos",

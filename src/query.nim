@@ -62,7 +62,6 @@ proc genQueryParam*(query: Query): string =
   if "nativeretweets" notin query.excludes:
     param &= "include:nativeretweets "
 
-  let rewrite = query.fromUser.len > 0 and query.kind in {posts, media}
   for f in query.filters:
     filters.add "filter:" & f
   for e in query.excludes:
