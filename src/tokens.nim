@@ -1,5 +1,5 @@
-import asyncdispatch, httpclient, times, sequtils, strutils
-import types
+import asyncdispatch, httpclient, times, sequtils, strutils, json
+import types, agents, consts
 
 var tokenPool {.threadvar.}: seq[Token]
 
@@ -9,27 +9,27 @@ proc fetchToken(): Future[Token] {.async.} =
       "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
       "accept-language": "en-US,en;q=0.5",
       "connection": "keep-alive",
-      "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:75.0) Gecko/20100101 Firefox/75.0"
+      "user-agent": getAgent(),
+      "authorization": auth
     })
     client = newAsyncHttpClient(headers=headers)
 
-  var resp: string
+  var
+    resp: string
+    tok: string
 
   try:
-    resp = await client.getContent("https://twitter.com")
+    resp = await client.postContent(activate)
+    tok = parseJson(resp)["guest_token"].getStr
+
+    let time = getTime()
+    result = Token(tok: tok, remaining: 187, reset: time + 15.minutes,
+                   init: time, lastUse: time)
+  except Exception as e:
+    echo "fetching token failed: ", e.msg
+    return Token()
+  finally:
     client.close()
-  except:
-    echo "fetching token failed"
-    return Token()
-
-  let pos = resp.rfind("gt=")
-  if pos == -1:
-    echo "token parse fail"
-    return Token()
-
-  let time = getTime()
-  result = Token(tok: resp[pos+3 .. pos+21], remaining: 187,
-                 reset: time + 15.minutes, init: time, lastUse: time)
 
 proc expired(token: Token): bool {.inline.} =
   const
