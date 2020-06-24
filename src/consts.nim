@@ -6,6 +6,7 @@ const
   api = parseUri("https://api.twitter.com")
   graphql = api / "graphql"
   timelineApi = api / "2/timeline"
+  activate* = $(api / "1.1/guest/activate.json")
   graphUser* = graphql / "E4iSsd6gypGFWx2eUhSC1g/UserByScreenName"
   graphList* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
   graphListId* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
