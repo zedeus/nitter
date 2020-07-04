@@ -65,3 +65,13 @@ nav {
         }
     }
 }
+
+.lp {
+    height: 13px;
+    display: block;
+    fill: var(--fg_nav);
+
+    &:hover {
+        fill: var(--accent_light);
+    }
+}

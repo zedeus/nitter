@@ -6,7 +6,9 @@ import ../utils, ../types, ../prefs, ../formatters
 
 import jester
 
-const doctype = "<!DOCTYPE html>\n"
+const
+  doctype = "<!DOCTYPE html>\n"
+  lp = readFile("public/lp.svg")
 
 proc renderNavbar*(title, rss: string; req: Request): VNode =
   let twitterPath = getTwitterLink(req.path, req.params)
@@ -25,6 +27,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
         if rss.len > 0:
           icon "rss-feed", title="RSS Feed", href=rss
         icon "bird", title="Open in Twitter", href=twitterPath
+        a(href="https://liberapay.com/zedeus"): verbatim lp
         icon "info-circled", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 
