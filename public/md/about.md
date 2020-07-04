@@ -7,7 +7,7 @@ privacy. The source is available on GitHub at <https://github.com/zedeus/nitter>
 * All requests go through the backend, client never talks to Twitter
 * Prevents Twitter from tracking your IP or JavaScript fingerprint
 * Unofficial API (no rate limits or developer account required)
-* Lightweight (for [@nim_lang](/nim_lang), 36KB vs 580KB from twitter.com)
+* Lightweight (for [@nim_lang](/nim_lang), 60KB vs 784KB from twitter.com)
 * RSS feeds
 * Themes
 * Mobile support (responsive design)
@@ -37,7 +37,8 @@ Twitter account.
 
 ## Donating
 
-LiberaPay: <https://liberapay.com/zedeus/donate> \
+Liberapay: <https://liberapay.com/zedeus> \
+Patreon: <https://patreon.com/nitter> \
 BTC: bc1qp7q4qz0fgfvftm5hwz3vy284nue6jedt44kxya \
 ETH: 0x66d84bc3fd031b62857ad18c62f1ba072b011925 \
 LTC: ltc1qhsz5nxw6jw9rdtw9qssjeq2h8hqk2f85rdgpkr \

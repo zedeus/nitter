@@ -9,25 +9,31 @@ Inspired by the [invidio.us](https://github.com/omarroth/invidious) project.
 - All requests go through the backend, client never talks to Twitter
 - Prevents Twitter from tracking your IP or JavaScript fingerprint
 - Unofficial API (no rate limits or developer account required)
-- Lightweight (for [@nim_lang](https://nitter.net/nim_lang), 58KB vs 784KB from twitter.com)
+- Lightweight (for [@nim_lang](https://nitter.net/nim_lang), 60KB vs 784KB from twitter.com)
 - RSS feeds
 - Themes
 - Mobile support (responsive design)
 - AGPLv3 licensed, no proprietary instances permitted
 
-## Todo (roughly in this order)
+Liberapay: https://liberapay.com/zedeus \
+Patreon: https://patreon.com/nitter \
+BTC: bc1qp7q4qz0fgfvftm5hwz3vy284nue6jedt44kxya \
+ETH: 0x66d84bc3fd031b62857ad18c62f1ba072b011925 \
+LTC: ltc1qhsz5nxw6jw9rdtw9qssjeq2h8hqk2f85rdgpkr \
+XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscWGWJCczFLe9RFhM3d1zpL
+
+## Roadmap
 
 - Embeds
+- Account system with timeline support
 - Archiving tweets/profiles
-- Simple account system with customizable feed
-- Json API endpoints
-- Emoji support (WIP, uses native font for now)
+- Developer API
 
 ## Resources
 
 The wiki contains a list of
-[Nitter instances](https://github.com/zedeus/nitter/wiki/Instances) and
-a list of [browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
+[instances](https://github.com/zedeus/nitter/wiki/Instances) and
+[browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
 maintained by the community.
 
 ## Why?
@@ -43,7 +49,7 @@ for users to control whether their data gets sent to advertisers.
 Using an instance of Nitter (hosted on a VPS for example), you can browse
 Twitter without JavaScript while retaining your privacy. In addition to
 respecting your privacy, Nitter is on average around 15 times lighter than
-Twitter, and in most cases serves pages faster (eg. timelines 2-4x faster).
+Twitter, and in most cases serves pages faster (eg. timelines load 2-4x faster).
 
 In the future a simple account system will be added that lets you follow Twitter
 users, allowing you to have a clean chronological timeline without needing a
@@ -135,13 +141,6 @@ implemented. If you're running Nitter with systemd, you can check stdout like
 this: `journalctl -u nitter.service` (add `--follow` to see just the last 15
 lines). If you're running the Docker image, you can do this:
 `docker logs --follow *nitter container id*`
-
-## Donating <a href="https://liberapay.com/zedeus/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
-
-BTC: bc1qp7q4qz0fgfvftm5hwz3vy284nue6jedt44kxya \
-ETH: 0x66d84bc3fd031b62857ad18c62f1ba072b011925 \
-LTC: ltc1qhsz5nxw6jw9rdtw9qssjeq2h8hqk2f85rdgpkr \
-XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscWGWJCczFLe9RFhM3d1zpL
 
 ## Contact
 
