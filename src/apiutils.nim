@@ -29,10 +29,11 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
   })
 
 proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
-  var
-    token = await getToken()
-    client = newAsyncHttpClient(headers=genHeaders(token))
+  var token = await getToken()
+  if token.tok.len == 0:
+    result = newJNull()
 
+  var client = newAsyncHttpClient(headers=genHeaders(token))
   try:
     let
       resp = await client.get($url)
@@ -54,5 +55,4 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
     echo "error: ", url
     result = newJNull()
   finally:
-    try: client.close()
-    except: discard
+    client.close()

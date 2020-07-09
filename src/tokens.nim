@@ -1,9 +1,15 @@
 import asyncdispatch, httpclient, times, sequtils, strutils, json
 import types, agents, consts
 
-var tokenPool {.threadvar.}: seq[Token]
+var
+  tokenPool {.threadvar.}: seq[Token]
+  lastFailed: Time
+  minFail = initDuration(seconds=10)
 
 proc fetchToken(): Future[Token] {.async.} =
+  if getTime() - lastFailed < minFail:
+    return Token()
+
   let
     headers = newHttpHeaders({
       "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -26,8 +32,9 @@ proc fetchToken(): Future[Token] {.async.} =
     result = Token(tok: tok, remaining: 187, reset: time + 15.minutes,
                    init: time, lastUse: time)
   except Exception as e:
+    lastFailed = getTime()
     echo "fetching token failed: ", e.msg
-    return Token()
+    result = Token()
   finally:
     client.close()
 
