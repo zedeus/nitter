@@ -47,4 +47,4 @@ XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscW
 ## Contact
 
 Feel free to join our Freenode IRC channel at #nitter, or our
-[Matrix server](https://matrix.to/#/#nitter:matrix.org).
+[Matrix channel](https://matrix.to/#/#nitter:matrix.org).
