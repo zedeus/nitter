@@ -63,7 +63,7 @@
 #end proc
 #
 #proc renderTimelineRss*(timeline: Timeline; profile: Profile; hostname: string; multi=false): string =
-#let prefs = Prefs(replaceTwitter: hostname, replaceYouTube: "invidio.us")
+#let prefs = Prefs(replaceTwitter: hostname, replaceYouTube: "invidious.snopyta.org")
 #result = ""
 #let user = (if multi: "" else: "@") & profile.username
 #var title = profile.fullname
@@ -94,7 +94,7 @@
 #end proc
 #
 #proc renderListRss*(tweets: seq[Tweet]; list: List; hostname: string): string =
-#let prefs = Prefs(replaceTwitter: hostname, replaceYouTube: "invidio.us")
+#let prefs = Prefs(replaceTwitter: hostname, replaceYouTube: "invidious.snopyta.org")
 #let link = &"https://{hostname}/{list.username}/lists/{list.name}"
 #result = ""
 <?xml version="1.0" encoding="UTF-8"?>
@@ -112,7 +112,7 @@
 #end proc
 #
 #proc renderSearchRss*(tweets: seq[Tweet]; name, param, hostname: string): string =
-#let prefs = Prefs(replaceTwitter: hostname, replaceYouTube: "invidio.us")
+#let prefs = Prefs(replaceTwitter: hostname, replaceYouTube: "invidious.snopyta.org")
 #let link = &"https://{hostname}/search"
 #let escName = xmltree.escape(name)
 #result = ""
