@@ -77,6 +77,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
 
     for url in images:
       meta(property="og:image", content=getPicUrl(url))
+      meta(property="twitter:card", content="summary_large_image")
 
     if video.len > 0:
       meta(property="og:video:url", content=video)
