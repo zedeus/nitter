@@ -6,3 +6,5 @@ nitter
 /tmp
 /tools/gencss
 /public/css/style.css
+dump.rdb
+nohup.out

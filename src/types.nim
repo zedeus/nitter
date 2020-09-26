@@ -139,6 +139,7 @@ type
   TweetStats* = object
     replies*: int
     retweets*: int
+    quotedreplies*: int
     likes*: int
 
   Tweet* = ref object
