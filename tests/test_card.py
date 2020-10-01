@@ -62,7 +62,7 @@ no_thumb = [
 
     ['mobile_test/status/490378953744318464',
      'Nantasket Beach',
-     'Rocks on the beach.',
+     'Explore this photo titled Nantasket Beach by Ben Sandofsky (@sandofsky) on 500px',
      '500px.com'],
 
     ['nim_lang/status/1082989146040340480',
