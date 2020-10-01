@@ -321,8 +321,11 @@ proc parseThread(js: JsonNode; global: GlobalObjects): tuple[thread: Chain, self
       let
         cursor = content{"timelineCursor"}
         more = cursor{"displayTreatment", "actionText"}.getStr
-      result.thread.more = parseInt(more[0 ..< more.find(" ")])
       result.thread.cursor = cursor{"value"}.getStr
+      if more.len > 0 and more[0].isDigit():
+        result.thread.more = parseInt(more[0 ..< more.find(" ")])
+      else:
+        result.thread.more = -1
     else:
       var tweet = finalizeTweet(global, entry.getId)
       if not tweet.available:
