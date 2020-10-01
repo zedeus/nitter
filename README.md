@@ -100,15 +100,23 @@ using the systemd service below. You should run Nitter behind a reverse proxy
 such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for
 security reasons.
 
+To run nitter with docker, you will need to install redis before you run these commands.
+
 To build and run Nitter in Docker:
 ```bash
 docker build -t nitter:latest .
-docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d -p 8080:8080 nitter:latest
+docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host -p 8080:8080 nitter:latest
 ```
 
 A prebuilt Docker image is provided as well:
 ```bash
-docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d -p 8080:8080 zedeus/nitter:latest
+docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host -p 8080:8080 zedeus/nitter:latest
+```
+
+Using docker-compose to run both nitter and redis as different containers:
+Change redisHost from `localhost` to `redis` in `nitter.conf` and then run:
+```bash
+docker-compose up -d
 ```
 
 Note the Docker commands expect a `nitter.conf` file in the directory you run them.

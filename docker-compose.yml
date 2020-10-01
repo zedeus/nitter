@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  redis:
+    image: redis:6-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/var/lib/redis
+  nitter:
+    image: zedeus/nitter:latest
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nitter.conf:/src/nitter.conf
+volumes:
+  redis-data:
