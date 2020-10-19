@@ -5,8 +5,7 @@ EXPOSE 8080
 COPY . /src/nitter
 WORKDIR /src/nitter
 
-RUN apk update \
-    && apk add libsass-dev libffi-dev openssl-dev redis \
+RUN apk --no-cache add libsass-dev libffi-dev openssl-dev redis \
     && nimble build -y -d:release --passC:"-flto" --passL:"-flto" \
     && strip -s nitter \
     && nimble scss
