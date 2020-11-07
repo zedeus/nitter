@@ -15,4 +15,4 @@ WORKDIR /src/
 RUN apk --no-cache add pcre-dev sqlite-dev
 COPY --from=nim /src/nitter/nitter /src/nitter/start.sh /src/nitter/nitter.conf ./
 COPY --from=nim /src/nitter/public ./public
-CMD ./start.sh
+CMD ["./start.sh"]
