@@ -13,6 +13,7 @@ const configPath {.strdefine.} = "./nitter.conf"
 let (cfg, fullCfg) = getConfig(configPath)
 
 when defined(release):
+  import logging
   # Silence Jester's query warning
   addHandler(newConsoleLogger())
   setLogFilter(lvlError)
