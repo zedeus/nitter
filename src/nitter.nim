@@ -1,4 +1,4 @@
-import asyncdispatch, logging, strformat
+import asyncdispatch, strformat
 from net import Port
 
 import jester
