@@ -299,7 +299,11 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
          (tweet.reply.len > 1 or tweet.reply[0] != tweet.profile.username):
         renderReply(tweet)
 
-      tdiv(class="tweet-content media-body", dir="auto"):
+      var tweetClass = "tweet-content media-body"
+      if prefs.bidiSupport:
+        tweetClass &= " tweet-bidi"
+
+      tdiv(class=tweetClass, dir="auto"):
         verbatim replaceUrl(tweet.text, prefs) & renderLocation(tweet)
 
       if tweet.attribution.isSome:

@@ -20,6 +20,11 @@
     font-family: $font_3;
     line-height: 1.4em;
     pointer-events: all;
+    display: inline;
+}
+
+.tweet-bidi {
+    display: block !important;
 }
 
 .tweet-header {

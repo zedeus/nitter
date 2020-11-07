@@ -88,6 +88,9 @@ genPrefs:
     stickyProfile(checkbox, true):
       "Make profile sidebar stick to top"
 
+    bidiSupport(checkbox, false):
+      "Support bidirectional text (makes clicking on tweets harder)"
+
     hideTweetStats(checkbox, false):
       "Hide tweet stats (replies, retweets, likes)"
 
