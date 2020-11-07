@@ -328,7 +328,7 @@ proc parseThread(js: JsonNode; global: GlobalObjects): tuple[thread: Chain, self
       else:
         result.thread.more = -1
     else:
-      var tweet = finalizeTweet(global, entry.getId)
+      var tweet = finalizeTweet(global, t.getEntryId)
       if not tweet.available:
         tweet.tombstone = getTombstone(content{"tombstone"})
       result.thread.content.add tweet
@@ -343,8 +343,8 @@ proc parseConversation*(js: JsonNode; tweetId: string): Conversation =
 
   for e in instructions[0]{"addEntries", "entries"}:
     let entry = e{"entryId"}.getStr
-    if "tweet" in entry:
-      let tweet = finalizeTweet(global, entry.getId)
+    if "tweet" in entry or "tombstone" in entry:
+      let tweet = finalizeTweet(global, e.getEntryId)
       if $tweet.id != tweetId:
         result.before.content.add tweet
       else:
@@ -408,8 +408,8 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
 
   for e in instructions[0]{"addEntries", "entries"}:
     let entry = e{"entryId"}.getStr
-    if "tweet" in entry or "sq-I-t" in entry:
-      let tweet = finalizeTweet(global, entry.getId)
+    if "tweet" in entry or "sq-I-t" in entry or "tombstone" in entry:
+      let tweet = finalizeTweet(global, e.getEntryId)
       if not tweet.available: continue
       result.content.add tweet
     elif "cursor-top" in entry:
