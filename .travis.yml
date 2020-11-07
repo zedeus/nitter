@@ -21,7 +21,6 @@ jobs:
         - docker push $IMAGE_NAME:latest
     - stage: test
       if: (NOT type IN (pull_request)) AND (branch = master)
-      sudo: required
       dist: bionic
       language: python
       python:
@@ -46,7 +45,6 @@ jobs:
         - pytest --headless -n 8 --reruns 10 --reruns-delay 2
     - stage: pr
       if: type IN (pull_request)
-      sudo: required
       dist: bionic
       language: python
       python:
