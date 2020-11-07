@@ -59,7 +59,7 @@ proc getEntryId*(js: JsonNode): string {.inline.} =
   let entry = js{"entryId"}.getStr
   if entry.len == 0: return
 
-  if "tweet" in entry:
+  if "tweet" in entry or "sq-I-t" in entry:
     return entry.getId
   elif "tombstone" in entry:
     return js{"content", "item", "content", "tombstone", "tweet", "id"}.getStr
