@@ -1,7 +1,8 @@
 import asyncdispatch, httpclient, times, sequtils, strutils, json
-import types, agents, consts
+import types, agents, consts, http_pool
 
 var
+  clientPool {.threadvar.}: HttpPool
   tokenPool {.threadvar.}: seq[Token]
   lastFailed: Time
   minFail = initDuration(seconds=10)
@@ -10,22 +11,20 @@ proc fetchToken(): Future[Token] {.async.} =
   if getTime() - lastFailed < minFail:
     return Token()
 
-  let
-    headers = newHttpHeaders({
-      "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-      "accept-language": "en-US,en;q=0.5",
-      "connection": "keep-alive",
-      "user-agent": getAgent(),
-      "authorization": auth
-    })
-    client = newAsyncHttpClient(headers=headers)
+  let headers = newHttpHeaders({
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "accept-language": "en-US,en;q=0.5",
+    "connection": "keep-alive",
+    "user-agent": getAgent(),
+    "authorization": auth
+  })
 
   var
     resp: string
     tok: string
 
   try:
-    resp = await client.postContent(activate)
+    resp = clientPool.use(headers): await c.postContent(activate)
     tok = parseJson(resp)["guest_token"].getStr
 
     let time = getTime()
@@ -35,8 +34,6 @@ proc fetchToken(): Future[Token] {.async.} =
     lastFailed = getTime()
     echo "fetching token failed: ", e.msg
     result = Token()
-  finally:
-    client.close()
 
 proc expired(token: Token): bool {.inline.} =
   const
@@ -74,6 +71,8 @@ proc poolTokens*(amount: int) {.async.} =
     release(await token)
 
 proc initTokenPool*(cfg: Config) {.async.} =
+  clientPool = HttpPool()
+
   while true:
     if tokenPool.countIt(not it.isLimited) < cfg.minTokens:
       await poolTokens(min(4, cfg.minTokens - tokenPool.len))

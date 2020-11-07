@@ -3,7 +3,7 @@ from net import Port
 
 import jester
 
-import types, config, prefs, formatters, redis_cache, tokens
+import types, config, prefs, formatters, redis_cache, http_pool, tokens
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list,
@@ -25,6 +25,7 @@ updateDefaultPrefs(fullCfg)
 setCacheTimes(cfg)
 setHmacKey(cfg.hmacKey)
 setProxyEncoding(cfg.base64Media)
+setMaxHttpConns(100)
 
 waitFor initRedisPool(cfg)
 stdout.write &"Connected to Redis at {cfg.redisHost}:{cfg.redisPort}\n"
