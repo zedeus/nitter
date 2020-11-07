@@ -14,6 +14,7 @@ const
   manifestRegex = re"(.+(.ts|.m3u8|.vmap))"
   userpicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
   extRegex = re"(\.[A-z]+)$"
+  illegalXmlRegex = re"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]"
 
   twitter = parseUri("https://twitter.com")
 
@@ -25,6 +26,9 @@ proc stripHtml*(text: string): string =
       if el.len == 0: continue
       el[0].text = link
   html.innerText()
+
+proc sanitizeXml*(text: string): string =
+  text.replace(illegalXmlRegex, "")
 
 proc shortLink*(text: string; length=28): string =
   result = text.replace(wwwRegex, "")

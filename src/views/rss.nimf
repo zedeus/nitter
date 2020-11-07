@@ -69,7 +69,7 @@
 #var title = profile.fullname
 #if not multi: title &= " / " & user
 #end if
-#title = xmltree.escape(title)
+#title = xmltree.escape(title).sanitizeXml
 <?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
   <channel>
@@ -86,7 +86,7 @@
       <width>128</width>
       <height>128</height>
     </image>
-    # if timeline.content.len > 0:
+    #if timeline.content.len > 0:
     ${renderRssTweets(timeline.content, prefs, hostname)}
     #end if
   </channel>
