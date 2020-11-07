@@ -44,9 +44,15 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
     if request.headers.getOrDefault("If-None-Match") == hashed:
       return Http304
 
+    let contentLength =
+      if res.headers.hasKey("content-length"):
+        res.headers["content-length", 0]
+      else:
+        ""
+
     let headers = newHttpHeaders({
       "Content-Type": res.headers["content-type", 0],
-      "Content-Length": res.headers["content-length", 0],
+      "Content-Length": contentLength,
       "Cache-Control": maxAge,
       "ETag": hashed
     })
