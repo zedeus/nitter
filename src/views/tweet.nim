@@ -245,7 +245,7 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
       renderReply(quote)
 
     if quote.text.len > 0:
-      tdiv(class="quote-text"):
+      tdiv(class="quote-text", dir="auto"):
         verbatim replaceUrl(quote.text, prefs)
 
     if quote.hasThread:
