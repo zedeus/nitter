@@ -185,8 +185,8 @@ proc renderStats(stats: TweetStats; views: string): VNode =
   buildHtml(tdiv(class="tweet-stats")):
     span(class="tweet-stat"): icon "comment", insertSep($stats.replies, ',')
     span(class="tweet-stat"): icon "retweet", insertSep($stats.retweets, ',')
-    span(class="tweet-stat"): icon "heart", insertSep($stats.likes, ',')
     span(class="tweet-stat"): icon "quote", insertSep($stats.quotes, ',')
+    span(class="tweet-stat"): icon "heart", insertSep($stats.likes, ',')
     if views.len > 0:
       span(class="tweet-stat"): icon "play", insertSep(views, ',')
 
