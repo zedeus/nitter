@@ -23,20 +23,20 @@ card = [
      'We are very proud to announce Nim version 0.20. This is a massive release, both literally and figuratively. It contains more than 1,000 commits and it marks our release candidate for version 1.0!',
      'nim-lang.org', True],
 
-    ['Tesla/status/1141041022035623936',
-     'Experience the Tesla Arcade',
-     '',
-     'www.tesla.com', True],
+    # ['Tesla/status/1141041022035623936',
+    #  'Experience the Tesla Arcade',
+    #  '',
+    #  'www.tesla.com', True],
 
     ['voidtarget/status/1094632512926605312',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too)',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too) - obsplugin.nim',
      'gist.github.com', True],
 
-    ['AdsAPI/status/1110272721005367296',
-     'Conversation Targeting',
-     '',
-     'view.highspot.com', True],
+    # ['AdsAPI/status/1110272721005367296',
+    #  'Conversation Targeting',
+    #  '',
+    #  'view.highspot.com', True],
 
     ['FluentAI/status/1116417904831029248',
      'Amazon’s Alexa isn’t just AI — thousands of humans are listening',
@@ -85,31 +85,31 @@ playable = [
 
     ['nim_lang/status/1121090879823986688',
      'Nim - First natively compiled language w/ hot code-reloading at...',
-     '#nim #c++ #ACCUConf Nim is a statically typed systems and applications programming language which offers perhaps some of the most powerful metaprogramming ca...',
+     '#nim #c++ #ACCUConfNim is a statically typed systems and applications programming language which offers perhaps some of the most powerful metaprogramming capabi...',
      'youtube.com']
 ]
 
-promo = [
-    ['BangOlufsen/status/1145698701517754368',
-     'Upgrade your journey', '',
-     'www.bang-olufsen.com'],
+# promo = [
+    # ['BangOlufsen/status/1145698701517754368',
+    #  'Upgrade your journey', '',
+    #  'www.bang-olufsen.com'],
 
-    ['BangOlufsen/status/1154934429900406784',
-     'Learn more about Beosound Shape', '',
-     'www.bang-olufsen.com']
-]
+    # ['BangOlufsen/status/1154934429900406784',
+    #  'Learn more about Beosound Shape', '',
+    #  'www.bang-olufsen.com']
+# ]
 
 
 class CardTest(BaseTestCase):
     @parameterized.expand(card)
     def test_card(self, tweet, title, description, destination, large):
         self.open_nitter(tweet)
-        card = Card(Conversation.main + " ")
-        self.assert_text(title, card.title)
-        self.assert_text(destination, card.destination)
-        self.assertIn('_img', self.get_image_url(card.image + ' img'))
+        c = Card(Conversation.main + " ")
+        self.assert_text(title, c.title)
+        self.assert_text(destination, c.destination)
+        self.assertIn('_img', self.get_image_url(c.image + ' img'))
         if len(description) > 0:
-            self.assert_text(description, card.description)
+            self.assert_text(description, c.description)
         if large:
             self.assert_element_visible('.card.large')
         else:
@@ -118,29 +118,29 @@ class CardTest(BaseTestCase):
     @parameterized.expand(no_thumb)
     def test_card_no_thumb(self, tweet, title, description, destination):
         self.open_nitter(tweet)
-        card = Card(Conversation.main + " ")
-        self.assert_text(title, card.title)
-        self.assert_text(destination, card.destination)
+        c = Card(Conversation.main + " ")
+        self.assert_text(title, c.title)
+        self.assert_text(destination, c.destination)
         if len(description) > 0:
-            self.assert_text(description, card.description)
+            self.assert_text(description, c.description)
 
     @parameterized.expand(playable)
     def test_card_playable(self, tweet, title, description, destination):
         self.open_nitter(tweet)
-        card = Card(Conversation.main + " ")
-        self.assert_text(title, card.title)
-        self.assert_text(destination, card.destination)
-        self.assertIn('_img', self.get_image_url(card.image + ' img'))
+        c = Card(Conversation.main + " ")
+        self.assert_text(title, c.title)
+        self.assert_text(destination, c.destination)
+        self.assertIn('_img', self.get_image_url(c.image + ' img'))
         self.assert_element_visible('.card-overlay')
         if len(description) > 0:
-            self.assert_text(description, card.description)
+            self.assert_text(description, c.description)
 
-    @parameterized.expand(promo)
-    def test_card_promo(self, tweet, title, description, destination):
-        self.open_nitter(tweet)
-        card = Card(Conversation.main + " ")
-        self.assert_text(title, card.title)
-        self.assert_text(destination, card.destination)
-        self.assert_element_visible('.video-overlay')
-        if len(description) > 0:
-            self.assert_text(description, card.description)
+    # @parameterized.expand(promo)
+    # def test_card_promo(self, tweet, title, description, destination):
+    #     self.open_nitter(tweet)
+    #     c = Card(Conversation.main + " ")
+    #     self.assert_text(title, c.title)
+    #     self.assert_text(destination, c.destination)
+    #     self.assert_element_visible('.video-overlay')
+    #     if len(description) > 0:
+    #         self.assert_text(description, c.description)

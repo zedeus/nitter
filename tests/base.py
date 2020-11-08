@@ -37,7 +37,7 @@ class Tweet(object):
 class Profile(object):
     fullname = '.profile-card-fullname'
     username = '.profile-card-username'
-    protected = '.icon-lock-circled'
+    protected = '.icon-lock'
     verified = '.verified-icon'
     banner = '.profile-banner'
     bio = '.profile-bio'
