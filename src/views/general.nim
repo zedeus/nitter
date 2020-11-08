@@ -45,8 +45,8 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     opensearchUrl = "http://" & cfg.hostname & "/opensearch"
 
   buildHtml(head):
-    link(rel="stylesheet", `type`="text/css", href="/css/style.css")
-    link(rel="stylesheet", `type`="text/css", href="/css/fontello.css")
+    link(rel="stylesheet", `type`="text/css", href="/css/style.css?v=1")
+    link(rel="stylesheet", `type`="text/css", href="/css/fontello.css?v=1")
     link(rel="apple-touch-icon", sizes="180x180", href="/apple-touch-icon.png")
     link(rel="icon", type="image/png", sizes="32x32", href="/favicon-32x32.png")
     link(rel="icon", type="image/png", sizes="16x16", href="/favicon-16x16.png")
