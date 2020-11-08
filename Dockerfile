@@ -1,4 +1,4 @@
-FROM nimlang/nim:alpine as nim
+FROM nimlang/nim:1.2.8-alpine as nim
 MAINTAINER setenforce@protonmail.com
 EXPOSE 8080
 
