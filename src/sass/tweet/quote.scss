@@ -79,6 +79,8 @@
         video {
             height: unset;
             width: unset;
+            max-height: 100%;
+            max-width: 100%;
         }
     }
 
