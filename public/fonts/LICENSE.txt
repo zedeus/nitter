@@ -10,13 +10,13 @@ Font license info
    Homepage:  http://www.entypo.com
 
 
-## MFG Labs
+## Iconic
 
-   Copyright (C) 2012 by Daniel Bruce
+   Copyright (C) 2012 by P.J. Onori
 
-   Author:    MFG Labs
+   Author:    P.J. Onori
    License:   SIL (http://scripts.sil.org/OFL)
-   Homepage:  http://www.mfglabs.com/
+   Homepage:  http://somerandomdude.com/work/iconic/
 
 
 ## Font Awesome
@@ -35,5 +35,14 @@ Font license info
    Author:    Aristeides Stathopoulos
    License:   SIL (http://scripts.sil.org/OFL)
    Homepage:  http://aristeides.com/
+
+
+## Modern Pictograms
+
+   Copyright (c) 2012 by John Caserta. All rights reserved.
+
+   Author:    John Caserta
+   License:   SIL (http://scripts.sil.org/OFL)
+   Homepage:  http://thedesignoffice.org/project/modern-pictograms/
 
 

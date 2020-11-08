@@ -27,7 +27,7 @@ proc linkUser*(profile: Profile, class=""): VNode =
       icon "ok", class="verified-icon", title="Verified account"
     if isName and profile.protected:
       text " "
-      icon "lock-circled", title="Protected account"
+      icon "lock", title="Protected account"
 
 proc linkText*(text: string; class=""): VNode =
   let url = if "http" notin text: "http://" & text else: text

@@ -140,6 +140,7 @@ type
     replies*: int
     retweets*: int
     likes*: int
+    quotes*: int
 
   Tweet* = ref object
     id*: int64

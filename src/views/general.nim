@@ -28,7 +28,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
           icon "rss-feed", title="RSS Feed", href=rss
         icon "bird", title="Open in Twitter", href=twitterPath
         a(href="https://liberapay.com/zedeus"): verbatim lp
-        icon "info-circled", title="About", href="/about"
+        icon "info", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 
 proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";

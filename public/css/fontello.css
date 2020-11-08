@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'fontello';
-  src: url('/fonts/fontello.eot?63207931');
-  src: url('/fonts/fontello.eot?63207931#iefix') format('embedded-opentype'),
-       url('/fonts/fontello.woff2?63207931') format('woff2'),
-       url('/fonts/fontello.woff?63207931') format('woff'),
-       url('/fonts/fontello.ttf?63207931') format('truetype'),
-       url('/fonts/fontello.svg?63207931#fontello') format('svg');
+  src: url('/fonts/fontello.eot?21002321');
+  src: url('/fonts/fontello.eot?21002321#iefix') format('embedded-opentype'),
+       url('/fonts/fontello.woff2?21002321') format('woff2'),
+       url('/fonts/fontello.woff?21002321') format('woff'),
+       url('/fonts/fontello.ttf?21002321') format('truetype'),
+       url('/fonts/fontello.svg?21002321#fontello') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -14,8 +14,8 @@
   font-family: "fontello";
   font-style: normal;
   font-weight: normal;
-  speak: none;
-
+  speak: never;
+ 
   display: inline-block;
   text-decoration: inherit;
   width: 1em;
@@ -24,33 +24,30 @@
   /* For safety - reset parent styles, that can break glyph codes*/
   font-variant: normal;
   text-transform: none;
-
+ 
   /* fix buttons height, for twitter bootstrap */
   line-height: 1em;
-
+ 
   /* Font smoothing. That was taken from TWBS */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-.icon-help-circled:before { content: '\e800'; } /* '' */
-.icon-attention:before { content: '\e801'; } /* '' */
+ 
+.icon-heart:before { content: '\2665'; } /* '♥' */
+.icon-quote:before { content: '\275e'; } /* '❞' */
 .icon-comment:before { content: '\e802'; } /* '' */
 .icon-ok:before { content: '\e803'; } /* '' */
 .icon-play:before { content: '\e804'; } /* '' */
 .icon-link:before { content: '\e805'; } /* '' */
 .icon-calendar:before { content: '\e806'; } /* '' */
 .icon-location:before { content: '\e807'; } /* '' */
-.icon-down-small:before { content: '\e808'; } /* '' */
 .icon-picture:before { content: '\e809'; } /* '' */
-.icon-lock-circled:before { content: '\e80a'; } /* '' */
+.icon-lock:before { content: '\e80a'; } /* '' */
 .icon-down:before { content: '\e80b'; } /* '' */
-.icon-info-circled:before { content: '\e80c'; } /* '' */
 .icon-retweet:before { content: '\e80d'; } /* '' */
 .icon-search:before { content: '\e80e'; } /* '' */
 .icon-pin:before { content: '\e80f'; } /* '' */
-.icon-user:before { content: '\e810'; } /* '' */
-.icon-heart:before { content: '\e811'; } /* '' */
 .icon-cog:before { content: '\e812'; } /* '' */
 .icon-rss-feed:before { content: '\e813'; } /* '' */
-.icon-bird:before { content: '\f099'; } /* '' */
+.icon-info:before { content: '\f128'; } /* '' */
+.icon-bird:before { content: '\f309'; } /* '' */

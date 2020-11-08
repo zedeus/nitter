@@ -230,6 +230,7 @@ proc parseTweet(js: JsonNode): Tweet =
       replies: js{"reply_count"}.getInt,
       retweets: js{"retweet_count"}.getInt,
       likes: js{"favorite_count"}.getInt,
+      quotes: js{"quote_count"}.getInt
     )
   )
 
