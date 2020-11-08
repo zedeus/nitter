@@ -27,7 +27,7 @@ proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
 
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.profile.username)):
-        var size = "_normal"
+        var size = "_bigger"
         if not prefs.autoplayGifs and tweet.profile.userpic.endsWith("gif"):
           size = "_400x400"
         genImg(tweet.profile.getUserpic(size), class="avatar")
