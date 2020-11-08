@@ -23,6 +23,13 @@
     font-size: 20px;
 }
 
+
+@media(max-width: 600px) {
+    .main-tweet .tweet-content {
+        font-size: 16px;
+    }
+}
+
 .reply {
     background-color: var(--bg_panel);
     margin-bottom: 10px;
