@@ -51,7 +51,7 @@ proc createStatusRouter*(cfg: Config) =
         if card.image.len > 0:
           images = @[card.image]
         elif card.video.isSome():
-          video = getVideoEmbed(cfg, parseInt(card.video.get().videoId))
+          images = @[card.video.get().thumb]
 
       let html = renderConversation(conv, prefs, getPath() & "#m")
       resp renderMain(html, request, cfg, prefs, title, desc, ogTitle,
