@@ -15,7 +15,7 @@ template notNull*(js: JsonNode): bool = js.kind != JNull
 template `?`*(js: JsonNode): untyped =
   let j = js
   if j.isNull: return
-  else: j
+  j
 
 template `with`*(ident, value, body): untyped =
   block:

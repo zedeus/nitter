@@ -46,7 +46,7 @@ proc parseGraphProfile*(js: JsonNode; username: string): Profile =
 
   let user = js{"data", "user", "legacy"}
   let id = js{"data", "user", "rest_id"}.getStr
-  parseProfile(user, id)
+  result = parseProfile(user, id)
 
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
