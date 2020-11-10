@@ -13,11 +13,6 @@ card = [
      'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - pytorch/fairseq',
      'github.com', False],
 
-    ['TheTwoffice/status/558685306090946561',
-     'Eternity: a moment standing still forever…',
-     '- James Montgomery. | facebook | 500px | ferpectshotz | I dusted off this one from my old archives, it was taken while I was living in mighty new York city working at Wall St. I think this was the 11...',
-     'flickr.com', False],
-
     ['nim_lang/status/1136652293510717440',
      'Version 0.20.0 released',
      'We are very proud to announce Nim version 0.20. This is a massive release, both literally and figuratively. It contains more than 1,000 commits and it marks our release candidate for version 1.0!',
@@ -75,6 +70,11 @@ no_thumb = [
      'In recent years, with the advent of deep neural networks, the accuracy of speech recognition models have been notably improved which have made possible the production of speech-to-text systems that...',
      'fluent.ai'],
 
+
+    ['TheTwoffice/status/558685306090946561',
+     'Eternity: a moment standing still forever…',
+     '- James Montgomery. | facebook | 500px | ferpectshotz | I dusted off this one from my old archives, it was taken while I was living in mighty new York city working at Wall St. I think this was the 11...',
+     'flickr.com'],
 ]
 
 playable = [
