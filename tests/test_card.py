@@ -16,7 +16,7 @@ card = [
     ['TheTwoffice/status/558685306090946561',
      'Eternity: a moment standing still forever…',
      '- James Montgomery. | facebook | 500px | ferpectshotz | I dusted off this one from my old archives, it was taken while I was living in mighty new York city working at Wall St. I think this was the 11...',
-     'flickr.com', True],
+     'flickr.com', False],
 
     ['nim_lang/status/1136652293510717440',
      'Version 0.20.0 released',
