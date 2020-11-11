@@ -150,13 +150,12 @@ proc extractHashtags(result: var seq[ReplaceSlice], js: JsonNode) =
 
 proc replacedWith(runes: seq[Rune], repls: openArray[ReplaceSlice],
                   textSlice: Slice[int]): string =
+  template extractLowerBound(i: int, idx): int =
+    if i > 0: repls[idx].slice.b.succ else: textSlice.a
+
   result = newStringOfCap(runes.len)
   for i, rep in repls:
-    let slice =
-      if i == 0: textSlice.a ..< repls[i].slice.a
-      else: repls[i - 1].slice.b.succ ..< rep.slice.a
-    result.add $runes[slice]
-    if rep.slice.a > textSlice.b: return
+    result.add $runes[extractLowerBound(i, i - 1) ..< rep.slice.a]
     case rep.kind
     of rkHashtag:
       let
@@ -169,10 +168,7 @@ proc replacedWith(runes: seq[Rune], repls: openArray[ReplaceSlice],
       result.add a(rep.display, href = rep.url)
     of rkRemove:
       discard
-  let lowerBound =
-    if repls.len > 0: repls[^1].slice.b.succ
-    else: textSlice.a
-  result.add $runes[lowerBound ..< textSlice.b]
+  result.add $runes[extractLowerBound(repls.len, ^1) ..< textSlice.b]
 
 proc deduplicate(s: var seq[ReplaceSlice]) =
   var
@@ -184,8 +180,8 @@ proc deduplicate(s: var seq[ReplaceSlice]) =
       if s[i].slice.a == s[j].slice.a:
         s.del j
         dec len
-        dec j
-      inc j
+      else:
+        inc j
     inc i
 
 proc cmp(x, y: ReplaceSlice): int = cmp(x.slice.a, y.slice.b)
