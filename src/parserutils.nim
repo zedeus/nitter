@@ -1,4 +1,4 @@
-import strutils, times, macros, htmlgen, unicode, options, algorithm
+import strutils, times, macros, htmlgen, unicode, options
 import regex, packedjson
 import types, utils, formatters
 
@@ -6,17 +6,8 @@ const
   unRegex = re"(^|[^A-z0-9-_./?])@([A-z0-9_]{1,15})"
   unReplace = "$1<a href=\"/$2\">@$2</a>"
 
-  htRegex = re"(^|[^\w-_./?])([#＃$])([\w_]+)"
+  htRegex = re"(^|[^\w-_./?])([#$])([\w_]+)"
   htReplace = "$1<a href=\"/search?q=%23$3\">$2$3</a>"
-
-type
-  ReplaceSliceKind = enum
-    rkRemove, rkUrl, rkHashtag, rkMention
-
-  ReplaceSlice = object
-    slice: Slice[int]
-    kind: ReplaceSliceKind
-    url, display: string
 
 template isNull*(js: JsonNode): bool = js.kind == JNull
 template notNull*(js: JsonNode): bool = js.kind != JNull
@@ -133,91 +124,64 @@ proc getTombstone*(js: JsonNode): string =
   result = js{"tombstoneInfo", "richText", "text"}.getStr
   result.removeSuffix(" Learn more")
 
-proc extractSlice(js: JsonNode): Slice[int] =
-  result = js["indices"][0].getInt ..< js["indices"][1].getInt
+template getSlice(text: string; slice: seq[int]): string =
+  text.runeSubStr(slice[0], slice[1] - slice[0])
 
-proc extractUrls(result: var seq[ReplaceSlice]; js: JsonNode;
-                 textLen: int; hideTwitter = false) =
+proc getSlice(text: string; js: JsonNode): string =
+  if js.kind != JArray or js.len < 2 or js[0].kind != JInt: return text
+
+  let slice = @[js{0}.getInt, js{1}.getInt]
+  text.getSlice(slice)
+
+proc expandUrl(text: var string; js: JsonNode; tLen: int; hideTwitter=false) =
+  let u = js{"url"}.getStr
+  if u.len == 0 or u notin text:
+    return
+
   let
-    url = js["expanded_url"].getStr
-    slice = js.extractSlice
+    url = js{"expanded_url"}.getStr
+    slice = js{"indices"}[1].getInt
 
-  if hideTwitter and slice.b >= textLen and url.isTwitterUrl:
-    if slice.a < textLen:
-      result.add ReplaceSlice(kind: rkRemove, slice: slice)
+  if hideTwitter and slice >= tLen and url.isTwitterUrl:
+    text = text.replace(u, "")
+    text.removeSuffix(' ')
+    text.removeSuffix('\n')
   else:
-    result.add ReplaceSlice(kind: rkUrl, url: url,
-                            display: url.shortLink, slice: slice)
+    text = text.replace(u, a(shortLink(url), href=url))
 
-proc extractHashtags(result: var seq[ReplaceSlice]; js: JsonNode) =
-  result.add ReplaceSlice(kind: rkHashtag, slice: js.extractSlice)
-
-proc replacedWith(runes: seq[Rune]; repls: openArray[ReplaceSlice];
-                  textSlice: Slice[int]): string =
-  template extractLowerBound(i: int; idx): int =
-    if i > 0: repls[idx].slice.b.succ else: textSlice.a
-
-  result = newStringOfCap(runes.len)
-  for i, rep in repls:
-    result.add $runes[extractLowerBound(i, i - 1) ..< rep.slice.a]
-    case rep.kind
-    of rkHashtag:
-      let
-        name = $runes[rep.slice.a.succ .. rep.slice.b]
-        symbol = $runes[rep.slice.a]
-      result.add a(symbol & name, href = "/search?q=%23" & name)
-    of rkMention:
-      result.add a($runes[rep.slice], href = rep.url, title = rep.display)
-    of rkUrl:
-      result.add a(rep.display, href = rep.url)
-    of rkRemove:
-      discard
-  result.add $runes[extractLowerBound(repls.len, ^1) ..< textSlice.b]
-
-proc deduplicate(s: var seq[ReplaceSlice]) =
-  var
-    len = s.len
-    i = 0
-  while i < len:
-    var j = i + 1
-    while j < len:
-      if s[i].slice.a == s[j].slice.a:
-        s.del j
-        dec len
-      else:
-        inc j
-    inc i
-
-proc cmp(x, y: ReplaceSlice): int = cmp(x.slice.a, y.slice.b)
+proc expandMention(text: var string; orig: string; js: JsonNode) =
+  let
+    name = js{"name"}.getStr
+    href = '/' & js{"screen_name"}.getStr
+    uname = orig.getSlice(js{"indices"})
+  text = text.replace(uname, a(uname, href=href, title=name))
 
 proc expandProfileEntities*(profile: var Profile; js: JsonNode) =
   let
-    orig = profile.bio.toRunes
+    orig = profile.bio
     ent = ? js{"entities"}
 
   with urls, ent{"url", "urls"}:
     profile.website = urls[0]{"expanded_url"}.getStr
 
-  var replacements = newSeq[ReplaceSlice]()
-
   with urls, ent{"description", "urls"}:
-    for u in urls:
-      replacements.extractUrls(u, orig.high)
+    for u in urls: profile.bio.expandUrl(u, orig.high)
 
-  replacements.deduplicate
-  replacements.sort(cmp)
-
-  profile.bio = orig.replacedWith(replacements, 0 .. orig.len)
   profile.bio = profile.bio.replace(unRegex, unReplace)
                            .replace(htRegex, htReplace)
 
+  for mention in ? ent{"user_mentions"}:
+    profile.bio.expandMention(orig, mention)
+
 proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
-    orig = tweet.text.toRunes
+    orig = tweet.text
     textRange = js{"display_text_range"}
-    textSlice = textRange{0}.getInt .. textRange{1}.getInt
+    slice = @[textRange{0}.getInt, textRange{1}.getInt]
     hasQuote = js{"is_quote_status"}.getBool
     hasCard = tweet.card.isSome
+
+  tweet.text = tweet.text.getSlice(slice)
 
   var replyTo = ""
   if tweet.replyId != 0:
@@ -227,45 +191,26 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
 
   let ent = ? js{"entities"}
 
-  var replacements = newSeq[ReplaceSlice]()
-
   with urls, ent{"urls"}:
     for u in urls:
-      let urlStr = u["url"].getStr
-      if urlStr.len == 0 or urlStr notin tweet.text:
-        continue
-      replacements.extractUrls(u, textSlice.b, hideTwitter = hasQuote)
+      tweet.text.expandUrl(u, slice[1], hasQuote)
       if hasCard and u{"url"}.getStr == get(tweet.card).url:
         get(tweet.card).url = u{"expanded_url"}.getStr
 
   with media, ent{"media"}:
-    for m in media:
-      replacements.extractUrls(m, textSlice.b, hideTwitter = true)
+    for m in media: tweet.text.expandUrl(m, slice[1], hideTwitter=true)
 
-  if "hashtags" in ent:
-    for hashtag in ent["hashtags"]:
-      replacements.extractHashtags(hashtag)
+  if "hashtags" in ent or "symbols" in ent:
+    tweet.text = tweet.text.replace(htRegex, htReplace)
 
-  if "symbols" in ent:
-    for symbol in ent["symbols"]:
-      replacements.extractHashtags(symbol)
+  for mention in ? ent{"user_mentions"}:
+    let
+      name = mention{"screen_name"}.getStr
+      idx = tweet.reply.find(name)
 
-  if "user_mentions" in ent:
-    for mention in ent["user_mentions"]:
-      let
-        name = mention{"screen_name"}.getStr
-        slice = mention.extractSlice
-        idx = tweet.reply.find(name)
-
-      if slice.a >= textSlice.a:
-        replacements.add ReplaceSlice(kind: rkMention, slice: slice,
-          url: "/" & name, display: mention["name"].getStr)
-        if idx > -1 and name != replyTo:
-          tweet.reply.delete idx
-      elif idx == -1 and tweet.replyId != 0:
-        tweet.reply.add name
-
-  replacements.deduplicate
-  replacements.sort(cmp)
-
-  tweet.text = orig.replacedWith(replacements, textSlice)
+    if mention{"indices"}[0].getInt >= slice[0]:
+      tweet.text.expandMention(orig, mention)
+      if idx > -1 and name != replyTo:
+        tweet.reply.delete idx
+    elif idx == -1 and tweet.replyId != 0:
+      tweet.reply.add name
