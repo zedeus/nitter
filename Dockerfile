@@ -2,7 +2,7 @@ FROM nimlang/nim:alpine as nim
 MAINTAINER setenforce@protonmail.com
 EXPOSE 8080
 
-RUN apk --no-cache add libsass-dev libffi-dev openssl-dev redis
+RUN apk --no-cache add libsass-dev libffi-dev openssl-dev redis openssh-client
 
 COPY . /src/nitter
 WORKDIR /src/nitter
