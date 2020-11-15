@@ -33,6 +33,12 @@
     .image-attachment {
         width: 100%;
     }
+
+    .gallery-gif {
+        align-self: flex-start;
+        border-radius: 7px;
+        overflow: hidden;
+    }
 }
 
 .attachment {
@@ -102,7 +108,6 @@
 }
 
 .media-gif {
-    display: inline-block;
     background-color: unset;
     width: unset;
 }
