@@ -1,5 +1,5 @@
 import asyncdispatch, times, strutils, tables
-import redis, redpool, frosty, snappy
+import redis, redpool, frosty, supersnappy
 
 import types, api
 

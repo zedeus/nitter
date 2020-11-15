@@ -18,10 +18,10 @@ requires "regex#2e32fdc"
 requires "nimcrypto >= 0.4.11"
 requires "markdown#abdbe5e"
 requires "packedjson#7198cc8"
-requires "snappy#d13e2cc"
+requires "supersnappy#1.1.5"
 requires "redpool#57aeb25"
 requires "https://github.com/zedeus/redis#94bcbf1"
-requires "https://github.com/disruptek/frosty#0.2.3"
+requires "https://github.com/disruptek/frosty#0.3.1"
 
 
 # Tasks

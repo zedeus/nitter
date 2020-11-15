@@ -1,4 +1,4 @@
-import asyncdispatch, strutils, tables, times, sequtils, hashes, snappy
+import asyncdispatch, strutils, tables, times, sequtils, hashes, supersnappy
 
 import jester
 
@@ -7,7 +7,7 @@ import ../query
 
 include "../views/rss.nimf"
 
-export times, hashes, snappy
+export times, hashes, supersnappy
 
 proc showRss*(req: Request; hostname: string; query: Query): Future[Rss] {.async.} =
   var profile: Profile
