@@ -109,7 +109,7 @@ Note the Docker commands expect a `nitter.conf` file in the directory you run th
 
 To run Nitter via systemd you can use this service file:
 
-```bash
+```ini
 [Unit]
 Description=Nitter (An alternative Twitter front-end)
 After=syslog.target
