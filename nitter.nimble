@@ -21,7 +21,7 @@ requires "packedjson#7198cc8"
 requires "supersnappy#1.1.5"
 requires "redpool#57aeb25"
 requires "https://github.com/zedeus/redis#94bcbf1"
-requires "https://github.com/disruptek/frosty#0.4.3"
+requires "https://github.com/disruptek/frosty#0.3.1"
 
 
 # Tasks

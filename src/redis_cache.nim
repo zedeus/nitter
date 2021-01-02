@@ -33,7 +33,7 @@ proc initRedisPool*(cfg: Config) {.async.} =
                               host=cfg.redisHost, port=cfg.redisPort)
 
     await migrate("snappyRss", "rss:*")
-    await migrate("newFrosty", "*")
+    await migrate("oldFrosty", "*")
 
   except OSError:
     stdout.write "Failed to connect to Redis.\n"
