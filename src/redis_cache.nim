@@ -1,4 +1,4 @@
-import asyncdispatch, times, strutils, tables
+import asyncdispatch, times, strutils, tables, hashes
 import redis, redpool, frosty, supersnappy
 
 import types, api
@@ -22,7 +22,7 @@ proc migrate*(key, match: string) {.async.} =
       let list = await r.scan(newCursor(0), match, 100000)
       r.startPipelining()
       for item in list:
-        if item != "p:":
+        if item != "p:" or item == match:
           discard await r.del(item)
       await r.setk(key, "true")
       discard await r.flushPipeline()
@@ -34,14 +34,19 @@ proc initRedisPool*(cfg: Config) {.async.} =
 
     await migrate("snappyRss", "rss:*")
     await migrate("oldFrosty", "*")
+    await migrate("userBuckets", "p:")
+
+    pool.withAcquire(r):
+      await r.configSet("hash-max-ziplist-entries", "1000")
 
   except OSError:
     stdout.write "Failed to connect to Redis.\n"
     stdout.flushFile
     quit(1)
 
-template toKey(p: Profile): string = "p:" & toLower(p.username)
-template toKey(l: List): string = toLower("l:" & l.username & '/' & l.name)
+template pidKey(name: string): string = "pid:" & $(hash(name) div 1_000_000)
+template profileKey(name: string): string = "p:" & name
+template listKey(l: List): string = toLower("l:" & l.username & '/' & l.name)
 
 proc get(query: string): Future[string] {.async.} =
   pool.withAcquire(r):
@@ -52,23 +57,25 @@ proc setex(key: string; time: int; data: string) {.async.} =
     discard await r.setex(key, time, data)
 
 proc cache*(data: List) {.async.} =
-  await setex(data.toKey, listCacheTime, compress(freeze(data)))
+  await setex(data.listKey, listCacheTime, compress(freeze(data)))
 
 proc cache*(data: PhotoRail; name: string) {.async.} =
   await setex("pr:" & name, baseCacheTime, compress(freeze(data)))
 
 proc cache*(data: Profile) {.async.} =
   if data.username.len == 0: return
+  let name = toLower(data.username)
   pool.withAcquire(r):
     r.startPipelining()
-    discard await r.setex(data.toKey, baseCacheTime, compress(freeze(data)))
-    discard await r.hset("p:", toLower(data.username), data.id)
+    discard await r.setex(name.profileKey, baseCacheTime, compress(freeze(data)))
+    discard await r.hset(name.pidKey, name, data.id)
     discard await r.flushPipeline()
 
 proc cacheProfileId*(username, id: string) {.async.} =
   if username.len == 0 or id.len == 0: return
+  let name = toLower(username)
   pool.withAcquire(r):
-    discard await r.hset("p:", toLower(username), id)
+    discard await r.hset(name.pidKey, name, id)
 
 proc cacheRss*(query: string; rss: Rss) {.async.} =
   let key = "rss:" & query
@@ -80,8 +87,9 @@ proc cacheRss*(query: string; rss: Rss) {.async.} =
     discard await r.flushPipeline()
 
 proc getProfileId*(username: string): Future[string] {.async.} =
+  let name = toLower(username)
   pool.withAcquire(r):
-    result = await r.hget("p:", toLower(username))
+    result = await r.hget(name.pidKey, name)
     if result == redisNil:
       result.setLen(0)
 
