@@ -159,7 +159,6 @@ proc replacedWith(runes: seq[Rune]; repls: openArray[ReplaceSlice];
 
   result = newStringOfCap(runes.len)
 
-  var upperBound = textSlice.b
   for i, rep in repls:
     result.add $runes[extractLowerBound(i, i - 1) ..< rep.slice.a]
     case rep.kind

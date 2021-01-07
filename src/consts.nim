@@ -4,20 +4,23 @@ const
   auth* = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
   api = parseUri("https://api.twitter.com")
-  graphql = api / "graphql"
-  timelineApi = api / "2/timeline"
   activate* = $(api / "1.1/guest/activate.json")
-  graphUser* = graphql / "E4iSsd6gypGFWx2eUhSC1g/UserByScreenName"
-  graphList* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
-  graphListId* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
-  timeline* = timelineApi / "profile"
-  mediaTimeline* = timelineApi / "media"
-  listTimeline* = timelineApi / "list.json"
+
   listMembers* = api / "1.1/lists/members.json"
   userShow* = api / "1.1/users/show.json"
   photoRail* = api / "1.1/statuses/media_timeline.json"
-  tweet* = timelineApi / "conversation"
   search* = api / "2/search/adaptive.json"
+
+  timelineApi = api / "2/timeline"
+  tweet* = timelineApi / "conversation"
+  timeline* = timelineApi / "profile"
+  mediaTimeline* = timelineApi / "media"
+  listTimeline* = timelineApi / "list.json"
+
+  graphql = api / "graphql"
+  graphUser* = graphql / "E4iSsd6gypGFWx2eUhSC1g/UserByScreenName"
+  graphList* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
+  graphListId* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
 
   timelineParams* = {
     "include_profile_interstitial_type": "0",
