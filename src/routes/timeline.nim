@@ -31,7 +31,10 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
     profile = await getCachedProfile(name)
     profileId = if profile.suspended: "s"
                 else: profile.id
-    await cacheProfileId(profile.username, profileId)
+
+    if profileId.len > 0:
+       await cacheProfileId(profile.username, profileId)
+
     fetched = true
 
   if profileId.len == 0 or profile.protected:
@@ -66,7 +69,8 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
       break
 
   if profile.username.len == 0:
-    profile = await getCachedProfile(name, cache=true)
+    profile = await getCachedProfile(name)
+    fetched = true
 
   if fetched and not found:
     await cache(profile)

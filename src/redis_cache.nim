@@ -63,7 +63,7 @@ proc cache*(data: PhotoRail; name: string) {.async.} =
   await setex("pr:" & name, baseCacheTime, compress(freeze(data)))
 
 proc cache*(data: Profile) {.async.} =
-  if data.username.len == 0: return
+  if data.username.len == 0 or data.id.len == 0: return
   let name = toLower(data.username)
   pool.withAcquire(r):
     r.startPipelining()
@@ -93,14 +93,12 @@ proc getProfileId*(username: string): Future[string] {.async.} =
     if result == redisNil:
       result.setLen(0)
 
-proc getCachedProfile*(username: string; fetch=true;
-                       cache=false): Future[Profile] {.async.} =
+proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} =
   let prof = await get("p:" & toLower(username))
   if prof != redisNil:
     uncompress(prof).thaw(result)
   elif fetch:
     result = await getProfile(username)
-    if cache: await cache(result)
 
 proc getCachedPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return
