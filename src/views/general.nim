@@ -35,6 +35,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
                  images: seq[string] = @[]; ogTitle=""; theme=""; rss=""): VNode =
   let ogType =
     if video.len > 0: "video"
+    elif rss.len > 0: "object"
     elif images.len > 0: "photo"
     else: "article"
 
@@ -45,15 +46,10 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     opensearchUrl = "http://" & cfg.hostname & "/opensearch"
 
   buildHtml(head):
-    link(rel="preload", type="text/css", href="/css/style.css?v=3", `as`="style")
-    link(rel="preload", type="text/css", href="/css/fontello.css?v=2", `as`="style")
-    link(rel="preload", href="/fonts/fontello.woff2?21002321", `as`="font")
-
     link(rel="stylesheet", type="text/css", href="/css/style.css?v=3")
     link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=2")
 
     if theme.len > 0:
-      link(rel="preload", type="text/css", href=(&"/css/themes/{theme}.css"), `as`="style")
       link(rel="stylesheet", type="text/css", href=(&"/css/themes/{theme}.css"))
 
     link(rel="apple-touch-icon", sizes="180x180", href="/apple-touch-icon.png")
@@ -88,8 +84,14 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     meta(property="og:locale", content="en_US")
 
     for url in images:
-      meta(property="og:image", content=getPicUrl(url))
-      meta(property="twitter:card", content="summary_large_image")
+      let image = "https://" & cfg.hostname & getPicUrl(url)
+      meta(property="og:image", content=image)
+      meta(property="twitter:image:src", content=image)
+
+      if rss.len > 0:
+        meta(property="twitter:card", content="summary")
+      else:
+        meta(property="twitter:card", content="summary_large_image")
 
     if video.len > 0:
       meta(property="og:video:url", content=video)
