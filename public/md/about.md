@@ -6,7 +6,7 @@ privacy. The source is available on GitHub at <https://github.com/zedeus/nitter>
 * No JavaScript or ads
 * All requests go through the backend, client never talks to Twitter
 * Prevents Twitter from tracking your IP or JavaScript fingerprint
-* Unofficial API (no rate limits or developer account required)
+* Uses Twitter's unofficial API (no rate limits or developer account required)
 * Lightweight (for [@nim_lang](/nim_lang), 60KB vs 784KB from twitter.com)
 * RSS feeds
 * Themes
