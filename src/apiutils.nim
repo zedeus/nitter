@@ -31,13 +31,16 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
     "DNT": "1"
   })
 
+proc rateLimitError(): ref RateLimitError =
+  newException(RateLimitError, "rate limited with " & getPoolInfo())
+
 proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
   once:
     pool = HttpPool()
 
   var token = await getToken()
   if token.tok.len == 0:
-    result = newJNull()
+    raise rateLimitError()
 
   let headers = genHeaders(token)
   try:
@@ -59,4 +62,4 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
       token.release()
   except Exception:
     echo "error: ", url
-    result = newJNull()
+    raise rateLimitError()

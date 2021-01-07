@@ -8,6 +8,7 @@
 
 .error-panel {
     @include center-panel(var(--error_red));
+    text-align: center;
 }
 
 .search-bar > form {

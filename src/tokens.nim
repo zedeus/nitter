@@ -1,4 +1,5 @@
-import asyncdispatch, httpclient, times, sequtils, strutils, json
+import asyncdispatch, httpclient, times, sequtils, json, math
+import strutils, strformat
 import types, agents, consts, http_pool
 
 var
@@ -32,8 +33,8 @@ proc fetchToken(): Future[Token] {.async.} =
                    init: time, lastUse: time)
   except Exception as e:
     lastFailed = getTime()
-    echo "fetching token failed: ", e.msg
     result = Token()
+    echo "fetching token failed: ", e.msg
 
 proc expired(token: Token): bool {.inline.} =
   const
@@ -77,3 +78,7 @@ proc initTokenPool*(cfg: Config) {.async.} =
     if tokenPool.countIt(not it.isLimited) < cfg.minTokens:
       await poolTokens(min(4, cfg.minTokens - tokenPool.len))
     await sleepAsync(2000)
+
+proc getPoolInfo*: string =
+  let avg = tokenPool.mapIt(it.remaining).sum()
+  return &"{tokenPool.len} tokens, average remaining: {avg}"

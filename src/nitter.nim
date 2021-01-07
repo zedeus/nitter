@@ -1,5 +1,6 @@
 import asyncdispatch, strformat
 from net import Port
+from htmlgen import a
 
 import jester
 
@@ -8,6 +9,8 @@ import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list,
   unsupported, embed, resolver, router_utils]
+
+const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 
 const configPath {.strdefine.} = "./nitter.conf"
 let (cfg, fullCfg) = getConfig(configPath)
@@ -70,6 +73,12 @@ routes:
 
   error Http404:
     resp Http404, showError("Page not found", cfg)
+
+  error RateLimitError:
+    echo error.exc.msg
+    resp Http429, showError("Instance has been rate limited.<br>Use " &
+      a("another instance", href = instancesUrl) &
+      " or try again later.", cfg)
 
   extend unsupported, ""
   extend preferences, ""

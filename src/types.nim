@@ -4,6 +4,8 @@ import prefs_impl
 genPrefsType()
 
 type
+  RateLimitError* = object of CatchableError
+
   Token* = ref object
     tok*: string
     remaining*: int

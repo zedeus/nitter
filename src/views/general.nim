@@ -117,4 +117,4 @@ proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
 proc renderError*(error: string): VNode =
   buildHtml(tdiv(class="panel-container")):
     tdiv(class="error-panel"):
-      span: text error
+      span: verbatim error
