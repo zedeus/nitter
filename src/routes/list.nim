@@ -15,7 +15,7 @@ template respList*(list, timeline, vnode: typed) =
     html = renderList(vnode, timeline.query, list)
     rss = "/$1/lists/$2/rss" % [@"name", @"list"]
 
-  resp renderMain(html, request, cfg, prefs, rss=rss)
+  resp renderMain(html, request, cfg, prefs, rss=rss, banner=list.banner)
 
 proc createListRouter*(cfg: Config) =
   router list:

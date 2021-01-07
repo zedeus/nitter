@@ -32,7 +32,8 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
         iconReferer "cog", "/settings", path, title="Preferences"
 
 proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
-                 images: seq[string] = @[]; ogTitle=""; theme=""; rss=""): VNode =
+                 images: seq[string] = @[]; banner=""; ogTitle=""; theme="";
+                 rss=""): VNode =
   let ogType =
     if video.len > 0: "video"
     elif rss.len > 0: "object"
@@ -83,7 +84,15 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     meta(property="og:site_name", content="Nitter")
     meta(property="og:locale", content="en_US")
 
+    if banner.len > 0:
+      let bannerUrl = getPicUrl(banner)
+      link(rel="preload", type="image/png", href=getPicUrl(banner), `as`="image")
+
     for url in images:
+      let suffix = if "400x400" in url: "" else: "?name=small"
+      let preloadUrl = getPicUrl(url & suffix)
+      link(rel="preload", type="image/png", href=preloadUrl, `as`="image")
+
       let image = "https://" & cfg.hostname & getPicUrl(url)
       meta(property="og:image", content=image)
       meta(property="twitter:image:src", content=image)
@@ -98,15 +107,20 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
       meta(property="og:video:secure_url", content=video)
       meta(property="og:video:type", content="text/html")
 
+    # this is last so images are also preloaded
+    # if this is done earlier, Chrome only preloads one image for some reason
+    link(rel="preload", type="font/woff2", `as`="font",
+         href="/fonts/fontello.woff2?21002321", crossorigin="anonymous")
+
 proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
                  titleText=""; desc=""; ogTitle=""; rss=""; video="";
-                 images: seq[string] = @[]): string =
+                 images: seq[string] = @[]; banner=""): string =
   var theme = toLowerAscii(prefs.theme).replace(" ", "_")
   if "theme" in req.params:
     theme = toLowerAscii(req.params["theme"]).replace(" ", "_")
 
   let node = buildHtml(html(lang="en")):
-    renderHead(prefs, cfg, titleText, desc, video, images, ogTitle, theme, rss)
+    renderHead(prefs, cfg, titleText, desc, video, images, banner, ogTitle, theme, rss)
 
     body:
       renderNavbar(cfg.title, rss, req)
