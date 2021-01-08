@@ -211,7 +211,6 @@ type
     base64Media*: bool
     minTokens*: int
 
-    cacheDir*: string
     rssCacheTime*: int
     listCacheTime*: int
 

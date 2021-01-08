@@ -39,10 +39,7 @@ proc createSearchRouter*(cfg: Config) =
       redirect("/search?q=" & encodeUrl("#" & @"hash"))
 
     get "/opensearch":
-      var url = ""
-      if cfg.useHttps:
-        url = "https://" & cfg.hostname & "/search?q="
-      else:
-        url = "http://" & cfg.hostname & "/search?q="
+      var url = if cfg.useHttps: "https://" else: "http://"
+      url &= cfg.hostname & "/search?q="
       resp Http200, {"Content-Type": "application/opensearchdescription+xml"},
                     generateOpenSearchXML(cfg.title, cfg.hostname, url)

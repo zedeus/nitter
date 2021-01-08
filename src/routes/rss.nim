@@ -9,7 +9,7 @@ include "../views/rss.nimf"
 
 export times, hashes, supersnappy
 
-proc showRss*(req: Request; hostname: string; query: Query): Future[Rss] {.async.} =
+proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.} =
   var profile: Profile
   var timeline: Timeline
   let
@@ -35,8 +35,7 @@ proc showRss*(req: Request; hostname: string; query: Query): Future[Rss] {.async
     return Rss(feed: profile.username, cursor: "suspended")
 
   if profile.fullname.len > 0:
-    let rss = compress renderTimelineRss(timeline, profile, hostname,
-                                         multi=(names.len > 1))
+    let rss = compress renderTimelineRss(timeline, profile, cfg, multi=(names.len > 1))
     return Rss(feed: rss, cursor: timeline.bottom)
 
 template respRss*(rss) =
@@ -44,6 +43,7 @@ template respRss*(rss) =
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg)
   elif rss.cursor.len == 9 and rss.cursor == "suspended":
     resp Http404, showError(getSuspended(rss.feed), cfg)
+
   let headers = {"Content-Type": "application/rss+xml; charset=utf-8",
                  "Min-Id": rss.cursor}
   resp Http200, headers, uncompress rss.feed
@@ -69,7 +69,7 @@ proc createRssRouter*(cfg: Config) =
       let tweets = await getSearch[Tweet](query, cursor)
       rss.cursor = tweets.bottom
       rss.feed = compress renderSearchRss(tweets.content, query.text,
-                                          genQueryUrl(query), cfg.hostname)
+                                          genQueryUrl(query), cfg)
 
       await cacheRss(key, rss)
       respRss(rss)
@@ -85,7 +85,7 @@ proc createRssRouter*(cfg: Config) =
       if rss.cursor.len > 0:
         respRss(rss)
 
-      rss = await showRss(request, cfg.hostname, Query(fromUser: @[name]))
+      rss = await timelineRss(request, cfg, Query(fromUser: @[name]))
 
       await cacheRss(key, rss)
       respRss(rss)
@@ -110,7 +110,7 @@ proc createRssRouter*(cfg: Config) =
       if rss.cursor.len > 0:
         respRss(rss)
 
-      rss = await showRss(request, cfg.hostname, query)
+      rss = await timelineRss(request, cfg, query)
 
       await cacheRss(key, rss)
       respRss(rss)
@@ -129,7 +129,7 @@ proc createRssRouter*(cfg: Config) =
         list = await getCachedList(@"name", @"list")
         timeline = await getListTimeline(list.id, cursor)
       rss.cursor = timeline.bottom
-      rss.feed = compress renderListRss(timeline.content, list, cfg.hostname)
+      rss.feed = compress renderListRss(timeline.content, list, cfg)
 
       await cacheRss(key, rss)
       respRss(rss)

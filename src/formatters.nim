@@ -18,6 +18,10 @@ const
 
   twitter = parseUri("https://twitter.com")
 
+proc getUrlPrefix*(cfg: Config): string =
+  if cfg.useHttps: "https://" & cfg.hostname
+  else: "http://" & cfg.hostname
+
 proc stripHtml*(text: string): string =
   var html = parseHtml(text)
   for el in html.findAll("a"):
@@ -48,7 +52,7 @@ proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
     result = result.replace(cards, prefs.replaceTwitter & "/cards")
     result = result.replace(twRegex, prefs.replaceTwitter)
   if absolute.len > 0:
-    result = result.replace("href=\"/", "href=\"https://" & absolute & "/")
+    result = result.replace("href=\"/", "href=\"" & absolute & "/")
 
 proc getM3u8Url*(content: string): string =
   var m: RegexMatch
@@ -69,7 +73,7 @@ proc getUserpic*(profile: Profile; style=""): string =
   getUserPic(profile.userpic, style)
 
 proc getVideoEmbed*(cfg: Config; id: int64): string =
-  &"https://{cfg.hostname}/i/videos/{id}"
+  &"{getUrlPrefix(cfg)}/i/videos/{id}"
 
 proc pageTitle*(profile: Profile): string =
   &"{profile.fullname} (@{profile.username})"

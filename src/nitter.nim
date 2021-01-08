@@ -21,8 +21,7 @@ when defined(release):
   addHandler(newConsoleLogger())
   setLogFilter(lvlError)
 
-let http = if cfg.useHttps: "https" else: "http"
-stdout.write &"Starting Nitter at {http}://{cfg.hostname}\n"
+stdout.write &"Starting Nitter at {getUrlPrefix(cfg)}\n"
 stdout.flushFile
 
 updateDefaultPrefs(fullCfg)

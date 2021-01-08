@@ -24,7 +24,6 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     base64Media: cfg.get("Config", "base64Media", false),
     minTokens: cfg.get("Config", "tokenCount", 10),
 
-    cacheDir: cfg.get("Cache", "directory", "/tmp/nitter"),
     listCacheTime: cfg.get("Cache", "listMinutes", 120),
     rssCacheTime: cfg.get("Cache", "rssMinutes", 10),
 

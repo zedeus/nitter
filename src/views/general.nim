@@ -40,11 +40,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     elif images.len > 0: "photo"
     else: "article"
 
-  var opensearchUrl = ""
-  if cfg.useHttps:
-    opensearchUrl = "https://" & cfg.hostname & "/opensearch"
-  else:
-    opensearchUrl = "http://" & cfg.hostname & "/opensearch"
+  let opensearchUrl = getUrlPrefix(cfg) & "/opensearch"
 
   buildHtml(head):
     link(rel="stylesheet", type="text/css", href="/css/style.css?v=3")
@@ -93,7 +89,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
       let preloadUrl = getPicUrl(url & suffix)
       link(rel="preload", type="image/png", href=preloadUrl, `as`="image")
 
-      let image = "https://" & cfg.hostname & getPicUrl(url)
+      let image = getUrlPrefix(cfg) & getPicUrl(url)
       meta(property="og:image", content=image)
       meta(property="twitter:image:src", content=image)
 
