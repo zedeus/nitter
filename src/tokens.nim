@@ -1,4 +1,4 @@
-import asyncdispatch, httpclient, times, sequtils, json, math
+import asyncdispatch, httpclient, times, sequtils, json, math, random
 import strutils, strformat
 import types, agents, consts, http_pool
 
@@ -6,11 +6,20 @@ var
   clientPool {.threadvar.}: HttpPool
   tokenPool {.threadvar.}: seq[Token]
   lastFailed: Time
-  minFail = initDuration(seconds=10)
+  minFail = initDuration(minutes=30)
+
+proc getPoolInfo*: string =
+  if tokenPool.len == 0: return "token pool empty"
+
+  let avg = tokenPool.mapIt(it.remaining).sum() div tokenPool.len
+  return &"{tokenPool.len} tokens, average remaining: {avg}"
+
+proc rateLimitError*(): ref RateLimitError =
+  newException(RateLimitError, "rate limited with " & getPoolInfo())
 
 proc fetchToken(): Future[Token] {.async.} =
   if getTime() - lastFailed < minFail:
-    return Token()
+    raise rateLimitError()
 
   let headers = newHttpHeaders({
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -33,7 +42,6 @@ proc fetchToken(): Future[Token] {.async.} =
                    init: time, lastUse: time)
   except Exception as e:
     lastFailed = getTime()
-    result = Token()
     echo "fetching token failed: ", e.msg
 
 proc expired(token: Token): bool {.inline.} =
@@ -49,19 +57,25 @@ proc isLimited(token: Token): bool {.inline.} =
     token.expired
 
 proc release*(token: Token) =
-  if token != nil and not token.expired:
-    token.lastUse = getTime()
-    tokenPool.insert(token)
+  if token != nil and token.expired:
+    tokenPool.delete(tokenPool.find(token))
 
 proc getToken*(): Future[Token] {.async.} =
   for i in 0 ..< tokenPool.len:
     if not result.isLimited: break
     result.release()
-    result = tokenPool.pop()
+    result = tokenPool.sample()
 
   if result.isLimited:
     result.release()
     result = await fetchToken()
+    tokenPool.add result
+    echo getPoolInfo()
+
+  if result == nil:
+    raise rateLimitError()
+
+  dec result.remaining
 
 proc poolTokens*(amount: int) {.async.} =
   var futs: seq[Future[Token]]
@@ -69,7 +83,14 @@ proc poolTokens*(amount: int) {.async.} =
     futs.add fetchToken()
 
   for token in futs:
-    release(await token)
+    var newToken: Token
+
+    try: newToken = await token
+    except: discard
+
+    if newToken != nil:
+      tokenPool.add newToken
+      echo getPoolInfo()
 
 proc initTokenPool*(cfg: Config) {.async.} =
   clientPool = HttpPool()
@@ -78,7 +99,3 @@ proc initTokenPool*(cfg: Config) {.async.} =
     if tokenPool.countIt(not it.isLimited) < cfg.minTokens:
       await poolTokens(min(4, cfg.minTokens - tokenPool.len))
     await sleepAsync(2000)
-
-proc getPoolInfo*: string =
-  let avg = tokenPool.mapIt(it.remaining).sum()
-  return &"{tokenPool.len} tokens, average remaining: {avg}"

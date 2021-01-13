@@ -31,9 +31,6 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
     "DNT": "1"
   })
 
-proc rateLimitError(): ref RateLimitError =
-  newException(RateLimitError, "rate limited with " & getPoolInfo())
-
 proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
   once:
     pool = HttpPool()
@@ -54,12 +51,16 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
       echo resp.status, ": ", body
       result = newJNull()
 
-    if not oldApi and resp.headers.hasKey(rl & "limit"):
-      token.remaining = parseInt(resp.headers[rl & "remaining"])
-      token.reset = fromUnix(parseInt(resp.headers[rl & "reset"]))
+    if not oldApi and resp.headers.hasKey(rl & "reset"):
+      let time = fromUnix(parseInt(resp.headers[rl & "reset"]))
+      if token.reset != time:
+        token.remaining = parseInt(resp.headers[rl & "limit"])
+      token.reset = time
 
     if result.getError notin {invalidToken, forbidden, badToken}:
-      token.release()
+      token.lastUse = getTime()
+    else:
+      echo "fetch error: ", result.getError
   except Exception:
     echo "error: ", url
     raise rateLimitError()
