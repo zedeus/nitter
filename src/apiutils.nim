@@ -37,6 +37,7 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
 
   var token = await getToken()
   if token.tok.len == 0:
+    release(token, true)
     raise rateLimitError()
 
   let headers = genHeaders(token)
@@ -61,6 +62,9 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
       token.lastUse = getTime()
     else:
       echo "fetch error: ", result.getError
-  except Exception:
-    echo "error: ", url
+      release(token, true)
+      raise rateLimitError()
+  except Exception as e:
+    echo "error: ", e.msg, ", url: ", url
+    release(token, true)
     raise rateLimitError()

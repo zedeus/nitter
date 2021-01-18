@@ -2,11 +2,16 @@ import asyncdispatch, httpclient, times, sequtils, json, math, random
 import strutils, strformat
 import types, agents, consts, http_pool
 
+const
+  expirationTime = 3.hours
+  maxLastUse = 1.hours
+  resetPeriod = 15.minutes
+  failDelay = initDuration(minutes=30)
+
 var
   clientPool {.threadvar.}: HttpPool
   tokenPool {.threadvar.}: seq[Token]
   lastFailed: Time
-  minFail = initDuration(minutes=30)
 
 proc getPoolInfo*: string =
   if tokenPool.len == 0: return "token pool empty"
@@ -18,7 +23,7 @@ proc rateLimitError*(): ref RateLimitError =
   newException(RateLimitError, "rate limited with " & getPoolInfo())
 
 proc fetchToken(): Future[Token] {.async.} =
-  if getTime() - lastFailed < minFail:
+  if getTime() - lastFailed < failDelay:
     raise rateLimitError()
 
   let headers = newHttpHeaders({
@@ -38,39 +43,36 @@ proc fetchToken(): Future[Token] {.async.} =
     tok = parseJson(resp)["guest_token"].getStr
 
     let time = getTime()
-    result = Token(tok: tok, remaining: 187, reset: time + 15.minutes,
+    result = Token(tok: tok, remaining: 187, reset: time + resetPeriod,
                    init: time, lastUse: time)
   except Exception as e:
     lastFailed = getTime()
     echo "fetching token failed: ", e.msg
 
-proc expired(token: Token): bool {.inline.} =
-  const
-    expirationTime = 2.hours
-    maxLastUse = 1.hours
+template expired(token: Token): untyped =
   let time = getTime()
-  result = token.init < time - expirationTime or
-           token.lastUse < time - maxLastUse
+  token.init < time - expirationTime or
+    token.lastUse < time - maxLastUse
 
-proc isLimited(token: Token): bool {.inline.} =
+template isLimited(token: Token): untyped =
   token == nil or (token.remaining <= 1 and token.reset > getTime()) or
     token.expired
 
-proc release*(token: Token) =
-  if token != nil and token.expired:
-    tokenPool.delete(tokenPool.find(token))
+proc release*(token: Token; invalid=false) =
+  if token != nil and (invalid or token.expired):
+    let idx = tokenPool.find(token)
+    if idx > -1: tokenPool.delete(idx)
 
 proc getToken*(): Future[Token] {.async.} =
   for i in 0 ..< tokenPool.len:
     if not result.isLimited: break
-    result.release()
+    release(result)
     result = tokenPool.sample()
 
   if result.isLimited:
-    result.release()
+    release(result)
     result = await fetchToken()
     tokenPool.add result
-    echo getPoolInfo()
 
   if result == nil:
     raise rateLimitError()
@@ -90,7 +92,6 @@ proc poolTokens*(amount: int) {.async.} =
 
     if newToken != nil:
       tokenPool.add newToken
-      echo getPoolInfo()
 
 proc initTokenPool*(cfg: Config) {.async.} =
   clientPool = HttpPool()
