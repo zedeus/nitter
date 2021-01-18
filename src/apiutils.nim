@@ -65,6 +65,7 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
       release(token, true)
       raise rateLimitError()
   except Exception as e:
-    echo "error: ", e.msg, ", url: ", url
-    release(token, true)
+    echo "error: ", e.msg, ", token: ", token[], ", url: ", url
+    if "length" notin e.msg:
+      release(token, true)
     raise rateLimitError()
