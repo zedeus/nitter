@@ -1,24 +1,5 @@
 jobs:
   include:
-    - stage: build
-      if: (NOT type IN (pull_request)) AND (branch = master)
-      language: minimal
-      services:
-        - docker
-      script:
-        - docker build -t $IMAGE_NAME:$TRAVIS_COMMIT .
-        - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-        - docker push $IMAGE_NAME:$TRAVIS_COMMIT
-    - stage: deploy
-      if: (NOT type IN (pull_request)) AND (branch = master)
-      language: minimal
-      services:
-        - docker
-      script:
-        - docker pull $IMAGE_NAME:$TRAVIS_COMMIT
-        - docker tag $IMAGE_NAME:$TRAVIS_COMMIT $IMAGE_NAME:latest
-        - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-        - docker push $IMAGE_NAME:latest
     - stage: test
       if: (NOT type IN (pull_request)) AND (branch = master)
       dist: bionic
