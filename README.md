@@ -1,6 +1,7 @@
 # Nitter
 
-![CI/CD](https://github.com/zedeus/nitter/workflows/CI/CD/badge.svg)
+[![Test Matrix](https://github.com/zedeus/nitter/workflows/CI/CD/badge.svg)](https://github.com/zedeus/nitter/actions?query=workflow%3ACI/CD)
+[![License](https://img.shields.io/github/license/zedeus/nitter?style=flat)](#license)
 
 A free and open source alternative Twitter front-end focused on privacy. \
 Inspired by the [Invidious](https://github.com/iv-org/invidious) project.
