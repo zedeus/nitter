@@ -1,9 +1,9 @@
-name: Docker Multi-Architecture Build
+name: CI/CD
 
 on:
   push:
     paths-ignore:
-      - "**.md"
+      - "README.md"
     branches:
       - master
 
