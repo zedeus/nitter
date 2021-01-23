@@ -14,6 +14,7 @@ RUN nimble build -y -d:release --passC:"-flto" --passL:"-flto" \
 FROM redis:6.0.4-alpine
 WORKDIR /src/
 RUN apk --no-cache add pcre-dev sqlite-dev
-COPY --from=nim /src/nitter/nitter /src/nitter/start.sh /src/nitter/nitter.conf ./
+COPY --from=nim /src/nitter/nitter /src/nitter/start.sh /src/nitter/nitter.example.conf ./
+RUN mv nitter.example.conf nitter.conf
 COPY --from=nim /src/nitter/public ./public
 CMD ["./start.sh"]
