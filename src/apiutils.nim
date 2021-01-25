@@ -37,7 +37,6 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
 
   var token = await getToken()
   if token.tok.len == 0:
-    release(token, true)
     raise rateLimitError()
 
   let headers = genHeaders(token)
