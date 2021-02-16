@@ -32,8 +32,8 @@ XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscW
 
 ## Resources
 
-The wiki contains a list of
-[instances](https://github.com/zedeus/nitter/wiki/Instances) and
+The wiki contains 
+[a list of instances](https://github.com/zedeus/nitter/wiki/Instances) and
 [browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
 maintained by the community.
 
