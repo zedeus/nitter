@@ -39,11 +39,10 @@ maintained by the community.
 
 ## Why?
 
-It's basically impossible to use Twitter without JavaScript enabled. If you try,
-you're redirected to the legacy mobile version which is awful both functionally
-and aesthetically. For privacy-minded folks, preventing JavaScript analytics and
-potential IP-based tracking is important, but apart from using the legacy mobile
-version and a VPN, it's impossible. This is is especially relevant now that Twitter
+It's basically impossible to use Twitter without JavaScript enabled. For privacy-minded folks,
+preventing JavaScript analytics and potential IP-based tracking is important,
+but apart from using the legacy mobile version and a VPN, it's impossible.
+This is is especially relevant now that Twitter
 [removed the ability](https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws)
 for users to control whether their data gets sent to advertisers.
 
