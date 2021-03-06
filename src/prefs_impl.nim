@@ -62,6 +62,10 @@ genPrefs:
       "Replace Instagram links with Bibliogram (blank to disable)"
       placeholder: "Bibliogram hostname"
 
+    replaceReddit(input, ""):
+      "Replace Reddit links with Teddit/Libreddit (blank to disable)"
+      placeholder: "Teddit/Libreddit hostname"
+
   Media:
     mp4Playback(checkbox, true):
       "Enable mp4 video playback"
