@@ -63,8 +63,8 @@ genPrefs:
       placeholder: "Bibliogram hostname"
 
     replaceReddit(input, ""):
-      "Replace Reddit links with Teddit/Libreddit (blank to disable)"
-      placeholder: "Teddit/Libreddit hostname"
+      "Replace Reddit links with Teddit (blank to disable)"
+      placeholder: "Teddit hostname"
 
   Media:
     mp4Playback(checkbox, true):
