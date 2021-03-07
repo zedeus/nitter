@@ -9,6 +9,8 @@ const
   rdRegex = re"((www|np|new|amp)\.)?reddit.com"
   cards = "cards.twitter.com/cards"
   tco = "https://t.co"
+  rdImageRegex = re"i\.redd\.it\/"
+  rdVideoRegex = re"v\.redd\.it"
 
   wwwRegex = re"https?://(www[0-9]?\.)?"
   m3u8Regex = re"""url="(.+.m3u8)""""
@@ -53,7 +55,12 @@ proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
     result = result.replace(cards, prefs.replaceTwitter & "/cards")
     result = result.replace(twRegex, prefs.replaceTwitter)
   if prefs.replaceReddit.len > 0:
+    result = result.replace(rdImageRegex, prefs.replaceReddit & "/pics/w:null_")
+    if contains(result, rdVideoRegex):
+      result = result.replace(rdVideoRegex, prefs.replaceReddit & "/vids") & ".mp4"
     result = result.replace(rdRegex, prefs.replaceReddit)
+    if prefs.replaceReddit in result:
+      result = result.replace("/gallery/", "/comments/")
   if absolute.len > 0:
     result = result.replace("href=\"/", "href=\"" & absolute & "/")
 
