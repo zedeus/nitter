@@ -11,6 +11,7 @@ const
   tco = "https://t.co"
   rdImageRegex = re"i\.redd\.it\/"
   rdVideoRegex = re"v\.redd\.it"
+  rdVideoExtensionRegex = re"v\.redd\.it\/(\w+)"
 
   wwwRegex = re"https?://(www[0-9]?\.)?"
   m3u8Regex = re"""url="(.+.m3u8)""""
@@ -56,8 +57,9 @@ proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
     result = result.replace(twRegex, prefs.replaceTwitter)
   if prefs.replaceReddit.len > 0:
     result = result.replace(rdImageRegex, prefs.replaceReddit & "/pics/w:null_")
-    if contains(result, rdVideoRegex):
-      result = result.replace(rdVideoRegex, prefs.replaceReddit & "/vids") & ".mp4"
+    for match in findAll(result, rdVideoExtensionRegex):
+      result.insert(".mp4", match.boundaries.b + 1)
+    result = result.replace(rdVideoRegex, prefs.replaceReddit & "/vids")
     result = result.replace(rdRegex, prefs.replaceReddit)
     if prefs.replaceReddit in result:
       result = result.replace("/gallery/", "/comments/")
