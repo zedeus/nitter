@@ -50,6 +50,11 @@ macro genPrefs*(prefDsl: untyped) =
     const `name`*: PrefList = toOrderedTable(`table`)
 
 genPrefs:
+  Timeline:
+    following(input, ""):
+      "A comma-separated list of users to follow."
+      placeholder: "one,two,three"
+
   Display:
     theme(select, "Nitter"):
       "Theme"
