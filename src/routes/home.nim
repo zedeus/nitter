@@ -5,6 +5,13 @@ import ../views/[general, home, search]
 
 export home
 
+proc showHome*(request: Request; query: Query; cfg: Config; prefs: Prefs;
+                   after: string): Future[string] {.async.} =
+  let
+    timeline = await getSearch[Tweet](query, after)
+    html = renderHome(timeline, prefs, getPath())
+  return renderMain(html, request, cfg, prefs, "Multi")
+
 proc createHomeRouter*(cfg: Config) =
   router home:
     get "/":
@@ -14,27 +21,14 @@ proc createHomeRouter*(cfg: Config) =
         names = getNames(prefs.following)
 
       var query = request.getQuery("", prefs.following)
-      if names.len != 1:
-        query.fromUser = names
+      query.fromUser = names
 
       if @"scroll".len > 0:
-        if query.fromUser.len != 1:
-          var timeline = await getSearch[Tweet](query, after)
-          if timeline.content.len == 0: resp Http404
-          timeline.beginning = true
-          resp $renderTweetSearch(timeline, prefs, getPath())
-        else:
-          var (_, timeline, _) = await fetchSingleTimeline(after, query, skipRail=true)
-          if timeline.content.len == 0: resp Http404
-          timeline.beginning = true
-          resp $renderTimelineTweets(timeline, prefs, getPath())
+        var timeline = await getSearch[Tweet](query, after)
+        if timeline.content.len == 0: resp Http404
+        timeline.beginning = true
+        resp $renderHome(timeline, prefs, getPath())
 
-      var rss = "/$1/$2/rss" % [@"name", @"tab"]
-      if @"tab".len == 0:
-        rss = "/$1/rss" % @"name"
-      elif @"tab" == "search":
-        rss &= "?" & genQueryUrl(query)
-      
       if names.len == 0:
         resp renderMain(renderSearch(), request, cfg, themePrefs())
-      respTimeline(await showTimeline(request, query, cfg, prefs, rss, after))
+      resp (await showHome(request, query, cfg, prefs, after))
