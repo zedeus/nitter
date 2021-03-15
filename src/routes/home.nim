@@ -10,7 +10,7 @@ proc showHome*(request: Request; query: Query; cfg: Config; prefs: Prefs;
   let
     timeline = await getSearch[Tweet](query, after)
     html = renderHome(timeline, prefs, getPath())
-  return renderMain(html, request, cfg, prefs, "Multi")
+  return renderMain(html, request, cfg, prefs)
 
 proc createHomeRouter*(cfg: Config) =
   router home:
