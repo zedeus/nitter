@@ -1,6 +1,6 @@
 import jester
 import asyncdispatch, strutils, options, router_utils, timeline
-import ".."/[prefs, types, utils]
+import ".."/[prefs, types, utils, redis_cache]
 import ../views/[general, home, search]
 
 export home
@@ -32,3 +32,18 @@ proc createHomeRouter*(cfg: Config) =
       if names.len == 0:
         resp renderMain(renderSearch(), request, cfg, themePrefs())
       resp (await showHome(request, query, cfg, prefs, after))
+    get "/following":
+      let
+        prefs = cookiePrefs()
+        names = getNames(prefs.following)
+      var
+        profs: seq[Profile]
+        query = request.getQuery("", prefs.following)
+      query.fromUser = names
+      query.kind = userList
+      
+      for name in names:
+        let prof = await getCachedProfile(name)
+        profs &= @[prof]
+
+      resp renderMain(renderFollowing(query, profs, prefs), request, cfg, prefs)
