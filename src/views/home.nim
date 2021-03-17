@@ -1,4 +1,4 @@
-import karax/[karaxdsl, vdom], strutils
+import karax/[karaxdsl, vdom]
 import search, timeline, renderutils
 import ../types
 
