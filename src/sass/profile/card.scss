@@ -13,9 +13,12 @@
     width: 100%;
 }
 
-.profile-card-tabs-name {
+.profile-card-tabs-name-and-follow {
     @include breakable;
-    max-width: 100%;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 .profile-card-username {
@@ -32,6 +35,10 @@
     font-weight: bold;
     text-shadow: none;
     max-width: 100%;
+}
+
+.profile-card-follow-button {
+    float: none;
 }
 
 .profile-card-avatar {
