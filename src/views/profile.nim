@@ -30,9 +30,9 @@ proc renderUserCard*(user: User; prefs: Prefs; path: string): VNode =
           linkUser(user, class="profile-card-username")
         let following = isFollowing(user.username, prefs.following)
         if not following:
-          buttonReferer "/follow", "Follow", path, "profile-card-follow-button"
+          buttonReferer "/follow/" & profile.username, "Follow", path, "profile-card-follow-button"
         else:
-          buttonReferer "/unfollow", "Unfollow", path, "profile-card-follow-button"
+          buttonReferer "/unfollow/" & profile.username, "Unfollow", path, "profile-card-follow-button"
 
     tdiv(class="profile-card-extra"):
       if user.bio.len > 0:
