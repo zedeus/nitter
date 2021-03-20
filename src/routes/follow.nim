@@ -8,6 +8,8 @@ proc addUserToFollowing*(following, toAdd: string): string =
   var updated = following.split(",")
   if updated == @[""]:
     return toAdd
+  elif toAdd in updated:
+    return following
   else:
     updated = concat(updated, @[toAdd])
     result = updated.join(",")
