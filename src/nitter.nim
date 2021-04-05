@@ -28,7 +28,7 @@ updateDefaultPrefs(fullCfg)
 setCacheTimes(cfg)
 setHmacKey(cfg.hmacKey)
 setProxyEncoding(cfg.base64Media)
-setMaxHttpConns(100)
+setMaxHttpConns(cfg.httpMaxConns)
 
 waitFor initRedisPool(cfg)
 stdout.write &"Connected to Redis at {cfg.redisHost}:{cfg.redisPort}\n"
