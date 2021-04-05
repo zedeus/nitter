@@ -1,6 +1,7 @@
 import asyncdispatch, strformat
 from net import Port
 from htmlgen import a
+from os import getEnv
 
 import jester
 
@@ -12,7 +13,7 @@ import routes/[
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 
-const configPath {.strdefine.} = "./nitter.conf"
+let configPath = getEnv("NITTER_CONF_FILE", "./nitter.conf")
 let (cfg, fullCfg) = getConfig(configPath)
 
 when defined(release):
