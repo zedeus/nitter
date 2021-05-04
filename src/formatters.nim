@@ -11,7 +11,7 @@ const
 
   wwwRegex = re"https?://(www[0-9]?\.)?"
   m3u8Regex = re"""url="(.+.m3u8)""""
-  manifestRegex = re"(.+(.ts|.m3u8|.vmap))"
+  manifestRegex = re"\/(.+(.ts|.m4s|.m3u8|.vmap|.mp4))"
   userpicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
   extRegex = re"(\.[A-z]+)$"
   illegalXmlRegex = re"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]"
@@ -61,7 +61,7 @@ proc getM3u8Url*(content: string): string =
 
 proc proxifyVideo*(manifest: string; proxy: bool): string =
   proc cb(m: RegexMatch; s: string): string =
-    result = "https://video.twimg.com" & s[m.group(0)[0]]
+    result = "https://video.twimg.com/" & s[m.group(0)[0]]
     if proxy: result = getVidUrl(result)
   result = manifest.replace(manifestRegex, cb)
 

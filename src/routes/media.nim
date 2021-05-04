@@ -109,7 +109,7 @@ proc createMediaRouter*(cfg: Config) =
       if getHmac(url) != request.matches[1]:
         resp showError("Failed to verify signature", cfg)
 
-      if ".mp4" in url or ".ts" in url:
+      if ".mp4" in url or ".ts" in url or ".m4s" in url:
         let code = await proxyMedia(request, url)
         check code
 
