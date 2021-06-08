@@ -85,6 +85,7 @@ $ cd nitter
 $ nimble build -d:release
 $ nimble scss
 $ mkdir ./tmp
+$ cp nitter.example.conf nitter.conf
 ```
 
 Set your hostname, port, HMAC key, https (must be correct for cookies), and
