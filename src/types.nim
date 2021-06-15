@@ -125,7 +125,8 @@ type
     messageMe = "message_me"
     videoDirectMessage = "video_direct_message"
     imageDirectMessage = "image_direct_message"
-
+    audiospace = "audiospace"
+    
   Card* = object
     kind*: CardKind
     id*: string
