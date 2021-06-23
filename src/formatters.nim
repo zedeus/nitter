@@ -97,7 +97,7 @@ proc getTime*(tweet: Tweet): string =
   tweet.time.format("d/M/yyyy', 'HH:mm:ss")
 
 proc getRfc822Time*(tweet: Tweet): string =
-  tweet.time.format("ddd', 'd MMM yyyy HH:mm:ss 'GMT'")
+  tweet.time.format("ddd', 'dd MMM yyyy HH:mm:ss 'GMT'")
 
 proc getTweetTime*(tweet: Tweet): string =
   tweet.time.format("h:mm tt' · 'MMM d', 'YYYY")
