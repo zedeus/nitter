@@ -204,6 +204,7 @@ type
     address*: string
     port*: int
     useHttps*: bool
+    httpMaxConns*: int
     title*: string
     hostname*: string
     staticDir*: string
