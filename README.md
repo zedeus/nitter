@@ -145,6 +145,5 @@ lines). If you're running the Docker image, you can do this:
 
 ## Contact
 
-Feel free to join our Freenode IRC channel at #nitter, or our
-[Matrix channel](https://matrix.to/#/#nitter:matrix.org).
+Feel free to join our [Matrix channel](https://matrix.to/#/#nitter:matrix.org).
 You can email me at zedeus@pm.me if you wish to contact me personally.
