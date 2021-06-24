@@ -131,7 +131,7 @@ Restart=always
 RestartSec=15
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 ```
 
 Then enable and run the service:
