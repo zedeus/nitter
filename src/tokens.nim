@@ -36,11 +36,13 @@ proc fetchToken(): Future[Token] {.async.} =
 
   var
     resp: string
+    tokNode: JsonNode
     tok: string
 
   try:
     resp = clientPool.use(headers): await c.postContent(activate)
-    tok = parseJson(resp)["guest_token"].getStr
+    tokNode = parseJson(resp)["guest_token"]
+    tok = tokNode.getStr($(tokNode.getInt))
 
     let time = getTime()
     result = Token(tok: tok, remaining: 187, reset: time + resetPeriod,
