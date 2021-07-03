@@ -7,7 +7,7 @@ import ../views/[general, about]
 proc createUnsupportedRouter*(cfg: Config) =
   router unsupported:
     template feature {.dirty.} =
-      resp renderMain(renderFeature(), request, cfg, themePrefs())
+      resp renderMain(renderFeature(cfg), request, cfg, themePrefs())
 
     get "/about/feature": feature()
     get "/intent/?@i?": feature()

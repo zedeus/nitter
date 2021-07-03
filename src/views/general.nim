@@ -1,4 +1,4 @@
-import uri, strutils, strformat
+import uri, strutils, strformat, os
 import karax/[karaxdsl, vdom]
 
 import renderutils
@@ -8,9 +8,8 @@ import jester
 
 const
   doctype = "<!DOCTYPE html>\n"
-  lp = readFile("public/lp.svg")
 
-proc renderNavbar*(title, rss: string; req: Request): VNode =
+proc renderNavbar*(cfg: Config, rss: string; req: Request): VNode =
   let twitterPath = getTwitterLink(req.path, req.params)
   var path = $(parseUri(req.path) ? filterParams(req.params))
   if "/status" in path: path.add "#m"
@@ -18,7 +17,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
   buildHtml(nav):
     tdiv(class="inner-nav"):
       tdiv(class="nav-item"):
-        a(class="site-name", href="/"): text title
+        a(class="site-name", href="/"): text cfg.title
 
       a(href="/"): img(class="site-logo", src="/logo.png")
 
@@ -27,7 +26,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
         if rss.len > 0:
           icon "rss-feed", title="RSS Feed", href=rss
         icon "bird", title="Open in Twitter", href=twitterPath
-        a(href="https://liberapay.com/zedeus"): verbatim lp
+        a(href="https://liberapay.com/zedeus"): verbatim readFile(cfg.staticDir / "lp.svg")
         icon "info", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 
@@ -119,7 +118,7 @@ proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
     renderHead(prefs, cfg, titleText, desc, video, images, banner, ogTitle, theme, rss)
 
     body:
-      renderNavbar(cfg.title, rss, req)
+      renderNavbar(cfg, rss, req)
 
       tdiv(class="container"):
         body
