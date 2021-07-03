@@ -1,15 +1,18 @@
+import os
 import karax/[karaxdsl, vdom]
 import markdown
+
+import ".."/[types]
 
 const
   hash = staticExec("git log -1 --format=\"%h\"")
   link = "https://github.com/zedeus/nitter/commit/" & hash
 
-let
-  about = markdown(readFile("public/md/about.md"))
-  feature = markdown(readFile("public/md/feature.md"))
+var about, feature: string
 
-proc renderAbout*(): VNode =
+proc renderAbout*(cfg: Config): VNode =
+  if about.len == 0:
+    about = markdown(readFile(cfg.staticDir / "md/about.md"))
   buildHtml(tdiv(class="overlay-panel")):
     verbatim about
     h2: text "Instance info"
@@ -17,6 +20,8 @@ proc renderAbout*(): VNode =
       text "Commit "
       a(href=link): text hash
 
-proc renderFeature*(): VNode =
+proc renderFeature*(cfg: Config): VNode =
+  if feature.len == 0:
+    feature = markdown(readFile(cfg.staticDir / "md/feature.md"))
   buildHtml(tdiv(class="overlay-panel")):
     verbatim feature
