@@ -54,7 +54,12 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
       "Content-Type": res.headers["content-type", 0],
       "Content-Length": contentLength,
       "Cache-Control": maxAge,
-      "ETag": hashed
+      "ETag": hashed,
+      "x-frame-options": "DENY",
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "no-referrer",
+      "permissions-policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()",
+      "content-security-policy": "default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' blob:; font-src 'self'; media-src 'self' blob:; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; connect-src'self'; upgrade-insecure-requests;"
     })
 
     respond(request, headers)
