@@ -54,9 +54,9 @@ genPrefs:
       "Replace Twitter links with Nitter (blank to disable)"
       placeholder: "Nitter hostname"
 
-    replaceYouTube(input, "invidious.snopyta.org"):
-      "Replace YouTube links with Invidious (blank to disable)"
-      placeholder: "Invidious hostname"
+    replaceYouTube(input, "piped.kavin.rocks"):
+      "Replace YouTube links with Piped/Invidious (blank to disable)"
+      placeholder: "Piped hostname"
 
     replaceInstagram(input, ""):
       "Replace Instagram links with Bibliogram (blank to disable)"
