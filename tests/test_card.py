@@ -3,35 +3,20 @@ from parameterized import parameterized
 
 
 card = [
-    ['PyTorch/status/1123379369672450051',
-     'PyTorch',
-     'An open source deep learning platform that provides a seamless path from research prototyping to production deployment.',
-     'pytorch.org', False],
-
     ['Thom_Wolf/status/1122466524860702729',
      'pytorch/fairseq',
      'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - pytorch/fairseq',
-     'github.com', False],
+     'github.com', True],
 
     ['nim_lang/status/1136652293510717440',
      'Version 0.20.0 released',
      'We are very proud to announce Nim version 0.20. This is a massive release, both literally and figuratively. It contains more than 1,000 commits and it marks our release candidate for version 1.0!',
      'nim-lang.org', True],
 
-    # ['Tesla/status/1141041022035623936',
-    #  'Experience the Tesla Arcade',
-    #  '',
-    #  'www.tesla.com', True],
-
     ['voidtarget/status/1094632512926605312',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too)',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too) - obsplugin.nim',
      'gist.github.com', True],
-
-    # ['AdsAPI/status/1110272721005367296',
-    #  'Conversation Targeting',
-    #  '',
-    #  'view.highspot.com', True],
 
     ['FluentAI/status/1116417904831029248',
      'Amazon’s Alexa isn’t just AI — thousands of humans are listening',
@@ -68,24 +53,18 @@ no_thumb = [
     ['lorenlugosch/status/1115440394148487168',
      'Fluent Speech Commands: A dataset for spoken language understanding research',
      'In recent years, with the advent of deep neural networks, the accuracy of speech recognition models have been notably improved which have made possible the production of speech-to-text systems that...',
-     'fluent.ai'],
-
-
-    ['TheTwoffice/status/558685306090946561',
-     'Eternity: a moment standing still forever…',
-     '- James Montgomery. | facebook | 500px | ferpectshotz | I dusted off this one from my old archives, it was taken while I was living in mighty new York city working at Wall St. I think this was the 11...',
-     'flickr.com'],
+     'fluent.ai']
 ]
 
 playable = [
     ['nim_lang/status/1118234460904919042',
      'Nim development blog 2019-03',
-     'Arne (aka Krux02) * debugging: * improved nim-gdb, $ works, framefilter * alias for --debugger:native: -g * bugs: * forwarding of .pure. * sizeof union * fea...',
+     'Arne (aka Krux02)* debugging: * improved nim-gdb, $ works, framefilter * alias for --debugger:native: -g* bugs: * forwarding of .pure. * sizeof union* fe...',
      'youtube.com'],
 
     ['nim_lang/status/1121090879823986688',
      'Nim - First natively compiled language w/ hot code-reloading at...',
-     '#nim #c++ #ACCUConfNim is a statically typed systems and applications programming language which offers perhaps some of the most powerful metaprogramming capabi...',
+     '#nim #c++ #ACCUConfNim is a statically typed systems and applications programming language which offers perhaps some of the most powerful metaprogramming cap...',
      'youtube.com']
 ]
 

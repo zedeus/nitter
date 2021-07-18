@@ -8,10 +8,6 @@ text = [
 
 What are we doing wrong? reuters.com/article/us-norwa…"""],
 
-    ['SpaceX/status/1136998058242088960',
-     'SpaceX Jobs', '@SpaceXJobs',
-     'Super excited to be number 1! Let’s make humanity multiplanetary 🚀 businessinsider.com/universu…'],
-
     ['nim_lang/status/924694255364341760',
      'Hacker News', '@newsycombinator',
      'Why Rust fails hard at scientific computing andre-ratsimbazafy.com/why-r…']

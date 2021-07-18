@@ -28,18 +28,6 @@ invalid = [
 ]
 
 multiline = [
-    [1262214452826562567, 'laurenbringe_',
-     """
-Summoning circle
-
-                   🕯      🕯
-           🕯                       🕯
-                      
-       🕯       Serotonin       🕯
-                        
-          🕯                         🕯
-                   🕯      🕯"""],
-
     [400897186990284800, 'mobile_test_3',
      """
 ♔
