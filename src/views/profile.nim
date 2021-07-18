@@ -11,7 +11,7 @@ proc renderStat(num, class: string; text=""): VNode =
     span(class="profile-stat-num"):
       text if num.len == 0: "?" else: insertSep(num, ',')
 
-proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
+proc renderProfileCard*(profile: Profile; prefs: Prefs, path: string): VNode =
   buildHtml(tdiv(class="profile-card")):
     tdiv(class="profile-card-info"):
       let url = getPicUrl(profile.getUserPic())
@@ -21,9 +21,15 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
       a(class="profile-card-avatar", href=url, target="_blank"):
         genImg(profile.getUserpic(size))
 
-      tdiv(class="profile-card-tabs-name"):
-        linkUser(profile, class="profile-card-fullname")
-        linkUser(profile, class="profile-card-username")
+      tdiv(class="profile-card-tabs-name-and-follow"):
+        tdiv():
+          linkUser(profile, class="profile-card-fullname")
+          linkUser(profile, class="profile-card-username")
+        let following = isFollowing(profile.username, prefs.following)
+        if not following:
+          buttonReferer "/follow/" & profile.username, "Follow", path, "profile-card-follow-button"
+        else:
+          buttonReferer "/unfollow/" & profile.username, "Unfollow", path, "profile-card-follow-button"
 
     tdiv(class="profile-card-extra"):
       if profile.bio.len > 0:
@@ -104,7 +110,7 @@ proc renderProfile*(profile: Profile; timeline: var Timeline;
 
     let sticky = if prefs.stickyProfile: "sticky" else: "unset"
     tdiv(class="profile-tab", style={position: sticky}):
-      renderProfileCard(profile, prefs)
+      renderProfileCard(profile, prefs, path)
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)
 

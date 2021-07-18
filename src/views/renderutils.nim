@@ -93,3 +93,7 @@ proc getTabClass*(query: Query; tab: QueryKind): string =
   result = "tab-item"
   if query.kind == tab:
     result &= " active"
+
+proc isFollowing*(name, following: string): bool =
+  let following = following.split(",")
+  return name in following
