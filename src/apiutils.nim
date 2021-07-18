@@ -41,9 +41,10 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
 
   let headers = genHeaders(token)
   try:
-    let
-      resp = pool.use(headers): await c.get($url)
-      body = await resp.body
+    var resp: AsyncResponse
+    let body = pool.use(headers):
+      resp = await c.get($url)
+      await resp.body
 
     if body.startsWith('{') or body.startsWith('['):
       result = parseJson(body)
@@ -65,6 +66,6 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
       raise rateLimitError()
   except Exception as e:
     echo "error: ", e.msg, ", token: ", token[], ", url: ", url
-    if "length" notin e.msg:
+    if "length" notin e.msg and "descriptor" notin e.msg:
       release(token, true)
     raise rateLimitError()
