@@ -221,6 +221,8 @@ type
     redisConns*: int
     redisMaxConns*: int
 
+    replaceYouTube*: string
+
   Rss* = object
     feed*, cursor*: string
 
