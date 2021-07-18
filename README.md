@@ -106,6 +106,36 @@ A prebuilt Docker image is provided as well:
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d -p 8080:8080 zedeus/nitter:latest
 ```
 
+To run the prebuilt Docker image via docker-compose:
+```yaml
+version: '3.5'
+services:
+  nitter:
+    volumes:
+        - ./nitter.conf:/src/nitter.conf
+    ports:
+        - 8080:8080
+    image: zedeus/nitter
+    container_name: nitter
+    healthcheck:
+      test: ["CMD", "wget" ,"--no-verbose", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 1m
+      timeout: 3s
+    depends_on:
+      - redis
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+```
+
 Note the Docker commands expect a `nitter.conf` file in the directory you run them.
 
 To run Nitter via systemd you can use this service file:
