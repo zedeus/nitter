@@ -117,6 +117,7 @@ services:
         - 8080:8080
     image: zedeus/nitter
     container_name: nitter
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget" ,"--no-verbose", "--tries=1", "--spider", "http://localhost:8080"]
       interval: 1m
