@@ -127,8 +127,6 @@ services:
     image: redis:alpine
     container_name: redis
     restart: unless-stopped
-    ports:
-      - 6379:6379
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 1s
