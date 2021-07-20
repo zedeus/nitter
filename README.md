@@ -112,7 +112,7 @@ version: '3.5'
 services:
   nitter:
     volumes:
-        - ./nitter.conf:/src/nitter.conf
+        - ./nitter.conf:/src/nitter.conf:ro
     ports:
         - 8080:8080
     image: zedeus/nitter
