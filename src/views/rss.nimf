@@ -1,5 +1,5 @@
 #? stdtmpl(subsChar = '$', metaChad = '#')
-#import strutils, xmltree, strformat, options
+#import strutils, xmltree, strformat, options, unicode
 #import ../types, ../utils, ../formatters
 #
 #proc getTitle(tweet: Tweet; prefs: Prefs; retweet: string): string =
@@ -7,7 +7,11 @@
 #elif retweet.len > 0: result = &"RT by @{retweet}: "
 #elif tweet.reply.len > 0: result = &"R to @{tweet.reply[0]}: "
 #end if
-#result &= xmltree.escape(stripHtml(tweet.text))
+#var text = stripHtml(tweet.text)
+#if unicode.runeLen(text) > 32:
+#  text = unicode.runeSubStr(text, 0, 32) & "..."
+#end if
+#result &= xmltree.escape(text)
 #if result.len > 0: return
 #end if
 #if tweet.photos.len > 0:
