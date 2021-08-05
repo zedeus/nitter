@@ -34,7 +34,9 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     redisConns: cfg.get("Cache", "redisConnections", 20),
     redisMaxConns: cfg.get("Cache", "redisMaxConnections", 30),
 
-    replaceYouTube: cfg.get("Preferences", "replaceYouTube", "piped.kavin.rocks")
+    replaceYouTube: cfg.get("Preferences", "replaceYouTube", "piped.kavin.rocks"),
+
+    language: cfg.get("Preferences", "language", "en")
   )
 
   return (conf, cfg)

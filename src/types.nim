@@ -223,6 +223,8 @@ type
 
     replaceYouTube*: string
 
+    language*: string
+
   Rss* = object
     feed*, cursor*: string
 

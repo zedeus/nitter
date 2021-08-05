@@ -1,6 +1,6 @@
-import strutils
+import strutils, tables
 import karax/[karaxdsl, vdom, vstyles]
-import ".."/[types, utils]
+import ".."/[types, utils, language]
 
 proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
   var c = "icon-" & icon
@@ -24,7 +24,7 @@ proc linkUser*(profile: Profile, class=""): VNode =
   buildHtml(a(href=href, class=class, title=nameText)):
     text nameText
     if isName and profile.verified:
-      icon "ok", class="verified-icon", title="Verified account"
+      icon "ok", class="verified-icon", title=lang["Verified account"]
     if isName and profile.protected:
       text " "
       icon "lock", title="Protected account"

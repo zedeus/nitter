@@ -1,22 +1,20 @@
-import strutils, strformat, sequtils, unicode, tables
+import strutils, strformat, sequtils, unicode, tables, renderutils, timeline
 import karax/[karaxdsl, vdom]
+import ".."/[types, query, language]
 
-import renderutils, timeline
-import ".."/[types, query]
-
-const toggles = {
-  "nativeretweets": "Retweets",
-  "media": "Media",
-  "videos": "Videos",
-  "news": "News",
-  "verified": "Verified",
-  "native_video": "Native videos",
-  "replies": "Replies",
-  "links": "Links",
-  "images": "Images",
-  "safe": "Safe",
-  "quote": "Quotes",
-  "pro_video": "Pro videos"
+let toggles = {
+  "nativeretweets": lang["Retweets"],
+  "media": lang["Media"],
+  "videos": lang["Videos"],
+  "news": lang["News"],
+  "verified": lang["Verified"],
+  "native_video": lang["Native videos"],
+  "replies": lang["Replies"],
+  "links": lang["Links"],
+  "images": lang["Images"],
+  "safe": lang["Safe"],
+  "quote": lang["Quotes"],
+  "pro_video": lang["Pro videos"]
 }.toOrderedTable
 
 proc renderSearch*(): VNode =
@@ -24,30 +22,30 @@ proc renderSearch*(): VNode =
     tdiv(class="search-bar"):
       form(`method`="get", action="/search"):
         hiddenField("f", "users")
-        input(`type`="text", name="q", autofocus="", placeholder="Enter username...")
+        input(`type`="text", name="q", autofocus="", placeholder=lang["Enter username..."])
         button(`type`="submit"): icon "search"
 
 proc renderProfileTabs*(query: Query; username: string): VNode =
   let link = "/" & username
   buildHtml(ul(class="tab")):
     li(class=query.getTabClass(posts)):
-      a(href=link): text "Tweets"
+      a(href=link): text lang["Tweets"]
     li(class=(query.getTabClass(replies) & " wide")):
-      a(href=(link & "/with_replies")): text "Tweets & Replies"
+      a(href=(link & "/with_replies")): text lang["Tweets & Replies"]
     li(class=query.getTabClass(media)):
-      a(href=(link & "/media")): text "Media"
+      a(href=(link & "/media")): text lang["Media"]
     li(class=query.getTabClass(tweets)):
-      a(href=(link & "/search")): text "Search"
+      a(href=(link & "/search")): text lang["Search"]
 
 proc renderSearchTabs*(query: Query): VNode =
   var q = query
   buildHtml(ul(class="tab")):
     li(class=query.getTabClass(tweets)):
       q.kind = tweets
-      a(href=("?" & genQueryUrl(q))): text "Tweets"
+      a(href=("?" & genQueryUrl(q))): text lang["Tweets"]
     li(class=query.getTabClass(users)):
       q.kind = users
-      a(href=("?" & genQueryUrl(q))): text "Users"
+      a(href=("?" & genQueryUrl(q))): text lang["Users"]
 
 proc isPanelOpen(q: Query): bool =
   q.fromUser.len == 0 and (q.filters.len > 0 or q.excludes.len > 0 or
@@ -58,7 +56,7 @@ proc renderSearchPanel*(query: Query): VNode =
   let action = if user.len > 0: &"/{user}/search" else: "/search"
   buildHtml(form(`method`="get", action=action, class="search-field")):
     hiddenField("f", "tweets")
-    genInput("q", "", query.text, "Enter search...", class="pref-inline")
+    genInput("q", "", query.text, lang["Enter search..."], class="pref-inline")
     button(`type`="submit"): icon "search"
     if isPanelOpen(query):
       input(id="search-panel-toggle", `type`="checkbox", checked="")
@@ -78,14 +76,14 @@ proc renderSearchPanel*(query: Query): VNode =
 
       tdiv(class="search-row"):
         tdiv:
-          span(class="search-title"): text "Time range"
+          span(class="search-title"): text lang["Time range"]
           tdiv(class="date-range"):
             genDate("since", query.since)
             span(class="search-title"): text "-"
             genDate("until", query.until)
         tdiv:
-          span(class="search-title"): text "Near"
-          genInput("near", "", query.near, placeholder="Location...")
+          span(class="search-title"): text lang["Near"]
+          genInput("near", "", query.near, placeholder=lang["Location..."])
 
 proc renderTweetSearch*(results: Result[Tweet]; prefs: Prefs; path: string): VNode =
   let query = results.query

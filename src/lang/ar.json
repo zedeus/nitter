@@ -1,0 +1,73 @@
+{
+  "dir": "rtl",
+  "Verified account": "حساب موثق",
+
+  "retweeted": "أعاد التغريد",
+  "Replying to": "يرد على",
+
+  "Retweets": "معاد التغريد",
+  "Media": "الإعلام",
+  "Videos": "الفيديوهات",
+  "News": "الأخبار",
+  "Verified": "موثق",
+  "Native videos": "الفيديوهات الأصلية",
+  "Replies": "الردود",
+  "Links": "الروابط",
+  "Images": "الصور",
+  "Safe": "آمن",
+  "Quotes": "الإقتباسات",
+  "Pro videos": "الفيديوهات الإحترافية",
+
+  "Tweets": "التغريدات",
+  "Tweets & Replies": "التغريدات والردود",
+  "Search": "البحث",
+	"Users": "المستخدمون",
+
+
+  "Time range": "النطاق الزمني",
+  "Near": "قريب",
+  "Location...": "الموقع...",
+
+  "Enter username...": "ادخل اسم المستخدم...",
+  "Enter search...": "ادخل البحث...",
+
+  "Joined": "انضم",
+
+  "following": "المتابَعين",
+  "followers": "المتابِعون",
+  "likes": "الإعجابات",
+
+  "Photos and videos": "الصور والفيديوهات",
+
+  "Privacy": "الخصوصية",
+
+  "Replace Twitter links with Nitter (blank to disable)": "استبدل روابط تويتر بنيتير، (فارغ لإلغاء التفعيل)",
+  "Nitter hostname": "اسم نيتير المضيف",
+
+
+  "Replace YouTube links with Piped/Invidious (blank to disable)": "استبدل روابط يوتيوب بإنديفيوس/بايبد، (فارغ لإلغاء التفعيل)",
+  "Piped hostname": "اسم بايبد المضيف",
+
+  "Replace Instagram links with Bibliogram (blank to disable)": "استبدل روابط إنستغرام ببيبليوغرام، (فارغ لإلغاء التفعيل)",
+  "Bibliogram hostname": "اسم بيبليوغرام المضيف",
+
+  "Enable mp4 video playback": "تفعيل  تشغيل فيديو mp4",
+  "Enable hls video streaming (requires JavaScript)": "تفعيل  بث فيديو hls (يتطلب JavaScript)",
+  "Proxy video streaming through the server (might be slow)": "بث فيديو الوكيل  عبر الخادم (ربما يكون بطيئاً)",
+  "Mute videos by default": "كتم الفيديوهات  افتراضياً",
+  "Autoplay gifs": "تشغيل الـGIFS تلقائياً",
+
+  "Display": "العرض",
+  "Theme": "السمة",
+  "Infinite scrolling (requires JavaScript, experimental!)": "التمرير اللانهائي (يتطلب JavaScript، تجريبي!)",
+  "Make profile sidebar stick to top":  "اجعل  شريط الملف الشخصي يلصق  إلى الأعلى",
+  "Support bidirectional text (makes clicking on tweets harder)": "ادعم النص ثنائي الاتجاه (يجعل الضغط على التغريدات أصعب)",
+  "Hide tweet stats (replies, retweets, likes)": "أخف احصائيات التغريدات (الردور، إعادات التغريد، الإعجابات)",
+  "Hide profile banner": "أخف لافتة الملف الشخصي",
+  "Hide pinned tweets": "أخف التغريدات المثبتة",
+  "Hide tweet replies": "أخف ردور التغريدات",
+
+  "Preferences are stored client-side using cookies without any personal information.": "تخزن التفضيلات  جانب العميل باستخدام ملفات تعريف الارتباط بدون أي معلومات شخصية.",
+  "Save preferences": "حفظ التفضيلات",
+  "Reset Preferences": "إعادة تعيين التفضيلات"
+}

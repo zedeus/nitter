@@ -1,8 +1,6 @@
-import strutils, sequtils, strformat, options
+import strutils, sequtils, strformat, options, renderutils, tables
 import karax/[karaxdsl, vdom, vstyles]
-
-import renderutils
-import ".."/[types, utils, formatters]
+import ".."/[types, utils, formatters, language]
 
 proc getSmallPic(url: string): string =
   result = url
@@ -19,7 +17,7 @@ proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
   buildHtml(tdiv):
     if retweet.len > 0:
       tdiv(class="retweet-header"):
-        span: icon "retweet", retweet & " retweeted"
+        span: icon "retweet", retweet & " " & lang["retweeted"]
 
     if tweet.pinned:
       tdiv(class="pinned"):
@@ -192,7 +190,7 @@ proc renderStats(stats: TweetStats; views: string): VNode =
 
 proc renderReply(tweet: Tweet): VNode =
   buildHtml(tdiv(class="replying-to")):
-    text "Replying to "
+    text lang["Replying to"] & " "
     for i, u in tweet.reply:
       if i > 0: text " "
       a(href=("/" & u)): text "@" & u

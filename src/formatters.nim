@@ -1,6 +1,6 @@
 import strutils, strformat, times, uri, tables, xmltree, htmlparser
 import regex
-import types, utils, query
+import types, utils, query, tables, language
 
 const
   ytRegex = re"([A-z.]+\.)?youtu(be\.com|\.be)"
@@ -88,7 +88,7 @@ proc pageDesc*(profile: Profile): string =
     "The latest tweets from " & profile.fullname
 
 proc getJoinDate*(profile: Profile): string =
-  profile.joinDate.format("'Joined' MMMM YYYY")
+  profile.joinDate.format("'" & lang["Joined"] & "' MMMM YYYY")
 
 proc getJoinDateFull*(profile: Profile): string =
   profile.joinDate.format("h:mm tt - d MMM YYYY")

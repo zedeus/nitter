@@ -1,0 +1,73 @@
+{
+  "dir": "ltr",
+  "Verified account": "Verified account",
+
+  "retweeted": "retweeted",
+  "Replying to": "Replying to",
+
+  "Retweets": "Retweets",
+  "Media": "Media",
+  "Videos": "Videos",
+  "News": "News",
+  "Verified": "Verified",
+  "Native videos": "Native videos",
+  "Replies": "Replies",
+  "Links": "Links",
+  "Images": "Images",
+  "Safe": "Safe",
+  "Quotes": "Quotes",
+  "Pro videos": "Pro videos",
+
+  "Tweets": "Tweets",
+  "Tweets & Replies": "Tweets & Replies",
+  "Search": "Search",
+	"Users": "Users",
+
+
+  "Time range": "Time range",
+  "Near": "Near",
+  "Location...": "Location...",
+
+  "Enter username...": "Enter username...",
+  "Enter search...": "Enter search...",
+
+  "Joined": "Joined",
+
+  "following": "following",
+  "followers": "followers",
+  "likes": "likes",
+
+  "Photos and videos": "Photos and videos",
+
+  "Privacy": "Privacy",
+
+  "Replace Twitter links with Nitter (blank to disable)": "Replace Twitter links with Nitter (blank to disable)",
+  "Nitter hostname": "Nitter hostname",
+
+
+  "Replace YouTube links with Piped/Invidious (blank to disable)": "Replace YouTube links with Piped/Invidious (blank to disable)",
+  "Piped hostname": "Piped hostname",
+
+  "Replace Instagram links with Bibliogram (blank to disable)": "Replace Instagram links with Bibliogram (blank to disable)",
+  "Bibliogram hostname": "Bibliogram hostname",
+
+  "Enable mp4 video playback": "Enable mp4 video playback",
+  "Enable hls video streaming (requires JavaScript)": "Enable hls video streaming (requires JavaScript)",
+  "Proxy video streaming through the server (might be slow)": "Proxy video streaming through the server (might be slow)",
+  "Mute videos by default": "كتم الفيديوهات  افتراضياً",
+  "Autoplay gifs": "Autoplay gifs",
+
+  "Display": "Display",
+  "Theme": "Theme",
+  "Infinite scrolling (requires JavaScript, experimental!)": "Infinite scrolling (requires JavaScript, experimental!)",
+  "Make profile sidebar stick to top":  "Make profile sidebar stick to top",
+  "Support bidirectional text (makes clicking on tweets harder)": "Support bidirectional text (makes clicking on tweets harder)",
+  "Hide tweet stats (replies, retweets, likes)": "Hide tweet stats (replies, retweets, likes)",
+  "Hide profile banner": "Hide profile banner",
+  "Hide pinned tweets": "Hide pinned tweets",
+  "Hide tweet replies": "Hide tweet replies",
+
+  "Preferences are stored client-side using cookies without any personal information.": "Preferences are stored client-side using cookies without any personal information.",
+  "Save preferences": "Save preferences",
+  "Reset Preferences": "Reset Preferences"
+}

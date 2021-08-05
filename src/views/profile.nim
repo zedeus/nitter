@@ -1,8 +1,6 @@
-import strutils, strformat
+import strutils, strformat, renderutils, search, tables
 import karax/[karaxdsl, vdom, vstyles]
-
-import renderutils, search
-import ".."/[types, utils, formatters]
+import ".."/[types, utils, formatters, language]
 
 proc renderStat(num, class: string; text=""): VNode =
   let t = if text.len > 0: text else: class
@@ -55,21 +53,21 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
 
       tdiv(class="profile-card-extra-links"):
         ul(class="profile-statlist"):
-          renderStat(profile.tweets, "posts", text="Tweets")
-          renderStat(profile.following, "following")
-          renderStat(profile.followers, "followers")
-          renderStat(profile.likes, "likes")
+          renderStat(profile.tweets, "posts", text=lang["Tweets"])
+          renderStat(profile.following, lang["following"])
+          renderStat(profile.followers, lang["followers"])
+          renderStat(profile.likes, lang["likes"])
 
 proc renderPhotoRail(profile: Profile; photoRail: PhotoRail): VNode =
   let count = insertSep($profile.media, ',')
   buildHtml(tdiv(class="photo-rail-card")):
     tdiv(class="photo-rail-header"):
       a(href=(&"/{profile.username}/media")):
-        icon "picture", count & " Photos and videos"
+        icon "picture", count & " " & lang["Photos and videos"]
 
     input(id="photo-rail-grid-toggle", `type`="checkbox")
     label(`for`="photo-rail-grid-toggle", class="photo-rail-header-mobile"):
-      icon "picture", count & " Photos and videos"
+      icon "picture", count & " " & lang["Photos and videos"]
       icon "down"
 
     tdiv(class="photo-rail-grid"):
