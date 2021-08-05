@@ -19,7 +19,7 @@ requires "nimcrypto >= 0.4.11"
 requires "markdown#abdbe5e"
 requires "packedjson#7198cc8"
 requires "supersnappy#1.1.5"
-requires "redpool#57aeb25"
+requires "redpool#f880f49"
 requires "https://github.com/zedeus/redis#94bcbf1"
 requires "https://github.com/disruptek/frosty#0.3.1"
 
