@@ -226,6 +226,8 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
       tdiv(class="unavailable-quote"):
         if quote.tombstone.len > 0:
           text quote.tombstone
+        elif quote.text.len > 0:
+          text quote.text
         else:
           text "This tweet is unavailable"
 
@@ -278,8 +280,13 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       tdiv(class="unavailable-box"):
         if tweet.tombstone.len > 0:
           text tweet.tombstone
+        elif tweet.text.len > 0:
+          text tweet.text
         else:
           text "This tweet is unavailable"
+
+      if tweet.quote.isSome:
+        renderQuote(tweet.quote.get(), prefs, path)
 
   let fullTweet = tweet
   var retweet: string

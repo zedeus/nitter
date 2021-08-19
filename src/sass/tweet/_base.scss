@@ -188,6 +188,7 @@
     height: 100%;
     padding: 12px;
     border: solid 1px var(--dark_grey);
+    box-sizing: border-box;
     border-radius: 10px;
     background-color: var(--bg_color);
 }
