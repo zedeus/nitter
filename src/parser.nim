@@ -275,6 +275,7 @@ proc parseTweet(js: JsonNode): Tweet =
     else:
       newSeq[string]()
   )
+
   if js{"withheld_copyright"}.getBool or
      # XX - Content is withheld in all countries
      "XX" in withheldInCountries or
