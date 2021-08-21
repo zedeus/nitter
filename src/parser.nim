@@ -1,5 +1,6 @@
 import strutils, options, tables, times, math
 import packedjson
+import packedjson / deserialiser
 import types, parserutils, utils
 
 proc parseProfile(js: JsonNode; id=""): Profile =
@@ -267,6 +268,21 @@ proc parseTweet(js: JsonNode): Tweet =
       of "animated_gif":
         result.gif = some(parseGif(m))
       else: discard
+
+  let withheldInCountries = (
+    if js{"withheld_in_countries"}.kind == JArray:
+      js{"withheld_in_countries"}.to(seq[string])
+    else:
+      newSeq[string]()
+  )
+
+  if js{"withheld_copyright"}.getBool or
+     # XX - Content is withheld in all countries
+     "XX" in withheldInCountries or
+     # XY - Content is withheld due to a DMCA request.
+     "XY" in withheldInCountries or
+     (withheldInCountries.len > 0 and "withheld" in result.text):
+    result.available = false
 
 proc finalizeTweet(global: GlobalObjects; id: string): Tweet =
   let intId = if id.len > 0: parseBiggestInt(id) else: 0
