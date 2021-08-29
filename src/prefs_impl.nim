@@ -54,7 +54,7 @@ genPrefs:
       "Replace Twitter links with Nitter (blank to disable)"
       placeholder: "Nitter hostname"
 
-    replaceYouTube(input, "piped.kavin.rocks"):
+    replaceYouTube(input, ""):
       "Replace YouTube links with Piped/Invidious (blank to disable)"
       placeholder: "Piped hostname"
 
