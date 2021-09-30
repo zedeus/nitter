@@ -2,6 +2,7 @@ import asyncdispatch, strutils, sequtils, uri, options, times
 import jester, karax/vdom
 
 import router_utils
+import rest
 import ".."/[types, redis_cache, formatters, query, api]
 import ../views/[general, profile, timeline, status, search]
 
@@ -10,15 +11,16 @@ export uri, sequtils
 export router_utils
 export redis_cache, formatters, query, api
 export profile, timeline, status
+export rest
 
 proc getQuery*(request: Request; tab, name: string): Query =
   case tab
   of "with_replies": getReplyQuery(name)
   of "media": getMediaQuery(name)
-  of "search": initQuery(params(request), name=name)
+  of "search": initQuery(params(request), name = name)
   else: Query(fromUser: @[name])
 
-proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
+proc fetchSingleTimeline*(after: string; query: Query; skipRail = false):
                         Future[(Profile, Timeline, PhotoRail)] {.async.} =
   let name = query.fromUser[0]
 
@@ -33,7 +35,7 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
                 else: profile.id
 
     if profileId.len > 0:
-       await cacheProfileId(profile.username, profileId)
+      await cacheProfileId(profile.username, profileId)
 
     fetched = true
 
@@ -54,7 +56,7 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
   var timeline =
     case query.kind
     of posts: await getTimeline(profileId, after)
-    of replies: await getTimeline(profileId, after, replies=true)
+    of replies: await getTimeline(profileId, after, replies = true)
     of media: await getMediaTimeline(profileId, after)
     else: await getSearch[Tweet](query, after)
 
@@ -86,7 +88,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
     let
       timeline = await getSearch[Tweet](query, after)
       html = renderTweetSearch(timeline, prefs, getPath())
-    return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
+    return renderMain(html, request, cfg, prefs, "Multi", rss = rss)
 
   var (p, t, r) = await fetchSingleTimeline(after, query)
 
@@ -95,8 +97,8 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
 
   let pHtml = renderProfile(p, t, r, prefs, getPath())
   result = renderMain(pHtml, request, cfg, prefs, pageTitle(p), pageDesc(p),
-                      rss=rss, images = @[p.getUserpic("_400x400")],
-                      banner=p.banner)
+                      rss = rss, images = @[p.getUserpic("_400x400")],
+                      banner = p.banner)
 
 template respTimeline*(timeline: typed) =
   let t = timeline
@@ -126,7 +128,8 @@ proc createTimelineRouter*(cfg: Config) =
           timeline.beginning = true
           resp $renderTweetSearch(timeline, prefs, getPath())
         else:
-          var (_, timeline, _) = await fetchSingleTimeline(after, query, skipRail=true)
+          var (_, timeline, _) = await fetchSingleTimeline(after, query,
+              skipRail = true)
           if timeline.content.len == 0: resp Http404
           timeline.beginning = true
           resp $renderTimelineTweets(timeline, prefs, getPath())
@@ -138,3 +141,24 @@ proc createTimelineRouter*(cfg: Config) =
         rss &= "?" & genQueryUrl(query)
 
       respTimeline(await showTimeline(request, query, cfg, prefs, rss, after))
+
+    get "/api/@name/@tab/?":
+      cond '.' notin @"name"
+      cond @"name" notin ["pic", "gif", "video"]
+      cond @"tab" in ["profile", "timeline", "with_replies", "media", "search", ""]
+      let
+        prefs = cookiePrefs()
+        after = getCursor()
+        names = getNames(@"name")
+
+      var query = request.getQuery(@"tab", @"name")
+      if names.len != 1:
+        query.fromUser = names
+
+      var (profile, timeline, _) = await fetchSingleTimeline(after, query,
+          skipRail = true)
+
+      if @"tab" in ["profile", ""]:
+        rest Http200, profile
+      else:
+        rest Http200, timeline
