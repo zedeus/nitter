@@ -217,6 +217,8 @@ type
     base64Media*: bool
     minTokens*: int
     enableRss*: bool
+    proxy*: string
+    proxyAuth*: string
 
     rssCacheTime*: int
     listCacheTime*: int
