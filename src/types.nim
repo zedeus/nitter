@@ -1,4 +1,4 @@
-import times, sequtils, options, tables
+import times, sequtils, options, tables, json
 import prefs_impl
 
 genPrefsType()
@@ -126,7 +126,7 @@ type
     videoDirectMessage = "video_direct_message"
     imageDirectMessage = "image_direct_message"
     audiospace = "audiospace"
-    
+
   Card* = object
     kind*: CardKind
     id*: string
@@ -227,5 +227,59 @@ type
   Rss* = object
     feed*, cursor*: string
 
+  RestApiError* = object
+    message*: string
+
+  LinkHeader* = object
+    links*: TableRef[string, string]
+
 proc contains*(thread: Chain; tweet: Tweet): bool =
   thread.content.anyIt(it.id == tweet.id)
+
+proc `%`*[T](p: Result[T]): JsonNode =
+  result = %p.content
+
+proc `%`*(t: Time): JsonNode =
+  result = JsonNode(kind: JString, str: format(t, "yyyy-MM-dd'T'HH:mm:sszzz", utc()))
+
+proc `%`*(t: Tweet): JsonNode =
+  let p = t.profile
+  result = %* {
+    "id": t.id,
+    "threadId": t.threadId,
+    "replyId": t.replyId,
+    "profile": {"id": p.id, "username": p.username, "fullname": p.fullname},
+    "text": t.text,
+    "time": t.time,
+    "reply": t.reply,
+    "pinned": t.pinned,
+    "hasThread": t.hasThread,
+    "available": t.available,
+    "tombstone": t.tombstone,
+    "location": t.location,
+    "stats": t.stats,
+    "retweet": t.retweet,
+    "attribution": t.attribution,
+    "mediaTags": t.mediaTags,
+    "quote": t.quote,
+    "card": t.card,
+    "poll": t.poll,
+    "gif": t.gif,
+    "video": t.video,
+    "photos": t.photos,
+  }
+
+proc newRestApiError*(message: string): RestApiError =
+  result.message = message
+
+proc newLinkHeader*(): LinkHeader =
+  result.links = newTable[string, string]()
+
+proc `[]=`*(links: LinkHeader; rel: string; url: sink string) =
+  links.links[rel] = url
+
+proc `$`*(links: LinkHeader): string =
+  for rel, url in links.links:
+    if len(result) > 0:
+      add(result, ", ")
+    add(result, "<" & url & ">; rel=\"" & rel & "\"")
