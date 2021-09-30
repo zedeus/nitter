@@ -2,8 +2,9 @@ import parsecfg except Config
 import types, strutils
 
 proc get*[T](config: parseCfg.Config; s, v: string; default: T): T =
-  let val = config.getSectionValue(s, v)
-  if val.len == 0: return default
+  let val = config.getSectionValue(s, v, $default)
+  if val.len == 0 and v != "replaceYouTube":
+    return default
 
   when T is int: parseInt(val)
   elif T is bool: parseBool(val)
