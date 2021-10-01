@@ -449,6 +449,10 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
     elif "cursor-bottom" in entry:
       result.bottom = e.getCursor
 
+proc parseRecommnedations*(js: JsonNode): Recommendations =
+  for u in js:
+    result.add parseProfile(u{"user"})
+
 proc parsePhotoRail*(js: JsonNode): PhotoRail =
   for tweet in js:
     let

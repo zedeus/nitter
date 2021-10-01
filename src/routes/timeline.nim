@@ -19,8 +19,8 @@ proc getQuery*(request: Request; tab, name: string): Query =
   of "search": initQuery(params(request), name=name)
   else: Query(fromUser: @[name])
 
-proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
-                        Future[(Profile, Timeline, PhotoRail)] {.async.} =
+proc fetchSingleTimeline*(after: string; query: Query; skipRail=false, skipRecommendations=false):
+                        Future[(Profile, Timeline, PhotoRail, Recommendations)] {.async.} =
   let name = query.fromUser[0]
 
   var
@@ -52,6 +52,13 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
   else:
     rail = getCachedPhotoRail(name)
 
+  var recommendations: Future[Recommendations]
+  if skipRecommendations:
+    recommendations = newFuture[Recommendations]()
+    recommendations.complete(@[])
+  else:
+    recommendations = getCachedRecommendations(profileId)
+
   var timeline =
     case query.kind
     of posts: await getTimeline(profileId, after)
@@ -76,7 +83,7 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
   if fetched and not found:
     await cache(profile)
 
-  return (profile, timeline, await rail)
+  return (profile, timeline, await rail, await recommendations)
 
 proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
                    rss, after: string): Future[string] {.async.} =
@@ -86,12 +93,12 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
       html = renderTweetSearch(timeline, prefs, getPath())
     return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
-  var (p, t, r) = await fetchSingleTimeline(after, query)
+  var (p, t, r, rc) = await fetchSingleTimeline(after, query)
 
   if p.suspended: return showError(getSuspended(p.username), cfg)
   if p.id.len == 0: return
 
-  let pHtml = renderProfile(p, t, r, prefs, getPath())
+  let pHtml = renderProfile(p, t, r, rc, prefs, getPath())
   result = renderMain(pHtml, request, cfg, prefs, pageTitle(p), pageDesc(p),
                       rss=rss, images = @[p.getUserpic("_400x400")],
                       banner=p.banner)
@@ -139,7 +146,7 @@ proc createTimelineRouter*(cfg: Config) =
           timeline.beginning = true
           resp $renderTweetSearch(timeline, prefs, getPath())
         else:
-          var (_, timeline, _) = await fetchSingleTimeline(after, query, skipRail=true)
+          var (_, timeline, _, _) = await fetchSingleTimeline(after, query, skipRail=true, skipRecommendations=true)
           if timeline.content.len == 0: resp Http404
           timeline.beginning = true
           resp $renderTimelineTweets(timeline, prefs, getPath())

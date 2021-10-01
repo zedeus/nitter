@@ -2,7 +2,7 @@
 import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 
-import renderutils, search
+import renderutils, search, timeline
 import ".."/[types, utils, formatters]
 
 proc renderStat(num, class: string; text=""): VNode =
@@ -81,6 +81,20 @@ proc renderPhotoRail(profile: Profile; photoRail: PhotoRail): VNode =
           style={backgroundColor: col}):
           genImg(photo.url & (if "format" in photo.url: "" else: ":thumb"))
 
+proc renderRecommendations(recommendations: Recommendations; prefs: Prefs): VNode =
+  buildHtml(tdiv(class="recommendations-card")):
+    tdiv(class="recommendations-header"):
+      span: text "You might like"
+
+    input(id="recommendations-list-toggle", `type`="checkbox")
+    label(`for`="recommendations-list-toggle", class="recommendations-header-mobile"):
+      span: text "You might like"
+      icon "down"
+
+    tdiv(class="recommendations-list"):
+      for i, recommendation in recommendations:
+        renderUser(recommendation, prefs)
+
 proc renderBanner(profile: Profile): VNode =
   buildHtml():
     if "#" in profile.banner:
@@ -96,7 +110,7 @@ proc renderProtected(username: string): VNode =
       p: text &"Only confirmed followers have access to @{username}'s tweets."
 
 proc renderProfile*(profile: Profile; timeline: var Timeline;
-                    photoRail: PhotoRail; prefs: Prefs; path: string): VNode =
+                    photoRail: PhotoRail; recommendations: Recommendations; prefs: Prefs; path: string): VNode =
   timeline.query.fromUser = @[profile.username]
   buildHtml(tdiv(class="profile-tabs")):
     if not prefs.hideBanner:
@@ -108,6 +122,9 @@ proc renderProfile*(profile: Profile; timeline: var Timeline;
       renderProfileCard(profile, prefs)
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)
+      if recommendations.len > 0:
+        renderRecommendations(recommendations, prefs)
+
 
     if profile.protected:
       renderProtected(profile.username)

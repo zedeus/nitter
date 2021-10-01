@@ -1,0 +1,59 @@
+@import '_variables';
+
+.recommendations {
+    &-card {
+        float: left;
+        background: var(--bg_panel);
+        border-radius: 0 0 4px 4px;
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    &-header {
+        padding: 5px 12px 0;
+    }
+
+    &-header-mobile {
+        display: none;
+        box-sizing: border-box;
+        padding: 5px 12px 0;
+        width: 100%;
+        float: unset;
+        color: var(--accent);
+        justify-content: space-between;
+    }
+}
+
+@include create-toggle(recommendations-list, 640px);
+#recommendations-list-toggle:checked ~ .recommendations-list {
+    padding-bottom: 12px;
+}
+
+@media(max-width: 600px) {
+    .recommendations-header {
+        display: none;
+    }
+
+    .recommendations-header-mobile {
+        display: flex;
+    }
+
+    .recommendations-list {
+        max-height: 0;
+        padding-bottom: 0;
+        overflow: scroll;
+        transition: max-height 0.4s;
+    }
+}
+
+@media(max-width: 600px) {
+    #recommendations-list-toggle:checked ~ .recommendations-list {
+        max-height: 160px;
+    }
+}
+
+@media(max-width: 450px) {
+    #recommendations-list-toggle:checked ~ .recommendations-list {
+        max-height: 160px;
+    }
+}

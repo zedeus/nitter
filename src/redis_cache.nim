@@ -74,6 +74,9 @@ proc cache*(data: List) {.async.} =
 proc cache*(data: PhotoRail; name: string) {.async.} =
   await setex("pr:" & name, baseCacheTime, compress(toFlatty(data)))
 
+proc cache*(data: Recommendations; userId: string) {.async.} =
+  await setex("rc:" & userId, listCacheTime, compress(toFlatty(data)))
+
 proc cache*(data: Profile) {.async.} =
   if data.username.len == 0 or data.id.len == 0: return
   let name = toLower(data.username)
@@ -98,6 +101,15 @@ proc cacheRss*(query: string; rss: Rss) {.async.} =
     discard await r.hset(key, "min", rss.cursor)
     discard await r.expire(key, rssCacheTime)
     discard await r.flushPipeline()
+
+proc getCachedRecommendations*(userId: string): Future[Recommendations] {.async.} =
+  if userId.len == 0: return
+  let recommendations = await get("rc:" & userId)
+  if recommendations != redisNil:
+    result = fromFlatty(uncompress(recommendations), Recommendations)
+  else:
+    result = await getRecommendations(userId)
+    await cache(result, userId)
 
 proc getProfileId*(username: string): Future[string] {.async.} =
   let name = toLower(username)
