@@ -119,19 +119,18 @@ proc createRssRouter*(cfg: Config) =
       await cacheRss(key, rss)
       respRss(rss)
 
-    get "/@name/lists/@list/rss":
+    get "/i/lists/@id/rss":
       cond cfg.enableRss
-      cond '.' notin @"name"
       let
         cursor = getCursor()
-        key = @"name" & "/" & @"list" & cursor
+        key = @"id" & cursor
 
       var rss = await getCachedRss(key)
       if rss.cursor.len > 0:
         respRss(rss)
 
       let
-        list = await getCachedList(@"name", @"list")
+        list = await getCachedList(id=(@"id"))
         timeline = await getListTimeline(list.id, cursor)
       rss.cursor = timeline.bottom
       rss.feed = compress renderListRss(timeline.content, list, cfg)

@@ -109,7 +109,7 @@ ${renderRssTweets(timeline.content, cfg)}
 #end proc
 #
 #proc renderListRss*(tweets: seq[Tweet]; list: List; cfg: Config): string =
-#let link = &"{getUrlPrefix(cfg)}/{list.username}/lists/{list.name}"
+#let link = &"{getUrlPrefix(cfg)}/i/lists/{list.id}"
 #result = ""
 <?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
