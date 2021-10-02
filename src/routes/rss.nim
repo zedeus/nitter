@@ -62,7 +62,7 @@ proc createRssRouter*(cfg: Config) =
 
       let
         cursor = getCursor()
-        key = $hash(genQueryUrl(query)) & cursor
+        key = "search:" & $hash(genQueryUrl(query)) & ":" & cursor
 
       var rss = await getCachedRss(key)
       if rss.cursor.len > 0:
@@ -82,7 +82,7 @@ proc createRssRouter*(cfg: Config) =
       let
         cursor = getCursor()
         name = @"name"
-        key = name & cursor
+        key = "twitter:" & name & ":" & cursor
 
       var rss = await getCachedRss(key)
       if rss.cursor.len > 0:
@@ -105,9 +105,9 @@ proc createRssRouter*(cfg: Config) =
         of "search": initQuery(params(request), name=name)
         else: Query(fromUser: @[name])
 
-      var key = @"name" & "/" & @"tab"
+      var key = @"tab" & ":" & @"name" & ":"
       if @"tab" == "search":
-        key &= $hash(genQueryUrl(query))
+        key &= $hash(genQueryUrl(query)) & "/"
       key &= getCursor()
 
       var rss = await getCachedRss(key)
@@ -123,7 +123,9 @@ proc createRssRouter*(cfg: Config) =
       cond cfg.enableRss
       let
         cursor = getCursor()
-        key = @"id" & cursor
+        key =
+          if cursor.len == 0: "lists:" & @"id"
+          else: "lists:" & @"id" & ":" & cursor
 
       var rss = await getCachedRss(key)
       if rss.cursor.len > 0:
