@@ -126,7 +126,7 @@ type
     videoDirectMessage = "video_direct_message"
     imageDirectMessage = "image_direct_message"
     audiospace = "audiospace"
-    
+
   Card* = object
     kind*: CardKind
     id*: string
@@ -212,6 +212,7 @@ type
     hmacKey*: string
     base64Media*: bool
     minTokens*: int
+    enableRSS*: bool
 
     rssCacheTime*: int
     listCacheTime*: int
