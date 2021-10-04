@@ -105,8 +105,22 @@ template respTimeline*(timeline: typed) =
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg)
   resp t
 
+template respUserId*() =
+  cond @"user_id".len > 0
+  let username = await getCachedProfileScreenName(@"user_id")
+  if username.len > 0:
+    redirect("/" & username)
+  else:
+    resp Http404, showError("User not found", cfg)
+
 proc createTimelineRouter*(cfg: Config) =
   router timeline:
+    get "/i/user/@user_id":
+      respUserId()
+
+    get "/intent/user":
+      respUserId()
+
     get "/@name/?@tab?/?":
       cond '.' notin @"name"
       cond @"name" notin ["pic", "gif", "video"]
