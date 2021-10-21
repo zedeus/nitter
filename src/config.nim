@@ -33,6 +33,7 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     redisPort: cfg.get("Cache", "redisPort", 6379),
     redisConns: cfg.get("Cache", "redisConnections", 20),
     redisMaxConns: cfg.get("Cache", "redisMaxConnections", 30),
+    redisPassword: cfg.get("Cache", "redisPassword", ""),
 
     replaceYouTube: cfg.get("Preferences", "replaceYouTube", "piped.kavin.rocks"),
 

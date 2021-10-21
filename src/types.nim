@@ -220,6 +220,7 @@ type
     redisPort*: int
     redisConns*: int
     redisMaxConns*: int
+    redisPassword*: string
 
     replaceYouTube*: string
 

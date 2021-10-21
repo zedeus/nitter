@@ -158,4 +158,8 @@
     padding: .75em;
     display: flex;
     position: relative;
+
+    &.unavailable {
+        flex-direction: column;
+    }
 }

@@ -11,7 +11,7 @@ RUN nimble build -y -d:release --passC:"-flto" --passL:"-flto" \
     && strip -s nitter \
     && nimble scss
 
-FROM redis:6.0.4-alpine
+FROM redis:6-alpine
 WORKDIR /src/
 RUN apk --no-cache add pcre-dev sqlite-dev
 COPY --from=nim /src/nitter/nitter /src/nitter/start.sh /src/nitter/nitter.conf ./

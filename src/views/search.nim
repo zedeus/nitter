@@ -22,7 +22,7 @@ proc renderSearch*(): VNode =
     tdiv(class="search-bar"):
       form(`method`="get", action="/search"):
         hiddenField("f", "users")
-        input(`type`="text", name="q", autofocus="", placeholder=lang["Enter username..."])
+        input(`type`="text", name="q", autofocus="", placeholder=lang["Enter username..."], dir="auto")
         button(`type`="submit"): icon "search"
 
 proc renderProfileTabs*(query: Query; username: string): VNode =
