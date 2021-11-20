@@ -169,7 +169,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
   let
     vals = ? js{"binding_values"}
     name = js{"name"}.getStr
-    kind = parseEnum[CardKind](name[(name.find(":") + 1) ..< name.len])
+    kind = parseEnum[CardKind](name[(name.find(":") + 1) ..< name.len], unknown)
 
   result = Card(
     kind: kind,
@@ -195,7 +195,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
     result.url = vals{"player_url"}.getStrVal
     if "youtube.com" in result.url:
       result.url = result.url.replace("/embed/", "/watch?v=")
-  of unified:
+  of unified, unknown:
     result.title = "This card type is not supported."
   else: discard
 

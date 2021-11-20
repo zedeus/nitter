@@ -126,6 +126,8 @@ type
     videoDirectMessage = "video_direct_message"
     imageDirectMessage = "image_direct_message"
     audiospace = "audiospace"
+    newsletter_publication = "newsletter_publication"
+    unknown
     
   Card* = object
     kind*: CardKind
