@@ -5,7 +5,7 @@ import types, utils, query
 const
   ytRegex = re"([A-z.]+\.)?youtu(be\.com|\.be)"
   twRegex = re"(www\.|mobile\.)?twitter\.com"
-  igRegex = re"(www\.)?instagram.com"
+  igRegex = re"(www\.)?instagram\.com"
   cards = "cards.twitter.com/cards"
   tco = "https://t.co"
 
