@@ -75,7 +75,7 @@ proc parseGraphList*(js: JsonNode): List =
     id: list{"id_str"}.getStr,
     name: list{"name"}.getStr,
     username: list{"user", "legacy", "screen_name"}.getStr,
-    userId: list{"user", "legacy", "id_str"}.getStr,
+    userId: list{"user", "rest_id"}.getStr,
     description: list{"description"}.getStr,
     members: list{"member_count"}.getInt,
     banner: list{"custom_banner_media", "media_info", "url"}.getImageStr
