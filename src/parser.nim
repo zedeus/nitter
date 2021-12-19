@@ -405,7 +405,7 @@ proc parseUsers*(js: JsonNode; after=""): Result[Profile] =
 
   for e in instructions[0]{"addEntries", "entries"}:
     let entry = e{"entryId"}.getStr
-    if "sq-I-u" in entry:
+    if "user-" in entry:
       let id = entry.getId
       if id in global.users:
         result.content.add global.users[id]
