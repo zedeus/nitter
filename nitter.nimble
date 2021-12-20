@@ -10,7 +10,7 @@ bin           = @["nitter"]
 
 # Dependencies
 
-requires "nim >= 1.2.0"
+requires "nim >= 1.4.8"
 requires "jester >= 0.5.0"
 requires "karax >= 1.1.2"
 requires "sass#e683aa1"
