@@ -93,8 +93,8 @@ proc parsePoll(js: JsonNode): Poll =
     result.options.add vals{choice & "_label"}.getStrVal
 
   let time = vals{"end_datetime_utc", "string_value"}.getDateTime
-  if time > getTime():
-    let timeLeft = $(time - getTime())
+  if time > now():
+    let timeLeft = $(time - now())
     result.status = timeLeft[0 ..< timeLeft.find(",")]
   else:
     result.status = "Final results"
@@ -269,12 +269,11 @@ proc parseTweet(js: JsonNode): Tweet =
         result.gif = some(parseGif(m))
       else: discard
 
-  let withheldInCountries = (
+  let withheldInCountries: seq[string] =
     if js{"withheld_in_countries"}.kind == JArray:
       js{"withheld_in_countries"}.to(seq[string])
     else:
       newSeq[string]()
-  )
 
   if js{"withheld_copyright"}.getBool or
      # XX - Content is withheld in all countries

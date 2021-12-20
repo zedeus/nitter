@@ -1,4 +1,4 @@
-import asyncdispatch, strutils, tables, times, sequtils, hashes, supersnappy
+import asyncdispatch, strutils, tables, times, hashes, supersnappy
 
 import jester
 

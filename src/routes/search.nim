@@ -1,4 +1,4 @@
-import strutils, sequtils, uri
+import strutils, uri
 
 import jester
 

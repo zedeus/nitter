@@ -46,7 +46,7 @@ type
     verified*: bool
     protected*: bool
     suspended*: bool
-    joinDate*: Time
+    joinDate*: DateTime
 
   VideoType* = enum
     m3u8 = "application/x-mpegURL"
@@ -152,7 +152,7 @@ type
     replyId*: int64
     profile*: Profile
     text*: string
-    time*: Time
+    time*: DateTime
     reply*: seq[string]
     pinned*: bool
     hasThread*: bool

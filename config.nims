@@ -7,3 +7,4 @@
 # disable annoying warnings
 warning("GcUnsafe2", off)
 warning("ObservableStores", off)
+warning("HoleEnumConv", off)

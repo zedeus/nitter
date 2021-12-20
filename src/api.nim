@@ -88,7 +88,7 @@ proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
   let client = newAsyncHttpClient(maxRedirects=0)
   try:
-    let resp = await client.request(url, $HttpHead)
+    let resp = await client.request(url, HttpHead)
     result = resp.headers["location"].replaceUrl(prefs)
   except:
     discard

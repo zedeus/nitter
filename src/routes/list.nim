@@ -3,7 +3,7 @@ import strutils
 import jester
 
 import router_utils
-import ".."/[query, types, redis_cache, api]
+import ".."/[types, redis_cache, api]
 import ../views/[general, timeline, list]
 export getListTimeline, getGraphList
 

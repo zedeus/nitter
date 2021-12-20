@@ -1,8 +1,8 @@
-import asyncdispatch, strutils, sequtils, uri, options
+import asyncdispatch, strutils, options
 import jester
 import ".."/[types, api], ../views/embed
 
-export embed
+export api, embed
 
 proc createEmbedRouter*(cfg: Config) =
   router embed:

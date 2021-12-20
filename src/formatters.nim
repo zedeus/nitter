@@ -104,12 +104,9 @@ proc getTweetTime*(tweet: Tweet): string =
 
 proc getShortTime*(tweet: Tweet): string =
   let now = now()
-  var then = tweet.time.local()
-  then.utcOffset = 0
+  let since = now - tweet.time
 
-  let since = now - then
-
-  if now.year != then.year:
+  if now.year != tweet.time.year:
     result = tweet.time.format("d MMM yyyy")
   elif since.inDays >= 1:
     result = tweet.time.format("MMM d")
