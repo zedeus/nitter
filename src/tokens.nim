@@ -57,7 +57,7 @@ template expired(token: Token): untyped =
     token.lastUse < time - maxLastUse
 
 template isLimited(token: Token): untyped =
-  token == nil or (token.remaining <= 1 and token.reset > getTime()) or
+  token == nil or (token.remaining <= 5 and token.reset > getTime()) or
     token.expired
 
 proc release*(token: Token; invalid=false) =
@@ -78,8 +78,6 @@ proc getToken*(): Future[Token] {.async.} =
 
   if result == nil:
     raise rateLimitError()
-
-  dec result.remaining
 
 proc poolTokens*(amount: int) {.async.} =
   var futs: seq[Future[Token]]

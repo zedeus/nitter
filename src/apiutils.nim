@@ -53,10 +53,8 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
       result = newJNull()
 
     if not oldApi and resp.headers.hasKey(rl & "reset"):
-      let time = fromUnix(parseInt(resp.headers[rl & "reset"]))
-      if token.reset != time:
-        token.remaining = parseInt(resp.headers[rl & "limit"])
-      token.reset = time
+      token.remaining = parseInt(resp.headers[rl & "remaining"])
+      token.reset = fromUnix(parseInt(resp.headers[rl & "reset"]))
 
     if result.getError notin {invalidToken, forbidden, badToken}:
       token.lastUse = getTime()
