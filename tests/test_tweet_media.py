@@ -1,5 +1,6 @@
 from base import BaseTestCase, Poll, Media
 from parameterized import parameterized
+from selenium.webdriver.common.by import By
 
 poll = [
     ['nim_lang/status/1064219801499955200', 'Style insensitivity', '91', 1, [
@@ -53,8 +54,8 @@ class MediaTest(BaseTestCase):
         poll_choices = self.find_elements(Poll.choice)
         for i, (v, o) in enumerate(choices):
             choice = poll_choices[i]
-            value = choice.find_element_by_class_name(Poll.value)
-            option = choice.find_element_by_class_name(Poll.option)
+            value = choice.find_element(By.CLASS_NAME, Poll.value)
+            option = choice.find_element(By.CLASS_NAME, Poll.option)
             choice_class = choice.get_attribute('class')
 
             self.assert_equal(v, value.text)
@@ -106,7 +107,7 @@ class MediaTest(BaseTestCase):
         self.assert_equal(len(rows), len(gallery_rows))
 
         for i, row in enumerate(gallery_rows):
-            images = row.find_elements_by_css_selector('img')
+            images = row.find_elements(By.CSS_SELECTOR, 'img')
             self.assert_equal(len(rows[i]), len(images))
             for j, image in enumerate(images):
                 self.assertIn(rows[i][j], image.get_attribute('src'))
