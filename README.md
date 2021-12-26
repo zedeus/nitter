@@ -62,6 +62,11 @@ Twitter account.
 
 ## Installation
 
+### Dependencies
+* libpcre
+* libsass
+* redis
+
 To compile Nitter you need a Nim installation, see
 [nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to
 install it system-wide or in the user directory you create below.
