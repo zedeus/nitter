@@ -6,11 +6,6 @@ type
 
 var maxConns {.threadvar.}: int
 
-let keepAlive* = newHttpHeaders({
-  "connection": "Keep-Alive",
-  "accept-encoding": "gzip"
-})
-
 proc setMaxHttpConns*(n: int) =
   maxConns = n
 
