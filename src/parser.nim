@@ -269,19 +269,19 @@ proc parseTweet(js: JsonNode): Tweet =
         result.gif = some(parseGif(m))
       else: discard
 
-  let withheldInCountries: seq[string] =
-    if js{"withheld_in_countries"}.kind == JArray:
-      js{"withheld_in_countries"}.to(seq[string])
-    else:
-      newSeq[string]()
+  with jsWithheld, js{"withheld_in_countries"}:
+    var withheldInCountries: seq[string]
 
-  if js{"withheld_copyright"}.getBool or
-     # XX - Content is withheld in all countries
-     "XX" in withheldInCountries or
-     # XY - Content is withheld due to a DMCA request.
-     "XY" in withheldInCountries or
-     (withheldInCountries.len > 0 and "withheld" in result.text):
-    result.available = false
+    if jsWithheld.kind == JArray:
+      withheldInCountries = jsWithheld.to(seq[string])
+
+    # XX - Content is withheld in all countries
+    # XY - Content is withheld due to a DMCA request.
+    if js{"withheld_copyright"}.getBool or
+       withheldInCountries.len > 0 and ("XX" in withheldInCountries or
+                                        "XY" in withheldInCountries or
+                                        "withheld" in result.text):
+      result.available = false
 
 proc finalizeTweet(global: GlobalObjects; id: string): Tweet =
   let intId = if id.len > 0: parseBiggestInt(id) else: 0
