@@ -41,17 +41,22 @@ proc shortLink*(text: string; length=28): string =
 
 proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
   result = url
-  if prefs.replaceYouTube.len > 0:
+
+  if prefs.replaceYouTube.len > 0 and ytRegex in result:
     result = result.replace(ytRegex, prefs.replaceYouTube)
     if prefs.replaceYouTube in result:
       result = result.replace("/c/", "/")
-  if prefs.replaceInstagram.len > 0:
-    result = result.replace(igRegex, prefs.replaceInstagram)
-  if prefs.replaceTwitter.len > 0:
+
+  if prefs.replaceTwitter.len > 0 and
+     (twRegex in result or tco in result):
     result = result.replace(tco, "https://" & prefs.replaceTwitter & "/t.co")
     result = result.replace(cards, prefs.replaceTwitter & "/cards")
     result = result.replace(twRegex, prefs.replaceTwitter)
-  if absolute.len > 0:
+
+  if prefs.replaceInstagram.len > 0 and igRegex in result:
+    result = result.replace(igRegex, prefs.replaceInstagram)
+
+  if absolute.len > 0 and "href" in result:
     result = result.replace("href=\"/", "href=\"" & absolute & "/")
 
 proc getM3u8Url*(content: string): string =
