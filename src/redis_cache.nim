@@ -22,8 +22,7 @@ proc migrate*(key, match: string) {.async.} =
       let list = await r.scan(newCursor(0), match, 100000)
       r.startPipelining()
       for item in list:
-        if item == match:
-          discard await r.del(item)
+        discard await r.del(item)
       await r.setk(key, "true")
       discard await r.flushPipeline()
 
@@ -34,10 +33,11 @@ proc initRedisPool*(cfg: Config) {.async.} =
 
     await migrate("snappyRss", "rss:*")
     await migrate("oldFrosty", "*")
-    await migrate("userBuckets", "p:")
-    await migrate("profileDates", "p:")
+    await migrate("userBuckets", "p:*")
+    await migrate("profileDates", "p:*")
 
     pool.withAcquire(r):
+      # optimize memory usage for profile ID buckets
       await r.configSet("hash-max-ziplist-entries", "1000")
 
   except OSError:
