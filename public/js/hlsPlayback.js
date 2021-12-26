@@ -16,7 +16,7 @@ function playVideo(overlay) {
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = url;
-        video.addEventListened('canplay', function() {
+        video.addEventListener('canplay', function() {
             video.play();
         });
     }
