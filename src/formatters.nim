@@ -56,7 +56,7 @@ proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
 
 proc getM3u8Url*(content: string): string =
   var m: RegexMatch
-  if content.find(m3u8Regex, m):
+  if content.match(m3u8Regex, m):
     result = content[m.group(0)[0]]
 
 proc proxifyVideo*(manifest: string; proxy: bool): string =
