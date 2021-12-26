@@ -20,7 +20,7 @@ proc renderNavbar*(title, rss: string; req: Request): VNode =
       tdiv(class="nav-item"):
         a(class="site-name", href="/"): text title
 
-      a(href="/"): img(class="site-logo", src="/logo.png")
+      a(href="/"): img(class="site-logo", src="/logo.png", alt="Logo")
 
       tdiv(class="nav-item right"):
         icon "search", title="Search", href="/search"
@@ -74,6 +74,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
         text cfg.title
 
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(name="theme-color", content="#1F1F1F")
     meta(property="og:type", content=ogType)
     meta(property="og:title", content=(if ogTitle.len > 0: ogTitle else: titleText))
     meta(property="og:description", content=stripHtml(desc))
