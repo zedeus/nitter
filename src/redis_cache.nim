@@ -1,5 +1,5 @@
 import asyncdispatch, times, strutils, tables, hashes
-import redis, redpool, frosty, supersnappy
+import redis, redpool, flatty, supersnappy
 
 import types, api
 
@@ -10,6 +10,13 @@ var
   baseCacheTime = 60 * 60
   rssCacheTime: int
   listCacheTime*: int
+
+# flatty can't serialize DateTime, so we need to define this
+proc toFlatty*(s: var string, x: DateTime) =
+  s.toFlatty(x.toTime().toUnix())
+
+proc fromFlatty*(s: string, i: var int, x: var DateTime) =
+  x = fromUnix(s.fromFlatty(int64)).utc()
 
 proc setCacheTimes*(cfg: Config) =
   rssCacheTime = cfg.rssCacheTime * 60
@@ -28,11 +35,12 @@ proc migrate*(key, match: string) {.async.} =
 
 proc initRedisPool*(cfg: Config) {.async.} =
   try:
-    pool = await newRedisPool(cfg.redisConns, maxConns=cfg.redisMaxConns,
-                              host=cfg.redisHost, port=cfg.redisPort, password=cfg.redisPassword)
+    pool = await newRedisPool(cfg.redisConns, cfg.redisMaxConns,
+                              host=cfg.redisHost, port=cfg.redisPort,
+                              password=cfg.redisPassword)
 
+    await migrate("flatty", "*:*")
     await migrate("snappyRss", "rss:*")
-    await migrate("oldFrosty", "*")
     await migrate("userBuckets", "p:*")
     await migrate("profileDates", "p:*")
 
@@ -58,17 +66,17 @@ proc setex(key: string; time: int; data: string) {.async.} =
     discard await r.setex(key, time, data)
 
 proc cache*(data: List) {.async.} =
-  await setex(data.listKey, listCacheTime, compress(freeze(data)))
+  await setex(data.listKey, listCacheTime, compress(toFlatty(data)))
 
 proc cache*(data: PhotoRail; name: string) {.async.} =
-  await setex("pr:" & name, baseCacheTime, compress(freeze(data)))
+  await setex("pr:" & name, baseCacheTime, compress(toFlatty(data)))
 
 proc cache*(data: Profile) {.async.} =
   if data.username.len == 0 or data.id.len == 0: return
   let name = toLower(data.username)
   pool.withAcquire(r):
     r.startPipelining()
-    discard await r.setex(name.profileKey, baseCacheTime, compress(freeze(data)))
+    discard await r.setex(name.profileKey, baseCacheTime, compress(toFlatty(data)))
     discard await r.hset(name.pidKey, name, data.id)
     discard await r.flushPipeline()
 
@@ -97,7 +105,7 @@ proc getProfileId*(username: string): Future[string] {.async.} =
 proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} =
   let prof = await get("p:" & toLower(username))
   if prof != redisNil:
-    uncompress(prof).thaw(result)
+    result = fromFlatty(uncompress(prof), Profile)
   elif fetch:
     result = await getProfile(username)
 
@@ -105,7 +113,7 @@ proc getCachedPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return
   let rail = await get("pr:" & toLower(name))
   if rail != redisNil:
-    uncompress(rail).thaw(result)
+    result = fromFlatty(uncompress(rail), PhotoRail)
   else:
     result = await getPhotoRail(name)
     await cache(result, name)
@@ -115,7 +123,7 @@ proc getCachedList*(username=""; name=""; id=""): Future[List] {.async.} =
              else: await get(toLower("l:" & username & '/' & name))
 
   if list != redisNil:
-    uncompress(list).thaw(result)
+    result = fromFlatty(uncompress(list), List)
   else:
     if id.len > 0:
       result = await getGraphListById(id)
