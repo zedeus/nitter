@@ -1,5 +1,5 @@
 import httpclient, asyncdispatch, options, times, strutils, uri
-import packedjson
+import packedjson, zippy
 import types, tokens, consts, parserutils, http_pool
 
 const rl = "x-rate-limit-"
@@ -26,6 +26,7 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
     "x-guest-token": if token == nil: "" else: token.tok,
     "x-twitter-active-user": "yes",
     "authority": "api.twitter.com",
+    "accept-encoding": "gzip",
     "accept-language": "en-US,en;q=0.9",
     "accept": "*/*",
     "DNT": "1"
@@ -44,7 +45,7 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
     var resp: AsyncResponse
     let body = pool.use(headers):
       resp = await c.get($url)
-      await resp.body
+      uncompress(await resp.body)
 
     if body.startsWith('{') or body.startsWith('['):
       result = parseJson(body)

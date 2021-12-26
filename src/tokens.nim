@@ -1,5 +1,6 @@
 import asyncdispatch, httpclient, times, sequtils, json, math, random
 import strutils, strformat
+import zippy
 import types, agents, consts, http_pool
 
 const
@@ -28,6 +29,7 @@ proc fetchToken(): Future[Token] {.async.} =
 
   let headers = newHttpHeaders({
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "accept-encoding": "gzip",
     "accept-language": "en-US,en;q=0.5",
     "connection": "keep-alive",
     "user-agent": getAgent(),
@@ -41,7 +43,7 @@ proc fetchToken(): Future[Token] {.async.} =
 
   try:
     resp = clientPool.use(headers): await c.postContent(activate)
-    tokNode = parseJson(resp)["guest_token"]
+    tokNode = parseJson(uncompress(resp))["guest_token"]
     tok = tokNode.getStr($(tokNode.getInt))
 
     let time = getTime()
