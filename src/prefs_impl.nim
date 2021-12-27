@@ -50,45 +50,12 @@ macro genPrefs*(prefDsl: untyped) =
     const `name`*: PrefList = toOrderedTable(`table`)
 
 genPrefs:
-  Privacy:
-    replaceTwitter(input, "nitter.net"):
-      "Replace Twitter links with Nitter (blank to disable)"
-      placeholder: "Nitter hostname"
-
-    replaceYouTube(input, "piped.kavin.rocks"):
-      "Replace YouTube links with Piped/Invidious (blank to disable)"
-      placeholder: "Piped hostname"
-
-    replaceReddit(input, "teddit.net"):
-      "Replace Reddit links with Teddit/Libreddit (blank to disable)"
-      placeholder: "Teddit hostname"
-
-    replaceInstagram(input, ""):
-      "Replace Instagram links with Bibliogram (blank to disable)"
-      placeholder: "Bibliogram hostname"
-
-  Media:
-    mp4Playback(checkbox, true):
-      "Enable mp4 video playback"
-
-    hlsPlayback(checkbox, false):
-      "Enable hls video streaming (requires JavaScript)"
-
-    proxyVideos(checkbox, true):
-      "Proxy video streaming through the server (might be slow)"
-
-    muteVideos(checkbox, false):
-      "Mute videos by default"
-
-    autoplayGifs(checkbox, true):
-      "Autoplay gifs"
-
   Display:
     theme(select, "Nitter"):
       "Theme"
 
     infiniteScroll(checkbox, false):
-      "Infinite scrolling (requires JavaScript, experimental!)"
+      "Infinite scrolling (experimental, requires JavaScript)"
 
     stickyProfile(checkbox, true):
       "Make profile sidebar stick to top"
@@ -107,6 +74,39 @@ genPrefs:
 
     hideReplies(checkbox, false):
       "Hide tweet replies"
+
+  Media:
+    mp4Playback(checkbox, true):
+      "Enable mp4 video playback (only for gifs)"
+
+    hlsPlayback(checkbox, false):
+      "Enable hls video streaming (requires JavaScript)"
+
+    proxyVideos(checkbox, true):
+      "Proxy video streaming through the server (might be slow)"
+
+    muteVideos(checkbox, false):
+      "Mute videos by default"
+
+    autoplayGifs(checkbox, true):
+      "Autoplay gifs"
+
+  "Link replacements (blank to disable)":
+    replaceTwitter(input, "nitter.net"):
+      "Twitter -> Nitter"
+      placeholder: "Nitter hostname"
+
+    replaceYouTube(input, "piped.kavin.rocks"):
+      "YouTube -> Piped/Invidious"
+      placeholder: "Piped hostname"
+
+    replaceReddit(input, "teddit.net"):
+      "Reddit -> Teddit/Libreddit"
+      placeholder: "Teddit hostname"
+
+    replaceInstagram(input, ""):
+      "Instagram -> Bibliogram"
+      placeholder: "Bibliogram hostname"
 
 iterator allPrefs*(): Pref =
   for k, v in prefList:

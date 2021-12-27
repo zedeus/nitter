@@ -28,4 +28,4 @@ requires "flatty#0.2.3"
 # Tasks
 
 task scss, "Generate css":
-  exec "nim c --hint[Processing]:off -r tools/gencss"
+  exec "nim c --hint[Processing]:off -d:danger -r tools/gencss"
