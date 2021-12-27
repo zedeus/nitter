@@ -97,8 +97,9 @@ Redis info in `nitter.conf`. To run Redis, either run
 `redis-server --daemonize yes`, or `systemctl enable --now redis` (or
 redis-server depending on the distro). Run Nitter by executing `./nitter` or
 using the systemd service below. You should run Nitter behind a reverse proxy
-such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for
-security reasons.
+such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or
+[Apache](https://github.com/zedeus/nitter/wiki/Apache) for security and
+performance reasons.
 
 ### Docker
 
