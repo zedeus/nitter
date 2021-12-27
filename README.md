@@ -3,8 +3,10 @@
 [![Test Matrix](https://github.com/zedeus/nitter/workflows/CI/CD/badge.svg)](https://github.com/zedeus/nitter/actions?query=workflow%3ACI/CD)
 [![License](https://img.shields.io/github/license/zedeus/nitter?style=flat)](#license)
 
-A free and open source alternative Twitter front-end focused on privacy. \
-Inspired by the [Invidious](https://github.com/iv-org/invidious) project.
+A free and open source alternative Twitter front-end focused on privacy and
+performance. \
+Inspired by the [Invidious](https://github.com/iv-org/invidious)
+project.
 
 - No JavaScript or ads
 - All requests go through the backend, client never talks to Twitter
@@ -39,12 +41,14 @@ maintained by the community.
 
 ## Why?
 
-It's basically impossible to use Twitter without JavaScript enabled. If you try,
-you're redirected to the legacy mobile version which is awful both functionally
-and aesthetically. For privacy-minded folks, preventing JavaScript analytics and
-potential IP-based tracking is important, but apart from using the legacy mobile
-version and a VPN, it's impossible. This is is especially relevant now that Twitter
-[removed the ability](https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws)
+It's impossible to use Twitter without JavaScript enabled. For privacy-minded
+folks, preventing JavaScript analytics and IP-based tracking is important, but
+apart from using a VPN and uBlock/uMatrix, it's impossible. Despite being behind
+a VPN and using heavy-duty adblockers, you can get accurately tracked with your
+[browser's fingerprint](https://restoreprivacy.com/browser-fingerprinting/),
+[no JavaScript required](https://noscriptfingerprint.com/). This all became
+particularly important after Twitter [removed the
+ability](https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws)
 for users to control whether their data gets sent to advertisers.
 
 Using an instance of Nitter (hosted on a VPS for example), you can browse
