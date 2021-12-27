@@ -224,7 +224,10 @@ type
     redisMaxConns*: int
     redisPassword*: string
 
+    replaceTwitter*: string
     replaceYouTube*: string
+    replaceReddit*: string
+    replaceInstagram*: string
 
   Rss* = object
     feed*, cursor*: string
