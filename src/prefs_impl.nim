@@ -58,6 +58,10 @@ genPrefs:
       "Replace YouTube links with Piped/Invidious (blank to disable)"
       placeholder: "Piped hostname"
 
+    replaceReddit(input, "teddit.net"):
+      "Replace Reddit links with Teddit/Libreddit (blank to disable)"
+      placeholder: "Teddit hostname"
+
     replaceInstagram(input, ""):
       "Replace Instagram links with Bibliogram (blank to disable)"
       placeholder: "Bibliogram hostname"

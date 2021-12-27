@@ -4,8 +4,16 @@ import types, utils, query
 
 const
   ytRegex = re"([A-z.]+\.)?youtu(be\.com|\.be)"
-  twRegex = re"(?<![^\/> ])(?<![^\/]\/)(www\.|mobile\.)?twitter\.com"
   igRegex = re"(www\.)?instagram\.com"
+
+  rdRegex = re"(?<![.b])((www|np|new|amp|old)\.)?reddit.com"
+  rdShortRegex = re"(?<![.b])redd\.it\/"
+  # Videos cannot be supported uniformly between Teddit and Libreddit,
+  # so v.redd.it links will not be replaced.
+  # Images aren't supported due to errors from Teddit when the image
+  # wasn't first displayed via a post on the Teddit instance.
+
+  twRegex = re"(?<![^\/> ])(?<![^\/]\/)(www\.|mobile\.)?twitter\.com"
   cards = "cards.twitter.com/cards"
   tco = "https://t.co"
 
@@ -52,6 +60,12 @@ proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
     result = result.replace(tco, "https://" & prefs.replaceTwitter & "/t.co")
     result = result.replace(cards, prefs.replaceTwitter & "/cards")
     result = result.replace(twRegex, prefs.replaceTwitter)
+
+  if prefs.replaceReddit.len > 0 and (rdRegex in result or "redd.it" in result):
+    result = result.replace(rdShortRegex, prefs.replaceReddit & "/comments/")
+    result = result.replace(rdRegex, prefs.replaceReddit)
+    if prefs.replaceReddit in result and "/gallery/" in result:
+      result = result.replace("/gallery/", "/comments/")
 
   if prefs.replaceInstagram.len > 0 and igRegex in result:
     result = result.replace(igRegex, prefs.replaceInstagram)
