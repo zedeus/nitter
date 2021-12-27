@@ -1,4 +1,5 @@
 // @license http://www.gnu.org/licenses/agpl-3.0.html AGPL-3.0
+// SPDX-License-Identifier: AGPL-3.0-only
 function insertBeforeLast(node, elem) {
     node.insertBefore(elem, node.childNodes[node.childNodes.length - 2]);
 }
