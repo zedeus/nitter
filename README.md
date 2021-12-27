@@ -103,7 +103,9 @@ performance reasons.
 
 ### Docker
 
-To run Nitter with Docker, you'll need to install Redis before you run these commands.
+To run Nitter with Docker, you'll need to install and run Redis separately
+before you can run the container. See below for how to also run Redis using
+Docker.
 
 To build and run Nitter in Docker:
 ```bash
@@ -117,12 +119,13 @@ docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host zedeus/nitte
 ```
 
 Using docker-compose to run both Nitter and Redis as different containers:
-Change redisHost from `localhost` to `redis` in `nitter.conf` and then run:
+Change `redisHost` from `localhost` to `redis` in `nitter.conf`, then run:
 ```bash
 docker-compose up -d
 ```
 
-Note the Docker commands expect a `nitter.conf` file in the directory you run them.
+Note the Docker commands expect a `nitter.conf` file in the directory you run
+them.
 
 ### systemd
 
