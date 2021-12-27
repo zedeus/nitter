@@ -70,7 +70,7 @@ proc renderUser(user: Profile; prefs: Prefs): VNode =
         linkUser(user, class="username")
 
       tdiv(class="tweet-content media-body", dir="auto"):
-        verbatim replaceUrl(user.bio, prefs)
+        verbatim replaceUrls(user.bio, prefs)
 
 proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs; path=""): VNode =
   buildHtml(tdiv(class="timeline")):

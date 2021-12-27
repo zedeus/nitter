@@ -47,8 +47,8 @@ proc shortLink*(text: string; length=28): string =
   if result.len > length:
     result = result[0 ..< length] & "…"
 
-proc replaceUrl*(url: string; prefs: Prefs; absolute=""): string =
-  result = url
+proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
+  result = body
 
   if prefs.replaceYouTube.len > 0 and ytRegex in result:
     result = result.replace(ytRegex, prefs.replaceYouTube)

@@ -166,7 +166,7 @@ proc renderCardContent(card: Card): VNode =
 proc renderCard(card: Card; prefs: Prefs; path: string): VNode =
   const smallCards = {app, player, summary, storeLink}
   let large = if card.kind notin smallCards: " large" else: ""
-  let url = replaceUrl(card.url, prefs)
+  let url = replaceUrls(card.url, prefs)
 
   buildHtml(tdiv(class=("card" & large))):
     if card.video.isSome:
@@ -249,7 +249,7 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
 
     if quote.text.len > 0:
       tdiv(class="quote-text", dir="auto"):
-        verbatim replaceUrl(quote.text, prefs)
+        verbatim replaceUrls(quote.text, prefs)
 
     if quote.hasThread:
       a(class="show-thread", href=getLink(quote)):
@@ -312,7 +312,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         tweetClass &= " tweet-bidi"
 
       tdiv(class=tweetClass, dir="auto"):
-        verbatim replaceUrl(tweet.text, prefs) & renderLocation(tweet)
+        verbatim replaceUrls(tweet.text, prefs) & renderLocation(tweet)
 
       if tweet.attribution.isSome:
         renderAttribution(tweet.attribution.get())

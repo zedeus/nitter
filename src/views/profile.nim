@@ -29,7 +29,7 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
       if profile.bio.len > 0:
         tdiv(class="profile-bio"):
           p(dir="auto"):
-            verbatim replaceUrl(profile.bio, prefs)
+            verbatim replaceUrls(profile.bio, prefs)
 
       if profile.location.len > 0:
         tdiv(class="profile-location"):
@@ -45,7 +45,7 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
       if profile.website.len > 0:
         tdiv(class="profile-website"):
           span:
-            let url = replaceUrl(profile.website, prefs)
+            let url = replaceUrls(profile.website, prefs)
             icon "link"
             a(href=url): text shortLink(url)
 

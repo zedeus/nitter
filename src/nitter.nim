@@ -69,7 +69,7 @@ routes:
   get "/i/redirect":
     let url = decodeUrl(@"url")
     if url.len == 0: resp Http404
-    redirect(replaceUrl(url, cookiePrefs()))
+    redirect(replaceUrls(url, cookiePrefs()))
 
   error Http404:
     resp Http404, showError("Page not found", cfg)
