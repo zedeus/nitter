@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils
 import karax/[karaxdsl, vdom, vstyles]
 import ".."/[types, utils]

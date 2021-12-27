@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, times, macros, htmlgen, unicode, options, algorithm
 import regex, packedjson
 import types, utils, formatters

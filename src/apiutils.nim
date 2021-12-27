@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import httpclient, asyncdispatch, options, times, strutils, uri
 import packedjson, zippy
 import types, tokens, consts, parserutils, http_pool

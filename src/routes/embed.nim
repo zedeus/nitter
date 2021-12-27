@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch, strutils, options
 import jester
 import ".."/[types, api], ../views/embed

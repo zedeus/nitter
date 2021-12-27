@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, sequtils, uri, tables
 from jester import Request, cookies
 

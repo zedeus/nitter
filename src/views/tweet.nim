@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, sequtils, strformat, options
 import karax/[karaxdsl, vdom, vstyles]
 

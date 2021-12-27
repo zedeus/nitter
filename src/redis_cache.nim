@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch, times, strutils, tables, hashes
 import redis, redpool, flatty, supersnappy
 

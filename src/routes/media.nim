@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import uri, strutils, httpclient, os, hashes, base64, re
 import asynchttpserver, asyncstreams, asyncfile, asyncnet
 
