@@ -100,7 +100,9 @@ using the systemd service below. You should run Nitter behind a reverse proxy
 such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or Apache for
 security reasons.
 
-To run Nitter with docker, you will need to install Redis before you run these commands.
+### Docker
+
+To run Nitter with Docker, you'll need to install Redis before you run these commands.
 
 To build and run Nitter in Docker:
 ```bash
@@ -120,6 +122,8 @@ docker-compose up -d
 ```
 
 Note the Docker commands expect a `nitter.conf` file in the directory you run them.
+
+### systemd
 
 To run Nitter via systemd you can use this service file:
 
@@ -149,6 +153,8 @@ WantedBy=multi-user.target
 
 Then enable and run the service:
 `systemctl enable --now nitter.service`
+
+### Logging
 
 Nitter currently prints some errors to stdout, and there is no real logging
 implemented. If you're running Nitter with systemd, you can check stdout like
