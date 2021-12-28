@@ -67,11 +67,16 @@ proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
       searchMode = ("tweet_search_mode", "live")
       parse = parseTimeline
 
-  let
-    q = genQueryParam(query)
-    url = search ? genParams(searchParams & @[("q", q), searchMode], after)
-  result = parse(await fetch(url), after)
-  result.query = query
+  let q = genQueryParam(query)
+  if q.len == 0 or q == emptyQuery:
+    return Result[T](beginning: true, query: query)
+
+  let url = search ? genParams(searchParams & @[("q", q), searchMode], after)
+  try:
+    result = parse(await fetch(url), after)
+    result.query = query
+  except InternalError:
+    return Result[T](beginning: true, query: query)
 
 proc getTweetImpl(id: string; after=""): Future[Conversation] {.async.} =
   let url = tweet / (id & ".json") ? genParams(cursor=after)

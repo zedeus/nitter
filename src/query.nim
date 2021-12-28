@@ -12,6 +12,8 @@ const
     "verified", "safe"
   ]
 
+  emptyQuery* = "include:nativeretweets"
+
 template `@`(param: string): untyped =
   if param in pms: pms[param]
   else: ""
