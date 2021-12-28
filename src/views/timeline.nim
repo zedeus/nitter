@@ -26,7 +26,7 @@ proc renderNewer*(query: Query; path: string; focus=""): VNode =
 
 proc renderMore*(query: Query; cursor: string; focus=""): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"?{getQuery(query)}cursor={encodeUrl(cursor)}{focus}")):
+    a(href=(&"?{getQuery(query)}cursor={encodeUrl(cursor, usePlus=false)}{focus}")):
       text "Load more"
 
 proc renderNoMore(): VNode =

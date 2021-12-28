@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import uri
 import karax/[karaxdsl, vdom]
 
 import ".."/[types, formatters]
@@ -38,7 +37,7 @@ proc renderReplies*(replies: Result[Chain]; prefs: Prefs; path: string): VNode =
       renderReplyThread(thread, prefs, path)
 
     if replies.bottom.len > 0:
-      renderMore(Query(), encodeUrl(replies.bottom), focus="#r")
+      renderMore(Query(), replies.bottom, focus="#r")
 
 proc renderConversation*(conv: Conversation; prefs: Prefs; path: string): VNode =
   let hasAfter = conv.after.content.len > 0

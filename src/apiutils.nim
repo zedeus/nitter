@@ -14,10 +14,15 @@ proc genParams*(pars: openarray[(string, string)] = @[]; cursor="";
     result &= p
   if ext:
     result &= ("ext", "mediaStats")
-  if cursor.len > 0:
-    result &= ("cursor", cursor)
   if count.len > 0:
     result &= ("count", count)
+  if cursor.len > 0:
+    # The raw cursor often has plus signs, which sometimes get turned into spaces,
+    # so we need to them back into a plus
+    if " " in cursor:
+      result &= ("cursor", cursor.replace(" ", "+"))
+    else:
+      result &= ("cursor", cursor)
 
 proc genHeaders*(token: Token = nil): HttpHeaders =
   result = newHttpHeaders({
