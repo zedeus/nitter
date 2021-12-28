@@ -25,7 +25,7 @@ proc renderNavbar*(cfg: Config, rss: string; req: Request): VNode =
 
       tdiv(class="nav-item right"):
         icon "search", title="Search", href="/search"
-        if cfg.enableRSS and rss.len > 0:
+        if cfg.enableRss and rss.len > 0:
           icon "rss-feed", title="RSS Feed", href=rss
         icon "bird", title="Open in Twitter", href=twitterPath
         a(href="https://liberapay.com/zedeus"): verbatim lp
@@ -58,7 +58,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     link(rel="search", type="application/opensearchdescription+xml", title=cfg.title,
                             href=opensearchUrl)
 
-    if cfg.enableRSS and rss.len > 0:
+    if cfg.enableRss and rss.len > 0:
       link(rel="alternate", type="application/rss+xml", href=rss, title="RSS feed")
 
     if prefs.hlsPlayback:

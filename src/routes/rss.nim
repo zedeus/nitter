@@ -52,6 +52,7 @@ template respRss*(rss) =
 proc createRssRouter*(cfg: Config) =
   router rss:
     get "/search/rss":
+      cond cfg.enableRss
       if @"q".len > 200:
         resp Http400, showError("Search input too long.", cfg)
 
@@ -76,6 +77,7 @@ proc createRssRouter*(cfg: Config) =
       respRss(rss)
 
     get "/@name/rss":
+      cond cfg.enableRss
       cond '.' notin @"name"
       let
         cursor = getCursor()
@@ -92,6 +94,7 @@ proc createRssRouter*(cfg: Config) =
       respRss(rss)
 
     get "/@name/@tab/rss":
+      cond cfg.enableRss
       cond '.' notin @"name"
       cond @"tab" in ["with_replies", "media", "search"]
       let name = @"name"
@@ -117,6 +120,7 @@ proc createRssRouter*(cfg: Config) =
       respRss(rss)
 
     get "/@name/lists/@list/rss":
+      cond cfg.enableRss
       cond '.' notin @"name"
       let
         cursor = getCursor()

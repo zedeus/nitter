@@ -216,7 +216,7 @@ type
     hmacKey*: string
     base64Media*: bool
     minTokens*: int
-    enableRSS*: bool
+    enableRss*: bool
 
     rssCacheTime*: int
     listCacheTime*: int

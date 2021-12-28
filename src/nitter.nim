@@ -48,8 +48,7 @@ createStatusRouter(cfg)
 createSearchRouter(cfg)
 createMediaRouter(cfg)
 createEmbedRouter(cfg)
-if cfg.enableRSS:
-  createRssRouter(cfg)
+createRssRouter(cfg)
 
 settings:
   port = Port(cfg.port)
