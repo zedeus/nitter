@@ -14,7 +14,7 @@ const
   # Images aren't supported due to errors from Teddit when the image
   # wasn't first displayed via a post on the Teddit instance.
 
-  twRegex = re"(?<![^\/> ])(?<![^\/]\/)(www\.|mobile\.)?twitter\.com"
+  twRegex = re"(?<=(?<!\S)https:\/\/|(?<=\s))(www\.|mobile\.)?twitter\.com"
   cards = "cards.twitter.com/cards"
   tco = "https://t.co"
 
