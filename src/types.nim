@@ -6,6 +6,7 @@ genPrefsType()
 
 type
   RateLimitError* = object of CatchableError
+  InternalError* = object of CatchableError
 
   Token* = ref object
     tok*: string
