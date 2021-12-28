@@ -77,14 +77,16 @@ routes:
     resp Http404, showError("Page not found", cfg)
 
   error InternalError:
-    echo error.exc.msg
+    echo error.exc.name, ": ", error.exc.msg
     const link = a("open a GitHub issue", href = issuesUrl)
-    resp Http500, showError(&"An error occurred, please {link} with the URL you tried to visit.", cfg)
+    resp Http500, showError(
+      &"An error occurred, please {link} with the URL you tried to visit.", cfg)
 
   error RateLimitError:
-    echo error.exc.msg
+    echo error.exc.name, ": ", error.exc.msg
     const link = a("another instance", href = instancesUrl)
-    resp Http429, showError(&"Instance has been rate limited.<br>Use {link} or try again later.", cfg)
+    resp Http429, showError(
+      &"Instance has been rate limited.<br>Use {link} or try again later.", cfg)
 
   extend unsupported, ""
   extend preferences, ""
