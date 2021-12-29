@@ -22,6 +22,7 @@ proc getGraphListById*(id: string): Future[List] {.async.} =
   result = parseGraphList(js)
 
 proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
+  if id.len == 0: return
   let
     ps = genParams({"list_id": id, "ranking_mode": "reverse_chronological"}, after)
     url = listTimeline ? ps
