@@ -271,10 +271,9 @@ proc parseTweet(js: JsonNode): Tweet =
       else: discard
 
   with jsWithheld, js{"withheld_in_countries"}:
-    var withheldInCountries: seq[string]
-
-    if jsWithheld.kind == JArray:
-      withheldInCountries = jsWithheld.to(seq[string])
+    let withheldInCountries: seq[string] =
+      if jsWithheld.kind != JArray: @[]
+      else: jsWithheld.to(seq[string])
 
     # XX - Content is withheld in all countries
     # XY - Content is withheld due to a DMCA request.
@@ -282,6 +281,7 @@ proc parseTweet(js: JsonNode): Tweet =
        withheldInCountries.len > 0 and ("XX" in withheldInCountries or
                                         "XY" in withheldInCountries or
                                         "withheld" in result.text):
+      result.text.removeSuffix(" Learn more.")
       result.available = false
 
 proc finalizeTweet(global: GlobalObjects; id: string): Tweet =
