@@ -52,8 +52,10 @@ proc cleanFilename*(filename: string): string =
     result &= ".png"
 
 proc filterParams*(params: Table): seq[(string, string)] =
-  const filter = ["name", "id", "list", "referer", "scroll"]
-  toSeq(params.pairs()).filterIt(it[0] notin filter and it[1].len > 0)
+  const filter = ["name", "tab", "id", "list", "referer", "scroll"]
+  for p in params.pairs():
+    if p[1].len > 0 and p[0] notin filter:
+      result.add p
 
 proc isTwitterUrl*(uri: Uri): bool =
   uri.hostname in twitterDomains

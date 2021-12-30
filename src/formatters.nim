@@ -158,7 +158,7 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
     path = "/search"
 
   if "/search" notin path and query.fromUser.len < 2:
-    return $(twitter / path ? filterParams(params))
+    return $(twitter / path)
 
   let p = {
     "f": if query.kind == users: "user" else: "live",

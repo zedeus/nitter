@@ -11,8 +11,7 @@ const
   doctype = "<!DOCTYPE html>\n"
   lp = readFile("public/lp.svg")
 
-proc renderNavbar*(cfg: Config, rss: string; req: Request): VNode =
-  let twitterPath = getTwitterLink(req.path, req.params)
+proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
   var path = $(parseUri(req.path) ? filterParams(req.params))
   if "/status" in path: path.add "#m"
 
@@ -27,14 +26,14 @@ proc renderNavbar*(cfg: Config, rss: string; req: Request): VNode =
         icon "search", title="Search", href="/search"
         if cfg.enableRss and rss.len > 0:
           icon "rss-feed", title="RSS Feed", href=rss
-        icon "bird", title="Open in Twitter", href=twitterPath
+        icon "bird", title="Open in Twitter", href=canonical
         a(href="https://liberapay.com/zedeus"): verbatim lp
         icon "info", title="About", href="/about"
         iconReferer "cog", "/settings", path, title="Preferences"
 
 proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
                  images: seq[string] = @[]; banner=""; ogTitle=""; theme="";
-                 rss=""): VNode =
+                 rss=""; canonical=""): VNode =
   let ogType =
     if video.len > 0: "video"
     elif rss.len > 0: "object"
@@ -57,6 +56,9 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
     link(rel="mask-icon", href="/safari-pinned-tab.svg", color="#ff6c60")
     link(rel="search", type="application/opensearchdescription+xml", title=cfg.title,
                             href=opensearchUrl)
+
+    if canonical.len > 0:
+      link(rel="canonical", href=canonical)
 
     if cfg.enableRss and rss.len > 0:
       link(rel="alternate", type="application/rss+xml", href=rss, title="RSS feed")
@@ -117,11 +119,14 @@ proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
   if "theme" in req.params:
     theme = toLowerAscii(req.params["theme"]).replace(" ", "_")
 
+  let canonical = getTwitterLink(req.path, req.params)
+
   let node = buildHtml(html(lang="en")):
-    renderHead(prefs, cfg, titleText, desc, video, images, banner, ogTitle, theme, rss)
+    renderHead(prefs, cfg, titleText, desc, video, images, banner, ogTitle,
+               theme, rss, canonical)
 
     body:
-      renderNavbar(cfg, rss, req)
+      renderNavbar(cfg, req, rss, canonical)
 
       tdiv(class="container"):
         body
