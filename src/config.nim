@@ -2,8 +2,8 @@
 import parsecfg except Config
 import types, strutils
 
-proc get*[T](config: parseCfg.Config; s, v: string; default: T): T =
-  let val = config.getSectionValue(s, v)
+proc get*[T](config: parseCfg.Config; section, key: string; default: T): T =
+  let val = config.getSectionValue(section, key)
   if val.len == 0: return default
 
   when T is int: parseInt(val)
@@ -37,9 +37,7 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     redisPort: cfg.get("Cache", "redisPort", 6379),
     redisConns: cfg.get("Cache", "redisConnections", 20),
     redisMaxConns: cfg.get("Cache", "redisMaxConnections", 30),
-    redisPassword: cfg.get("Cache", "redisPassword", ""),
-
-    replaceYouTube: cfg.get("Preferences", "replaceYouTube", "piped.kavin.rocks")
+    redisPassword: cfg.get("Cache", "redisPassword", "")
   )
 
   return (conf, cfg)
