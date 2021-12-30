@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, strformat, times, uri, tables, xmltree, htmlparser
+import strutils, strformat, times, uri, tables, xmltree, htmlparser, htmlgen
 import regex
 import types, utils, query
 
@@ -15,6 +15,8 @@ const
   # wasn't first displayed via a post on the Teddit instance.
 
   twRegex = re"(?<=(?<!\S)https:\/\/|(?<=\s))(www\.|mobile\.)?twitter\.com"
+  twLinkRegex = re"""<a href="https:\/\/twitter.com([^"]+)">twitter\.com(\S+)</a>"""
+
   cards = "cards.twitter.com/cards"
   tco = "https://t.co"
 
@@ -57,10 +59,12 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
       result = result.replace("/c/", "/")
 
   if prefs.replaceTwitter.len > 0 and
-     (twRegex in result or tco in result):
+     (twRegex in result or twLinkRegex in result or tco in result):
     result = result.replace(tco, https & prefs.replaceTwitter & "/t.co")
     result = result.replace(cards, prefs.replaceTwitter & "/cards")
     result = result.replace(twRegex, prefs.replaceTwitter)
+    result = result.replace(twLinkRegex, a(
+      prefs.replaceTwitter & "$2", href = https & prefs.replaceTwitter & "$1"))
 
   if prefs.replaceReddit.len > 0 and (rdRegex in result or "redd.it" in result):
     result = result.replace(rdShortRegex, prefs.replaceReddit & "/comments/")
