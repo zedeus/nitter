@@ -4,7 +4,7 @@ import strutils, uri
 import jester
 
 import router_utils
-import ".."/[query, types, api]
+import ".."/[query, types, api, formatters]
 import ../views/[general, search]
 
 include "../views/opensearch.nimf"
@@ -40,7 +40,6 @@ proc createSearchRouter*(cfg: Config) =
       redirect("/search?q=" & encodeUrl("#" & @"hash"))
 
     get "/opensearch":
-      var url = if cfg.useHttps: "https://" else: "http://"
-      url &= cfg.hostname & "/search?q="
+      let url = getUrlPrefix(cfg) & "/search?q="
       resp Http200, {"Content-Type": "application/opensearchdescription+xml"},
                     generateOpenSearchXML(cfg.title, cfg.hostname, url)

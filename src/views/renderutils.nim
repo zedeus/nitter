@@ -31,7 +31,7 @@ proc linkUser*(profile: Profile, class=""): VNode =
       icon "lock", title="Protected account"
 
 proc linkText*(text: string; class=""): VNode =
-  let url = if "http" notin text: "http://" & text else: text
+  let url = if "http" notin text: https & text else: text
   buildHtml():
     a(href=url, class=class): text text
 

@@ -28,7 +28,7 @@ const
   twitter = parseUri("https://twitter.com")
 
 proc getUrlPrefix*(cfg: Config): string =
-  if cfg.useHttps: "https://" & cfg.hostname
+  if cfg.useHttps: https & cfg.hostname
   else: "http://" & cfg.hostname
 
 proc stripHtml*(text: string): string =
@@ -58,7 +58,7 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
 
   if prefs.replaceTwitter.len > 0 and
      (twRegex in result or tco in result):
-    result = result.replace(tco, "https://" & prefs.replaceTwitter & "/t.co")
+    result = result.replace(tco, https & prefs.replaceTwitter & "/t.co")
     result = result.replace(cards, prefs.replaceTwitter & "/cards")
     result = result.replace(twRegex, prefs.replaceTwitter)
 

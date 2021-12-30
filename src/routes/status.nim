@@ -18,6 +18,7 @@ proc createStatusRouter*(cfg: Config) =
       cond '.' notin @"name"
       let prefs = cookiePrefs()
 
+      # used for the infinite scroll feature
       if @"scroll".len > 0:
         let replies = await getReplies(@"id", getCursor())
         if replies.content.len == 0:
@@ -34,10 +35,12 @@ proc createStatusRouter*(cfg: Config) =
           error = conv.tweet.tombstone
         resp Http404, showError(error, cfg)
 
-      var
+      let
         title = pageTitle(conv.tweet)
         ogTitle = pageTitle(conv.tweet.profile)
         desc = conv.tweet.text
+
+      var
         images = conv.tweet.photos
         video = ""
 
