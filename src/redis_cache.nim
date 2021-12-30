@@ -78,6 +78,7 @@ proc cache*(data: Profile) {.async.} =
   pool.withAcquire(r):
     r.startPipelining()
     discard await r.setex(name.profileKey, baseCacheTime, compress(toFlatty(data)))
+    discard await r.setex("i:" & data.id , baseCacheTime, data.username)
     discard await r.hset(name.pidKey, name, data.id)
     discard await r.flushPipeline()
 
@@ -109,6 +110,15 @@ proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} 
     result = fromFlatty(uncompress(prof), Profile)
   elif fetch:
     result = await getProfile(username)
+
+proc getCachedProfileScreenName*(userId: string): Future[string] {.async.} =
+  let username = await get("i:" & userId)
+  if username != redisNil:
+      result = username
+  else:
+    let profile = await getProfileById(userId)
+    result = profile.username
+    await cache(profile)
 
 proc getCachedPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return

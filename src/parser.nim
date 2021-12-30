@@ -38,6 +38,18 @@ proc parseUserShow*(js: JsonNode; username: string): Profile =
 
   result = parseProfile(js)
 
+proc parseUserShowId*(js: JsonNode; userId: string): Profile =
+  if js.isNull:
+    return Profile(id: userId)
+
+  with error, js{"errors"}:
+    result = Profile(id: userId)
+    if error.getError == suspended:
+      result.suspended = true
+    return
+
+  result = parseProfile(js)
+
 proc parseGraphProfile*(js: JsonNode; username: string): Profile =
   if js.isNull: return
   with error, js{"errors"}:
