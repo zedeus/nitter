@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, strutils, tables, times, hashes, supersnappy
+import asyncdispatch, strutils, tables, times, hashes, uri
 
-import jester
+import jester, supersnappy
 
 import router_utils, timeline
 import ../query
@@ -107,7 +107,7 @@ proc createRssRouter*(cfg: Config) =
 
       var key = @"tab" & ":" & @"name" & ":"
       if @"tab" == "search":
-        key &= $hash(genQueryUrl(query)) & "/"
+        key &= $hash(genQueryUrl(query)) & ":"
       key &= getCursor()
 
       var rss = await getCachedRss(key)
@@ -118,6 +118,23 @@ proc createRssRouter*(cfg: Config) =
 
       await cacheRss(key, rss)
       respRss(rss)
+
+    get "/@name/lists/@slug/rss":
+      cond cfg.enableRss
+      cond @"name" != "i"
+      let
+        slug = decodeUrl(@"slug")
+        list = await getCachedList(@"name", slug)
+        cursor = getCursor()
+
+      if list.id.len == 0:
+        resp Http404, showError("List \"" & @"slug" & "\" not found", cfg)
+
+      let url = "/i/lists/" & list.id & "/rss"
+      if cursor.len > 0:
+        redirect(url & "?cursor=" & encodeUrl(cursor, false))
+      else:
+        redirect(url)
 
     get "/i/lists/@id/rss":
       cond cfg.enableRss
