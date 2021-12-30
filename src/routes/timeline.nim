@@ -104,7 +104,7 @@ template respTimeline*(timeline: typed) =
 
 template respUserId*() =
   cond @"user_id".len > 0
-  let username = await getCachedProfileScreenName(@"user_id")
+  let username = await getCachedProfileUsername(@"user_id")
   if username.len > 0:
     redirect("/" & username)
   else:

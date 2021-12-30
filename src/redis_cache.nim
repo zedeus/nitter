@@ -111,10 +111,10 @@ proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} 
   elif fetch:
     result = await getProfile(username)
 
-proc getCachedProfileScreenName*(userId: string): Future[string] {.async.} =
+proc getCachedProfileUsername*(userId: string): Future[string] {.async.} =
   let username = await get("i:" & userId)
   if username != redisNil:
-      result = username
+    result = username
   else:
     let profile = await getProfileById(userId)
     result = profile.username
