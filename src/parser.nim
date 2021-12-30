@@ -135,6 +135,9 @@ proc parseVideo(js: JsonNode): Video =
   with title, js{"additional_media_info", "title"}:
     result.title = title.getStr
 
+  with description, js{"additional_media_info", "description"}:
+    result.description = description.getStr
+
   for v in js{"video_info", "variants"}:
     result.variants.add VideoVariant(
       videoType: parseEnum[VideoType](v{"content_type"}.getStr("summary")),

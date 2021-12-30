@@ -202,6 +202,8 @@ proc renderAttribution(profile: Profile): VNode =
   buildHtml(a(class="attribution", href=("/" & profile.username))):
     renderMiniAvatar(profile)
     strong: text profile.fullname
+    if profile.verified:
+      icon "ok", class="verified-icon", title="Verified account"
 
 proc renderMediaTags(tags: seq[Profile]): VNode =
   buildHtml(tdiv(class="media-tag-block")):
