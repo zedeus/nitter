@@ -25,5 +25,5 @@ proc renderList*(body: VNode; query: Query; list: List): VNode =
       tdiv(class="timeline-description"):
         text list.description
 
-    renderListTabs(query, &"/{list.username}/lists/{list.name}")
+    renderListTabs(query, &"/i/lists/{list.id}")
     body

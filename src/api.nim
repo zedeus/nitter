@@ -9,13 +9,13 @@ proc getGraphProfile*(username: string): Future[Profile] {.async.} =
     js = await fetch(graphUser ? {"variables": $variables})
   result = parseGraphProfile(js, username)
 
-proc getGraphList*(name, list: string): Future[List] {.async.} =
+proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let
     variables = %*{"screenName": name, "listSlug": list, "withHighlightedLabel": false}
     js = await fetch(graphList ? {"variables": $variables})
   result = parseGraphList(js)
 
-proc getGraphListById*(id: string): Future[List] {.async.} =
+proc getGraphList*(id: string): Future[List] {.async.} =
   let
     variables = %*{"listId": id, "withHighlightedLabel": false}
     js = await fetch(graphListId ? {"variables": $variables})
