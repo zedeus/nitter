@@ -49,11 +49,15 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
   let headers = genHeaders(token)
   try:
     var resp: AsyncResponse
-    let body = pool.use(headers):
+    var body = pool.use(headers):
       resp = await c.get($url)
-      let raw = await resp.body
-      if raw.len == 0: ""
-      else: uncompress(raw)
+      await resp.body
+
+    if body.len > 0:
+      if resp.headers.getOrDefault("content-encoding") == "gzip":
+        body = uncompress(body, dfGzip)
+      else:
+        echo "non-gzip body, url: ", url, ", body: ", body
 
     if body.startsWith('{') or body.startsWith('['):
       result = parseJson(body)

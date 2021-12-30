@@ -78,9 +78,6 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
 
   return (profile, timeline, await rail)
 
-proc get*(req: Request; key: string): string =
-  params(req).getOrDefault(key)
-
 proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
                    rss, after: string): Future[string] {.async.} =
   if query.fromUser.len != 1:
