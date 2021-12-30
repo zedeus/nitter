@@ -9,8 +9,8 @@ import ../views/[general, timeline, list]
 export getListTimeline, getGraphList
 
 template respList*(list, timeline, title, vnode: typed) =
-  if list.id.len == 0:
-    resp Http404, showError("List \"" & @"id" & "\" not found", cfg)
+  if list.id.len == 0 or list.name.len == 0:
+    resp Http404, showError("List " & @"id" & " not found", cfg)
 
   let
     html = renderList(vnode, timeline.query, list)
