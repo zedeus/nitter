@@ -17,7 +17,9 @@ proc toFlatty*(s: var string, x: DateTime) =
   s.toFlatty(x.toTime().toUnix())
 
 proc fromFlatty*(s: string, i: var int, x: var DateTime) =
-  x = fromUnix(s.fromFlatty(int64)).utc()
+  var unix: int64
+  s.fromFlatty(i, unix)
+  x = fromUnix(unix).utc()
 
 proc setCacheTimes*(cfg: Config) =
   rssCacheTime = cfg.rssCacheTime * 60
