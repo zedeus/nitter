@@ -92,15 +92,15 @@ genPrefs:
       "Autoplay gifs"
 
   "Link replacements (blank to disable)":
-    replaceTwitter(input, "nitter.net"):
+    replaceTwitter(input, ""):
       "Twitter -> Nitter"
       placeholder: "Nitter hostname"
 
-    replaceYouTube(input, "piped.kavin.rocks"):
+    replaceYouTube(input, ""):
       "YouTube -> Piped/Invidious"
       placeholder: "Piped hostname"
 
-    replaceReddit(input, "teddit.net"):
+    replaceReddit(input, ""):
       "Reddit -> Teddit/Libreddit"
       placeholder: "Teddit hostname"
 
