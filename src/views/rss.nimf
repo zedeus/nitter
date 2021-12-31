@@ -9,9 +9,9 @@
 #elif tweet.reply.len > 0: result = &"R to @{tweet.reply[0]}: "
 #end if
 #var text = stripHtml(tweet.text)
-#if unicode.runeLen(text) > 32:
-#  text = unicode.runeSubStr(text, 0, 32) & "..."
-#end if
+##if unicode.runeLen(text) > 32:
+##  text = unicode.runeSubStr(text, 0, 32) & "..."
+##end if
 #result &= xmltree.escape(text)
 #if result.len > 0: return
 #end if
