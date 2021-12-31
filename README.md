@@ -107,6 +107,8 @@ performance reasons.
 
 ### Docker
 
+#### NOTE: For ARM64/ARM support, please use [unixfox's image](https://quay.io/repository/unixfox/nitter?tab=tags), more info [here](https://github.com/zedeus/nitter/issues/399#issuecomment-997263495)
+
 To run Nitter with Docker, you'll need to install and run Redis separately
 before you can run the container. See below for how to also run Redis using
 Docker.
