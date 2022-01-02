@@ -4,11 +4,12 @@ import redis, redpool, flatty, supersnappy
 
 import types, api
 
-const redisNil = "\0\0"
+const
+  redisNil = "\0\0"
+  baseCacheTime = 60 * 60
 
 var
   pool {.threadvar.}: RedisPool
-  baseCacheTime = 60 * 60
   rssCacheTime: int
   listCacheTime*: int
 

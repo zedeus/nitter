@@ -9,8 +9,6 @@ var
 const
   https* = "https://"
   twimg* = "pbs.twimg.com/"
-  badJpgExts = @["1500x500", "jpgn", "jpg:", "jpg_", "_jpg"]
-  badPngExts = @["pngn", "png:", "png_", "_png"]
   twitterDomains = @[
     "twitter.com",
     "pic.twitter.com",
@@ -19,6 +17,7 @@ const
     "pbs.twimg.com",
     "video.twimg.com"
   ]
+  nitterParams = ["name", "tab", "id", "list", "referer", "scroll"]
 
 proc setHmacKey*(key: string) =
   hmacKey = key
@@ -43,18 +42,9 @@ proc getPicUrl*(link: string): string =
   else:
     &"/pic/{encodeUrl(link)}"
 
-proc cleanFilename*(filename: string): string =
-  const reg = re"[^A-Za-z0-9._-]"
-  result = filename.replace(reg, "_")
-  if badJpgExts.anyIt(it in result):
-    result &= ".jpg"
-  elif badPngExts.anyIt(it in result):
-    result &= ".png"
-
 proc filterParams*(params: Table): seq[(string, string)] =
-  const filter = ["name", "tab", "id", "list", "referer", "scroll"]
   for p in params.pairs():
-    if p[1].len > 0 and p[0] notin filter:
+    if p[1].len > 0 and p[0] notin nitterParams:
       result.add p
 
 proc isTwitterUrl*(uri: Uri): bool =
