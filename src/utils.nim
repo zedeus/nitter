@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, strformat, sequtils, uri, tables, base64
+import strutils, strformat, uri, tables, base64
 import nimcrypto, regex
 
 var
-  hmacKey {.threadvar.}: string
+  hmacKey: string
   base64Media = false
 
 const
   https* = "https://"
   twimg* = "pbs.twimg.com/"
+  nitterParams = ["name", "tab", "id", "list", "referer", "scroll"]
   twitterDomains = @[
     "twitter.com",
     "pic.twitter.com",
@@ -17,7 +18,6 @@ const
     "pbs.twimg.com",
     "video.twimg.com"
   ]
-  nitterParams = ["name", "tab", "id", "list", "referer", "scroll"]
 
 proc setHmacKey*(key: string) =
   hmacKey = key

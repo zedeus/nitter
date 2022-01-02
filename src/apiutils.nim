@@ -5,7 +5,7 @@ import types, tokens, consts, parserutils, http_pool
 
 const rl = "x-rate-limit-"
 
-var pool {.threadvar.}: HttpPool
+var pool: HttpPool
 
 proc genParams*(pars: openarray[(string, string)] = @[]; cursor="";
                 count="20"; ext=true): seq[(string, string)] =

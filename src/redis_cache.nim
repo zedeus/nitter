@@ -9,7 +9,7 @@ const
   baseCacheTime = 60 * 60
 
 var
-  pool {.threadvar.}: RedisPool
+  pool: RedisPool
   rssCacheTime: int
   listCacheTime*: int
 

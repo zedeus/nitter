@@ -11,8 +11,8 @@ const
   failDelay = initDuration(minutes=30)
 
 var
-  clientPool {.threadvar.}: HttpPool
-  tokenPool {.threadvar.}: seq[Token]
+  clientPool: HttpPool
+  tokenPool: seq[Token]
   lastFailed: Time
 
 proc getPoolInfo*: string =

@@ -5,8 +5,8 @@ type
   HttpPool* = ref object
     conns*: seq[AsyncHttpClient]
 
-var maxConns {.threadvar.}: int
-var proxy {.threadvar.}: Proxy
+var maxConns: int
+var proxy: Proxy
 
 proc setMaxHttpConns*(n: int) =
   maxConns = n

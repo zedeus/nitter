@@ -86,7 +86,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
 
     if banner.len > 0:
       let bannerUrl = getPicUrl(banner)
-      link(rel="preload", type="image/png", href=getPicUrl(banner), `as`="image")
+      link(rel="preload", type="image/png", href=bannerUrl, `as`="image")
 
     for url in images:
       let suffix = if "400x400" in url: "" else: "?name=small"
