@@ -118,7 +118,7 @@ proc getBanner*(js: JsonNode): string =
   if color.len > 0:
     return '#' & color
 
-  # use primary color from profile picture color histrogram
+  # use primary color from profile picture color histogram
   with p, js{"profile_image_extensions", "mediaColor", "r", "ok", "palette"}:
     if p.len > 0:
       let pal = p[0]{"rgb"}

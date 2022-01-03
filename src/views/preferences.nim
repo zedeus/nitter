@@ -46,4 +46,4 @@ proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string]): VNode 
         button(`type`="submit", class="pref-submit"):
           text "Save preferences"
 
-      buttonReferer "/resetprefs", "Reset Preferences", path, class="pref-reset"
+      buttonReferer "/resetprefs", "Reset preferences", path, class="pref-reset"

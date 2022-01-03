@@ -32,7 +32,7 @@ proc createPrefRouter*(cfg: Config) =
 
     post "/resetprefs":
       genResetPrefs()
-      redirect($(parseUri("/settings") ? filterParams(request.params)))
+      redirect("/settings?referer=" & encodeUrl(refPath()))
 
     post "/enablehls":
       savePref("hlsPlayback", "on", request)

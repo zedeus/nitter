@@ -42,12 +42,6 @@ proc hiddenField*(name, value: string): VNode =
 proc refererField*(path: string): VNode =
   hiddenField("referer", path)
 
-proc iconReferer*(icon, action, path: string, title=""): VNode =
-  buildHtml(form(`method`="get", action=action, class="icon-button")):
-    refererField path
-    button(`type`="submit"):
-      icon icon, title=title
-
 proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNode =
   buildHtml(form(`method`=`method`, action=action, class=class)):
     refererField path

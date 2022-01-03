@@ -12,8 +12,10 @@ const
   lp = readFile("public/lp.svg")
 
 proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
-  var path = $(parseUri(req.path) ? filterParams(req.params))
-  if "/status" in path: path.add "#m"
+  var path = req.params.getOrDefault("referer")
+  if path.len == 0:
+    path = $(parseUri(req.path) ? filterParams(req.params))
+    if "/status/" in path: path.add "#m"
 
   buildHtml(nav):
     tdiv(class="inner-nav"):
@@ -29,7 +31,7 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
         icon "bird", title="Open in Twitter", href=canonical
         a(href="https://liberapay.com/zedeus"): verbatim lp
         icon "info", title="About", href="/about"
-        iconReferer "cog", "/settings", path, title="Preferences"
+        icon "cog", title="Preferences", href=("/settings?referer=" & encodeUrl(path))
 
 proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
                  images: seq[string] = @[]; banner=""; ogTitle=""; theme="";
