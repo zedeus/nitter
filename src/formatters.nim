@@ -118,7 +118,7 @@ proc getJoinDateFull*(profile: Profile): string =
   profile.joinDate.format("h:mm tt - d MMM YYYY")
 
 proc getTime*(tweet: Tweet): string =
-  tweet.time.format("h:mm tt' · 'MMM d', 'YYYY 'UTC'")
+  tweet.time.format("MMM d', 'YYYY' · 'h:mm tt' UTC'")
 
 proc getRfc822Time*(tweet: Tweet): string =
   tweet.time.format("ddd', 'dd MMM yyyy HH:mm:ss 'GMT'")
