@@ -1,10 +1,12 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import karax/[karaxdsl, vdom]
-import markdown
+import strformat
+import karax/[karaxdsl, vdom], markdown
 
 const
-  hash = staticExec("git log -1 --format=\"%h\"")
+  date = staticExec("git show -s --format=\"%cd\" --date=format:\"%Y.%m.%d\"")
+  hash = staticExec("git show -s --format=\"%h\"")
   link = "https://github.com/zedeus/nitter/commit/" & hash
+  version = &"{date}-{hash}"
 
 let
   about = markdown(readFile("public/md/about.md"))
@@ -15,8 +17,8 @@ proc renderAbout*(): VNode =
     verbatim about
     h2: text "Instance info"
     p:
-      text "Commit "
-      a(href=link): text hash
+      text "Version "
+      a(href=link): text version
 
 proc renderFeature*(): VNode =
   buildHtml(tdiv(class="overlay-panel")):
