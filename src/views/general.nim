@@ -91,7 +91,8 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
       link(rel="preload", type="image/png", href=bannerUrl, `as`="image")
 
     for url in images:
-      let suffix = if "400x400" in url: "" else: "?name=small"
+      let suffix = if "400x400" in url or url.endsWith("placeholder.png"): ""
+                   else: "?name=small"
       let preloadUrl = getPicUrl(url & suffix)
       link(rel="preload", type="image/png", href=preloadUrl, `as`="image")
 
