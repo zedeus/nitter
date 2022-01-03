@@ -338,7 +338,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         renderQuote(tweet.quote.get(), prefs, path)
 
       if mainTweet:
-        p(class="tweet-published"): text getTweetTime(tweet)
+        p(class="tweet-published"): text getTime(tweet)
 
       if tweet.mediaTags.len > 0:
         renderMediaTags(tweet.mediaTags)
