@@ -7,7 +7,7 @@ import ".."/[types, utils, formatters]
 
 proc getSmallPic(url: string): string =
   result = url
-  if "?" notin url:
+  if "?" notin url and not url.endsWith("placeholder.png"):
     result &= ":small"
   result = getPicUrl(result)
 
