@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, strformat
+import asyncdispatch, strformat, logging
 from net import Port
 from htmlgen import a
 from os import getEnv
@@ -18,8 +18,7 @@ const issuesUrl = "https://github.com/zedeus/nitter/issues"
 let configPath = getEnv("NITTER_CONF_FILE", "./nitter.conf")
 let (cfg, fullCfg) = getConfig(configPath)
 
-when defined(release):
-  import logging
+if not cfg.enableDebug:
   # Silence Jester's query warning
   addHandler(newConsoleLogger())
   setLogFilter(lvlError)
