@@ -26,41 +26,20 @@ proc parseProfile(js: JsonNode; id=""): Profile =
 
   result.expandProfileEntities(js)
 
-proc parseUserShow*(js: JsonNode; username: string): Profile =
-  if js.isNull:
-    return Profile(username: username)
-
-  with error, js{"errors"}:
+proc parseUserShow*(js: JsonNode; username=""; id=""): Profile =
+  if id.len > 0:
+    result = Profile(id: id)
+  else:
     result = Profile(username: username)
-    if error.getError == suspended:
-      result.suspended = true
-    return
 
-  result = parseProfile(js)
-
-proc parseUserShowId*(js: JsonNode; userId: string): Profile =
-  if js.isNull:
-    return Profile(id: userId)
-
-  with error, js{"errors"}:
-    result = Profile(id: userId)
-    if error.getError == suspended:
-      result.suspended = true
-    return
-
-  result = parseProfile(js)
-
-proc parseGraphProfile*(js: JsonNode; username: string): Profile =
   if js.isNull: return
+
   with error, js{"errors"}:
-    result = Profile(username: username)
     if error.getError == suspended:
       result.suspended = true
     return
 
-  let user = js{"data", "user", "legacy"}
-  let id = js{"data", "user", "rest_id"}.getStr
-  result = parseProfile(user, id)
+  result = parseProfile(js)
 
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return

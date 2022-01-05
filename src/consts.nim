@@ -13,13 +13,12 @@ const
   search* = api / "2/search/adaptive.json"
 
   timelineApi = api / "2/timeline"
-  tweet* = timelineApi / "conversation"
   timeline* = timelineApi / "profile"
   mediaTimeline* = timelineApi / "media"
   listTimeline* = timelineApi / "list.json"
+  tweet* = timelineApi / "conversation"
 
   graphql = api / "graphql"
-  graphUser* = graphql / "E4iSsd6gypGFWx2eUhSC1g/UserByScreenName"
   graphList* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
   graphListId* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
 

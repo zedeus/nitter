@@ -3,12 +3,6 @@ import asyncdispatch, httpclient, uri, strutils
 import packedjson
 import types, query, formatters, consts, apiutils, parser
 
-proc getGraphProfile*(username: string): Future[Profile] {.async.} =
-  let
-    variables = %*{"screen_name": username, "withHighlightedLabel": true}
-    js = await fetch(graphUser ? {"variables": $variables})
-  result = parseGraphProfile(js, username)
-
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let
     variables = %*{"screenName": name, "listSlug": list, "withHighlightedLabel": false}
@@ -38,14 +32,14 @@ proc getListMembers*(list: List; after=""): Future[Result[Profile]] {.async.} =
 proc getProfile*(username: string): Future[Profile] {.async.} =
   let
     ps = genParams({"screen_name": username})
-    url = userShow ? ps
-  result = parseUserShow(await fetch(url, oldApi=true), username)
+    js = await fetch(userShow ? ps, oldApi=true)
+  result = parseUserShow(js, username=username)
 
 proc getProfileById*(userId: string): Future[Profile] {.async.} =
   let
     ps = genParams({"user_id": userId})
-    url = userShow ? ps
-  result = parseUserShowId(await fetch(url, oldApi=true), userId)
+    js = await fetch(userShow ? ps, oldApi=true)
+  result = parseUserShow(js, id=userId)
 
 proc getTimeline*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
   let
