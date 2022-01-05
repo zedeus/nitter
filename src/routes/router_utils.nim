@@ -42,3 +42,6 @@ template getCursor*(req: Request): string =
 
 proc getNames*(name: string): seq[string] =
   name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
+
+template respJson*(body: string) =
+  resp body, "application/json"

@@ -9,7 +9,7 @@ import jester
 import types, config, prefs, formatters, redis_cache, http_pool, tokens
 import views/[general, about]
 import routes/[
-  preferences, timeline, status, media, search, rss, list,
+  preferences, timeline, status, media, search, rss, list, debug,
   unsupported, embed, resolver, router_utils]
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
@@ -49,6 +49,7 @@ createSearchRouter(cfg)
 createMediaRouter(cfg)
 createEmbedRouter(cfg)
 createRssRouter(cfg)
+createDebugRouter(cfg)
 
 settings:
   port = Port(cfg.port)
@@ -98,3 +99,4 @@ routes:
   extend status, ""
   extend media, ""
   extend embed, ""
+  extend debug, ""

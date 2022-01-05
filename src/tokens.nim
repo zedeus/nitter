@@ -14,6 +14,22 @@ var
   tokenPool: seq[Token]
   lastFailed: Time
 
+proc getPoolJson*: string =
+  let list = newJObject()
+  for token in tokenPool:
+    list[token.tok] = %*{
+      "apis": newJObject(),
+      "init": $token.init,
+      "lastUse": $token.lastUse
+    }
+
+    for api in token.apis.keys:
+      list[token.tok]["apis"][$api] = %*{
+        "remaining": token.apis[api].remaining,
+        "reset": $token.apis[api].reset
+      }
+
+  return $list
 
 proc rateLimitError*(): ref RateLimitError =
   newException(RateLimitError, "rate limited")
