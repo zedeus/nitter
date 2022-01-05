@@ -20,7 +20,7 @@ type
 
   RateLimit* = object
     remaining*: int
-    reset*: Time
+    reset*: int
 
   Token* = ref object
     tok*: string

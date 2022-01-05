@@ -26,11 +26,7 @@ proc getPoolJson*: string =
     }
 
     for api in token.apis.keys:
-      list[token.tok]["apis"][$api] = %*{
-        "remaining": token.apis[api].remaining,
-        "reset": $token.apis[api].reset
-      }
-
+      list[token.tok]["apis"][$api] = %token.apis[api]
   return $list
 
 proc rateLimitError*(): ref RateLimitError =
@@ -71,7 +67,7 @@ proc isLimited(token: Token; api: Api): bool =
 
   if api in token.apis:
     let limit = token.apis[api]
-    return (limit.remaining <= 10 and limit.reset > getTime())
+    return (limit.remaining <= 10 and limit.reset > epochTime().int)
   else:
     return false
 
@@ -104,8 +100,6 @@ proc getToken*(api: Api): Future[Token] {.async.} =
     raise rateLimitError()
 
 proc setRateLimit*(token: Token; api: Api; remaining, reset: int) =
-  let reset = fromUnix(reset)
-
   # avoid undefined behavior in race conditions
   if api in token.apis:
     let limit = token.apis[api]
