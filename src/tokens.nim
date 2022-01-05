@@ -15,9 +15,15 @@ var
   tokenPool: seq[Token]
   lastFailed: Time
 
-proc getPoolJson*: string =
-  let list = newJObject()
+proc getPoolJson*(): JsonNode =
+  var
+    list = newJObject()
+    totalReqs = 0
+    totalPending = 0
+    reqsPerApi: Table[string, int]
+
   for token in tokenPool:
+    totalPending.inc(token.pending)
     list[token.tok] = %*{
       "apis": newJObject(),
       "pending": token.pending,
@@ -27,7 +33,25 @@ proc getPoolJson*: string =
 
     for api in token.apis.keys:
       list[token.tok]["apis"][$api] = %token.apis[api]
-  return $list
+
+      let
+        maxReqs =
+          case api
+          of Api.listBySlug, Api.list: 500
+          of Api.timeline: 187
+          else: 180
+        reqs = maxReqs - token.apis[api].remaining
+
+      reqsPerApi[$api] = reqsPerApi.getOrDefault($api, 0) + reqs
+      totalReqs.inc(reqs)
+
+  return %*{
+    "amount": tokenPool.len,
+    "requests": totalReqs,
+    "pending": totalPending,
+    "apis": reqsPerApi,
+    "tokens": list
+  }
 
 proc rateLimitError*(): ref RateLimitError =
   newException(RateLimitError, "rate limited")
