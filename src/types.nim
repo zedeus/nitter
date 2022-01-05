@@ -26,6 +26,7 @@ type
     tok*: string
     init*: Time
     lastUse*: Time
+    pending*: int
     apis*: Table[Api, RateLimit]
 
   Error* = enum

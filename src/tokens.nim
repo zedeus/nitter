@@ -5,8 +5,9 @@ import zippy
 import types, agents, consts, http_pool
 
 const
-  maxAge = 3.hours      # tokens expire after 3 hours
-  maxLastUse = 1.hours  # if a token is unused for 60 minutes, it expires
+  maxConcurrentReqs = 5  # max requests at a time per token, to avoid race conditions
+  maxAge = 3.hours       # tokens expire after 3 hours
+  maxLastUse = 1.hours   # if a token is unused for 60 minutes, it expires
   failDelay = initDuration(minutes=30)
 
 var
@@ -19,6 +20,7 @@ proc getPoolJson*: string =
   for token in tokenPool:
     list[token.tok] = %*{
       "apis": newJObject(),
+      "pending": token.pending,
       "init": $token.init,
       "lastUse": $token.lastUse
     }
@@ -69,35 +71,48 @@ proc isLimited(token: Token; api: Api): bool =
 
   if api in token.apis:
     let limit = token.apis[api]
-    return (limit.remaining <= 5 and limit.reset > getTime())
+    return (limit.remaining <= 10 and limit.reset > getTime())
   else:
     return false
 
-proc release*(token: Token; invalid=false) =
-  if not token.isNil and (invalid or token.expired):
+proc isReady(token: Token; api: Api): bool =
+  not (token.isNil or token.pending > maxConcurrentReqs or token.isLimited(api))
+
+proc release*(token: Token; used=false; invalid=false) =
+  if token.isNil: return
+  if invalid or token.expired:
     let idx = tokenPool.find(token)
     if idx > -1: tokenPool.delete(idx)
+  elif used:
+    dec token.pending
+    token.lastUse = getTime()
 
 proc getToken*(api: Api): Future[Token] {.async.} =
   for i in 0 ..< tokenPool.len:
-    if not (result.isNil or result.isLimited(api)):
-      break
+    if result.isReady(api): break
     release(result)
     result = tokenPool.sample()
 
-  if result.isNil or result.isLimited(api):
+  if not result.isReady(api):
     release(result)
     result = await fetchToken()
     tokenPool.add result
 
-  if result.isNil:
+  if not result.isNil:
+    inc result.pending
+  else:
     raise rateLimitError()
 
 proc setRateLimit*(token: Token; api: Api; remaining, reset: int) =
-  token.apis[api] = RateLimit(
-    remaining: remaining,
-    reset: fromUnix(reset)
-  )
+  let reset = fromUnix(reset)
+
+  # avoid undefined behavior in race conditions
+  if api in token.apis:
+    let limit = token.apis[api]
+    if limit.reset >= reset and limit.remaining < remaining:
+      return
+
+  token.apis[api] = RateLimit(remaining: remaining, reset: reset)
 
 proc poolTokens*(amount: int) {.async.} =
   var futs: seq[Future[Token]]

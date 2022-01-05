@@ -72,15 +72,12 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
         remaining = parseInt(resp.headers[rlRemaining])
         reset = parseInt(resp.headers[rlReset])
       token.setRateLimit(api, remaining, reset)
-      echo api, " ", remaining, " ", url.path
-    else:
-      echo api, " ", url.path
 
     if result.getError notin {invalidToken, forbidden, badToken}:
-      token.lastUse = getTime()
+      release(token, used=true)
     else:
       echo "fetch error: ", result.getError
-      release(token, true)
+      release(token, invalid=true)
       raise rateLimitError()
 
     if resp.status == $Http400:
@@ -90,5 +87,5 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
   except Exception as e:
     echo "error: ", e.name, ", msg: ", e.msg, ", token: ", token[], ", url: ", url
     if "length" notin e.msg and "descriptor" notin e.msg:
-      release(token, true)
+      release(token, invalid=true)
     raise rateLimitError()
