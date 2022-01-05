@@ -19,8 +19,8 @@ const
   tweet* = timelineApi / "conversation"
 
   graphql = api / "graphql"
-  graphList* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
-  graphListId* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
+  graphListBySlug* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
+  graphList* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
 
   timelineParams* = {
     "include_profile_interstitial_type": "0",

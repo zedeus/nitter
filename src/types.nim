@@ -8,12 +8,25 @@ type
   RateLimitError* = object of CatchableError
   InternalError* = object of CatchableError
 
-  Token* = ref object
-    tok*: string
+  Api* {.pure.} = enum
+    userShow
+    photoRail
+    timeline
+    search
+    tweet
+    list
+    listBySlug
+    listMembers
+
+  RateLimit* = object
     remaining*: int
     reset*: Time
+
+  Token* = ref object
+    tok*: string
     init*: Time
     lastUse*: Time
+    apis*: Table[Api, RateLimit]
 
   Error* = enum
     null = 0

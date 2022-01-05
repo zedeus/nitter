@@ -3,7 +3,9 @@ import httpclient, asyncdispatch, options, times, strutils, uri
 import packedjson, zippy
 import types, tokens, consts, parserutils, http_pool
 
-const rl = "x-rate-limit-"
+const
+  rlRemaining = "x-rate-limit-remaining"
+  rlReset = "x-rate-limit-reset"
 
 var pool: HttpPool
 
@@ -38,11 +40,11 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
     "DNT": "1"
   })
 
-proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
+proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
   once:
     pool = HttpPool()
 
-  var token = await getToken()
+  var token = await getToken(api)
   if token.tok.len == 0:
     raise rateLimitError()
 
@@ -65,9 +67,14 @@ proc fetch*(url: Uri; oldApi=false): Future[JsonNode] {.async.} =
       echo resp.status, ": ", body
       result = newJNull()
 
-    if not oldApi and resp.headers.hasKey(rl & "reset"):
-      token.remaining = parseInt(resp.headers[rl & "remaining"])
-      token.reset = fromUnix(parseInt(resp.headers[rl & "reset"]))
+    if api != Api.search and resp.headers.hasKey(rlRemaining):
+      let
+        remaining = parseInt(resp.headers[rlRemaining])
+        reset = parseInt(resp.headers[rlReset])
+      token.setRateLimit(api, remaining, reset)
+      echo api, " ", remaining, " ", url.path
+    else:
+      echo api, " ", url.path
 
     if result.getError notin {invalidToken, forbidden, badToken}:
       token.lastUse = getTime()
