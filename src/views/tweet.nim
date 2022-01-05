@@ -181,12 +181,16 @@ proc renderCard(card: Card; prefs: Prefs; path: string): VNode =
         tdiv(class="card-content-container"):
           renderCardContent(card)
 
+func formatStat(stat: int): string =
+  if stat > 0: insertSep($stat, ',')
+  else: ""
+
 proc renderStats(stats: TweetStats; views: string): VNode =
   buildHtml(tdiv(class="tweet-stats")):
-    span(class="tweet-stat"): icon "comment", insertSep($stats.replies, ',')
-    span(class="tweet-stat"): icon "retweet", insertSep($stats.retweets, ',')
-    span(class="tweet-stat"): icon "quote", insertSep($stats.quotes, ',')
-    span(class="tweet-stat"): icon "heart", insertSep($stats.likes, ',')
+    span(class="tweet-stat"): icon "comment", formatStat(stats.replies)
+    span(class="tweet-stat"): icon "retweet", formatStat(stats.retweets)
+    span(class="tweet-stat"): icon "quote", formatStat(stats.quotes)
+    span(class="tweet-stat"): icon "heart", formatStat(stats.likes)
     if views.len > 0:
       span(class="tweet-stat"): icon "play", insertSep(views, ',')
 
