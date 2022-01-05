@@ -73,7 +73,7 @@ proc cache*(data: List) {.async.} =
   await setex(data.listKey, listCacheTime, compress(toFlatty(data)))
 
 proc cache*(data: PhotoRail; name: string) {.async.} =
-  await setex("pr:" & name, baseCacheTime, compress(toFlatty(data)))
+  await setex("pr:" & toLower(name), baseCacheTime, compress(toFlatty(data)))
 
 proc cache*(data: Profile) {.async.} =
   if data.username.len == 0 or data.id.len == 0: return
