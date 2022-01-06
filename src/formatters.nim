@@ -23,7 +23,7 @@ const
   wwwRegex = re"https?://(www[0-9]?\.)?"
   m3u8Regex = re"""url="(.+.m3u8)""""
   manifestRegex = re"\/(.+(.ts|.m4s|.m3u8|.vmap|.mp4))"
-  userpicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
+  userPicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
   extRegex = re"(\.[A-z]+)$"
   illegalXmlRegex = re"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]"
 
@@ -89,12 +89,12 @@ proc proxifyVideo*(manifest: string; proxy: bool): string =
     if proxy: result = getVidUrl(result)
   result = manifest.replace(manifestRegex, cb)
 
-proc getUserpic*(userpic: string; style=""): string =
-  let pic = userpic.replace(userpicRegex, "$2")
+proc getUserPic*(userPic: string; style=""): string =
+  let pic = userPic.replace(userPicRegex, "$2")
   pic.replace(extRegex, style & "$1")
 
-proc getUserpic*(profile: Profile; style=""): string =
-  getUserPic(profile.userpic, style)
+proc getUserPic*(profile: Profile; style=""): string =
+  getUserPic(profile.userPic, style)
 
 proc getVideoEmbed*(cfg: Config; id: int64): string =
   &"{getUrlPrefix(cfg)}/i/videos/{id}"

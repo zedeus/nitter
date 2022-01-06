@@ -9,7 +9,7 @@ const
 
 var pool: HttpPool
 
-proc genParams*(pars: openarray[(string, string)] = @[]; cursor="";
+proc genParams*(pars: openArray[(string, string)] = @[]; cursor="";
                 count="20"; ext=true): seq[(string, string)] =
   result = timelineParams
   for p in pars:

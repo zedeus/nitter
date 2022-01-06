@@ -12,7 +12,7 @@ proc getSmallPic(url: string): string =
   result = getPicUrl(result)
 
 proc renderMiniAvatar(profile: Profile): VNode =
-  let url = getPicUrl(profile.getUserpic("_mini"))
+  let url = getPicUrl(profile.getUserPic("_mini"))
   buildHtml():
     img(class="avatar mini", src=url)
 
@@ -29,9 +29,9 @@ proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.profile.username)):
         var size = "_bigger"
-        if not prefs.autoplayGifs and tweet.profile.userpic.endsWith("gif"):
+        if not prefs.autoplayGifs and tweet.profile.userPic.endsWith("gif"):
           size = "_400x400"
-        genImg(tweet.profile.getUserpic(size), class="avatar")
+        genImg(tweet.profile.getUserPic(size), class="avatar")
 
       tdiv(class="tweet-name-row"):
         tdiv(class="fullname-and-username"):

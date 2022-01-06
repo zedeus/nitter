@@ -12,7 +12,7 @@ proc parseProfile(js: JsonNode; id=""): Profile =
     fullname: js{"name"}.getStr,
     location: js{"location"}.getStr,
     bio: js{"description"}.getStr,
-    userpic: js{"profile_image_url_https"}.getImageStr.replace("_normal", ""),
+    userPic: js{"profile_image_url_https"}.getImageStr.replace("_normal", ""),
     banner: js.getBanner,
     following: $js{"friends_count"}.getInt,
     followers: $js{"followers_count"}.getInt,

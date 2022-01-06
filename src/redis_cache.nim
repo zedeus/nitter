@@ -65,45 +65,45 @@ proc get(query: string): Future[string] {.async.} =
   pool.withAcquire(r):
     result = await r.get(query)
 
-proc setex(key: string; time: int; data: string) {.async.} =
+proc setEx(key: string; time: int; data: string) {.async.} =
   pool.withAcquire(r):
-    discard await r.setex(key, time, data)
+    discard await r.setEx(key, time, data)
 
 proc cache*(data: List) {.async.} =
-  await setex(data.listKey, listCacheTime, compress(toFlatty(data)))
+  await setEx(data.listKey, listCacheTime, compress(toFlatty(data)))
 
 proc cache*(data: PhotoRail; name: string) {.async.} =
-  await setex("pr:" & toLower(name), baseCacheTime, compress(toFlatty(data)))
+  await setEx("pr:" & toLower(name), baseCacheTime, compress(toFlatty(data)))
 
 proc cache*(data: Profile) {.async.} =
   if data.username.len == 0 or data.id.len == 0: return
   let name = toLower(data.username)
   pool.withAcquire(r):
     r.startPipelining()
-    discard await r.setex(name.profileKey, baseCacheTime, compress(toFlatty(data)))
-    discard await r.setex("i:" & data.id , baseCacheTime, data.username)
-    discard await r.hset(name.pidKey, name, data.id)
+    discard await r.setEx(name.profileKey, baseCacheTime, compress(toFlatty(data)))
+    discard await r.setEx("i:" & data.id , baseCacheTime, data.username)
+    discard await r.hSet(name.pidKey, name, data.id)
     discard await r.flushPipeline()
 
 proc cacheProfileId*(username, id: string) {.async.} =
   if username.len == 0 or id.len == 0: return
   let name = toLower(username)
   pool.withAcquire(r):
-    discard await r.hset(name.pidKey, name, id)
+    discard await r.hSet(name.pidKey, name, id)
 
 proc cacheRss*(query: string; rss: Rss) {.async.} =
   let key = "rss:" & query
   pool.withAcquire(r):
     r.startPipelining()
-    discard await r.hset(key, "rss", rss.feed)
-    discard await r.hset(key, "min", rss.cursor)
+    discard await r.hSet(key, "rss", rss.feed)
+    discard await r.hSet(key, "min", rss.cursor)
     discard await r.expire(key, rssCacheTime)
     discard await r.flushPipeline()
 
 proc getProfileId*(username: string): Future[string] {.async.} =
   let name = toLower(username)
   pool.withAcquire(r):
-    result = await r.hget(name.pidKey, name)
+    result = await r.hGet(name.pidKey, name)
     if result == redisNil:
       result.setLen(0)
 
@@ -148,8 +148,8 @@ proc getCachedList*(username=""; slug=""; id=""): Future[List] {.async.} =
 proc getCachedRss*(key: string): Future[Rss] {.async.} =
   let k = "rss:" & key
   pool.withAcquire(r):
-    result.cursor = await r.hget(k, "min")
+    result.cursor = await r.hGet(k, "min")
     if result.cursor.len > 2:
-      result.feed = await r.hget(k, "rss")
+      result.feed = await r.hGet(k, "rss")
     else:
       result.cursor.setLen 0

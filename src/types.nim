@@ -52,7 +52,7 @@ type
     location*: string
     website*: string
     bio*: string
-    userpic*: string
+    userPic*: string
     banner*: string
     following*: string
     followers*: string
