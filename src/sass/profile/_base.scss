@@ -51,9 +51,10 @@
     margin-bottom: unset;
 }
 
-@media(max-width: 600px) {
+@media(max-width: 700px) {
     .profile-tabs {
         width: 100vw;
+        max-width: 600px;
 
         .timeline-container {
             width: 100% !important;
@@ -69,5 +70,11 @@
         max-width: unset;
         position: initial !important;
         padding: 0;
+    }
+}
+
+@media (min-height: 900px) {
+    .profile-tab.sticky {
+        position: sticky;
     }
 }

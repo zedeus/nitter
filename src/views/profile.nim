@@ -105,8 +105,8 @@ proc renderProfile*(profile: Profile; timeline: var Timeline;
       tdiv(class="profile-banner"):
         renderBanner(profile)
 
-    let sticky = if prefs.stickyProfile: "sticky" else: "unset"
-    tdiv(class="profile-tab", style={position: sticky}):
+    let sticky = if prefs.stickyProfile: " sticky" else: ""
+    tdiv(class=(&"profile-tab{sticky}")):
       renderProfileCard(profile, prefs)
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)
