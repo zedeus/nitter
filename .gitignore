@@ -3,6 +3,7 @@ nitter
 *.db
 /tests/__pycache__
 /tests/geckodriver.log
-/tmp
+/tests/downloaded_files/*
 /tools/gencss
 /public/css/style.css
+nitter.conf

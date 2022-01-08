@@ -10,21 +10,22 @@ bin           = @["nitter"]
 
 # Dependencies
 
-requires "nim >= 1.2.0"
+requires "nim >= 1.4.8"
 requires "jester >= 0.5.0"
-requires "karax >= 1.1.2"
+requires "karax#c71bc92"
 requires "sass#e683aa1"
-requires "regex#2e32fdc"
-requires "nimcrypto >= 0.4.11"
+requires "regex#eeefb4f"
+requires "nimcrypto#a5742a9"
 requires "markdown#abdbe5e"
-requires "packedjson#7198cc8"
-requires "supersnappy#1.1.5"
-requires "redpool#57aeb25"
-requires "https://github.com/zedeus/redis#94bcbf1"
-requires "https://github.com/disruptek/frosty#0.3.1"
+requires "packedjson#d11d167"
+requires "supersnappy#2.1.1"
+requires "redpool#f880f49"
+requires "https://github.com/zedeus/redis#d0a0e6f"
+requires "zippy#0.7.3"
+requires "flatty#0.2.3"
 
 
 # Tasks
 
 task scss, "Generate css":
-  exec "nim c --hint[Processing]:off -r tools/gencss"
+  exec "nim c --hint[Processing]:off -d:danger -r tools/gencss"

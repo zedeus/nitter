@@ -6,4 +6,11 @@
 
 # disable annoying warnings
 warning("GcUnsafe2", off)
-warning("ObservableStores", off)
+hint("XDeclaredButNotUsed", off)
+hint("User", off)
+
+const
+  nimVersion = (major: NimMajor, minor: NimMinor, patch: NimPatch)
+
+when nimVersion >= (1, 6, 0):
+  warning("HoleEnumConv", off)

@@ -1,26 +1,60 @@
-import asyncdispatch, httpclient, times, sequtils, json, math, random
-import strutils, strformat
+# SPDX-License-Identifier: AGPL-3.0-only
+import asyncdispatch, httpclient, times, sequtils, json, random
+import strutils, tables
+import zippy
 import types, agents, consts, http_pool
 
 const
-  expirationTime = 3.hours
-  maxLastUse = 1.hours
-  resetPeriod = 15.minutes
+  maxConcurrentReqs = 5  # max requests at a time per token, to avoid race conditions
+  maxAge = 3.hours       # tokens expire after 3 hours
+  maxLastUse = 1.hours   # if a token is unused for 60 minutes, it expires
   failDelay = initDuration(minutes=30)
 
 var
-  clientPool {.threadvar.}: HttpPool
-  tokenPool {.threadvar.}: seq[Token]
+  clientPool: HttpPool
+  tokenPool: seq[Token]
   lastFailed: Time
 
-proc getPoolInfo*: string =
-  if tokenPool.len == 0: return "token pool empty"
+proc getPoolJson*(): JsonNode =
+  var
+    list = newJObject()
+    totalReqs = 0
+    totalPending = 0
+    reqsPerApi: Table[string, int]
 
-  let avg = tokenPool.mapIt(it.remaining).sum() div tokenPool.len
-  return &"{tokenPool.len} tokens, average remaining: {avg}"
+  for token in tokenPool:
+    totalPending.inc(token.pending)
+    list[token.tok] = %*{
+      "apis": newJObject(),
+      "pending": token.pending,
+      "init": $token.init,
+      "lastUse": $token.lastUse
+    }
+
+    for api in token.apis.keys:
+      list[token.tok]["apis"][$api] = %token.apis[api]
+
+      let
+        maxReqs =
+          case api
+          of Api.listBySlug, Api.list: 500
+          of Api.timeline: 187
+          else: 180
+        reqs = maxReqs - token.apis[api].remaining
+
+      reqsPerApi[$api] = reqsPerApi.getOrDefault($api, 0) + reqs
+      totalReqs.inc(reqs)
+
+  return %*{
+    "amount": tokenPool.len,
+    "requests": totalReqs,
+    "pending": totalPending,
+    "apis": reqsPerApi,
+    "tokens": list
+  }
 
 proc rateLimitError*(): ref RateLimitError =
-  newException(RateLimitError, "rate limited with " & getPoolInfo())
+  newException(RateLimitError, "rate limited")
 
 proc fetchToken(): Future[Token] {.async.} =
   if getTime() - lastFailed < failDelay:
@@ -28,58 +62,75 @@ proc fetchToken(): Future[Token] {.async.} =
 
   let headers = newHttpHeaders({
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "accept-encoding": "gzip",
     "accept-language": "en-US,en;q=0.5",
     "connection": "keep-alive",
     "user-agent": getAgent(),
     "authorization": auth
   })
 
-  var
-    resp: string
-    tokNode: JsonNode
-    tok: string
-
   try:
-    resp = clientPool.use(headers): await c.postContent(activate)
-    tokNode = parseJson(resp)["guest_token"]
-    tok = tokNode.getStr($(tokNode.getInt))
+    let
+      resp = clientPool.use(headers): await c.postContent(activate)
+      tokNode = parseJson(uncompress(resp))["guest_token"]
+      tok = tokNode.getStr($(tokNode.getInt))
+      time = getTime()
 
-    let time = getTime()
-    result = Token(tok: tok, remaining: 187, reset: time + resetPeriod,
-                   init: time, lastUse: time)
+    return Token(tok: tok, init: time, lastUse: time)
   except Exception as e:
     lastFailed = getTime()
     echo "fetching token failed: ", e.msg
 
-template expired(token: Token): untyped =
+proc expired(token: Token): bool =
   let time = getTime()
-  token.init < time - expirationTime or
-    token.lastUse < time - maxLastUse
+  token.init < time - maxAge or token.lastUse < time - maxLastUse
 
-template isLimited(token: Token): untyped =
-  token == nil or (token.remaining <= 1 and token.reset > getTime()) or
-    token.expired
+proc isLimited(token: Token; api: Api): bool =
+  if token.isNil or token.expired:
+    return true
 
-proc release*(token: Token; invalid=false) =
-  if token != nil and (invalid or token.expired):
+  if api in token.apis:
+    let limit = token.apis[api]
+    return (limit.remaining <= 10 and limit.reset > epochTime().int)
+  else:
+    return false
+
+proc isReady(token: Token; api: Api): bool =
+  not (token.isNil or token.pending > maxConcurrentReqs or token.isLimited(api))
+
+proc release*(token: Token; used=false; invalid=false) =
+  if token.isNil: return
+  if invalid or token.expired:
     let idx = tokenPool.find(token)
     if idx > -1: tokenPool.delete(idx)
+  elif used:
+    dec token.pending
+    token.lastUse = getTime()
 
-proc getToken*(): Future[Token] {.async.} =
+proc getToken*(api: Api): Future[Token] {.async.} =
   for i in 0 ..< tokenPool.len:
-    if not result.isLimited: break
+    if result.isReady(api): break
     release(result)
     result = tokenPool.sample()
 
-  if result.isLimited:
+  if not result.isReady(api):
     release(result)
     result = await fetchToken()
     tokenPool.add result
 
-  if result == nil:
+  if not result.isNil:
+    inc result.pending
+  else:
     raise rateLimitError()
 
-  dec result.remaining
+proc setRateLimit*(token: Token; api: Api; remaining, reset: int) =
+  # avoid undefined behavior in race conditions
+  if api in token.apis:
+    let limit = token.apis[api]
+    if limit.reset >= reset and limit.remaining < remaining:
+      return
+
+  token.apis[api] = RateLimit(remaining: remaining, reset: reset)
 
 proc poolTokens*(amount: int) {.async.} =
   var futs: seq[Future[Token]]
@@ -92,13 +143,13 @@ proc poolTokens*(amount: int) {.async.} =
     try: newToken = await token
     except: discard
 
-    if newToken != nil:
+    if not newToken.isNil:
       tokenPool.add newToken
 
 proc initTokenPool*(cfg: Config) {.async.} =
   clientPool = HttpPool()
 
   while true:
-    if tokenPool.countIt(not it.isLimited) < cfg.minTokens:
+    if tokenPool.countIt(not it.isLimited(Api.timeline)) < cfg.minTokens:
       await poolTokens(min(4, cfg.minTokens - tokenPool.len))
     await sleepAsync(2000)

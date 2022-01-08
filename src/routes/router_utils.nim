@@ -1,4 +1,5 @@
-import strutils, sequtils, uri, tables
+# SPDX-License-Identifier: AGPL-3.0-only
+import strutils, sequtils, uri, tables, json
 from jester import Request, cookies
 
 import ../views/general
@@ -41,3 +42,6 @@ template getCursor*(req: Request): string =
 
 proc getNames*(name: string): seq[string] =
   name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
+
+template respJson*(node: JsonNode) =
+  resp $node, "application/json"

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, uri, os, algorithm
 
 import jester
@@ -31,7 +32,7 @@ proc createPrefRouter*(cfg: Config) =
 
     post "/resetprefs":
       genResetPrefs()
-      redirect($(parseUri("/settings") ? filterParams(request.params)))
+      redirect("/settings?referer=" & encodeUrl(refPath()))
 
     post "/enablehls":
       savePref("hlsPlayback", "on", request)

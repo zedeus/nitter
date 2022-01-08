@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, times, macros, htmlgen, unicode, options, algorithm
 import regex, packedjson
 import types, utils, formatters
@@ -43,14 +44,14 @@ template getError*(js: JsonNode): Error =
   if js.kind != JArray or js.len == 0: null
   else: Error(js[0]{"code"}.getInt)
 
-template parseTime(time: string; f: static string; flen: int): Time =
+template parseTime(time: string; f: static string; flen: int): DateTime =
   if time.len != flen: return
-  parse(time, f).toTime
+  parse(time, f, utc())
 
-proc getDateTime*(js: JsonNode): Time =
+proc getDateTime*(js: JsonNode): DateTime =
   parseTime(js.getStr, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", 20)
 
-proc getTime*(js: JsonNode): Time =
+proc getTime*(js: JsonNode): DateTime =
   parseTime(js.getStr, "ddd MMM dd hh:mm:ss \'+0000\' yyyy", 30)
 
 proc getId*(id: string): string {.inline.} =
@@ -117,7 +118,7 @@ proc getBanner*(js: JsonNode): string =
   if color.len > 0:
     return '#' & color
 
-  # use primary color from profile picture color histrogram
+  # use primary color from profile picture color histogram
   with p, js{"profile_image_extensions", "mediaColor", "r", "ok", "palette"}:
     if p.len > 0:
       let pal = p[0]{"rgb"}

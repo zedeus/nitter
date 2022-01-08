@@ -1,15 +1,15 @@
-import strutils, strformat, sequtils, uri, tables, base64
+# SPDX-License-Identifier: AGPL-3.0-only
+import strutils, strformat, uri, tables, base64
 import nimcrypto, regex
 
 var
-  hmacKey {.threadvar.}: string
+  hmacKey: string
   base64Media = false
 
 const
   https* = "https://"
   twimg* = "pbs.twimg.com/"
-  badJpgExts = @["1500x500", "jpgn", "jpg:", "jpg_", "_jpg"]
-  badPngExts = @["pngn", "png:", "png_", "_png"]
+  nitterParams = ["name", "tab", "id", "list", "referer", "scroll"]
   twitterDomains = @[
     "twitter.com",
     "pic.twitter.com",
@@ -42,17 +42,10 @@ proc getPicUrl*(link: string): string =
   else:
     &"/pic/{encodeUrl(link)}"
 
-proc cleanFilename*(filename: string): string =
-  const reg = re"[^A-Za-z0-9._-]"
-  result = filename.replace(reg, "_")
-  if badJpgExts.anyIt(it in result):
-    result &= ".jpg"
-  elif badPngExts.anyIt(it in result):
-    result &= ".png"
-
 proc filterParams*(params: Table): seq[(string, string)] =
-  const filter = ["name", "id", "list", "referer", "scroll"]
-  toSeq(params.pairs()).filterIt(it[0] notin filter and it[1].len > 0)
+  for p in params.pairs():
+    if p[1].len > 0 and p[0] notin nitterParams:
+      result.add p
 
 proc isTwitterUrl*(uri: Uri): bool =
   uri.hostname in twitterDomains

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import random, strformat, strutils, sequtils
 
 randomize()
@@ -30,7 +31,7 @@ proc windows(): string =
     trident = ["", "; Trident/5.0", "; Trident/6.0", "; Trident/7.0"]
   "Windows " & sample(nt) & sample(enc) & sample(arch) & sample(trident)
 
-let macs = toSeq(6..15).mapIt($it) & @["14_4", "10_1", "9_3"]
+const macs = toSeq(6..15).mapIt($it) & @["14_4", "10_1", "9_3"]
 
 proc mac(): string =
   "Macintosh; Intel Mac OS X 10_" & sample(macs) & sample(enc)

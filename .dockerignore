@@ -1,0 +1,6 @@
+*.png
+*.md
+LICENSE
+docker-compose.yml
+Dockerfile
+tests/

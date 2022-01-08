@@ -1,5 +1,7 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, options, tables, times, math
 import packedjson
+import packedjson / deserialiser
 import types, parserutils, utils
 
 proc parseProfile(js: JsonNode; id=""): Profile =
@@ -10,7 +12,7 @@ proc parseProfile(js: JsonNode; id=""): Profile =
     fullname: js{"name"}.getStr,
     location: js{"location"}.getStr,
     bio: js{"description"}.getStr,
-    userpic: js{"profile_image_url_https"}.getImageStr.replace("_normal", ""),
+    userPic: js{"profile_image_url_https"}.getImageStr.replace("_normal", ""),
     banner: js.getBanner,
     following: $js{"friends_count"}.getInt,
     followers: $js{"followers_count"}.getInt,
@@ -24,29 +26,20 @@ proc parseProfile(js: JsonNode; id=""): Profile =
 
   result.expandProfileEntities(js)
 
-proc parseUserShow*(js: JsonNode; username: string): Profile =
-  if js.isNull:
-    return Profile(username: username)
+proc parseUserShow*(js: JsonNode; username=""; id=""): Profile =
+  if id.len > 0:
+    result = Profile(id: id)
+  else:
+    result = Profile(username: username)
+
+  if js.isNull: return
 
   with error, js{"errors"}:
-    result = Profile(username: username)
     if error.getError == suspended:
       result.suspended = true
     return
 
   result = parseProfile(js)
-
-proc parseGraphProfile*(js: JsonNode; username: string): Profile =
-  if js.isNull: return
-  with error, js{"errors"}:
-    result = Profile(username: username)
-    if error.getError == suspended:
-      result.suspended = true
-    return
-
-  let user = js{"data", "user", "legacy"}
-  let id = js{"data", "user", "rest_id"}.getStr
-  result = parseProfile(user, id)
 
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
@@ -59,9 +52,9 @@ proc parseGraphList*(js: JsonNode): List =
 
   result = List(
     id: list{"id_str"}.getStr,
-    name: list{"name"}.getStr.replace(' ', '-'),
+    name: list{"name"}.getStr,
     username: list{"user", "legacy", "screen_name"}.getStr,
-    userId: list{"user", "legacy", "id_str"}.getStr,
+    userId: list{"user", "rest_id"}.getStr,
     description: list{"description"}.getStr,
     members: list{"member_count"}.getInt,
     banner: list{"custom_banner_media", "media_info", "url"}.getImageStr
@@ -92,8 +85,8 @@ proc parsePoll(js: JsonNode): Poll =
     result.options.add vals{choice & "_label"}.getStrVal
 
   let time = vals{"end_datetime_utc", "string_value"}.getDateTime
-  if time > getTime():
-    let timeLeft = $(time - getTime())
+  if time > now():
+    let timeLeft = $(time - now())
     result.status = timeLeft[0 ..< timeLeft.find(",")]
   else:
     result.status = "Final results"
@@ -114,12 +107,15 @@ proc parseVideo(js: JsonNode): Video =
     views: js{"ext", "mediaStats", "r", "ok", "viewCount"}.getStr,
     available: js{"ext_media_availability", "status"}.getStr == "available",
     title: js{"ext_alt_text"}.getStr,
-    durationMs: js{"duration_millis"}.getInt
+    durationMs: js{"video_info", "duration_millis"}.getInt
     # playbackType: mp4
   )
 
   with title, js{"additional_media_info", "title"}:
     result.title = title.getStr
+
+  with description, js{"additional_media_info", "description"}:
+    result.description = description.getStr
 
   for v in js{"video_info", "variants"}:
     result.variants.add VideoVariant(
@@ -168,7 +164,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
   let
     vals = ? js{"binding_values"}
     name = js{"name"}.getStr
-    kind = parseEnum[CardKind](name[(name.find(":") + 1) ..< name.len])
+    kind = parseEnum[CardKind](name[(name.find(":") + 1) ..< name.len], unknown)
 
   result = Card(
     kind: kind,
@@ -194,7 +190,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
     result.url = vals{"player_url"}.getStrVal
     if "youtube.com" in result.url:
       result.url = result.url.replace("/embed/", "/watch?v=")
-  of unified:
+  of audiospace, unified, unknown:
     result.title = "This card type is not supported."
   else: discard
 
@@ -267,6 +263,20 @@ proc parseTweet(js: JsonNode): Tweet =
       of "animated_gif":
         result.gif = some(parseGif(m))
       else: discard
+
+  with jsWithheld, js{"withheld_in_countries"}:
+    let withheldInCountries: seq[string] =
+      if jsWithheld.kind != JArray: @[]
+      else: jsWithheld.to(seq[string])
+
+    # XX - Content is withheld in all countries
+    # XY - Content is withheld due to a DMCA request.
+    if js{"withheld_copyright"}.getBool or
+       withheldInCountries.len > 0 and ("XX" in withheldInCountries or
+                                        "XY" in withheldInCountries or
+                                        "withheld" in result.text):
+      result.text.removeSuffix(" Learn more.")
+      result.available = false
 
 proc finalizeTweet(global: GlobalObjects; id: string): Tweet =
   let intId = if id.len > 0: parseBiggestInt(id) else: 0
@@ -389,7 +399,7 @@ proc parseUsers*(js: JsonNode; after=""): Result[Profile] =
 
   for e in instructions[0]{"addEntries", "entries"}:
     let entry = e{"entryId"}.getStr
-    if "sq-I-u" in entry:
+    if "user-" in entry:
       let id = entry.getId
       if id in global.users:
         result.content.add global.users[id]
