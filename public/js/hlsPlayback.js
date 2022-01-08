@@ -1,4 +1,5 @@
 // @license http://www.gnu.org/licenses/agpl-3.0.html AGPL-3.0
+// SPDX-License-Identifier: AGPL-3.0-only
 function playVideo(overlay) {
     const video = overlay.parentElement.querySelector('video');
     const url = video.getAttribute("data-url");
@@ -16,7 +17,7 @@ function playVideo(overlay) {
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = url;
-        video.addEventListened('canplay', function() {
+        video.addEventListener('canplay', function() {
             video.play();
         });
     }

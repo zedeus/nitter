@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, strformat, sequtils, tables, uri
 
 import types
@@ -10,6 +11,8 @@ const
     "replies", "retweets", "nativeretweets",
     "verified", "safe"
   ]
+
+  emptyQuery* = "include:nativeretweets"
 
 template `@`(param: string): untyped =
   if param in pms: pms[param]

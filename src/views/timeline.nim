@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, strformat, sequtils, algorithm, uri, options
 import karax/[karaxdsl, vdom]
 
@@ -25,7 +26,7 @@ proc renderNewer*(query: Query; path: string; focus=""): VNode =
 
 proc renderMore*(query: Query; cursor: string; focus=""): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"?{getQuery(query)}cursor={encodeUrl(cursor)}{focus}")):
+    a(href=(&"?{getQuery(query)}cursor={encodeUrl(cursor, usePlus=false)}{focus}")):
       text "Load more"
 
 proc renderNoMore(): VNode =
@@ -62,7 +63,7 @@ proc renderUser(user: Profile; prefs: Prefs): VNode =
     tdiv(class="tweet-body profile-result"):
       tdiv(class="tweet-header"):
         a(class="tweet-avatar", href=("/" & user.username)):
-          genImg(user.getUserpic("_bigger"), class="avatar")
+          genImg(user.getUserPic("_bigger"), class="avatar")
 
         tdiv(class="tweet-name-row"):
           tdiv(class="fullname-and-username"):
@@ -70,7 +71,7 @@ proc renderUser(user: Profile; prefs: Prefs): VNode =
         linkUser(user, class="username")
 
       tdiv(class="tweet-content media-body", dir="auto"):
-        verbatim replaceUrl(user.bio, prefs)
+        verbatim replaceUrls(user.bio, prefs)
 
 proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs; path=""): VNode =
   buildHtml(tdiv(class="timeline")):

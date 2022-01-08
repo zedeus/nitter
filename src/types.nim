@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import times, sequtils, options, tables
 import prefs_impl
 
@@ -5,13 +6,28 @@ genPrefsType()
 
 type
   RateLimitError* = object of CatchableError
+  InternalError* = object of CatchableError
+
+  Api* {.pure.} = enum
+    userShow
+    photoRail
+    timeline
+    search
+    tweet
+    list
+    listBySlug
+    listMembers
+
+  RateLimit* = object
+    remaining*: int
+    reset*: int
 
   Token* = ref object
     tok*: string
-    remaining*: int
-    reset*: Time
     init*: Time
     lastUse*: Time
+    pending*: int
+    apis*: Table[Api, RateLimit]
 
   Error* = enum
     null = 0
@@ -36,7 +52,7 @@ type
     location*: string
     website*: string
     bio*: string
-    userpic*: string
+    userPic*: string
     banner*: string
     following*: string
     followers*: string
@@ -46,7 +62,7 @@ type
     verified*: bool
     protected*: bool
     suspended*: bool
-    joinDate*: Time
+    joinDate*: DateTime
 
   VideoType* = enum
     m3u8 = "application/x-mpegURL"
@@ -126,6 +142,8 @@ type
     videoDirectMessage = "video_direct_message"
     imageDirectMessage = "image_direct_message"
     audiospace = "audiospace"
+    newsletterPublication = "newsletter_publication"
+    unknown
     
   Card* = object
     kind*: CardKind
@@ -150,7 +168,7 @@ type
     replyId*: int64
     profile*: Profile
     text*: string
-    time*: Time
+    time*: DateTime
     reply*: seq[string]
     pinned*: bool
     hasThread*: bool
@@ -212,6 +230,10 @@ type
     hmacKey*: string
     base64Media*: bool
     minTokens*: int
+    enableRss*: bool
+    enableDebug*: bool
+    proxy*: string
+    proxyAuth*: string
 
     rssCacheTime*: int
     listCacheTime*: int
@@ -220,8 +242,7 @@ type
     redisPort*: int
     redisConns*: int
     redisMaxConns*: int
-
-    replaceYouTube*: string
+    redisPassword*: string
 
   Rss* = object
     feed*, cursor*: string

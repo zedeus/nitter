@@ -1,9 +1,10 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils
 
 import jester
 
 import router_utils
-import ".."/[query, types, api]
+import ".."/[types, api]
 import ../views/general
 
 template respResolved*(url, kind: string): untyped =

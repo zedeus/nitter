@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 
@@ -14,12 +15,14 @@ proc renderStat(num, class: string; text=""): VNode =
 proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-card")):
     tdiv(class="profile-card-info"):
-      let url = getPicUrl(profile.getUserPic())
-      var size = "_400x400"
-      if prefs.autoplayGifs and profile.userpic.endsWith("gif"):
-        size = ""
+      let
+        url = getPicUrl(profile.getUserPic())
+        size =
+          if prefs.autoplayGifs and profile.userPic.endsWith("gif"): ""
+          else: "_400x400"
+
       a(class="profile-card-avatar", href=url, target="_blank"):
-        genImg(profile.getUserpic(size))
+        genImg(profile.getUserPic(size))
 
       tdiv(class="profile-card-tabs-name"):
         linkUser(profile, class="profile-card-fullname")
@@ -29,7 +32,7 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
       if profile.bio.len > 0:
         tdiv(class="profile-bio"):
           p(dir="auto"):
-            verbatim replaceUrl(profile.bio, prefs)
+            verbatim replaceUrls(profile.bio, prefs)
 
       if profile.location.len > 0:
         tdiv(class="profile-location"):
@@ -45,7 +48,7 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
       if profile.website.len > 0:
         tdiv(class="profile-website"):
           span:
-            let url = replaceUrl(profile.website, prefs)
+            let url = replaceUrls(profile.website, prefs)
             icon "link"
             a(href=url): text shortLink(url)
 
@@ -102,8 +105,8 @@ proc renderProfile*(profile: Profile; timeline: var Timeline;
       tdiv(class="profile-banner"):
         renderBanner(profile)
 
-    let sticky = if prefs.stickyProfile: "sticky" else: "unset"
-    tdiv(class="profile-tab", style={position: sticky}):
+    let sticky = if prefs.stickyProfile: " sticky" else: ""
+    tdiv(class=(&"profile-tab{sticky}")):
       renderProfileCard(profile, prefs)
       if photoRail.len > 0:
         renderPhotoRail(profile, photoRail)

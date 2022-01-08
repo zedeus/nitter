@@ -1,4 +1,5 @@
 #? stdtmpl(subsChar = '$', metaChar = '#')
+## SPDX-License-Identifier: AGPL-3.0-only
 #proc generateOpenSearchXML*(name, hostname, url: string): string =
 #  result = ""
 <?xml version="1.0" encoding="UTF-8"?>

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import tables
 import types, prefs_impl
 from config import get
@@ -5,7 +6,7 @@ from parsecfg import nil
 
 export genUpdatePrefs, genResetPrefs
 
-var defaultPrefs* {.threadvar.}: Prefs
+var defaultPrefs*: Prefs
 
 proc updateDefaultPrefs*(cfg: parsecfg.Config) =
   genDefaultPrefs()

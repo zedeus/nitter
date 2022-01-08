@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils
 import karax/[karaxdsl, vdom, vstyles]
 import ".."/[types, utils]
@@ -30,7 +31,7 @@ proc linkUser*(profile: Profile, class=""): VNode =
       icon "lock", title="Protected account"
 
 proc linkText*(text: string; class=""): VNode =
-  let url = if "http" notin text: "http://" & text else: text
+  let url = if "http" notin text: https & text else: text
   buildHtml():
     a(href=url, class=class): text text
 
@@ -40,12 +41,6 @@ proc hiddenField*(name, value: string): VNode =
 
 proc refererField*(path: string): VNode =
   hiddenField("referer", path)
-
-proc iconReferer*(icon, action, path: string, title=""): VNode =
-  buildHtml(form(`method`="get", action=action, class="icon-button")):
-    refererField path
-    button(`type`="submit"):
-      icon icon, title=title
 
 proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNode =
   buildHtml(form(`method`=`method`, action=action, class=class)):

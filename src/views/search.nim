@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import strutils, strformat, sequtils, unicode, tables
 import karax/[karaxdsl, vdom]
 
@@ -24,7 +25,7 @@ proc renderSearch*(): VNode =
     tdiv(class="search-bar"):
       form(`method`="get", action="/search"):
         hiddenField("f", "users")
-        input(`type`="text", name="q", autofocus="", placeholder="Enter username...")
+        input(`type`="text", name="q", autofocus="", placeholder="Enter username...", dir="auto")
         button(`type`="submit"): icon "search"
 
 proc renderProfileTabs*(query: Query; username: string): VNode =

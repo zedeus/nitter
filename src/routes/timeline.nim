@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch, strutils, sequtils, uri, options, times
 import jester, karax/vdom
 
@@ -45,7 +46,7 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
     return
 
   var rail: Future[PhotoRail]
-  if skipRail or query.kind == media:
+  if skipRail or profile.protected or query.kind == media:
     rail = newFuture[PhotoRail]()
     rail.complete(@[])
   else:
@@ -77,9 +78,6 @@ proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
 
   return (profile, timeline, await rail)
 
-proc get*(req: Request; key: string): string =
-  params(req).getOrDefault(key)
-
 proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
                    rss, after: string): Future[string] {.async.} =
   if query.fromUser.len != 1:
@@ -95,7 +93,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
 
   let pHtml = renderProfile(p, t, r, prefs, getPath())
   result = renderMain(pHtml, request, cfg, prefs, pageTitle(p), pageDesc(p),
-                      rss=rss, images = @[p.getUserpic("_400x400")],
+                      rss=rss, images = @[p.getUserPic("_400x400")],
                       banner=p.banner)
 
 template respTimeline*(timeline: typed) =
@@ -104,8 +102,22 @@ template respTimeline*(timeline: typed) =
     resp Http404, showError("User \"" & @"name" & "\" not found", cfg)
   resp t
 
+template respUserId*() =
+  cond @"user_id".len > 0
+  let username = await getCachedProfileUsername(@"user_id")
+  if username.len > 0:
+    redirect("/" & username)
+  else:
+    resp Http404, showError("User not found", cfg)
+
 proc createTimelineRouter*(cfg: Config) =
   router timeline:
+    get "/i/user/@user_id":
+      respUserId()
+
+    get "/intent/user":
+      respUserId()
+
     get "/@name/?@tab?/?":
       cond '.' notin @"name"
       cond @"name" notin ["pic", "gif", "video"]
@@ -119,6 +131,7 @@ proc createTimelineRouter*(cfg: Config) =
       if names.len != 1:
         query.fromUser = names
 
+      # used for the infinite scroll feature
       if @"scroll".len > 0:
         if query.fromUser.len != 1:
           var timeline = await getSearch[Tweet](query, after)
@@ -131,10 +144,12 @@ proc createTimelineRouter*(cfg: Config) =
           timeline.beginning = true
           resp $renderTimelineTweets(timeline, prefs, getPath())
 
-      var rss = "/$1/$2/rss" % [@"name", @"tab"]
-      if @"tab".len == 0:
-        rss = "/$1/rss" % @"name"
-      elif @"tab" == "search":
-        rss &= "?" & genQueryUrl(query)
+      let rss =
+        if @"tab".len == 0:
+          "/$1/rss" % @"name"
+        elif @"tab" == "search":
+          "/$1/search/rss?$2" % [@"name", genQueryUrl(query)]
+        else:
+          "/$1/$2/rss" % [@"name", @"tab"]
 
       respTimeline(await showTimeline(request, query, cfg, prefs, rss, after))

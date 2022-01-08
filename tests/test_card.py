@@ -5,7 +5,7 @@ from parameterized import parameterized
 card = [
     ['Thom_Wolf/status/1122466524860702729',
      'pytorch/fairseq',
-     'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - pytorch/fairseq',
+     'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - GitHub - pytorch/fairseq: Facebook AI Research Sequence-to-Sequence Toolkit written in Python.',
      'github.com', True],
 
     ['nim_lang/status/1136652293510717440',
@@ -48,12 +48,7 @@ no_thumb = [
     ['nim_lang/status/1082989146040340480',
      'Nim in 2018: A short recap',
      'Posted in r/programming by u/miran1',
-     'reddit.com'],
-
-    ['lorenlugosch/status/1115440394148487168',
-     'Fluent Speech Commands: A dataset for spoken language understanding research',
-     'In recent years, with the advent of deep neural networks, the accuracy of speech recognition models have been notably improved which have made possible the production of speech-to-text systems that...',
-     'fluent.ai']
+     'reddit.com']
 ]
 
 playable = [

@@ -174,7 +174,8 @@
 
 .tweet-stat {
     padding-top: 5px;
-    padding-right: 8px;
+    min-width: 1em;
+    margin-right: 0.8em;
 }
 
 .show-thread {
@@ -188,8 +189,10 @@
     height: 100%;
     padding: 12px;
     border: solid 1px var(--dark_grey);
+    box-sizing: border-box;
     border-radius: 10px;
     background-color: var(--bg_color);
+    z-index: 2;
 }
 
 .tweet-link {
