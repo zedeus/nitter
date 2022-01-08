@@ -36,7 +36,6 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
                  rss=""): VNode =
   let ogType =
     if video.len > 0: "video"
-    elif rss.len > 0: "object"
     elif images.len > 0: "photo"
     else: "article"
 
@@ -93,15 +92,15 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
       meta(property="og:image", content=image)
       meta(property="twitter:image:src", content=image)
 
-      if rss.len > 0:
-        meta(property="twitter:card", content="summary")
-      else:
-        meta(property="twitter:card", content="summary_large_image")
-
     if video.len > 0:
+      meta(property="twitter:card", content="summary_large_image")
       meta(property="og:video:url", content=video)
       meta(property="og:video:secure_url", content=video)
       meta(property="og:video:type", content="text/html")
+    elif images.len > 0:
+      meta(property="twitter:card", content="summary_large_image")
+    else:
+      meta(property="twitter:card", content="summary")
 
     # this is last so images are also preloaded
     # if this is done earlier, Chrome only preloads one image for some reason
