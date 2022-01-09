@@ -9,7 +9,7 @@ import ../views/[general, preferences]
 
 export preferences
 
-let reTitleize = re"(?<![A-z])([a-z])"
+let reTitleize = re"(?<![A-z])[a-z]"
 
 proc titleize(str: string): string =
   result = str
