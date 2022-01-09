@@ -29,3 +29,6 @@ requires "flatty#0.2.3"
 
 task scss, "Generate css":
   exec "nim c --hint[Processing]:off -d:danger -r tools/gencss"
+
+task md, "Render md":
+  exec "nim c --hint[Processing]:off -d:danger -r tools/rendermd"

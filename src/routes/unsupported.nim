@@ -3,7 +3,9 @@ import jester
 
 import router_utils
 import ../types
-import ../views/[general, about]
+import ../views/[general, feature]
+
+export feature
 
 proc createUnsupportedRouter*(cfg: Config) =
   router unsupported:

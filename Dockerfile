@@ -2,14 +2,14 @@ FROM nimlang/nim:1.6.2-alpine-regular as nim
 LABEL maintainer="setenforce@protonmail.com"
 EXPOSE 8080
 
-RUN apk --no-cache add libsass-dev
+RUN apk --no-cache add libsass-dev pcre
 
 COPY . /src/nitter
 WORKDIR /src/nitter
 
-RUN nimble build -y -d:release -d:danger --passC:"-flto" --passL:"-flto" \
-    && strip -s nitter \
-    && nimble scss
+RUN nimble build -y -d:danger -d:lto -d:strip \
+    && nimble scss \
+    && nimble md
 
 FROM alpine:latest
 WORKDIR /src/
