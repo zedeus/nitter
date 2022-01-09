@@ -32,6 +32,7 @@ setHmacKey(cfg.hmacKey)
 setProxyEncoding(cfg.base64Media)
 setMaxHttpConns(cfg.httpMaxConns)
 setHttpProxy(cfg.proxy, cfg.proxyAuth)
+initAboutPage(cfg.staticDir)
 
 waitFor initRedisPool(cfg)
 stdout.write &"Connected to Redis at {cfg.redisHost}:{cfg.redisPort}\n"

@@ -8,16 +8,18 @@ const
   link = "https://github.com/zedeus/nitter/commit/" & hash
   version = &"{date}-{hash}"
 
-let about =
+var aboutHtml: string
+
+proc initAboutPage*(dir: string) =
   try:
-    readFile("public/md/about.html")
+    aboutHtml = readFile(&"{dir}/md/about.html")
   except IOError:
-    stderr.write "public/md/about.html not found, please run `nimble md`\n"
-    "<h1>About page is missing</h1><br><br>"
+    stderr.write &"{dir}/about.html not found, please run `nimble md`\n"
+    aboutHtml = "<h1>About page is missing</h1><br><br>"
 
 proc renderAbout*(): VNode =
   buildHtml(tdiv(class="overlay-panel")):
-    verbatim about
+    verbatim aboutHtml
     h2: text "Instance info"
     p:
       text "Version "
