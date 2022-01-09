@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strformat
+import os, strformat
 import karax/[karaxdsl, vdom]
 
 const
@@ -12,9 +12,9 @@ var aboutHtml: string
 
 proc initAboutPage*(dir: string) =
   try:
-    aboutHtml = readFile(&"{dir}/md/about.html")
+    aboutHtml = readFile(dir/"md/about.html")
   except IOError:
-    stderr.write &"{dir}/about.html not found, please run `nimble md`\n"
+    stderr.write (dir/"md/about.html") & " not found, please run `nimble md`\n"
     aboutHtml = "<h1>About page is missing</h1><br><br>"
 
 proc renderAbout*(): VNode =
