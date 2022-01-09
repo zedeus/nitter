@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, uri, os, algorithm
+import strutils, uri, os, re, algorithm
 
 import jester
 
@@ -9,10 +9,21 @@ import ../views/[general, preferences]
 
 export preferences
 
+let reTitleize = re"(?<![A-z])([a-z])"
+
+proc titleize(str: string): string =
+  result = str
+  var idx = 0
+  while idx != -1:
+    idx = str.find(reTitleize, start = idx)
+    if idx != -1:
+      result[idx] = str[idx].toUpperAscii
+      idx.inc
+
 proc findThemes*(dir: string): seq[string] =
   for kind, path in walkDir(dir / "css" / "themes"):
     let theme = path.splitFile.name
-    result.add theme.capitalizeAscii.replace("_", " ")
+    result.add theme.replace("_", " ").titleize
   sort(result)
 
 proc createPrefRouter*(cfg: Config) =
