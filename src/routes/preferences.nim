@@ -4,21 +4,21 @@ import strutils, uri, os, re, algorithm
 import jester
 
 import router_utils
-import ".."/[types]
+import ../types
 import ../views/[general, preferences]
 
 export preferences
 
-let reTitleize = re"(?<![A-z])[a-z]"
+let titleizeRegex = re"(?<![A-z])[a-z]"
 
 proc titleize(str: string): string =
   result = str
   var idx = 0
   while idx != -1:
-    idx = str.find(reTitleize, start = idx)
+    idx = str.find(titleizeRegex, start = idx)
     if idx != -1:
       result[idx] = str[idx].toUpperAscii
-      idx.inc
+      inc idx
 
 proc findThemes*(dir: string): seq[string] =
   for kind, path in walkDir(dir / "css" / "themes"):
