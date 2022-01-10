@@ -1,24 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, uri, os, re, algorithm
+import strutils, uri, os, algorithm
 
 import jester
 
 import router_utils
-import ../types
+import ".."/[types, formatters]
 import ../views/[general, preferences]
 
 export preferences
-
-let titleizeRegex = re"(?<![A-z])[a-z]"
-
-proc titleize(str: string): string =
-  result = str
-  var idx = 0
-  while idx != -1:
-    idx = str.find(titleizeRegex, start = idx)
-    if idx != -1:
-      result[idx] = str[idx].toUpperAscii
-      inc idx
 
 proc findThemes*(dir: string): seq[string] =
   for kind, path in walkDir(dir / "css" / "themes"):

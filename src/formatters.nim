@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, strformat, times, uri, tables, xmltree, htmlparser, htmlgen
+import std/enumerate
 import regex
 import types, utils, query
 
@@ -179,3 +180,13 @@ proc getLocation*(u: Profile | Tweet): (string, string) =
 
 proc getSuspended*(username: string): string =
   &"User \"{username}\" has been suspended"
+
+proc titleize*(str: string): string =
+  const
+    lowercase = {'a'..'z'}
+    delims = {' ', '('}
+
+  result = str
+  for i, c in enumerate(str):
+    if c in lowercase and (i == 0 or str[i - 1] in delims):
+      result[i] = c.toUpperAscii
