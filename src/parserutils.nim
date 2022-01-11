@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, times, macros, htmlgen, unicode, options, algorithm
-import regex, packedjson
+import std/re
+import packedjson
 import types, utils, formatters
 
-const
+let
   unRegex = re"(^|[^A-z0-9-_./?])@([A-z0-9_]{1,15})"
   unReplace = "$1<a href=\"/$2\">@$2</a>"
 
@@ -213,8 +214,8 @@ proc expandProfileEntities*(profile: var Profile; js: JsonNode) =
   replacements.sort(cmp)
 
   profile.bio = orig.replacedWith(replacements, 0 .. orig.len)
-  profile.bio = profile.bio.replace(unRegex, unReplace)
-                           .replace(htRegex, htReplace)
+  profile.bio = profile.bio.replacef(unRegex, unReplace)
+                           .replacef(htRegex, htReplace)
 
 proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
