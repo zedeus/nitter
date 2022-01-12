@@ -70,12 +70,11 @@ type
     vmap = "video/vmap"
 
   VideoVariant* = object
-    videoType*: VideoType
+    contentType*: VideoType
     url*: string
     bitrate*: int
 
   Video* = object
-    videoId*: string
     durationMs*: int
     url*: string
     thumb*: string
@@ -147,8 +146,6 @@ type
     
   Card* = object
     kind*: CardKind
-    id*: string
-    query*: string
     url*: string
     title*: string
     dest*: string

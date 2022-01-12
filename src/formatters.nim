@@ -61,7 +61,7 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
     result = result.replace(tco, https & prefs.replaceTwitter & "/t.co")
     result = result.replace(cards, prefs.replaceTwitter & "/cards")
     result = result.replace(twRegex, prefs.replaceTwitter)
-    result = result.replace(twLinkRegex, a(
+    result = result.replacef(twLinkRegex, a(
       prefs.replaceTwitter & "$2", href = https & prefs.replaceTwitter & "$1"))
 
   if prefs.replaceReddit.len > 0 and ("reddit.com" in result or "redd.it" in result):

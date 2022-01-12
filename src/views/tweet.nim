@@ -97,7 +97,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
           img(src=thumb)
           renderVideoDisabled(video, path)
         else:
-          let vid = video.variants.filterIt(it.videoType == video.playbackType)
+          let vid = video.variants.filterIt(it.contentType == video.playbackType)
           let source = getVidUrl(vid[0].url)
           case video.playbackType
           of mp4:
