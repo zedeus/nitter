@@ -87,7 +87,7 @@ proc proxifyVideo*(manifest: string; proxy: bool): string =
     let url =
       if line.startsWith("#EXT-X-MAP:URI"): line[16 .. ^2]
       else: line
-    if url[0] == '/':
+    if url.startsWith('/'):
       let path = "https://video.twimg.com" & url
       replacements.add (url, if proxy: path.getVidUrl else: path)
   return manifest.multiReplace(replacements)
