@@ -109,7 +109,7 @@ genPrefs:
 
     replaceInstagram(input, ""):
       "Instagram -> Bibliogram"
-      placeholder: "Bibliogram hostname"   
+      placeholder: "Bibliogram hostname"
 
 iterator allPrefs*(): Pref =
   for k, v in prefList:
