@@ -98,14 +98,16 @@
 }
 
 .avatar {
-    border-radius: 50%;
-}
-
-.avatar.mini {
-    margin-right: 5px;
-    margin-top: -1px;
-    width: 20px;
-    height: 20px;
+    &.round {
+        border-radius: 50%;
+    }
+    
+    &.mini {
+        margin-right: 5px;
+        margin-top: -1px;
+        width: 20px;
+        height: 20px;
+    }
 }
 
 .attribution {
