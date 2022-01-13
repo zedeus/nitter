@@ -75,7 +75,7 @@ genPrefs:
     hideReplies(checkbox, false):
       "Hide tweet replies"
 
-    squareProfileImages(checkbox, false):
+    squareAvatars(checkbox, false):
       "Square profile pictures"
 
   Media:
@@ -109,8 +109,7 @@ genPrefs:
 
     replaceInstagram(input, ""):
       "Instagram -> Bibliogram"
-      placeholder: "Bibliogram hostname"
-      
+      placeholder: "Bibliogram hostname"   
 
 iterator allPrefs*(): Pref =
   for k, v in prefList:
