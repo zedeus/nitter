@@ -75,6 +75,9 @@ genPrefs:
     hideReplies(checkbox, false):
       "Hide tweet replies"
 
+    squareProfileImages(checkbox, false):
+      "Square profile pictures"
+
   Media:
     mp4Playback(checkbox, true):
       "Enable mp4 video playback (only for gifs)"
@@ -107,6 +110,7 @@ genPrefs:
     replaceInstagram(input, ""):
       "Instagram -> Bibliogram"
       placeholder: "Bibliogram hostname"
+      
 
 iterator allPrefs*(): Pref =
   for k, v in prefList:

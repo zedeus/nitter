@@ -31,7 +31,12 @@ proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
         var size = "_bigger"
         if not prefs.autoplayGifs and tweet.profile.userPic.endsWith("gif"):
           size = "_400x400"
-        genImg(tweet.profile.getUserPic(size), class="avatar")
+
+        let avatarClass =
+          if prefs.squareProfileImages: "avatar"
+          else: "avatar avatar-round"
+        
+        genImg(tweet.profile.getUserPic(size), class=avatarClass)
 
       tdiv(class="tweet-name-row"):
         tdiv(class="fullname-and-username"):
