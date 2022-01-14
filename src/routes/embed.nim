@@ -27,3 +27,11 @@ proc createEmbedRouter*(cfg: Config) =
         resp Http404
 
       resp $renderEmbeddedTweet(convo.tweet, cfg, request, prefs, path)
+
+    get "/embed/Tweet.html":
+      let id = @"id"
+
+      if id.len > 0:
+        redirect("/i/status/" & id & "/embed")
+      else:
+        resp Http404
