@@ -32,22 +32,24 @@ proc getUrlPrefix*(cfg: Config): string =
   if cfg.useHttps: https & cfg.hostname
   else: "http://" & cfg.hostname
 
-proc stripHtml*(text: string): string =
+proc shortLink*(text: string; length=28): string =
+  result = text.replace(wwwRegex, "")
+  if result.len > length:
+    result = result[0 ..< length] & "…"
+    
+proc stripHtml*(text: string; shorten=false): string =
   var html = parseHtml(text)
   for el in html.findAll("a"):
     let link = el.attr("href")
     if "http" in link:
       if el.len == 0: continue
-      el[0].text = link
+      el[0].text =
+        if shorten: link.shortLink
+        else: link
   html.innerText()
 
 proc sanitizeXml*(text: string): string =
   text.replace(illegalXmlRegex, "")
-
-proc shortLink*(text: string; length=28): string =
-  result = text.replace(wwwRegex, "")
-  if result.len > length:
-    result = result[0 ..< length] & "…"
 
 proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
   result = body

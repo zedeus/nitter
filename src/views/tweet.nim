@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, sequtils, strformat, options
 import karax/[karaxdsl, vdom, vstyles]
+from jester import Request
 
 import renderutils
 import ".."/[types, utils, formatters]
+import general
 
 proc getSmallPic(url: string): string =
   result = url
@@ -353,3 +355,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if showThread:
         a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
           text "Show this thread"
+
+proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): VNode =
+  buildHtml(tdiv(class="tweet-embed")):
+    renderHead(prefs, cfg, req)
+    renderTweet(tweet, prefs, path, mainTweet=true)
