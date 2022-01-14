@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch, strutils, options
 import jester, karax/vdom
-import ".."/[types, api], ../views/[embed, tweet, general]
+import ".."/[types, api]
+import ../views/[embed, tweet, general]
 import router_utils
 
 export api, embed, vdom
