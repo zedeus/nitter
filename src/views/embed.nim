@@ -8,7 +8,7 @@ import general, tweet
 
 const doctype = "<!DOCTYPE html>\n"
 
-proc renderVideoEmbed*(cfg: Config; req: Request; tweet: Tweet): string =
+proc renderVideoEmbed*(tweet: Tweet; cfg: Config; req: Request): string =
   let thumb = get(tweet.video).thumb
   let vidUrl = getVideoEmbed(cfg, tweet.id)
   let prefs = Prefs(hlsPlayback: true)

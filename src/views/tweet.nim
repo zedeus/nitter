@@ -356,7 +356,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
           text "Show this thread"
 
-proc renderTweetEmbed*(tweet: Tweet; prefs: Prefs; path: string; cfg: Config; req: Request): VNode =
+proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): VNode =
   buildHtml(tdiv(class="tweet-embed")):
     renderHead(prefs, cfg, req)
     renderTweet(tweet, prefs, path, mainTweet=true)
