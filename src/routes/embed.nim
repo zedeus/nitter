@@ -4,9 +4,7 @@ import jester, karax/vdom
 import ".."/[types, api], ../views/[embed, tweet, general]
 import router_utils
 
-export api, embed, vdom
-export tweet, general
-export router_utils
+export api, embed, vdom, tweet, general, router_utils
 
 proc createEmbedRouter*(cfg: Config) =
   router embed:
@@ -26,7 +24,7 @@ proc createEmbedRouter*(cfg: Config) =
       if convo == nil or convo.tweet == nil:
         resp Http404
 
-      resp $renderEmbeddedTweet(convo.tweet, cfg, request, prefs, path)
+      resp $renderTweetEmbed(convo.tweet, prefs, path, cfg, request)
 
     get "/embed/Tweet.html":
       let id = @"id"
