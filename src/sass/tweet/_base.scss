@@ -118,7 +118,9 @@
     justify-content: center;
     height: 100%;
 
-    .tweet-content { font-size: 18px }
+    .tweet-content { 
+        font-size: 18px 
+    }
     
     .tweet-body { 
         display: flex;
