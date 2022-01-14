@@ -98,6 +98,8 @@
 }
 
 .avatar {
+    position: absolute;
+
     &.round {
         border-radius: 50%;
     }
@@ -107,6 +109,19 @@
         margin-top: -1px;
         width: 20px;
         height: 20px;
+    }
+}
+
+.tweet-embed {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    
+    .tweet-body { 
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 0.75em * 2);
     }
 }
 

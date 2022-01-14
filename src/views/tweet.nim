@@ -298,7 +298,7 @@ proc renderEmbeddedTweet*(tweet: Tweet; cfg: Config; req: Request; prefs: Prefs;
       if tweet.quote.isSome:
         renderQuote(tweet.quote.get(), prefs, path)
 
-  buildHtml(tdiv(class="timeline-item")):
+  let body = buildHtml(tdiv(class="timeline-item")):
     renderHead(prefs, cfg, req)
     tdiv(class="tweet-body"):
       var views = ""
@@ -339,6 +339,9 @@ proc renderEmbeddedTweet*(tweet: Tweet; cfg: Config; req: Request; prefs: Prefs;
 
       if not prefs.hideTweetStats:
         renderStats(tweet.stats, views)
+
+  return buildHtml(tdiv(class="tweet-embed")):
+    body
   
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
