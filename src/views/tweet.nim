@@ -4,6 +4,7 @@ import karax/[karaxdsl, vdom, vstyles]
 
 import renderutils
 import ".."/[types, utils, formatters]
+import general
 
 proc getSmallPic(url: string): string =
   result = url
@@ -274,6 +275,59 @@ proc renderLocation*(tweet: Tweet): string =
     else:
       text place
   return $node
+
+proc renderEmbeddedTweet*(tweet: Tweet; cfg: Config; prefs: Prefs; path: string): VNode =
+  let fullTweet = tweet
+  var retweet: string
+  var tweet = fullTweet
+  if tweet.retweet.isSome:
+    tweet = tweet.retweet.get
+    retweet = fullTweet.profile.fullname
+
+  # handle unavailable
+
+  buildHtml(tdiv(class="timeline-item")):
+    renderHead(prefs, cfg)
+    tdiv(class="tweet-body"):
+      var views = ""
+      renderHeader(tweet, retweet, prefs)
+
+      var tweetClass = "tweet-content media-body"
+      if prefs.bidiSupport:
+        tweetClass &= " tweet-bidi"
+
+      tdiv(class=tweetClass, dir="auto"):
+        verbatim replaceUrls(tweet.text, prefs) & renderLocation(tweet)
+
+      if tweet.attribution.isSome:
+        renderAttribution(tweet.attribution.get(), prefs)
+
+      if tweet.card.isSome:
+        renderCard(tweet.card.get(), prefs, path)
+
+      if tweet.photos.len > 0:
+        renderAlbum(tweet)
+      elif tweet.video.isSome:
+        renderVideo(tweet.video.get(), prefs, path)
+        views = tweet.video.get().views
+      elif tweet.gif.isSome:
+        renderGif(tweet.gif.get(), prefs)
+        views = "GIF"
+
+      if tweet.poll.isSome:
+        renderPoll(tweet.poll.get())
+
+      if tweet.quote.isSome:
+        renderQuote(tweet.quote.get(), prefs, path)
+
+      p(class="tweet-published"): text getTime(tweet)
+
+      if tweet.mediaTags.len > 0:
+        renderMediaTags(tweet.mediaTags)
+
+      if not prefs.hideTweetStats:
+        renderStats(tweet.stats, views)
+  
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
                   last=false; showThread=false; mainTweet=false; afterTweet=false): VNode =
