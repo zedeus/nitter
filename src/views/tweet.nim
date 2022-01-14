@@ -277,73 +277,6 @@ proc renderLocation*(tweet: Tweet): string =
       text place
   return $node
 
-proc renderEmbeddedTweet*(tweet: Tweet; cfg: Config; req: Request; prefs: Prefs; path: string): VNode =
-  let fullTweet = tweet
-  var retweet: string
-  var tweet = fullTweet
-  if tweet.retweet.isSome:
-    tweet = tweet.retweet.get
-    retweet = fullTweet.profile.fullname
-
-  if not tweet.available:
-    return buildHtml(tdiv(class="unavailable timeline-item")):
-      tdiv(class="unavailable-box"):
-        if tweet.tombstone.len > 0:
-          text tweet.tombstone
-        elif tweet.text.len > 0:
-          text tweet.text
-        else:
-          text "This tweet is unavailable"
-
-      if tweet.quote.isSome:
-        renderQuote(tweet.quote.get(), prefs, path)
-
-  let body = buildHtml(tdiv(class="timeline-item")):
-    renderHead(prefs, cfg, req)
-    tdiv(class="tweet-body"):
-      var views = ""
-      renderHeader(tweet, retweet, prefs)
-
-      var tweetClass = "tweet-content media-body"
-      if prefs.bidiSupport:
-        tweetClass &= " tweet-bidi"
-
-      tdiv(class=tweetClass, dir="auto"):
-        verbatim replaceUrls(tweet.text, prefs) & renderLocation(tweet)
-
-      if tweet.attribution.isSome:
-        renderAttribution(tweet.attribution.get(), prefs)
-
-      if tweet.card.isSome:
-        renderCard(tweet.card.get(), prefs, path)
-
-      if tweet.photos.len > 0:
-        renderAlbum(tweet)
-      elif tweet.video.isSome:
-        renderVideo(tweet.video.get(), prefs, path)
-        views = tweet.video.get().views
-      elif tweet.gif.isSome:
-        renderGif(tweet.gif.get(), prefs)
-        views = "GIF"
-
-      if tweet.poll.isSome:
-        renderPoll(tweet.poll.get())
-
-      if tweet.quote.isSome:
-        renderQuote(tweet.quote.get(), prefs, path)
-
-      p(class="tweet-published"): text getTime(tweet)
-
-      if tweet.mediaTags.len > 0:
-        renderMediaTags(tweet.mediaTags)
-
-      if not prefs.hideTweetStats:
-        renderStats(tweet.stats, views)
-
-  return buildHtml(tdiv(class="tweet-embed")):
-    body
-  
-
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
                   last=false; showThread=false; mainTweet=false; afterTweet=false): VNode =
   var divClass = class
@@ -422,3 +355,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if showThread:
         a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
           text "Show this thread"
+
+proc renderEmbeddedTweet*(tweet: Tweet; cfg: Config; req: Request; prefs: Prefs; path: string): VNode =
+  return buildHtml(tdiv(class="tweet-embed")):
+    renderHead(prefs, cfg, req)
+    renderTweet(tweet, prefs, path)
