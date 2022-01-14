@@ -284,7 +284,18 @@ proc renderEmbeddedTweet*(tweet: Tweet; cfg: Config; prefs: Prefs; path: string)
     tweet = tweet.retweet.get
     retweet = fullTweet.profile.fullname
 
-  # handle unavailable
+  if not tweet.available:
+    return buildHtml(tdiv(class="unavailable timeline-item")):
+      tdiv(class="unavailable-box"):
+        if tweet.tombstone.len > 0:
+          text tweet.tombstone
+        elif tweet.text.len > 0:
+          text tweet.text
+        else:
+          text "This tweet is unavailable"
+
+      if tweet.quote.isSome:
+        renderQuote(tweet.quote.get(), prefs, path)
 
   buildHtml(tdiv(class="timeline-item")):
     renderHead(prefs, cfg)
