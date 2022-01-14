@@ -11,6 +11,9 @@ const
   doctype = "<!DOCTYPE html>\n"
   lp = readFile("public/lp.svg")
 
+proc toTheme(theme: string): string =
+  theme.toLowerAscii.replace(" ", "_")
+
 proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
   var path = req.params.getOrDefault("referer")
   if path.len == 0:
@@ -33,9 +36,13 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
         icon "info", title="About", href="/about"
         icon "cog", title="Preferences", href=("/settings?referer=" & encodeUrl(path))
 
-proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
-                 images: seq[string] = @[]; banner=""; ogTitle=""; theme="";
+proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
+                 video=""; images: seq[string] = @[]; banner=""; ogTitle="";
                  rss=""; canonical=""): VNode =
+  var theme = prefs.theme.toTheme
+  if "theme" in req.params:
+    theme = req.params["theme"].toTheme
+    
   let ogType =
     if video.len > 0: "video"
     elif rss.len > 0: "object"
@@ -118,15 +125,12 @@ proc renderHead*(prefs: Prefs; cfg: Config; titleText=""; desc=""; video="";
 proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
                  titleText=""; desc=""; ogTitle=""; rss=""; video="";
                  images: seq[string] = @[]; banner=""): string =
-  var theme = toLowerAscii(prefs.theme).replace(" ", "_")
-  if "theme" in req.params:
-    theme = toLowerAscii(req.params["theme"]).replace(" ", "_")
 
   let canonical = getTwitterLink(req.path, req.params)
 
   let node = buildHtml(html(lang="en")):
-    renderHead(prefs, cfg, titleText, desc, video, images, banner, ogTitle,
-               theme, rss, canonical)
+    renderHead(prefs, cfg, req, titleText, desc, video, images, banner, ogTitle,
+               rss, canonical)
 
     body:
       renderNavbar(cfg, req, rss, canonical)

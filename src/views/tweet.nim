@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, sequtils, strformat, options
 import karax/[karaxdsl, vdom, vstyles]
+from jester import Request
 
 import renderutils
 import ".."/[types, utils, formatters]
@@ -276,7 +277,7 @@ proc renderLocation*(tweet: Tweet): string =
       text place
   return $node
 
-proc renderEmbeddedTweet*(tweet: Tweet; cfg: Config; prefs: Prefs; path: string): VNode =
+proc renderEmbeddedTweet*(tweet: Tweet; cfg: Config; req: Request; prefs: Prefs; path: string): VNode =
   let fullTweet = tweet
   var retweet: string
   var tweet = fullTweet
@@ -298,7 +299,7 @@ proc renderEmbeddedTweet*(tweet: Tweet; cfg: Config; prefs: Prefs; path: string)
         renderQuote(tweet.quote.get(), prefs, path)
 
   buildHtml(tdiv(class="timeline-item")):
-    renderHead(prefs, cfg)
+    renderHead(prefs, cfg, req)
     tdiv(class="tweet-body"):
       var views = ""
       renderHeader(tweet, retweet, prefs)

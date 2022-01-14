@@ -15,12 +15,15 @@ proc createEmbedRouter*(cfg: Config) =
       if convo == nil or convo.tweet == nil or convo.tweet.video.isNone:
         resp Http404
 
-      resp renderVideoEmbed(cfg, convo.tweet)
+      resp renderVideoEmbed(cfg, request, convo.tweet)
 
-    get "/@user/status/@id/embedded":
+    get "/@user/status/@id/embed":
       let
-        tweet = (await getTweet(@"id")).tweet
+        convo = await getTweet(@"id")
         prefs = cookiePrefs()
         path = getPath()
 
-      resp $renderEmbeddedTweet(tweet, cfg, prefs, path)
+      if convo == nil or convo.tweet == nil:
+        resp Http404
+
+      resp $renderEmbeddedTweet(convo.tweet, cfg, request, prefs, path)
