@@ -20,7 +20,7 @@ proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.
 
   if names.len == 1:
     (profile, timeline) =
-      await fetchSingleTimeline(after, query, skipRail=true)
+      await fetchSingleTimeline(after, query, skipRail=true, skipRecommendations=true)
   else:
     var q = query
     q.fromUser = names

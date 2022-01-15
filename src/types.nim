@@ -112,6 +112,8 @@ type
 
   PhotoRail* = seq[GalleryPhoto]
 
+  Recommendations* = seq[Profile]
+
   Poll* = object
     options*: seq[string]
     values*: seq[int]

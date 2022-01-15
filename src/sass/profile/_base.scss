@@ -3,6 +3,7 @@
 
 @import 'card';
 @import 'photo-rail';
+@import 'recommendations';
 
 .profile-tabs {
     @include panel(auto, 900px);

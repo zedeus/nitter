@@ -11,6 +11,7 @@ const
   userShow* = api / "1.1/users/show.json"
   photoRail* = api / "1.1/statuses/media_timeline.json"
   search* = api / "2/search/adaptive.json"
+  recommendations* = api / "1.1/users/recommendations.json"
 
   timelineApi = api / "2/timeline"
   timeline* = timelineApi / "profile"

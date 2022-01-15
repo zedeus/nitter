@@ -92,6 +92,12 @@ proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
   if after.len > 0:
     result.replies = await getReplies(id, after)
 
+proc getRecommendations*(id: string): Future[Recommendations] {.async.} =
+  let
+    ps = genParams({"user_id": id})
+    url = recommendations ? ps
+  result = parseRecommnedations(await fetch(url, oldApi=true))
+
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
   let client = newAsyncHttpClient(maxRedirects=0)
   try:
