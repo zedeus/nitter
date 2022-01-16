@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, times, macros, htmlgen, unicode, options, algorithm
-import std/re
+import std/[strutils, times, macros, htmlgen, options, algorithm, re]
+import std/unicode except strip
 import packedjson
 import types, utils, formatters
 
@@ -275,3 +275,4 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   replacements.sort(cmp)
 
   tweet.text = orig.replacedWith(replacements, textSlice)
+                   .strip(leading=false)
