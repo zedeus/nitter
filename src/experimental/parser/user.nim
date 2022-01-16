@@ -38,10 +38,10 @@ proc getBanner(user: User): string =
     return '#' & user.profileLinkColor
   return "#161616"
 
-proc parseUser*(json: string): Profile =
+proc parseUser*(json: string; username=""): Profile =
   handleErrors:
     case error.code
-    of suspended: return Profile(suspended: true)
+    of suspended: return Profile(username: username, suspended: true)
     of userNotFound: return
     else: echo "[error - parseUser]: ", error
 

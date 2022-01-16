@@ -34,7 +34,7 @@ proc getProfile*(username: string): Future[Profile] {.async.} =
   let
     ps = genParams({"screen_name": username})
     json = await fetchRaw(userShow ? ps, Api.userShow)
-  result = parseUser(json)
+  result = parseUser(json, username)
 
 proc getProfileById*(userId: string): Future[Profile] {.async.} =
   let

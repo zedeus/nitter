@@ -80,16 +80,16 @@ proc cache*(data: PhotoRail; name: string) {.async.} =
   await setEx("pr:" & toLower(name), baseCacheTime, compress(toFlatty(data)))
 
 proc cache*(data: Profile) {.async.} =
-  if data.username.len == 0 or data.id.len == 0: return
+  if data.username.len == 0: return
   let name = toLower(data.username)
   pool.withAcquire(r):
     r.startPipelining()
     dawait r.setEx(name.profileKey, baseCacheTime, compress(toFlatty(data)))
-    dawait r.setEx("i:" & data.id , baseCacheTime, data.username)
-    dawait r.hSet(name.pidKey, name, data.id)
+    if data.id.len > 0:
+      dawait r.hSet(name.pidKey, name, data.id)
     dawait r.flushPipeline()
 
-proc cacheProfileId*(username, id: string) {.async.} =
+proc cacheProfileId(username, id: string) {.async.} =
   if username.len == 0 or id.len == 0: return
   let name = toLower(username)
   pool.withAcquire(r):
@@ -117,15 +117,21 @@ proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} 
     result = fromFlatty(uncompress(prof), Profile)
   elif fetch:
     result = await getProfile(username)
+    await cacheProfileId(result.username, result.id)
+    if result.suspended:
+      await cache(result)
 
 proc getCachedProfileUsername*(userId: string): Future[string] {.async.} =
-  let username = await get("i:" & userId)
+  let
+    key = "i:" & userId
+    username = await get(key)
+
   if username != redisNil:
     result = username
   else:
     let profile = await getProfileById(userId)
     result = profile.username
-    await cache(profile)
+    await setEx(key, baseCacheTime, result)
 
 proc getCachedPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return

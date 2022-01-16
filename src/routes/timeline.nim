@@ -30,20 +30,13 @@ proc fetchTimeline*(after: string; query: Query; skipRail=false):
 
   if profileId.len == 0:
     profile = await getCachedProfile(name)
-    profileId = if profile.suspended: "s"
-                else: profile.id
-
-    if profileId.len > 0:
-       await cacheProfileId(profile.username, profileId)
-
+    profileId = profile.id
     fetched = true
 
-  if profileId.len == 0 or profile.protected:
-    result[0] = profile
-    return
-  elif profileId == "s":
-    result[0] = Profile(username: name, suspended: true)
-    return
+  if profile.protected or profile.suspended:
+    return (profile, Timeline(), @[])
+  elif profileId.len == 0:
+    return (Profile(username: name), Timeline(), @[])
 
   var rail: Future[PhotoRail]
   if skipRail or profile.protected or query.kind == media:
