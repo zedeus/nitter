@@ -6,8 +6,8 @@ import types, agents, consts, http_pool
 
 const
   maxConcurrentReqs = 5  # max requests at a time per token, to avoid race conditions
-  maxAge = 3.hours       # tokens expire after 3 hours
   maxLastUse = 1.hours   # if a token is unused for 60 minutes, it expires
+  maxAge = 2.hours + 55.minutes  # tokens expire after 3 hours
   failDelay = initDuration(minutes=30)
 
 var
