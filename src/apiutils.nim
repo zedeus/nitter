@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import httpclient, asyncdispatch, options, sequtils, strutils, uri
+import httpclient, asyncdispatch, options, strutils, uri
 import jsony, packedjson, zippy
 import types, tokens, consts, parserutils, http_pool
-from experimental/types/common import Errors, ErrorObj
+import experimental/types/common
 
 const
   rlRemaining = "x-rate-limit-remaining"
@@ -108,8 +108,8 @@ proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
     updateToken()
 
     if result.startsWith("{\"errors"):
-      let errors = result.fromJson(Errors).errors
-      if errors.anyIt(it.code in {invalidToken, forbidden, badToken}):
+      let errors = result.fromJson(Errors)
+      if errors in {invalidToken, forbidden, badToken}:
         echo "fetch error: ", errors
         release(token, invalid=true)
         raise rateLimitError()

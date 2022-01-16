@@ -18,5 +18,5 @@ proc getImageUrl*(url: string): string =
 
 template handleErrors*(body) =
   if json.startsWith("{\"errors"):
-    let error {.inject.} = json.fromJson(Errors).errors[0].code
-    body
+    for error {.inject.} in json.fromJson(Errors).errors:
+      body
