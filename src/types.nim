@@ -48,17 +48,16 @@ type
     id*: string
     username*: string
     fullname*: string
-    lowername*: string
     location*: string
     website*: string
     bio*: string
     userPic*: string
     banner*: string
-    following*: string
-    followers*: string
-    tweets*: string
-    likes*: string
-    media*: string
+    following*: int
+    followers*: int
+    tweets*: int
+    likes*: int
+    media*: int
     verified*: bool
     protected*: bool
     suspended*: bool

@@ -47,6 +47,7 @@ proc initRedisPool*(cfg: Config) {.async.} =
     await migrate("snappyRss", "rss:*")
     await migrate("userBuckets", "p:*")
     await migrate("profileDates", "p:*")
+    await migrate("profileStats", "p:*")
 
     pool.withAcquire(r):
       # optimize memory usage for profile ID buckets

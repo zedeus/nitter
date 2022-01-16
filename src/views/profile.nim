@@ -5,12 +5,12 @@ import karax/[karaxdsl, vdom, vstyles]
 import renderutils, search
 import ".."/[types, utils, formatters]
 
-proc renderStat(num, class: string; text=""): VNode =
+proc renderStat(num: int; class: string; text=""): VNode =
   let t = if text.len > 0: text else: class
   buildHtml(li(class=class)):
     span(class="profile-stat-header"): text capitalizeAscii(t)
     span(class="profile-stat-num"):
-      text if num.len == 0: "?" else: insertSep(num, ',')
+      text insertSep($num, ',')
 
 proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-card")):

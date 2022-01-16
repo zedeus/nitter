@@ -19,8 +19,8 @@ proc getQuery*(request: Request; tab, name: string): Query =
   of "search": initQuery(params(request), name=name)
   else: Query(fromUser: @[name])
 
-proc fetchSingleTimeline*(after: string; query: Query; skipRail=false):
-                        Future[(Profile, Timeline, PhotoRail)] {.async.} =
+proc fetchTimeline*(after: string; query: Query; skipRail=false):
+                  Future[(Profile, Timeline, PhotoRail)] {.async.} =
   let name = query.fromUser[0]
 
   var
@@ -86,7 +86,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
       html = renderTweetSearch(timeline, prefs, getPath())
     return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
-  var (p, t, r) = await fetchSingleTimeline(after, query)
+  var (p, t, r) = await fetchTimeline(after, query)
 
   if p.suspended: return showError(getSuspended(p.username), cfg)
   if p.id.len == 0: return
@@ -139,7 +139,7 @@ proc createTimelineRouter*(cfg: Config) =
           timeline.beginning = true
           resp $renderTweetSearch(timeline, prefs, getPath())
         else:
-          var (_, timeline, _) = await fetchSingleTimeline(after, query, skipRail=true)
+          var (_, timeline, _) = await fetchTimeline(after, query, skipRail=true)
           if timeline.content.len == 0: resp Http404
           timeline.beginning = true
           resp $renderTimelineTweets(timeline, prefs, getPath())
