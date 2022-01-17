@@ -78,18 +78,16 @@ proc renderPhotoRail(profile: Profile; photoRail: PhotoRail): VNode =
     tdiv(class="photo-rail-grid"):
       for i, photo in photoRail:
         if i == 16: break
-        let col = if photo.color.len > 0: photo.color else: "#161616"
-        a(href=(&"/{profile.username}/status/{photo.tweetId}#m"),
-          style={backgroundColor: col}):
+        a(href=(&"/{profile.username}/status/{photo.tweetId}#m")):
           genImg(photo.url & (if "format" in photo.url: "" else: ":thumb"))
 
-proc renderBanner(profile: Profile): VNode =
+proc renderBanner(banner: string): VNode =
   buildHtml():
-    if "#" in profile.banner:
-      tdiv(class="profile-banner-color", style={backgroundColor: profile.banner})
+    if banner.startsWith('#'):
+      a(style={backgroundColor: banner})
     else:
-      a(href=getPicUrl(profile.banner), target="_blank"):
-        genImg(profile.banner)
+      a(href=getPicUrl(banner), target="_blank"):
+        genImg(banner)
 
 proc renderProtected(username: string): VNode =
   buildHtml(tdiv(class="timeline-container")):
@@ -103,7 +101,8 @@ proc renderProfile*(profile: Profile; timeline: var Timeline;
   buildHtml(tdiv(class="profile-tabs")):
     if not prefs.hideBanner:
       tdiv(class="profile-banner"):
-        renderBanner(profile)
+        if profile.banner.len > 0:
+          renderBanner(profile.banner)
 
     let sticky = if prefs.stickyProfile: " sticky" else: ""
     tdiv(class=(&"profile-tab{sticky}")):

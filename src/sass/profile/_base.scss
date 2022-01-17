@@ -15,21 +15,20 @@
 }
 
 .profile-banner {
-    padding-bottom: 4px;
+    margin-bottom: 4px;
+    background-color: var(--bg_panel);
 
     a {
-        display: inherit;
-        line-height: 0;
+        display: block;
+        position: relative;
+        padding: 33.34% 0 0 0;
     }
 
     img {
-        width: 100%;
+        max-width: 100%;
+        position: absolute;
+        top: 0;
     }
-}
-
-.profile-banner-color {
-    width: 100%;
-    padding-bottom: 25%;
 }
 
 .profile-tab {

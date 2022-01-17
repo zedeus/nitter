@@ -119,18 +119,6 @@ proc getBanner*(js: JsonNode): string =
   if color.len > 0:
     return '#' & color
 
-  # use primary color from profile picture color histogram
-  with p, js{"profile_image_extensions", "mediaColor", "r", "ok", "palette"}:
-    if p.len > 0:
-      let pal = p[0]{"rgb"}
-      result = "#"
-      result.add toHex(pal{"red"}.getInt, 2)
-      result.add toHex(pal{"green"}.getInt, 2)
-      result.add toHex(pal{"blue"}.getInt, 2)
-      return
-
-  return "#161616"
-
 proc getTombstone*(js: JsonNode): string =
   result = js{"tombstoneInfo", "richText", "text"}.getStr
   result.removeSuffix(" Learn more")

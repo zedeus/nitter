@@ -35,19 +35,25 @@
 }
 
 .profile-card-avatar {
-    display: block;
+    display: inline-block;
+    position: relative;
     width: 100%;
-    padding-bottom: 6px;
     margin-right: 4px;
+    margin-bottom: 6px;
+
+    &:after {
+        content: '';
+        display: block;
+        margin-top: 100%;
+    }
 
     img {
-        display: block;
         box-sizing: border-box;
+        position: absolute;
         width: 100%;
         height: 100%;
-        margin: 0;
         border: 4px solid var(--darker_grey);
-        background: var(--bg_color);
+        background: var(--bg_panel);
     }
 }
 
@@ -113,8 +119,8 @@
     }
 
     .profile-card-avatar {
-        height: 60px;
-        width: unset;
+        width: 80px;
+        height: 80px;
 
         img {
             border-width: 2px;

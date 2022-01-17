@@ -36,7 +36,6 @@ proc getBanner(user: User): string =
     return user.profileBannerUrl & "/1500x500"
   if user.profileLinkColor.len > 0:
     return '#' & user.profileLinkColor
-  return "#161616"
 
 proc parseUser*(json: string; username=""): Profile =
   handleErrors:
