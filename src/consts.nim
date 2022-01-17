@@ -35,16 +35,13 @@ const
     "cards_platform": "Web-12",
     "include_cards": "1",
     "include_composer_source": "false",
-    "include_ext_alt_text": "true",
     "include_reply_count": "1",
     "tweet_mode": "extended",
     "include_entities": "true",
     "include_user_entities": "true",
     "include_ext_media_color": "false",
-    "include_ext_media_availability": "true",
     "send_error_codes": "true",
     "simple_quoted_tweet": "true",
-    "ext": "mediaStats",
     "include_quote_count": "true"
   }.toSeq
 
