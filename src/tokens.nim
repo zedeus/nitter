@@ -2,7 +2,7 @@
 import asyncdispatch, httpclient, times, sequtils, json, random
 import strutils, tables
 import zippy
-import types, agents, consts, http_pool
+import types, consts, http_pool
 
 const
   maxConcurrentReqs = 5  # max requests at a time per token, to avoid race conditions
@@ -65,7 +65,6 @@ proc fetchToken(): Future[Token] {.async.} =
     "accept-encoding": "gzip",
     "accept-language": "en-US,en;q=0.5",
     "connection": "keep-alive",
-    "user-agent": getAgent(),
     "authorization": auth
   })
 
