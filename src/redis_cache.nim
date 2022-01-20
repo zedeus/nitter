@@ -83,11 +83,9 @@ proc cache*(data: Profile) {.async.} =
   if data.username.len == 0: return
   let name = toLower(data.username)
   pool.withAcquire(r):
-    r.startPipelining()
     dawait r.setEx(name.profileKey, baseCacheTime, compress(toFlatty(data)))
     if data.id.len > 0:
       dawait r.hSet(name.pidKey, name, data.id)
-    dawait r.flushPipeline()
 
 proc cacheProfileId(username, id: string) {.async.} =
   if username.len == 0 or id.len == 0: return
@@ -98,11 +96,9 @@ proc cacheProfileId(username, id: string) {.async.} =
 proc cacheRss*(query: string; rss: Rss) {.async.} =
   let key = "rss:" & query
   pool.withAcquire(r):
-    r.startPipelining()
     dawait r.hSet(key, "rss", rss.feed)
     dawait r.hSet(key, "min", rss.cursor)
     dawait r.expire(key, rssCacheTime)
-    dawait r.flushPipeline()
 
 proc getProfileId*(username: string): Future[string] {.async.} =
   let name = toLower(username)
