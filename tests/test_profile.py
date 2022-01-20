@@ -78,7 +78,7 @@ class ProfileTest(BaseTestCase):
     @parameterized.expand(banner_color)
     def test_banner_color(self, username, color):
         self.open_nitter(username)
-        banner = self.find_element(Profile.banner + '-color')
+        banner = self.find_element(Profile.banner + ' a')
         self.assertIn(color, banner.value_of_css_property('background-color'))
 
     @parameterized.expand(banner_image)
