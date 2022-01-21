@@ -28,7 +28,7 @@ requires "jsony#d0e69bd"
 # Tasks
 
 task scss, "Generate css":
-  exec "nim c --hint[Processing]:off -d:danger -r tools/gencss"
+  exec "nimble c --hint[Processing]:off -d:danger -r tools/gencss"
 
 task md, "Render md":
-  exec "nim c --hint[Processing]:off -d:danger -r tools/rendermd"
+  exec "nimble c --hint[Processing]:off -d:danger -r tools/rendermd"
