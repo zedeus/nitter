@@ -45,10 +45,15 @@ proc fetchTimeline*(after: string; query: Query; skipRail=false):
   else:
     rail = getCachedPhotoRail(name)
 
+  # var timeline =
+  #   case query.kind
+  #   of posts: await getTimeline(profileId, after)
+  #   of replies: await getTimeline(profileId, after, replies=true)
+  #   of media: await getMediaTimeline(profileId, after)
+  #   else: await getSearch[Tweet](query, after)
+
   var timeline =
     case query.kind
-    of posts: await getTimeline(profileId, after)
-    of replies: await getTimeline(profileId, after, replies=true)
     of media: await getMediaTimeline(profileId, after)
     else: await getSearch[Tweet](query, after)
 

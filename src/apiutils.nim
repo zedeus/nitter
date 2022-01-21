@@ -58,11 +58,17 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   if token.tok.len == 0:
     raise rateLimitError()
 
+  var
+    client = pool.acquire(genHeaders(token))
+    badClient = false
+
   try:
-    var resp: AsyncResponse
-    result = pool.use(genHeaders(token)):
-      resp = await c.get($url)
-      await resp.body
+    let resp = await client.get($url)
+    result = await resp.body
+
+    if resp.status == $Http503:
+      badClient = true
+      raise newException(InternalError, result)
 
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
@@ -83,6 +89,8 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     if "length" notin e.msg and "descriptor" notin e.msg:
       release(token, invalid=true)
     raise rateLimitError()
+  finally:
+    pool.release(client, badClient=badClient)
 
 proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
   var body: string
