@@ -94,7 +94,7 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
     if body.startsWith('{') or body.startsWith('['):
       result = parseJson(body)
     else:
-      echo resp.status, ": ", body
+      echo resp.status, ": ", body, " --- url: ", url
       result = newJNull()
 
     updateToken()
@@ -108,7 +108,7 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
 proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
   fetchImpl result:
     if not (result.startsWith('{') or result.startsWith('[')):
-      echo resp.status, ": ", result
+      echo resp.status, ": ", result, " --- url: ", url
       result.setLen(0)
 
     updateToken()
