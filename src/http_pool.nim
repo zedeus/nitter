@@ -5,8 +5,9 @@ type
   HttpPool* = ref object
     conns*: seq[AsyncHttpClient]
 
-var maxConns: int
-var proxy: Proxy
+var
+  maxConns: int
+  proxy: Proxy
 
 proc setMaxHttpConns*(n: int) =
   maxConns = n
@@ -32,7 +33,9 @@ proc acquire*(pool: HttpPool; heads: HttpHeaders): AsyncHttpClient =
     result.headers = heads
 
 template use*(pool: HttpPool; heads: HttpHeaders; body: untyped): untyped =
-  let c {.inject.} = pool.acquire(heads)
+  var
+    c {.inject.} = pool.acquire(heads)
+    badClient {.inject.} = false
 
   try:
     body
@@ -40,4 +43,4 @@ template use*(pool: HttpPool; heads: HttpHeaders; body: untyped): untyped =
     # Twitter closed the connection, retry
     body
   finally:
-    pool.release(c)
+    pool.release(c, badClient)
