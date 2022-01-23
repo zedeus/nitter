@@ -19,22 +19,24 @@ proc getQuery*(request: Request; tab, name: string): Query =
   of "search": initQuery(params(request), name=name)
   else: Query(fromUser: @[name])
 
+template skipIf[T](cond: bool; default; body: Future[T]): Future[T] =
+  if cond:
+    let fut = newFuture[T]()
+    fut.complete(default)
+    fut
+  else:
+    body
+
 proc fetchProfile*(after: string; query: Query; skipRail=false;
                    skipPinned=false): Future[Profile] {.async.} =
-  let name = query.fromUser[0]
+  let
+    name = query.fromUser[0]
+    userId = await getUserId(name)
 
-  let userId = await getUserId(name)
   if userId.len == 0:
     return Profile(user: User(username: name))
   elif userId == "suspended":
     return Profile(user: User(username: name, suspended: true))
-
-  var rail: Future[PhotoRail]
-  if skipRail or result.user.protected or query.kind == media:
-    rail = newFuture[PhotoRail]()
-    rail.complete(@[])
-  else:
-    rail = getCachedPhotoRail(name)
 
   # temporary fix to prevent errors from people browsing
   # timelines during/immediately after deployment
@@ -42,14 +44,19 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
   if query.kind in {posts, replies} and after.startsWith("scroll"):
     after.setLen 0
 
-  let timeline =
-    case query.kind
-    of posts: getTimeline(userId, after)
-    of replies: getTimeline(userId, after, replies=true)
-    of media: getMediaTimeline(userId, after)
-    else: getSearch[Tweet](query, after)
+  let
+    timeline =
+      case query.kind
+      of posts: getTimeline(userId, after)
+      of replies: getTimeline(userId, after, replies=true)
+      of media: getMediaTimeline(userId, after)
+      else: getSearch[Tweet](query, after)
 
-  let user = await getCachedUser(name)
+    rail =
+      skipIf(skipRail or query.kind == media, @[]):
+        getCachedPhotoRail(name)
+
+    user = await getCachedUser(name)
 
   var pinned: Option[Tweet]
   if not skipPinned and user.pinnedTweet > 0 and
