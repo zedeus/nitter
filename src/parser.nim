@@ -376,6 +376,9 @@ proc parseStatus*(js: JsonNode): Tweet =
   if not result.isNil:
     result.user = parseUser(js{"user"})
 
+    with quote, js{"quoted_status"}:
+      result.quote = some parseStatus(js{"quoted_status"})
+
 proc parseInstructions[T](res: var Result[T]; global: GlobalObjects; js: JsonNode) =
   if js.kind != JArray or js.len == 0:
     return
