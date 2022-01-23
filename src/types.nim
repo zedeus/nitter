@@ -41,6 +41,7 @@ type
     rateLimited = 88
     invalidToken = 89
     listIdOrSlug = 112
+    tweetNotFound = 144
     forbidden = 200
     badToken = 239
     noCsrf = 353

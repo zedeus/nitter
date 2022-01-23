@@ -63,11 +63,6 @@ proc parseGraphListMembers*(js: JsonNode; cursor: string): Result[User] =
 
   if js.isNull: return
 
-  # result.top = js{"previous_cursor_str"}.getStr
-  # result.bottom = js{"next_cursor_str"}.getStr
-  # if result.bottom.len == 1:
-  #   result.bottom.setLen 0
-
   let root = js{"data", "list", "members_timeline", "timeline", "instructions"}
   for instruction in root:
     if instruction{"type"}.getStr == "TimelineAddEntries":
@@ -373,6 +368,10 @@ proc parseConversation*(js: JsonNode; tweetId: string): Conversation =
       result.replies.bottom = e.getCursor
 
 proc parseStatus*(js: JsonNode): Tweet =
+  with e, js{"errors"}:
+    if e.getError == tweetNotFound:
+      return
+
   result = parseTweet(js)
   if not result.isNil:
     result.user = parseUser(js{"user"})
