@@ -97,29 +97,29 @@ proc proxifyVideo*(manifest: string; proxy: bool): string =
 proc getUserPic*(userPic: string; style=""): string =
   userPic.replacef(userPicRegex, "$2").replacef(extRegex, style & "$1")
 
-proc getUserPic*(profile: Profile; style=""): string =
-  getUserPic(profile.userPic, style)
+proc getUserPic*(user: User; style=""): string =
+  getUserPic(user.userPic, style)
 
 proc getVideoEmbed*(cfg: Config; id: int64): string =
   &"{getUrlPrefix(cfg)}/i/videos/{id}"
 
-proc pageTitle*(profile: Profile): string =
-  &"{profile.fullname} (@{profile.username})"
+proc pageTitle*(user: User): string =
+  &"{user.fullname} (@{user.username})"
 
 proc pageTitle*(tweet: Tweet): string =
-  &"{pageTitle(tweet.profile)}: \"{stripHtml(tweet.text)}\""
+  &"{pageTitle(tweet.user)}: \"{stripHtml(tweet.text)}\""
 
-proc pageDesc*(profile: Profile): string =
-  if profile.bio.len > 0:
-    stripHtml(profile.bio)
+proc pageDesc*(user: User): string =
+  if user.bio.len > 0:
+    stripHtml(user.bio)
   else:
-    "The latest tweets from " & profile.fullname
+    "The latest tweets from " & user.fullname
 
-proc getJoinDate*(profile: Profile): string =
-  profile.joinDate.format("'Joined' MMMM YYYY")
+proc getJoinDate*(user: User): string =
+  user.joinDate.format("'Joined' MMMM YYYY")
 
-proc getJoinDateFull*(profile: Profile): string =
-  profile.joinDate.format("h:mm tt - d MMM YYYY")
+proc getJoinDateFull*(user: User): string =
+  user.joinDate.format("h:mm tt - d MMM YYYY")
 
 proc getTime*(tweet: Tweet): string =
   tweet.time.format("MMM d', 'YYYY' · 'h:mm tt' UTC'")
@@ -146,7 +146,7 @@ proc getShortTime*(tweet: Tweet): string =
 
 proc getLink*(tweet: Tweet; focus=true): string =
   if tweet.id == 0: return
-  var username = tweet.profile.username
+  var username = tweet.user.username
   if username.len == 0:
     username = "i"
   result = &"/{username}/status/{tweet.id}"
@@ -175,7 +175,7 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
   if username.len > 0:
     result = result.replace("/" & username, "")
 
-proc getLocation*(u: Profile | Tweet): (string, string) =
+proc getLocation*(u: User | Tweet): (string, string) =
   if "://" in u.location: return (u.location, "")
   let loc = u.location.split(":")
   let url = if loc.len > 1: "/search?q=place:" & loc[1] else: ""

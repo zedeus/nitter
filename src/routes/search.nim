@@ -25,7 +25,7 @@ proc createSearchRouter*(cfg: Config) =
       of users:
         if "," in @"q":
           redirect("/" & @"q")
-        let users = await getSearch[Profile](query, getCursor())
+        let users = await getSearch[User](query, getCursor())
         resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs)
       of tweets:
         let

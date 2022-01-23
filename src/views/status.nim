@@ -10,24 +10,22 @@ proc renderEarlier(thread: Chain): VNode =
       text "earlier replies"
 
 proc renderMoreReplies(thread: Chain): VNode =
-  let num = if thread.more != -1: $thread.more & " " else: ""
-  let reply = if thread.more == 1: "reply" else: "replies"
   let link = getLink(thread.content[^1])
   buildHtml(tdiv(class="timeline-item more-replies")):
     if thread.content[^1].available:
       a(class="more-replies-text", href=link):
-        text $num & "more " & reply
+        text "more replies"
     else:
       a(class="more-replies-text"):
-        text $num & "more " & reply
+        text "more replies"
 
 proc renderReplyThread(thread: Chain; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="reply thread thread-line")):
     for i, tweet in thread.content:
-      let last = (i == thread.content.high and thread.more == 0)
+      let last = (i == thread.content.high and not thread.hasMore)
       renderTweet(tweet, prefs, path, index=i, last=last)
 
-    if thread.more != 0:
+    if thread.hasMore:
       renderMoreReplies(thread)
 
 proc renderReplies*(replies: Result[Chain]; prefs: Prefs; path: string): VNode =
@@ -60,12 +58,12 @@ proc renderConversation*(conv: Conversation; prefs: Prefs; path: string): VNode 
         tdiv(class="after-tweet thread-line"):
           let
             total = conv.after.content.high
-            more = conv.after.more
+            hasMore = conv.after.hasMore
           for i, tweet in conv.after.content:
             renderTweet(tweet, prefs, path, index=i,
-                        last=(i == total and more == 0), afterTweet=true)
+                        last=(i == total and not hasMore), afterTweet=true)
 
-          if more != 0:
+          if hasMore:
             renderMoreReplies(conv.after)
 
     if not prefs.hideReplies:

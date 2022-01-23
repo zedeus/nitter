@@ -12,32 +12,32 @@ proc renderStat(num: int; class: string; text=""): VNode =
     span(class="profile-stat-num"):
       text insertSep($num, ',')
 
-proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
+proc renderUserCard*(user: User; prefs: Prefs): VNode =
   buildHtml(tdiv(class="profile-card")):
     tdiv(class="profile-card-info"):
       let
-        url = getPicUrl(profile.getUserPic())
+        url = getPicUrl(user.getUserPic())
         size =
-          if prefs.autoplayGifs and profile.userPic.endsWith("gif"): ""
+          if prefs.autoplayGifs and user.userPic.endsWith("gif"): ""
           else: "_400x400"
 
       a(class="profile-card-avatar", href=url, target="_blank"):
-        genImg(profile.getUserPic(size))
+        genImg(user.getUserPic(size))
 
       tdiv(class="profile-card-tabs-name"):
-        linkUser(profile, class="profile-card-fullname")
-        linkUser(profile, class="profile-card-username")
+        linkUser(user, class="profile-card-fullname")
+        linkUser(user, class="profile-card-username")
 
     tdiv(class="profile-card-extra"):
-      if profile.bio.len > 0:
+      if user.bio.len > 0:
         tdiv(class="profile-bio"):
           p(dir="auto"):
-            verbatim replaceUrls(profile.bio, prefs)
+            verbatim replaceUrls(user.bio, prefs)
 
-      if profile.location.len > 0:
+      if user.location.len > 0:
         tdiv(class="profile-location"):
           span: icon "location"
-          let (place, url) = getLocation(profile)
+          let (place, url) = getLocation(user)
           if url.len > 1:
             a(href=url): text place
           elif "://" in place:
@@ -45,29 +45,29 @@ proc renderProfileCard*(profile: Profile; prefs: Prefs): VNode =
           else:
             span: text place
 
-      if profile.website.len > 0:
+      if user.website.len > 0:
         tdiv(class="profile-website"):
           span:
-            let url = replaceUrls(profile.website, prefs)
+            let url = replaceUrls(user.website, prefs)
             icon "link"
             a(href=url): text shortLink(url)
 
       tdiv(class="profile-joindate"):
-        span(title=getJoinDateFull(profile)):
-          icon "calendar", getJoinDate(profile)
+        span(title=getJoinDateFull(user)):
+          icon "calendar", getJoinDate(user)
 
       tdiv(class="profile-card-extra-links"):
         ul(class="profile-statlist"):
-          renderStat(profile.tweets, "posts", text="Tweets")
-          renderStat(profile.following, "following")
-          renderStat(profile.followers, "followers")
-          renderStat(profile.likes, "likes")
+          renderStat(user.tweets, "posts", text="Tweets")
+          renderStat(user.following, "following")
+          renderStat(user.followers, "followers")
+          renderStat(user.likes, "likes")
 
-proc renderPhotoRail(profile: Profile; photoRail: PhotoRail): VNode =
-  let count = insertSep($profile.media, ',')
+proc renderPhotoRail(profile: Profile): VNode =
+  let count = insertSep($profile.user.media, ',')
   buildHtml(tdiv(class="photo-rail-card")):
     tdiv(class="photo-rail-header"):
-      a(href=(&"/{profile.username}/media")):
+      a(href=(&"/{profile.user.username}/media")):
         icon "picture", count & " Photos and videos"
 
     input(id="photo-rail-grid-toggle", `type`="checkbox")
@@ -76,18 +76,19 @@ proc renderPhotoRail(profile: Profile; photoRail: PhotoRail): VNode =
       icon "down"
 
     tdiv(class="photo-rail-grid"):
-      for i, photo in photoRail:
+      for i, photo in profile.photoRail:
         if i == 16: break
-        a(href=(&"/{profile.username}/status/{photo.tweetId}#m")):
+        a(href=(&"/{profile.user.username}/status/{photo.tweetId}#m")):
           genImg(photo.url & (if "format" in photo.url: "" else: ":thumb"))
 
 proc renderBanner(banner: string): VNode =
   buildHtml():
-    if banner.startsWith('#'):
+    if banner.len == 0:
+      a()
+    elif banner.startsWith('#'):
       a(style={backgroundColor: banner})
     else:
-      a(href=getPicUrl(banner), target="_blank"):
-        genImg(banner)
+      a(href=getPicUrl(banner), target="_blank"): genImg(banner)
 
 proc renderProtected(username: string): VNode =
   buildHtml(tdiv(class="timeline-container")):
@@ -95,22 +96,21 @@ proc renderProtected(username: string): VNode =
       h2: text "This account's tweets are protected."
       p: text &"Only confirmed followers have access to @{username}'s tweets."
 
-proc renderProfile*(profile: Profile; timeline: var Timeline;
-                    photoRail: PhotoRail; prefs: Prefs; path: string): VNode =
-  timeline.query.fromUser = @[profile.username]
+proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
+  profile.tweets.query.fromUser = @[profile.user.username]
+
   buildHtml(tdiv(class="profile-tabs")):
     if not prefs.hideBanner:
       tdiv(class="profile-banner"):
-        if profile.banner.len > 0:
-          renderBanner(profile.banner)
+        renderBanner(profile.user.banner)
 
     let sticky = if prefs.stickyProfile: " sticky" else: ""
     tdiv(class=(&"profile-tab{sticky}")):
-      renderProfileCard(profile, prefs)
-      if photoRail.len > 0:
-        renderPhotoRail(profile, photoRail)
+      renderUserCard(profile.user, prefs)
+      if profile.photoRail.len > 0:
+        renderPhotoRail(profile)
 
-    if profile.protected:
-      renderProtected(profile.username)
+    if profile.user.protected:
+      renderProtected(profile.user.username)
     else:
-      renderTweetSearch(timeline, prefs, path)
+      renderTweetSearch(profile.tweets, prefs, path, profile.pinned)

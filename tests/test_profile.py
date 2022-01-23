@@ -18,9 +18,8 @@ protected = [
 invalid = [['thisprofiledoesntexist'], ['%']]
 
 banner_color = [
-    ['TheTwoffice', '29, 161, 242'],
-    ['profiletest', '80, 176, 58'],
-    ['nim_lang', '24, 26, 36']
+    ['nim_lang', '22, 25, 32'],
+    ['rustlang', '35, 31, 32']
 ]
 
 banner_image = [

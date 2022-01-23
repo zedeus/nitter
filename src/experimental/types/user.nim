@@ -1,7 +1,7 @@
 import common
 
 type
-  User* = object
+  RawUser* = object
     idStr*: string
     name*: string
     screenName*: string

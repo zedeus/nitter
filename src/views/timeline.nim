@@ -57,7 +57,7 @@ proc threadFilter(tweets: openArray[Tweet]; threads: openArray[int64]; it: Tweet
     elif t.replyId == result[0].id:
       result.add t
 
-proc renderUser(user: Profile; prefs: Prefs): VNode =
+proc renderUser(user: User; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-item")):
     a(class="tweet-link", href=("/" & user.username))
     tdiv(class="tweet-body profile-result"):
@@ -73,7 +73,7 @@ proc renderUser(user: Profile; prefs: Prefs): VNode =
       tdiv(class="tweet-content media-body", dir="auto"):
         verbatim replaceUrls(user.bio, prefs)
 
-proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs; path=""): VNode =
+proc renderTimelineUsers*(results: Result[User]; prefs: Prefs; path=""): VNode =
   buildHtml(tdiv(class="timeline")):
     if not results.beginning:
       renderNewer(results.query, path)
@@ -89,10 +89,15 @@ proc renderTimelineUsers*(results: Result[Profile]; prefs: Prefs; path=""): VNod
     else:
       renderNoMore()
 
-proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string): VNode =
+proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string;
+                           pinned=none(Tweet)): VNode =
   buildHtml(tdiv(class="timeline")):
     if not results.beginning:
       renderNewer(results.query, parseUri(path).path)
+
+    if pinned.isSome:
+      let tweet = get pinned
+      renderTweet(tweet, prefs, path, showThread=tweet.hasThread)
 
     if results.content.len == 0:
       if not results.beginning:

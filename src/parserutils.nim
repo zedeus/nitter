@@ -119,6 +119,16 @@ proc getBanner*(js: JsonNode): string =
   if color.len > 0:
     return '#' & color
 
+  # use primary color from profile picture color histogram
+  with p, js{"profile_image_extensions", "mediaColor", "r", "ok", "palette"}:
+    if p.len > 0:
+      let pal = p[0]{"rgb"}
+      result = "#"
+      result.add toHex(pal{"red"}.getInt, 2)
+      result.add toHex(pal{"green"}.getInt, 2)
+      result.add toHex(pal{"blue"}.getInt, 2)
+      return
+
 proc getTombstone*(js: JsonNode): string =
   result = js{"tombstoneInfo", "richText", "text"}.getStr
   result.removeSuffix(" Learn more")
@@ -184,13 +194,13 @@ proc deduplicate(s: var seq[ReplaceSlice]) =
 
 proc cmp(x, y: ReplaceSlice): int = cmp(x.slice.a, y.slice.b)
 
-proc expandProfileEntities*(profile: var Profile; js: JsonNode) =
+proc expandUserEntities*(user: var User; js: JsonNode) =
   let
-    orig = profile.bio.toRunes
+    orig = user.bio.toRunes
     ent = ? js{"entities"}
 
   with urls, ent{"url", "urls"}:
-    profile.website = urls[0]{"expanded_url"}.getStr
+    user.website = urls[0]{"expanded_url"}.getStr
 
   var replacements = newSeq[ReplaceSlice]()
 
@@ -201,9 +211,9 @@ proc expandProfileEntities*(profile: var Profile; js: JsonNode) =
   replacements.deduplicate
   replacements.sort(cmp)
 
-  profile.bio = orig.replacedWith(replacements, 0 .. orig.len)
-  profile.bio = profile.bio.replacef(unRegex, unReplace)
-                           .replacef(htRegex, htReplace)
+  user.bio = orig.replacedWith(replacements, 0 .. orig.len)
+  user.bio = user.bio.replacef(unRegex, unReplace)
+                     .replacef(htRegex, htReplace)
 
 proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   let

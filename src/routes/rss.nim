@@ -12,32 +12,32 @@ export times, hashes, supersnappy
 
 proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.} =
   var profile: Profile
-  var timeline: Timeline
   let
     name = req.params.getOrDefault("name")
     after = getCursor(req)
     names = getNames(name)
 
   if names.len == 1:
-    (profile, timeline) = await fetchTimeline(after, query, skipRail=true)
+    profile = await fetchProfile(after, query, skipRail=true, skipPinned=true)
   else:
     var q = query
     q.fromUser = names
-    timeline = await getSearch[Tweet](q, after)
-    # this is kinda dumb
     profile = Profile(
-      username: name,
-      fullname: names.join(" | "),
-      userpic: "https://abs.twimg.com/sticky/default_profile_images/default_profile.png"
+      tweets: await getSearch[Tweet](q, after),
+      # this is kinda dumb
+      user: User(
+        username: name,
+        fullname: names.join(" | "),
+        userpic: "https://abs.twimg.com/sticky/default_profile_images/default_profile.png"
+      )
     )
 
-  if profile.suspended:
-    return Rss(feed: profile.username, cursor: "suspended")
+  if profile.user.suspended:
+    return Rss(feed: profile.user.username, cursor: "suspended")
 
-  if profile.fullname.len > 0:
-    let rss = compress renderTimelineRss(timeline, profile, cfg,
-                                         multi=(names.len > 1))
-    return Rss(feed: rss, cursor: timeline.bottom)
+  if profile.user.fullname.len > 0:
+    let rss = compress renderTimelineRss(profile, cfg, multi=(names.len > 1))
+    return Rss(feed: rss, cursor: profile.tweets.bottom)
 
 template respRss*(rss, page) =
   if rss.cursor.len == 0:

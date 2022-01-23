@@ -1,8 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, httpclient, uri, strutils
+import asyncdispatch, httpclient, uri, strutils, sequtils, sugar
 import packedjson
 import types, query, formatters, consts, apiutils, parser
 import experimental/parser/user
+
+proc getGraphUser*(id: string): Future[User] {.async.} =
+  if id.len == 0 or id.any(c => not c.isDigit): return
+  let
+    variables = %*{"userId": id, "withSuperFollowsUserFields": true}
+    js = await fetch(graphUser ? {"variables": $variables}, Api.userRestId)
+  result = parseGraphUser(js, id)
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let
@@ -16,6 +23,22 @@ proc getGraphList*(id: string): Future[List] {.async.} =
     url = graphList ? {"variables": $variables}
   result = parseGraphList(await fetch(url, Api.list))
 
+proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} =
+  if list.id.len == 0: return
+  let
+    variables = %*{
+      "listId": list.id,
+      "cursor": after,
+      "withSuperFollowsUserFields": false,
+      "withBirdwatchPivots": false,
+      "withDownvotePerspective": false,
+      "withReactionsMetadata": false,
+      "withReactionsPerspective": false,
+      "withSuperFollowsTweetFields": false
+    }
+    url = graphListMembers ? {"variables": $variables}
+  result = parseGraphListMembers(await fetch(url, Api.listMembers), after)
+
 proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
@@ -23,44 +46,42 @@ proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
     url = listTimeline ? ps
   result = parseTimeline(await fetch(url, Api.timeline), after)
 
-proc getListMembers*(list: List; after=""): Future[Result[Profile]] {.async.} =
-  if list.id.len == 0: return
-  let
-    ps = genParams({"list_id": list.id}, after)
-    url = listMembers ? ps
-  result = parseListMembers(await fetch(url, Api.listMembers), after)
-
-proc getProfile*(username: string): Future[Profile] {.async.} =
+proc getUser*(username: string): Future[User] {.async.} =
+  if username.len == 0: return
   let
     ps = genParams({"screen_name": username})
     json = await fetchRaw(userShow ? ps, Api.userShow)
   result = parseUser(json, username)
 
-proc getProfileById*(userId: string): Future[Profile] {.async.} =
+proc getUserById*(userId: string): Future[User] {.async.} =
+  if userId.len == 0: return
   let
     ps = genParams({"user_id": userId})
     json = await fetchRaw(userShow ? ps, Api.userShow)
   result = parseUser(json)
 
 proc getTimeline*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
+  if id.len == 0: return
   let
     ps = genParams({"userId": id, "include_tweet_replies": $replies}, after)
     url = timeline / (id & ".json") ? ps
   result = parseTimeline(await fetch(url, Api.timeline), after)
 
 proc getMediaTimeline*(id: string; after=""): Future[Timeline] {.async.} =
+  if id.len == 0: return
   let url = mediaTimeline / (id & ".json") ? genParams(cursor=after)
   result = parseTimeline(await fetch(url, Api.timeline), after)
 
 proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
+  if name.len == 0: return
   let
     ps = genParams({"screen_name": name, "trim_user": "true"},
                    count="18", ext=false)
     url = photoRail ? ps
-  result = parsePhotoRail(await fetch(url, Api.photoRail))
+  result = parsePhotoRail(await fetch(url, Api.timeline))
 
 proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
-  when T is Profile:
+  when T is User:
     const
       searchMode = ("result_filter", "user")
       parse = parseUsers

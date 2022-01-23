@@ -2,12 +2,11 @@
 import uri, sequtils
 
 const
-  auth* = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+  auth* = "Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"
 
   api = parseUri("https://api.twitter.com")
   activate* = $(api / "1.1/guest/activate.json")
 
-  listMembers* = api / "1.1/lists/members.json"
   userShow* = api / "1.1/users/show.json"
   photoRail* = api / "1.1/statuses/media_timeline.json"
   search* = api / "2/search/adaptive.json"
@@ -19,8 +18,10 @@ const
   tweet* = timelineApi / "conversation"
 
   graphql = api / "graphql"
-  graphListBySlug* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
+  graphUser* = graphql / "I5nvpI91ljifos1Y3Lltyg/UserByRestId"
   graphList* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
+  graphListBySlug* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
+  graphListMembers* = graphql / "Ke6urWMeCV2UlKXGRy4sow/ListMembers"
 
   timelineParams* = {
     "include_profile_interstitial_type": "0",

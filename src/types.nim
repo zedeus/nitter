@@ -10,13 +10,13 @@ type
 
   Api* {.pure.} = enum
     userShow
-    photoRail
     timeline
     search
     tweet
     list
     listBySlug
     listMembers
+    userRestId
 
   RateLimit* = object
     remaining*: int
@@ -44,7 +44,7 @@ type
     badToken = 239
     noCsrf = 353
 
-  Profile* = object
+  User* = object
     id*: string
     username*: string
     fullname*: string
@@ -53,6 +53,7 @@ type
     bio*: string
     userPic*: string
     banner*: string
+    pinnedTweet*: int64
     following*: int
     followers*: int
     tweets*: int
@@ -162,7 +163,7 @@ type
     id*: int64
     threadId*: int64
     replyId*: int64
-    profile*: Profile
+    user*: User
     text*: string
     time*: DateTime
     reply*: seq[string]
@@ -173,8 +174,8 @@ type
     location*: string
     stats*: TweetStats
     retweet*: Option[Tweet]
-    attribution*: Option[Profile]
-    mediaTags*: seq[Profile]
+    attribution*: Option[User]
+    mediaTags*: seq[User]
     quote*: Option[Tweet]
     card*: Option[Card]
     poll*: Option[Poll]
@@ -190,7 +191,7 @@ type
 
   Chain* = object
     content*: seq[Tweet]
-    more*: int64
+    hasMore*: bool
     cursor*: string
 
   Conversation* = ref object
@@ -200,6 +201,12 @@ type
     replies*: Result[Chain]
 
   Timeline* = Result[Tweet]
+
+  Profile* = object
+    user*: User
+    photoRail*: PhotoRail
+    pinned*: Option[Tweet]
+    tweets*: Timeline
 
   List* = object
     id*: string
@@ -212,7 +219,7 @@ type
 
   GlobalObjects* = ref object
     tweets*: Table[string, Tweet]
-    users*: Table[string, Profile]
+    users*: Table[string, User]
 
   Config* = ref object
     address*: string
