@@ -17,6 +17,7 @@ type
     listBySlug
     listMembers
     userRestId
+    status
 
   RateLimit* = object
     remaining*: int

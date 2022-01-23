@@ -372,6 +372,11 @@ proc parseConversation*(js: JsonNode; tweetId: string): Conversation =
     elif "cursor-bottom" in entry:
       result.replies.bottom = e.getCursor
 
+proc parseStatus*(js: JsonNode): Tweet =
+  result = parseTweet(js)
+  if not result.isNil:
+    result.user = parseUser(js{"user"})
+
 proc parseInstructions[T](res: var Result[T]; global: GlobalObjects; js: JsonNode) =
   if js.kind != JArray or js.len == 0:
     return

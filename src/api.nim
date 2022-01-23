@@ -114,6 +114,10 @@ proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
   if after.len > 0:
     result.replies = await getReplies(id, after)
 
+proc getStatus*(id: string): Future[Tweet] {.async.} =
+  let url = status / (id & ".json") ? genParams()
+  result = parseStatus(await fetch(url, Api.status))
+
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
   let client = newAsyncHttpClient(maxRedirects=0)
   try:
