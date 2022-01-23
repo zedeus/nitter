@@ -61,7 +61,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   try:
     var resp: AsyncResponse
     pool.use(genHeaders(token)):
-      resp = await c.get(url)
+      resp = await c.get($url)
       result = await resp.body
 
       if resp.status == $Http503:
