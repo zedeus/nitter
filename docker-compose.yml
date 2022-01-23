@@ -22,4 +22,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  redis-data:
+  nitter-redis:
