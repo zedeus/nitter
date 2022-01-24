@@ -8,7 +8,7 @@ let
   unRegex = re"(^|[^A-z0-9-_./?])@([A-z0-9_]{1,15})"
   unReplace = "$1<a href=\"/$2\">@$2</a>"
 
-  htRegex = re"(^|[^\w-_./?])([#＃$])([\w_]+)"
+  htRegex = re"(^|[^\w-_./?])([#$]|＃)([\w_]+)"
   htReplace = "$1<a href=\"/search?q=%23$3\">$2$3</a>"
 
 type
