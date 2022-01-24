@@ -126,7 +126,7 @@ docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host zedeus/nitte
 ```
 
 Using docker-compose to run both Nitter and Redis as different containers:
-Change `redisHost` from `localhost` to `redis` in `nitter.conf`, then run:
+Change `redisHost` from `localhost` to `nitter-redis` in `nitter.conf`, then run:
 ```bash
 docker-compose up -d
 ```
