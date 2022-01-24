@@ -210,7 +210,7 @@ proc expandUserEntities*(user: var User; js: JsonNode) =
 
   replacements.deduplicate
   replacements.sort(cmp)
-  
+
   user.bio = orig.replacedWith(replacements, 0 .. orig.len)
   user.bio = user.bio.replacef(unRegex, unReplace)
                      .replacef(htRegex, htReplace)
