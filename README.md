@@ -84,7 +84,7 @@ Running it with the default config is fine, Nitter's default config is set to
 use the default Redis port and localhost.
 
 Here's how to create a `nitter` user, clone the repo, and build the project
-along with the scss.
+along with the scss and md files.
 
 ```bash
 # useradd -m nitter
@@ -93,6 +93,7 @@ $ git clone https://github.com/zedeus/nitter
 $ cd nitter
 $ nimble build -d:release
 $ nimble scss
+$ nimble md
 $ cp nitter.example.conf nitter.conf
 ```
 
@@ -125,7 +126,7 @@ docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host zedeus/nitte
 ```
 
 Using docker-compose to run both Nitter and Redis as different containers:
-Change `redisHost` from `localhost` to `redis` in `nitter.conf`, then run:
+Change `redisHost` from `localhost` to `nitter-redis` in `nitter.conf`, then run:
 ```bash
 docker-compose up -d
 ```

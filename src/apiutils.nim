@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import httpclient, asyncdispatch, options, times, strutils, uri
-import packedjson, zippy
+import httpclient, asyncdispatch, options, strutils, uri
+import jsony, packedjson, zippy
 import types, tokens, consts, parserutils, http_pool
+import experimental/types/common
 
 const
   rlRemaining = "x-rate-limit-remaining"
@@ -16,6 +17,8 @@ proc genParams*(pars: openArray[(string, string)] = @[]; cursor="";
     result &= p
   if ext:
     result &= ("ext", "mediaStats")
+    result &= ("include_ext_alt_text", "true")
+    result &= ("include_ext_media_availability", "true")
   if count.len > 0:
     result &= ("count", count)
   if cursor.len > 0:
@@ -40,7 +43,14 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
     "DNT": "1"
   })
 
-proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
+template updateToken() =
+  if api != Api.search and resp.headers.hasKey(rlRemaining):
+    let
+      remaining = parseInt(resp.headers[rlRemaining])
+      reset = parseInt(resp.headers[rlReset])
+    token.setRateLimit(api, remaining, reset)
+
+template fetchImpl(result, fetchBody) {.dirty.} =
   once:
     pool = HttpPool()
 
@@ -48,37 +58,25 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
   if token.tok.len == 0:
     raise rateLimitError()
 
-  let headers = genHeaders(token)
   try:
     var resp: AsyncResponse
-    var body = pool.use(headers):
+    pool.use(genHeaders(token)):
       resp = await c.get($url)
-      await resp.body
+      result = await resp.body
 
-    if body.len > 0:
+      if resp.status == $Http503:
+        badClient = true
+        raise newException(InternalError, result)
+
+    if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
-        body = uncompress(body, dfGzip)
+        result = uncompress(result, dfGzip)
       else:
-        echo "non-gzip body, url: ", url, ", body: ", body
+        echo "non-gzip body, url: ", url, ", body: ", result
 
-    if body.startsWith('{') or body.startsWith('['):
-      result = parseJson(body)
-    else:
-      echo resp.status, ": ", body
-      result = newJNull()
+    fetchBody
 
-    if api != Api.search and resp.headers.hasKey(rlRemaining):
-      let
-        remaining = parseInt(resp.headers[rlRemaining])
-        reset = parseInt(resp.headers[rlReset])
-      token.setRateLimit(api, remaining, reset)
-
-    if result.getError notin {invalidToken, forbidden, badToken}:
-      release(token, used=true)
-    else:
-      echo "fetch error: ", result.getError
-      release(token, invalid=true)
-      raise rateLimitError()
+    release(token, used=true)
 
     if resp.status == $Http400:
       raise newException(InternalError, $url)
@@ -89,3 +87,35 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
     if "length" notin e.msg and "descriptor" notin e.msg:
       release(token, invalid=true)
     raise rateLimitError()
+
+proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
+  var body: string
+  fetchImpl body:
+    if body.startsWith('{') or body.startsWith('['):
+      result = parseJson(body)
+    else:
+      echo resp.status, ": ", body, " --- url: ", url
+      result = newJNull()
+
+    updateToken()
+
+    let error = result.getError
+    if error in {invalidToken, forbidden, badToken}:
+      echo "fetch error: ", result.getError
+      release(token, invalid=true)
+      raise rateLimitError()
+
+proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
+  fetchImpl result:
+    if not (result.startsWith('{') or result.startsWith('[')):
+      echo resp.status, ": ", result, " --- url: ", url
+      result.setLen(0)
+
+    updateToken()
+
+    if result.startsWith("{\"errors"):
+      let errors = result.fromJson(Errors)
+      if errors in {invalidToken, forbidden, badToken}:
+        echo "fetch error: ", errors
+        release(token, invalid=true)
+        raise rateLimitError()

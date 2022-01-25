@@ -2,14 +2,14 @@
 import uri, sequtils
 
 const
-  auth* = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+  auth* = "Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw"
 
   api = parseUri("https://api.twitter.com")
   activate* = $(api / "1.1/guest/activate.json")
 
-  listMembers* = api / "1.1/lists/members.json"
   userShow* = api / "1.1/users/show.json"
   photoRail* = api / "1.1/statuses/media_timeline.json"
+  status* = api / "1.1/statuses/show"
   search* = api / "2/search/adaptive.json"
 
   timelineApi = api / "2/timeline"
@@ -19,8 +19,10 @@ const
   tweet* = timelineApi / "conversation"
 
   graphql = api / "graphql"
-  graphListBySlug* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
+  graphUser* = graphql / "I5nvpI91ljifos1Y3Lltyg/UserByRestId"
   graphList* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
+  graphListBySlug* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
+  graphListMembers* = graphql / "Ke6urWMeCV2UlKXGRy4sow/ListMembers"
 
   timelineParams* = {
     "include_profile_interstitial_type": "0",
@@ -35,16 +37,13 @@ const
     "cards_platform": "Web-12",
     "include_cards": "1",
     "include_composer_source": "false",
-    "include_ext_alt_text": "true",
     "include_reply_count": "1",
     "tweet_mode": "extended",
     "include_entities": "true",
     "include_user_entities": "true",
     "include_ext_media_color": "false",
-    "include_ext_media_availability": "true",
     "send_error_codes": "true",
     "simple_quoted_tweet": "true",
-    "ext": "mediaStats",
     "include_quote_count": "true"
   }.toSeq
 

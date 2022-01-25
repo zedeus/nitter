@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, httpclient
+import httpclient
 
 type
   HttpPool* = ref object
     conns*: seq[AsyncHttpClient]
 
-var maxConns: int
-var proxy: Proxy
+var
+  maxConns: int
+  proxy: Proxy
 
 proc setMaxHttpConns*(n: int) =
   maxConns = n
@@ -17,20 +18,24 @@ proc setHttpProxy*(url: string; auth: string) =
   else:
     proxy = nil
 
-proc release*(pool: HttpPool; client: AsyncHttpClient) =
-  if pool.conns.len >= maxConns:
-    client.close()
+proc release*(pool: HttpPool; client: AsyncHttpClient; badClient=false) =
+  if pool.conns.len >= maxConns or badClient:
+    try: client.close()
+    except: discard
   elif client != nil:
     pool.conns.insert(client)
 
-template use*(pool: HttpPool; heads: HttpHeaders; body: untyped): untyped =
-  var c {.inject.}: AsyncHttpClient
-
+proc acquire*(pool: HttpPool; heads: HttpHeaders): AsyncHttpClient =
   if pool.conns.len == 0:
-    c = newAsyncHttpClient(headers=heads, proxy=proxy)
+    result = newAsyncHttpClient(headers=heads, proxy=proxy)
   else:
-    c = pool.conns.pop()
-    c.headers = heads
+    result = pool.conns.pop()
+    result.headers = heads
+
+template use*(pool: HttpPool; heads: HttpHeaders; body: untyped): untyped =
+  var
+    c {.inject.} = pool.acquire(heads)
+    badClient {.inject.} = false
 
   try:
     body
@@ -38,4 +43,4 @@ template use*(pool: HttpPool; heads: HttpHeaders; body: untyped): untyped =
     # Twitter closed the connection, retry
     body
   finally:
-    pool.release(c)
+    pool.release(c, badClient)

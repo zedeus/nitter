@@ -7,6 +7,7 @@
 # disable annoying warnings
 warning("GcUnsafe2", off)
 hint("XDeclaredButNotUsed", off)
+hint("XCannotRaiseY", off)
 hint("User", off)
 
 const

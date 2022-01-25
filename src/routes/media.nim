@@ -5,7 +5,7 @@ import asynchttpserver, asyncstreams, asyncfile, asyncnet
 import jester
 
 import router_utils
-import ".."/[types, formatters, agents, utils]
+import ".."/[types, formatters, utils]
 
 export asynchttpserver, asyncstreams, asyncfile, asyncnet
 export httpclient, os, strutils, asyncstreams, base64, re
@@ -14,10 +14,8 @@ const
   m3u8Mime* = "application/vnd.apple.mpegurl"
   maxAge* = "max-age=604800"
 
-let mediaAgent* = getAgent()
-
-proc safeFetch*(url, agent: string): Future[string] {.async.} =
-  let client = newAsyncHttpClient(userAgent=agent)
+proc safeFetch*(url: string): Future[string] {.async.} =
+  let client = newAsyncHttpClient()
   try: result = await client.getContent(url)
   except: discard
   finally: client.close()
@@ -34,7 +32,7 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   result = Http200
   let
     request = req.getNativeReq()
-    client = newAsyncHttpClient(userAgent=mediaAgent)
+    client = newAsyncHttpClient()
 
   try:
     let res = await client.get(url)
@@ -116,14 +114,14 @@ proc createMediaRouter*(cfg: Config) =
 
       var content: string
       if ".vmap" in url:
-        let m3u8 = getM3u8Url(await safeFetch(url, mediaAgent))
+        let m3u8 = getM3u8Url(await safeFetch(url))
         if m3u8.len > 0:
-          content = await safeFetch(url, mediaAgent)
+          content = await safeFetch(url)
         else:
           resp Http404
 
       if ".m3u8" in url:
-        let vid = await safeFetch(url, mediaAgent)
+        let vid = await safeFetch(url)
         content = proxifyVideo(vid, cookiePref(proxyVideos))
 
       resp content, m3u8Mime

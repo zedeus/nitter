@@ -47,5 +47,5 @@ proc createListRouter*(cfg: Config) =
         prefs = cookiePrefs()
         list = await getCachedList(id=(@"id"))
         title = "@" & list.username & "/" & list.name
-        members = await getListMembers(list, getCursor())
+        members = await getGraphListMembers(list, getCursor())
       respList(list, members, title, renderTimelineUsers(members, prefs, request.path))

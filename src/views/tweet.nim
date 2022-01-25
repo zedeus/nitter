@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, sequtils, strformat, options
 import karax/[karaxdsl, vdom, vstyles]
+from jester import Request
 
 import renderutils
 import ".."/[types, utils, formatters]
+import general
 
 proc getSmallPic(url: string): string =
   result = url
@@ -11,10 +13,10 @@ proc getSmallPic(url: string): string =
     result &= ":small"
   result = getPicUrl(result)
 
-proc renderMiniAvatar(profile: Profile): VNode =
-  let url = getPicUrl(profile.getUserPic("_mini"))
+proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
+  let url = getPicUrl(user.getUserPic("_mini"))
   buildHtml():
-    img(class="avatar mini", src=url)
+    img(class=(prefs.getAvatarClass & " mini"), src=url)
 
 proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
   buildHtml(tdiv):
@@ -27,16 +29,16 @@ proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
         span: icon "pin", "Pinned Tweet"
 
     tdiv(class="tweet-header"):
-      a(class="tweet-avatar", href=("/" & tweet.profile.username)):
+      a(class="tweet-avatar", href=("/" & tweet.user.username)):
         var size = "_bigger"
-        if not prefs.autoplayGifs and tweet.profile.userPic.endsWith("gif"):
+        if not prefs.autoplayGifs and tweet.user.userPic.endsWith("gif"):
           size = "_400x400"
-        genImg(tweet.profile.getUserPic(size), class="avatar")
+        genImg(tweet.user.getUserPic(size), class=prefs.getAvatarClass)
 
       tdiv(class="tweet-name-row"):
         tdiv(class="fullname-and-username"):
-          linkUser(tweet.profile, class="fullname")
-          linkUser(tweet.profile, class="username")
+          linkUser(tweet.user, class="fullname")
+          linkUser(tweet.user, class="username")
 
         span(class="tweet-date"):
           a(href=getLink(tweet), title=tweet.getTime):
@@ -97,7 +99,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
           img(src=thumb)
           renderVideoDisabled(video, path)
         else:
-          let vid = video.variants.filterIt(it.videoType == video.playbackType)
+          let vid = video.variants.filterIt(it.contentType == video.playbackType)
           let source = getVidUrl(vid[0].url)
           case video.playbackType
           of mp4:
@@ -201,14 +203,14 @@ proc renderReply(tweet: Tweet): VNode =
       if i > 0: text " "
       a(href=("/" & u)): text "@" & u
 
-proc renderAttribution(profile: Profile): VNode =
-  buildHtml(a(class="attribution", href=("/" & profile.username))):
-    renderMiniAvatar(profile)
-    strong: text profile.fullname
-    if profile.verified:
+proc renderAttribution(user: User; prefs: Prefs): VNode =
+  buildHtml(a(class="attribution", href=("/" & user.username))):
+    renderMiniAvatar(user, prefs)
+    strong: text user.fullname
+    if user.verified:
       icon "ok", class="verified-icon", title="Verified account"
 
-proc renderMediaTags(tags: seq[Profile]): VNode =
+proc renderMediaTags(tags: seq[User]): VNode =
   buildHtml(tdiv(class="media-tag-block")):
     icon "user"
     for i, p in tags:
@@ -242,9 +244,9 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
 
     tdiv(class="tweet-name-row"):
       tdiv(class="fullname-and-username"):
-        renderMiniAvatar(quote.profile)
-        linkUser(quote.profile, class="fullname")
-        linkUser(quote.profile, class="username")
+        renderMiniAvatar(quote.user, prefs)
+        linkUser(quote.user, class="fullname")
+        linkUser(quote.user, class="username")
 
       span(class="tweet-date"):
         a(href=getLink(quote), title=quote.getTime):
@@ -299,7 +301,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
   var tweet = fullTweet
   if tweet.retweet.isSome:
     tweet = tweet.retweet.get
-    retweet = fullTweet.profile.fullname
+    retweet = fullTweet.user.fullname
 
   buildHtml(tdiv(class=("timeline-item " & divClass))):
     if not mainTweet:
@@ -310,7 +312,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       renderHeader(tweet, retweet, prefs)
 
       if not afterTweet and index == 0 and tweet.reply.len > 0 and
-         (tweet.reply.len > 1 or tweet.reply[0] != tweet.profile.username):
+         (tweet.reply.len > 1 or tweet.reply[0] != tweet.user.username):
         renderReply(tweet)
 
       var tweetClass = "tweet-content media-body"
@@ -321,7 +323,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         verbatim replaceUrls(tweet.text, prefs) & renderLocation(tweet)
 
       if tweet.attribution.isSome:
-        renderAttribution(tweet.attribution.get())
+        renderAttribution(tweet.attribution.get(), prefs)
 
       if tweet.card.isSome:
         renderCard(tweet.card.get(), prefs, path)
@@ -353,3 +355,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if showThread:
         a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
           text "Show this thread"
+
+proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): VNode =
+  buildHtml(tdiv(class="tweet-embed")):
+    renderHead(prefs, cfg, req)
+    renderTweet(tweet, prefs, path, mainTweet=true)

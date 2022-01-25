@@ -15,18 +15,18 @@ proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
     if text.len > 0:
       text " " & text
 
-proc linkUser*(profile: Profile, class=""): VNode =
+proc linkUser*(user: User, class=""): VNode =
   let
     isName = "username" notin class
-    href = "/" & profile.username
-    nameText = if isName: profile.fullname
-               else: "@" & profile.username
+    href = "/" & user.username
+    nameText = if isName: user.fullname
+               else: "@" & user.username
 
   buildHtml(a(href=href, class=class, title=nameText)):
     text nameText
-    if isName and profile.verified:
+    if isName and user.verified:
       icon "ok", class="verified-icon", title="Verified account"
-    if isName and profile.protected:
+    if isName and user.protected:
       text " "
       icon "lock", title="Protected account"
 
@@ -88,3 +88,9 @@ proc getTabClass*(query: Query; tab: QueryKind): string =
   result = "tab-item"
   if query.kind == tab:
     result &= " active"
+
+proc getAvatarClass*(prefs: Prefs): string =
+  if prefs.squareAvatars:
+    "avatar"
+  else:
+    "avatar round"

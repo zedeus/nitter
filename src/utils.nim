@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, strformat, uri, tables, base64
-import nimcrypto, regex
+import nimcrypto
 
 var
   hmacKey: string

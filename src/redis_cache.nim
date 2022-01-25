@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, times, strutils, tables, hashes
+import asyncdispatch, times, strformat, strutils, tables, hashes
 import redis, redpool, flatty, supersnappy
 
 import types, api
@@ -12,6 +12,9 @@ var
   pool: RedisPool
   rssCacheTime: int
   listCacheTime*: int
+
+template dawait(future) =
+  discard await future
 
 # flatty can't serialize DateTime, so we need to define this
 proc toFlatty*(s: var string, x: DateTime) =
@@ -33,9 +36,9 @@ proc migrate*(key, match: string) {.async.} =
       let list = await r.scan(newCursor(0), match, 100000)
       r.startPipelining()
       for item in list:
-        discard await r.del(item)
+        dawait r.del(item)
       await r.setk(key, "true")
-      discard await r.flushPipeline()
+      dawait r.flushPipeline()
 
 proc initRedisPool*(cfg: Config) {.async.} =
   try:
@@ -47,9 +50,11 @@ proc initRedisPool*(cfg: Config) {.async.} =
     await migrate("snappyRss", "rss:*")
     await migrate("userBuckets", "p:*")
     await migrate("profileDates", "p:*")
+    await migrate("profileStats", "p:*")
+    await migrate("userType", "p:*")
 
     pool.withAcquire(r):
-      # optimize memory usage for profile ID buckets
+      # optimize memory usage for user ID buckets
       await r.configSet("hash-max-ziplist-entries", "1000")
 
   except OSError:
@@ -57,9 +62,10 @@ proc initRedisPool*(cfg: Config) {.async.} =
     stdout.flushFile
     quit(1)
 
-template pidKey(name: string): string = "pid:" & $(hash(name) div 1_000_000)
-template profileKey(name: string): string = "p:" & name
+template uidKey(name: string): string = "pid:" & $(hash(name) div 1_000_000)
+template userKey(name: string): string = "p:" & name
 template listKey(l: List): string = "l:" & l.id
+template tweetKey(id: int64): string = "t:" & $id
 
 proc get(query: string): Future[string] {.async.} =
   pool.withAcquire(r):
@@ -67,7 +73,13 @@ proc get(query: string): Future[string] {.async.} =
 
 proc setEx(key: string; time: int; data: string) {.async.} =
   pool.withAcquire(r):
-    discard await r.setEx(key, time, data)
+    dawait r.setEx(key, time, data)
+
+proc cacheUserId(username, id: string) {.async.} =
+  if username.len == 0 or id.len == 0: return
+  let name = toLower(username)
+  pool.withAcquire(r):
+    dawait r.hSet(name.uidKey, name, id)
 
 proc cache*(data: List) {.async.} =
   await setEx(data.listKey, listCacheTime, compress(toFlatty(data)))
@@ -75,59 +87,79 @@ proc cache*(data: List) {.async.} =
 proc cache*(data: PhotoRail; name: string) {.async.} =
   await setEx("pr:" & toLower(name), baseCacheTime, compress(toFlatty(data)))
 
-proc cache*(data: Profile) {.async.} =
-  if data.username.len == 0 or data.id.len == 0: return
+proc cache*(data: User) {.async.} =
+  if data.username.len == 0: return
   let name = toLower(data.username)
+  await cacheUserId(name, data.id)
   pool.withAcquire(r):
-    r.startPipelining()
-    discard await r.setEx(name.profileKey, baseCacheTime, compress(toFlatty(data)))
-    discard await r.setEx("i:" & data.id , baseCacheTime, data.username)
-    discard await r.hSet(name.pidKey, name, data.id)
-    discard await r.flushPipeline()
+    dawait r.setEx(name.userKey, baseCacheTime, compress(toFlatty(data)))
 
-proc cacheProfileId*(username, id: string) {.async.} =
-  if username.len == 0 or id.len == 0: return
-  let name = toLower(username)
+proc cache*(data: Tweet) {.async.} =
+  if data.isNil or data.id == 0: return
   pool.withAcquire(r):
-    discard await r.hSet(name.pidKey, name, id)
+    dawait r.setEx(data.id.tweetKey, baseCacheTime, compress(toFlatty(data)))
 
 proc cacheRss*(query: string; rss: Rss) {.async.} =
   let key = "rss:" & query
   pool.withAcquire(r):
-    r.startPipelining()
-    discard await r.hSet(key, "rss", rss.feed)
-    discard await r.hSet(key, "min", rss.cursor)
-    discard await r.expire(key, rssCacheTime)
-    discard await r.flushPipeline()
+    dawait r.hSet(key, "rss", rss.feed)
+    dawait r.hSet(key, "min", rss.cursor)
+    dawait r.expire(key, rssCacheTime)
 
-proc getProfileId*(username: string): Future[string] {.async.} =
+template deserialize(data, T) =
+  try:
+    result = fromFlatty(uncompress(data), T)
+  except:
+    echo "Decompression failed($#): '$#'" % [astToStr(T), data]
+
+proc getUserId*(username: string): Future[string] {.async.} =
   let name = toLower(username)
   pool.withAcquire(r):
-    result = await r.hGet(name.pidKey, name)
+    result = await r.hGet(name.uidKey, name)
     if result == redisNil:
-      result.setLen(0)
+      let user = await getUser(username)
+      if user.suspended:
+        return "suspended"
+      else:
+        await cacheUserId(name, user.id)
+        return user.id
 
-proc getCachedProfile*(username: string; fetch=true): Future[Profile] {.async.} =
+proc getCachedUser*(username: string; fetch=true): Future[User] {.async.} =
   let prof = await get("p:" & toLower(username))
   if prof != redisNil:
-    result = fromFlatty(uncompress(prof), Profile)
+    prof.deserialize(User)
   elif fetch:
-    result = await getProfile(username)
+    let userId = await getUserId(username)
+    result = await getGraphUser(userId)
+    await cache(result)
 
-proc getCachedProfileUsername*(userId: string): Future[string] {.async.} =
-  let username = await get("i:" & userId)
+proc getCachedUsername*(userId: string): Future[string] {.async.} =
+  let
+    key = "i:" & userId
+    username = await get(key)
+
   if username != redisNil:
     result = username
   else:
-    let profile = await getProfileById(userId)
-    result = profile.username
-    await cache(profile)
+    let user = await getUserById(userId)
+    result = user.username
+    await setEx(key, baseCacheTime, result)
+
+proc getCachedTweet*(id: int64): Future[Tweet] {.async.} =
+  if id == 0: return
+  let tweet = await get(id.tweetKey)
+  if tweet != redisNil:
+    tweet.deserialize(Tweet)
+  else:
+    result = await getStatus($id)
+    if result.isNil:
+      await cache(result)
 
 proc getCachedPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return
   let rail = await get("pr:" & toLower(name))
   if rail != redisNil:
-    result = fromFlatty(uncompress(rail), PhotoRail)
+    rail.deserialize(PhotoRail)
   else:
     result = await getPhotoRail(name)
     await cache(result, name)
@@ -137,7 +169,7 @@ proc getCachedList*(username=""; slug=""; id=""): Future[List] {.async.} =
              else: await get("l:" & id)
 
   if list != redisNil:
-    result = fromFlatty(uncompress(list), List)
+    list.deserialize(List)
   else:
     if id.len > 0:
       result = await getGraphList(id)

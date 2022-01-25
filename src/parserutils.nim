@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, times, macros, htmlgen, unicode, options, algorithm
-import regex, packedjson
+import std/[strutils, times, macros, htmlgen, options, algorithm, re]
+import std/unicode except strip
+import packedjson
 import types, utils, formatters
 
-const
+let
   unRegex = re"(^|[^A-z0-9-_./?])@([A-z0-9_]{1,15})"
   unReplace = "$1<a href=\"/$2\">@$2</a>"
 
-  htRegex = re"(^|[^\w-_./?])([#＃$])([\w_]+)"
+  htRegex = re"(^|[^\w-_./?])([#$]|＃)([\w_]+)"
   htReplace = "$1<a href=\"/search?q=%23$3\">$2$3</a>"
 
 type
@@ -128,8 +129,6 @@ proc getBanner*(js: JsonNode): string =
       result.add toHex(pal{"blue"}.getInt, 2)
       return
 
-  return "#161616"
-
 proc getTombstone*(js: JsonNode): string =
   result = js{"tombstoneInfo", "richText", "text"}.getStr
   result.removeSuffix(" Learn more")
@@ -195,13 +194,13 @@ proc deduplicate(s: var seq[ReplaceSlice]) =
 
 proc cmp(x, y: ReplaceSlice): int = cmp(x.slice.a, y.slice.b)
 
-proc expandProfileEntities*(profile: var Profile; js: JsonNode) =
+proc expandUserEntities*(user: var User; js: JsonNode) =
   let
-    orig = profile.bio.toRunes
+    orig = user.bio.toRunes
     ent = ? js{"entities"}
 
   with urls, ent{"url", "urls"}:
-    profile.website = urls[0]{"expanded_url"}.getStr
+    user.website = urls[0]{"expanded_url"}.getStr
 
   var replacements = newSeq[ReplaceSlice]()
 
@@ -212,9 +211,9 @@ proc expandProfileEntities*(profile: var Profile; js: JsonNode) =
   replacements.deduplicate
   replacements.sort(cmp)
 
-  profile.bio = orig.replacedWith(replacements, 0 .. orig.len)
-  profile.bio = profile.bio.replace(unRegex, unReplace)
-                           .replace(htRegex, htReplace)
+  user.bio = orig.replacedWith(replacements, 0 .. orig.len)
+  user.bio = user.bio.replacef(unRegex, unReplace)
+                     .replacef(htRegex, htReplace)
 
 proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
@@ -274,3 +273,4 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   replacements.sort(cmp)
 
   tweet.text = orig.replacedWith(replacements, textSlice)
+                   .strip(leading=false)

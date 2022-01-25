@@ -2,12 +2,12 @@
 import asyncdispatch, httpclient, times, sequtils, json, random
 import strutils, tables
 import zippy
-import types, agents, consts, http_pool
+import types, consts, http_pool
 
 const
   maxConcurrentReqs = 5  # max requests at a time per token, to avoid race conditions
-  maxAge = 3.hours       # tokens expire after 3 hours
   maxLastUse = 1.hours   # if a token is unused for 60 minutes, it expires
+  maxAge = 2.hours + 55.minutes  # tokens expire after 3 hours
   failDelay = initDuration(minutes=30)
 
 var
@@ -37,7 +37,7 @@ proc getPoolJson*(): JsonNode =
       let
         maxReqs =
           case api
-          of Api.listBySlug, Api.list: 500
+          of Api.listMembers, Api.listBySlug, Api.list, Api.userRestId: 500
           of Api.timeline: 187
           else: 180
         reqs = maxReqs - token.apis[api].remaining
@@ -65,7 +65,6 @@ proc fetchToken(): Future[Token] {.async.} =
     "accept-encoding": "gzip",
     "accept-language": "en-US,en;q=0.5",
     "connection": "keep-alive",
-    "user-agent": getAgent(),
     "authorization": auth
   })
 

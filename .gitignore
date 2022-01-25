@@ -5,5 +5,7 @@ nitter
 /tests/geckodriver.log
 /tests/downloaded_files/*
 /tools/gencss
+/tools/rendermd
 /public/css/style.css
+/public/md/*.html
 nitter.conf

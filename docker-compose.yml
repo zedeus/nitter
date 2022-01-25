@@ -1,18 +1,25 @@
-version: "3.8"
+version: "3"
+
 services:
-  redis:
-    image: redis:6-alpine
-    restart: unless-stopped
-    volumes:
-      - redis-data:/var/lib/redis
+
   nitter:
     image: zedeus/nitter:latest
-    restart: unless-stopped
-    depends_on:
-      - redis
+    container_name: nitter
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080" # Replace with "8080:8080" if you don't use a reverse proxy
     volumes:
-      - ./nitter.conf:/src/nitter.conf
+      - ./nitter.conf:/src/nitter.conf:ro
+    depends_on:
+      - nitter-redis
+    restart: unless-stopped
+
+  nitter-redis:
+    image: redis:6-alpine
+    container_name: nitter-redis
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - nitter-redis:/data
+    restart: unless-stopped
+
 volumes:
-  redis-data:
+  nitter-redis:

@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, options, tables, times, math
-import packedjson
-import packedjson / deserialiser
+import packedjson, packedjson/deserialiser
 import types, parserutils, utils
+import experimental/parser/unifiedcard
 
-proc parseProfile(js: JsonNode; id=""): Profile =
+proc parseUser(js: JsonNode; id=""): User =
   if js.isNull: return
-  result = Profile(
+  result = User(
     id: if id.len > 0: id else: js{"id_str"}.getStr,
     username: js{"screen_name"}.getStr,
     fullname: js{"name"}.getStr,
@@ -14,32 +14,27 @@ proc parseProfile(js: JsonNode; id=""): Profile =
     bio: js{"description"}.getStr,
     userPic: js{"profile_image_url_https"}.getImageStr.replace("_normal", ""),
     banner: js.getBanner,
-    following: $js{"friends_count"}.getInt,
-    followers: $js{"followers_count"}.getInt,
-    tweets: $js{"statuses_count"}.getInt,
-    likes: $js{"favourites_count"}.getInt,
-    media: $js{"media_count"}.getInt,
+    following: js{"friends_count"}.getInt,
+    followers: js{"followers_count"}.getInt,
+    tweets: js{"statuses_count"}.getInt,
+    likes: js{"favourites_count"}.getInt,
+    media: js{"media_count"}.getInt,
     verified: js{"verified"}.getBool,
     protected: js{"protected"}.getBool,
     joinDate: js{"created_at"}.getTime
   )
 
-  result.expandProfileEntities(js)
+  result.expandUserEntities(js)
 
-proc parseUserShow*(js: JsonNode; username=""; id=""): Profile =
-  if id.len > 0:
-    result = Profile(id: id)
-  else:
-    result = Profile(username: username)
-
+proc parseGraphUser*(js: JsonNode; id: string): User =
   if js.isNull: return
 
-  with error, js{"errors"}:
-    if error.getError == suspended:
-      result.suspended = true
-    return
+  with user, js{"data", "user", "result", "legacy"}:
+    result = parseUser(user, id)
 
-  result = parseProfile(js)
+    with pinned, user{"pinned_tweet_ids_str"}:
+      if pinned.kind == JArray and pinned.len > 0:
+        result.pinnedTweet = parseBiggestInt(pinned[0].getStr)
 
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
@@ -60,21 +55,25 @@ proc parseGraphList*(js: JsonNode): List =
     banner: list{"custom_banner_media", "media_info", "url"}.getImageStr
   )
 
-proc parseListMembers*(js: JsonNode; cursor: string): Result[Profile] =
-  result = Result[Profile](
+proc parseGraphListMembers*(js: JsonNode; cursor: string): Result[User] =
+  result = Result[User](
     beginning: cursor.len == 0,
     query: Query(kind: userList)
   )
 
   if js.isNull: return
 
-  result.top = js{"previous_cursor_str"}.getStr
-  result.bottom = js{"next_cursor_str"}.getStr
-  if result.bottom.len == 1:
-    result.bottom.setLen 0
+  let root = js{"data", "list", "members_timeline", "timeline", "instructions"}
+  for instruction in root:
+    if instruction{"type"}.getStr == "TimelineAddEntries":
+      for entry in instruction{"entries"}:
+        let content = entry{"content"}
+        if content{"entryType"}.getStr == "TimelineTimelineItem":
+          with legacy, content{"itemContent", "user_results", "result", "legacy"}:
+            result.content.add parseUser(legacy)
+        elif content{"cursorType"}.getStr == "Bottom":
+          result.bottom = content{"value"}.getStr
 
-  for u in js{"users"}:
-    result.content.add parseProfile(u)
 
 proc parsePoll(js: JsonNode): Poll =
   let vals = js{"binding_values"}
@@ -102,7 +101,6 @@ proc parseGif(js: JsonNode): Gif =
 
 proc parseVideo(js: JsonNode): Video =
   result = Video(
-    videoId: js{"id_str"}.getStr,
     thumb: js{"media_url_https"}.getImageStr,
     views: js{"ext", "mediaStats", "r", "ok", "viewCount"}.getStr,
     available: js{"ext_media_availability", "status"}.getStr == "available",
@@ -119,7 +117,7 @@ proc parseVideo(js: JsonNode): Video =
 
   for v in js{"video_info", "variants"}:
     result.variants.add VideoVariant(
-      videoType: parseEnum[VideoType](v{"content_type"}.getStr("summary")),
+      contentType: parseEnum[VideoType](v{"content_type"}.getStr("summary")),
       bitrate: v{"bitrate"}.getInt,
       url: v{"url"}.getStr
     )
@@ -129,19 +127,17 @@ proc parsePromoVideo(js: JsonNode): Video =
     thumb: js{"player_image_large"}.getImageVal,
     available: true,
     durationMs: js{"content_duration_seconds"}.getStrVal("0").parseInt * 1000,
-    playbackType: vmap,
-    videoId: js{"player_content_id"}.getStrVal(js{"card_id"}.getStrVal(
-        js{"amplify_content_id"}.getStrVal())),
+    playbackType: vmap
   )
 
   var variant = VideoVariant(
-    videoType: vmap,
+    contentType: vmap,
     url: js{"player_hls_url"}.getStrVal(js{"player_stream_url"}.getStrVal(
         js{"amplify_url_vmap"}.getStrVal()))
   )
 
   if "m3u8" in variant.url:
-    variant.videoType = m3u8
+    variant.contentType = m3u8
     result.playbackType = m3u8
 
   result.variants.add variant
@@ -154,7 +150,7 @@ proc parseBroadcast(js: JsonNode): Card =
     title: js{"broadcaster_display_name"}.getStrVal,
     text: js{"broadcast_title"}.getStrVal,
     image: image,
-    video: some Video(videoId: js{"broadcast_media_id"}.getStrVal, thumb: image)
+    video: some Video(thumb: image)
   )
 
 proc parseCard(js: JsonNode; urls: JsonNode): Card =
@@ -165,6 +161,9 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
     vals = ? js{"binding_values"}
     name = js{"name"}.getStr
     kind = parseEnum[CardKind](name[(name.find(":") + 1) ..< name.len], unknown)
+
+  if kind == unified:
+    return parseUnifiedCard(vals{"unified_card", "string_value"}.getStr)
 
   result = Card(
     kind: kind,
@@ -190,7 +189,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
     result.url = vals{"player_url"}.getStrVal
     if "youtube.com" in result.url:
       result.url = result.url.replace("/embed/", "/watch?v=")
-  of audiospace, unified, unknown:
+  of audiospace, unknown:
     result.title = "This card type is not supported."
   else: discard
 
@@ -221,7 +220,7 @@ proc parseTweet(js: JsonNode): Tweet =
     time: js{"created_at"}.getTime,
     hasThread: js{"self_thread"}.notNull,
     available: true,
-    profile: Profile(id: js{"user_id_str"}.getStr),
+    user: User(id: js{"user_id_str"}.getStr),
     stats: TweetStats(
       replies: js{"reply_count"}.getInt,
       retweets: js{"retweet_count"}.getInt,
@@ -259,7 +258,7 @@ proc parseTweet(js: JsonNode): Tweet =
       of "video":
         result.video = some(parseVideo(m))
         with user, m{"additional_media_info", "source_user"}:
-          result.attribution = some(parseProfile(user))
+          result.attribution = some(parseUser(user))
       of "animated_gif":
         result.gif = some(parseGif(m))
       else: discard
@@ -313,36 +312,32 @@ proc parseGlobalObjects(js: JsonNode): GlobalObjects =
     users = ? js{"globalObjects", "users"}
 
   for k, v in users:
-    result.users[k] = parseProfile(v, k)
+    result.users[k] = parseUser(v, k)
 
   for k, v in tweets:
     var tweet = parseTweet(v)
-    if tweet.profile.id in result.users:
-      tweet.profile = result.users[tweet.profile.id]
+    if tweet.user.id in result.users:
+      tweet.user = result.users[tweet.user.id]
     result.tweets[k] = tweet
 
 proc parseThread(js: JsonNode; global: GlobalObjects): tuple[thread: Chain, self: bool] =
   result.thread = Chain()
-  for t in js{"content", "timelineModule", "items"}:
-    let content = t{"item", "content"}
-    if "Self" in content{"tweet", "displayType"}.getStr:
+
+  let thread = js{"content", "item", "content", "conversationThread"}
+  with cursor, thread{"showMoreCursor"}:
+    result.thread.cursor = cursor{"value"}.getStr
+    result.thread.hasMore = true
+
+  for t in thread{"conversationComponents"}:
+    let content = t{"conversationTweetComponent", "tweet"}
+
+    if content{"displayType"}.getStr == "SelfThread":
       result.self = true
 
-    let entry = t{"entryId"}.getStr
-    if "show_more" in entry:
-      let
-        cursor = content{"timelineCursor"}
-        more = cursor{"displayTreatment", "actionText"}.getStr
-      result.thread.cursor = cursor{"value"}.getStr
-      if more.len > 0 and more[0].isDigit():
-        result.thread.more = parseInt(more[0 ..< more.find(" ")])
-      else:
-        result.thread.more = -1
-    else:
-      var tweet = finalizeTweet(global, t.getEntryId)
-      if not tweet.available:
-        tweet.tombstone = getTombstone(content{"tombstone"})
-      result.thread.content.add tweet
+    var tweet = finalizeTweet(global, content{"id"}.getStr)
+    if not tweet.available:
+      tweet.tombstone = getTombstone(content{"tombstone"})
+    result.thread.content.add tweet
 
 proc parseConversation*(js: JsonNode; tweetId: string): Conversation =
   result = Conversation(replies: Result[Chain](beginning: true))
@@ -372,6 +367,18 @@ proc parseConversation*(js: JsonNode; tweetId: string): Conversation =
     elif "cursor-bottom" in entry:
       result.replies.bottom = e.getCursor
 
+proc parseStatus*(js: JsonNode): Tweet =
+  with e, js{"errors"}:
+    if e.getError == tweetNotFound:
+      return
+
+  result = parseTweet(js)
+  if not result.isNil:
+    result.user = parseUser(js{"user"})
+
+    with quote, js{"quoted_status"}:
+      result.quote = some parseStatus(js{"quoted_status"})
+
 proc parseInstructions[T](res: var Result[T]; global: GlobalObjects; js: JsonNode) =
   if js.kind != JArray or js.len == 0:
     return
@@ -388,8 +395,8 @@ proc parseInstructions[T](res: var Result[T]; global: GlobalObjects; js: JsonNod
       elif "bottom" in r{"entryId"}.getStr:
         res.bottom = r.getCursor
 
-proc parseUsers*(js: JsonNode; after=""): Result[Profile] =
-  result = Result[Profile](beginning: after.len == 0)
+proc parseUsers*(js: JsonNode; after=""): Result[User] =
+  result = Result[User](beginning: after.len == 0)
   let global = parseGlobalObjects(? js)
 
   let instructions = ? js{"timeline", "instructions"}
@@ -419,7 +426,7 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
 
   for e in instructions[0]{"addEntries", "entries"}:
     let entry = e{"entryId"}.getStr
-    if "tweet" in entry or "sq-I-t" in entry or "tombstone" in entry:
+    if "tweet" in entry or entry.startsWith("sq-I-t") or "tombstone" in entry:
       let tweet = finalizeTweet(global, e.getEntryId)
       if not tweet.available: continue
       result.content.add tweet
@@ -427,6 +434,12 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
       result.top = e.getCursor
     elif "cursor-bottom" in entry:
       result.bottom = e.getCursor
+    elif entry.startsWith("sq-C"):
+      with cursor, e{"content", "operation", "cursor"}:
+        if cursor{"cursorType"}.getStr == "Bottom":
+          result.bottom = cursor{"value"}.getStr
+        else:
+          result.top = cursor{"value"}.getStr
 
 proc parsePhotoRail*(js: JsonNode): PhotoRail =
   for tweet in js:
