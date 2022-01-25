@@ -180,7 +180,7 @@ proc createRssRouter*(cfg: Config) =
           error = conv.tweet.tombstone
         resp Http404, showError(error, cfg)
 
-      while conv.after.more != 0:
+      while conv.after.hasMore:
         let newer_conv = await getTweet($conv.after.content[^1].id)
         if newer_conv == nil or newer_conv.tweet == nil or newer_conv.tweet.id == 0:
           break
