@@ -2,8 +2,7 @@
 import asyncdispatch, httpclient, uri, strutils, sequtils, sugar
 import packedjson
 import types, query, formatters, consts, apiutils, parser
-import experimental/parser/[user, graphql]
-import experimental/parser/timeline as timelineParser
+import experimental/parser as newParser
 
 proc getGraphUser*(id: string): Future[User] {.async.} =
   if id.len == 0 or id.any(c => not c.isDigit): return
