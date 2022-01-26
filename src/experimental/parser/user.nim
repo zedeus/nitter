@@ -1,4 +1,4 @@
-import std/[algorithm, unicode, re, strutils]
+import std/[algorithm, unicode, re, strutils, strformat]
 import jsony
 import utils, slices
 import ../types/user as userType
@@ -34,8 +34,13 @@ proc expandUserEntities(user: var User; raw: RawUser) =
 proc getBanner(user: RawUser): string =
   if user.profileBannerUrl.len > 0:
     return user.profileBannerUrl & "/1500x500"
+
   if user.profileLinkColor.len > 0:
     return '#' & user.profileLinkColor
+
+  if user.profileImageExtensions.mediaColor.r.ok.palette.len > 0:
+    let color = user.profileImageExtensions.mediaColor.r.ok.palette[0].rgb
+    return &"#{color.red:02x}{color.green:02x}{color.blue:02x}"
 
 proc toUser*(raw: RawUser): User =
   result = User(

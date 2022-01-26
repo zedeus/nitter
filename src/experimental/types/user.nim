@@ -18,6 +18,7 @@ type
     protected*: bool
     profileBannerUrl*: string
     profileImageUrlHttps*: string
+    profileImageExtensions*: ImageExtensions
     profileLinkColor*: string
     pinnedTweetIdsStr*: seq[string]
 
@@ -27,3 +28,15 @@ type
 
   Urls* = object
     urls*: seq[Url]
+
+  ImageExtensions = object
+    mediaColor*: tuple[r: Ok]
+
+  Ok = object
+    ok*: Palette
+
+  Palette = object
+    palette*: seq[tuple[rgb: Color]]
+
+  Color* = object
+    red*, green*, blue*: int
