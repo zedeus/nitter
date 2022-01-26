@@ -45,25 +45,6 @@ proc parseGraphList*(js: JsonNode): List =
     banner: list{"custom_banner_media", "media_info", "url"}.getImageStr
   )
 
-proc parseGraphListMembers*(js: JsonNode; cursor: string): Result[User] =
-  result = Result[User](
-    beginning: cursor.len == 0,
-    query: Query(kind: userList)
-  )
-
-  if js.isNull: return
-
-  let root = js{"data", "list", "members_timeline", "timeline", "instructions"}
-  for instruction in root:
-    if instruction{"type"}.getStr == "TimelineAddEntries":
-      for entry in instruction{"entries"}:
-        let content = entry{"content"}
-        if content{"entryType"}.getStr == "TimelineTimelineItem":
-          with legacy, content{"itemContent", "user_results", "result", "legacy"}:
-            result.content.add parseUser(legacy)
-        elif content{"cursorType"}.getStr == "Bottom":
-          result.bottom = content{"value"}.getStr
-
 
 proc parsePoll(js: JsonNode): Poll =
   let vals = js{"binding_values"}

@@ -37,7 +37,7 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
       "withSuperFollowsTweetFields": false
     }
     url = graphListMembers ? {"variables": $variables}
-  result = parseGraphListMembers(await fetch(url, Api.listMembers), after)
+  result = parseGraphListMembers(await fetchRaw(url, Api.listMembers), after)
 
 proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
