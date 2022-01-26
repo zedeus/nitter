@@ -37,6 +37,30 @@ proc getBanner(user: RawUser): string =
   if user.profileLinkColor.len > 0:
     return '#' & user.profileLinkColor
 
+proc toUser*(raw: RawUser): User =
+  result = User(
+    id: raw.idStr,
+    username: raw.screenName,
+    fullname: raw.name,
+    location: raw.location,
+    bio: raw.description,
+    following: raw.friendsCount,
+    followers: raw.followersCount,
+    tweets: raw.statusesCount,
+    likes: raw.favouritesCount,
+    media: raw.mediaCount,
+    verified: raw.verified,
+    protected: raw.protected,
+    joinDate: parseTwitterDate(raw.createdAt),
+    banner: getBanner(raw),
+    userPic: getImageUrl(raw.profileImageUrlHttps).replace("_normal", "")
+  )
+
+  if raw.pinnedTweetIdsStr.len > 0:
+    result.pinnedTweet = parseBiggestInt(raw.pinnedTweetIdsStr[0])
+
+  result.expandUserEntities(raw)
+
 proc parseUser*(json: string; username=""): User =
   handleErrors:
     case error.code
@@ -44,24 +68,4 @@ proc parseUser*(json: string; username=""): User =
     of userNotFound: return
     else: echo "[error - parseUser]: ", error
 
-  let user = json.fromJson(RawUser)
-
-  result = User(
-    id: user.idStr,
-    username: user.screenName,
-    fullname: user.name,
-    location: user.location,
-    bio: user.description,
-    following: user.friendsCount,
-    followers: user.followersCount,
-    tweets: user.statusesCount,
-    likes: user.favouritesCount,
-    media: user.mediaCount,
-    verified: user.verified,
-    protected: user.protected,
-    joinDate: parseTwitterDate(user.createdAt),
-    banner: getBanner(user),
-    userPic: getImageUrl(user.profileImageUrlHttps).replace("_normal", "")
-  )
-
-  result.expandUserEntities(user)
+  result = toUser json.fromJson(RawUser)

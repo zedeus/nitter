@@ -26,16 +26,6 @@ proc parseUser(js: JsonNode; id=""): User =
 
   result.expandUserEntities(js)
 
-proc parseGraphUser*(js: JsonNode; id: string): User =
-  if js.isNull: return
-
-  with user, js{"data", "user", "result", "legacy"}:
-    result = parseUser(user, id)
-
-    with pinned, user{"pinned_tweet_ids_str"}:
-      if pinned.kind == JArray and pinned.len > 0:
-        result.pinnedTweet = parseBiggestInt(pinned[0].getStr)
-
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
 

@@ -2,14 +2,14 @@
 import asyncdispatch, httpclient, uri, strutils, sequtils, sugar
 import packedjson
 import types, query, formatters, consts, apiutils, parser
-import experimental/parser/user
+import experimental/parser/[user, graphql]
 
 proc getGraphUser*(id: string): Future[User] {.async.} =
   if id.len == 0 or id.any(c => not c.isDigit): return
   let
     variables = %*{"userId": id, "withSuperFollowsUserFields": true}
-    js = await fetch(graphUser ? {"variables": $variables}, Api.userRestId)
-  result = parseGraphUser(js, id)
+    js = await fetchRaw(graphUser ? {"variables": $variables}, Api.userRestId)
+  result = parseGraphUser(js)
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let

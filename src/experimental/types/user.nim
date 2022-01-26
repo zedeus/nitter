@@ -19,6 +19,7 @@ type
     profileBannerUrl*: string
     profileImageUrlHttps*: string
     profileLinkColor*: string
+    pinnedTweetIdsStr*: seq[string]
 
   Entities* = object
     url*: Urls
