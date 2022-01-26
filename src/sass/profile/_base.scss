@@ -42,12 +42,16 @@
     top: 50px;
 }
 
-.profile-result .username {
-    margin: 0 !important;
-}
+.profile-result {
+    min-height: 54px;
 
-.profile-result .tweet-header {
-    margin-bottom: unset;
+    .username {
+        margin: 0 !important;
+    }
+
+    .tweet-header {
+        margin-bottom: unset;
+    }
 }
 
 @media(max-width: 700px) {

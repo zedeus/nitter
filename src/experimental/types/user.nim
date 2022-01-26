@@ -1,3 +1,4 @@
+import options
 import common
 
 type
@@ -16,10 +17,10 @@ type
     mediaCount*: int
     verified*: bool
     protected*: bool
+    profileLinkColor*: string
     profileBannerUrl*: string
     profileImageUrlHttps*: string
-    profileImageExtensions*: ImageExtensions
-    profileLinkColor*: string
+    profileImageExtensions*: Option[ImageExtensions]
     pinnedTweetIdsStr*: seq[string]
 
   Entities* = object

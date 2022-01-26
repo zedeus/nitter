@@ -366,26 +366,6 @@ proc parseInstructions[T](res: var Result[T]; global: GlobalObjects; js: JsonNod
       elif "bottom" in r{"entryId"}.getStr:
         res.bottom = r.getCursor
 
-proc parseUsers*(js: JsonNode; after=""): Result[User] =
-  result = Result[User](beginning: after.len == 0)
-  let global = parseGlobalObjects(? js)
-
-  let instructions = ? js{"timeline", "instructions"}
-  if instructions.len == 0: return
-
-  result.parseInstructions(global, instructions)
-
-  for e in instructions[0]{"addEntries", "entries"}:
-    let entry = e{"entryId"}.getStr
-    if "user-" in entry:
-      let id = entry.getId
-      if id in global.users:
-        result.content.add global.users[id]
-    elif "cursor-top" in entry:
-      result.top = e.getCursor
-    elif "cursor-bottom" in entry:
-      result.bottom = e.getCursor
-
 proc parseTimeline*(js: JsonNode; after=""): Timeline =
   result = Timeline(beginning: after.len == 0)
   let global = parseGlobalObjects(? js)

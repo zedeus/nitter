@@ -3,6 +3,7 @@ import asyncdispatch, httpclient, uri, strutils, sequtils, sugar
 import packedjson
 import types, query, formatters, consts, apiutils, parser
 import experimental/parser/[user, graphql]
+import experimental/parser/timeline as timelineParser
 
 proc getGraphUser*(id: string): Future[User] {.async.} =
   if id.len == 0 or id.any(c => not c.isDigit): return
@@ -85,10 +86,12 @@ proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
     const
       searchMode = ("result_filter", "user")
       parse = parseUsers
+      fetchFunc = fetchRaw
   else:
     const
       searchMode = ("tweet_search_mode", "live")
       parse = parseTimeline
+      fetchFunc = fetch
 
   let q = genQueryParam(query)
   if q.len == 0 or q == emptyQuery:
@@ -96,7 +99,7 @@ proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
 
   let url = search ? genParams(searchParams & @[("q", q), searchMode], after)
   try:
-    result = parse(await fetch(url, Api.search), after)
+    result = parse(await fetchFunc(url, Api.search), after)
     result.query = query
   except InternalError:
     return Result[T](beginning: true, query: query)

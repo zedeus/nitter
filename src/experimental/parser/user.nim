@@ -1,4 +1,4 @@
-import std/[algorithm, unicode, re, strutils, strformat]
+import std/[algorithm, unicode, re, strutils, strformat, options]
 import jsony
 import utils, slices
 import ../types/user as userType
@@ -38,9 +38,11 @@ proc getBanner(user: RawUser): string =
   if user.profileLinkColor.len > 0:
     return '#' & user.profileLinkColor
 
-  if user.profileImageExtensions.mediaColor.r.ok.palette.len > 0:
-    let color = user.profileImageExtensions.mediaColor.r.ok.palette[0].rgb
-    return &"#{color.red:02x}{color.green:02x}{color.blue:02x}"
+  if user.profileImageExtensions.isSome:
+    let ext = get(user.profileImageExtensions)
+    if ext.mediaColor.r.ok.palette.len > 0:
+      let color = ext.mediaColor.r.ok.palette[0].rgb
+      return &"#{color.red:02x}{color.green:02x}{color.blue:02x}"
 
 proc toUser*(raw: RawUser): User =
   result = User(
