@@ -102,7 +102,7 @@ proc cache*(data: Tweet) {.async.} =
 proc cacheRss*(query: string; rss: Rss) {.async.} =
   let key = "rss:" & query
   pool.withAcquire(r):
-    dawait r.hSet(key, "rss", rss.feed)
+    dawait r.hSet(key, "rss", compress(rss.feed))
     dawait r.hSet(key, "min", rss.cursor)
     dawait r.expire(key, rssCacheTime)
 
@@ -182,6 +182,9 @@ proc getCachedRss*(key: string): Future[Rss] {.async.} =
   pool.withAcquire(r):
     result.cursor = await r.hGet(k, "min")
     if result.cursor.len > 2:
-      result.feed = await r.hGet(k, "rss")
+      let feed = await r.hGet(k, "rss")
+      if feed != redisNil:
+        try: result.feed = uncompress feed
+        except: echo "Decompressing RSS failed: ", feed
     else:
       result.cursor.setLen 0

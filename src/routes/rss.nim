@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch, strutils, tables, times, hashes, uri
 
-import jester, supersnappy
+import jester
 
 import router_utils, timeline
 import ../query
 
 include "../views/rss.nimf"
 
-export times, hashes, supersnappy
+export times, hashes
 
 proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.} =
   var profile: Profile
@@ -36,7 +36,7 @@ proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.
     return Rss(feed: profile.user.username, cursor: "suspended")
 
   if profile.user.fullname.len > 0:
-    let rss = compress renderTimelineRss(profile, cfg, multi=(names.len > 1))
+    let rss = renderTimelineRss(profile, cfg, multi=(names.len > 1))
     return Rss(feed: rss, cursor: profile.tweets.bottom)
 
 template respRss*(rss, page) =
@@ -52,7 +52,7 @@ template respRss*(rss, page) =
 
   let headers = {"Content-Type": "application/rss+xml; charset=utf-8",
                  "Min-Id": rss.cursor}
-  resp Http200, headers, uncompress rss.feed
+  resp Http200, headers, rss.feed
 
 proc createRssRouter*(cfg: Config) =
   router rss:
@@ -75,8 +75,7 @@ proc createRssRouter*(cfg: Config) =
 
       let tweets = await getSearch[Tweet](query, cursor)
       rss.cursor = tweets.bottom
-      rss.feed = compress renderSearchRss(tweets.content, query.text,
-                                          genQueryUrl(query), cfg)
+      rss.feed = renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg)
 
       await cacheRss(key, rss)
       respRss(rss, "Search")
@@ -157,7 +156,7 @@ proc createRssRouter*(cfg: Config) =
         list = await getCachedList(id=(@"id"))
         timeline = await getListTimeline(list.id, cursor)
       rss.cursor = timeline.bottom
-      rss.feed = compress renderListRss(timeline.content, list, cfg)
+      rss.feed = renderListRss(timeline.content, list, cfg)
 
       await cacheRss(key, rss)
       respRss(rss, "List")
