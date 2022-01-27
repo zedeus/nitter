@@ -48,7 +48,7 @@ template respRss*(rss, page) =
 
     resp Http404, showError(page & info & "not found", cfg)
   elif rss.cursor.len == 9 and rss.cursor == "suspended":
-    resp Http404, showError(getSuspended(rss.feed), cfg)
+    resp Http404, showError(getSuspended(@"name"), cfg)
 
   let headers = {"Content-Type": "application/rss+xml; charset=utf-8",
                  "Min-Id": rss.cursor}
