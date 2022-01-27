@@ -4,10 +4,13 @@ EXPOSE 8080
 
 RUN apk --no-cache add libsass-dev pcre
 
-COPY . /src/nitter
 WORKDIR /src/nitter
 
-RUN nimble build -y -d:danger -d:lto -d:strip \
+COPY nitter.nimble .
+RUN nimble install -y -d:strip
+
+COPY . .
+RUN nimble build -y -d:danger -d:lto \
     && nimble scss \
     && nimble md
 
