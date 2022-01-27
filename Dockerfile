@@ -10,7 +10,7 @@ COPY nitter.nimble .
 RUN nimble install -y -d:strip
 
 COPY . .
-RUN nimble build -y -d:danger -d:lto \
+RUN nimble build -d:danger -d:lto \
     && nimble scss \
     && nimble md
 
