@@ -5,7 +5,9 @@ author        = "zedeus"
 description   = "An alternative front-end for Twitter"
 license       = "AGPL-3.0"
 srcDir        = "src"
-bin           = @["nitter"]
+
+when not defined(depsOnly):
+  bin         = @["nitter"]
 
 
 # Dependencies
