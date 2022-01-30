@@ -23,9 +23,10 @@ const toggles = {
 proc renderSearch*(): VNode =
   buildHtml(tdiv(class="panel-container")):
     tdiv(class="search-bar"):
-      form(`method`="get", action="/search"):
+      form(`method`="get", action="/search", autocomplete="off"):
         hiddenField("f", "users")
-        input(`type`="text", name="q", autofocus="", placeholder="Enter username...", dir="auto")
+        input(`type`="text", name="q", autofocus="",
+              placeholder="Enter username...", dir="auto")
         button(`type`="submit"): icon "search"
 
 proc renderProfileTabs*(query: Query; username: string): VNode =
@@ -57,7 +58,8 @@ proc isPanelOpen(q: Query): bool =
 proc renderSearchPanel*(query: Query): VNode =
   let user = query.fromUser.join(",")
   let action = if user.len > 0: &"/{user}/search" else: "/search"
-  buildHtml(form(`method`="get", action=action, class="search-field")):
+  buildHtml(form(`method`="get", action=action,
+                 class="search-field", autocomplete="off")):
     hiddenField("f", "tweets")
     genInput("q", "", query.text, "Enter search...", class="pref-inline")
     button(`type`="submit"): icon "search"
@@ -111,7 +113,7 @@ proc renderTweetSearch*(results: Result[Tweet]; prefs: Prefs; path: string;
 proc renderUserSearch*(results: Result[User]; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-container")):
     tdiv(class="timeline-header"):
-      form(`method`="get", action="/search", class="search-field"):
+      form(`method`="get", action="/search", class="search-field", autocomplete="off"):
         hiddenField("f", "users")
         genInput("q", "", results.query.text, "Enter username...", class="pref-inline")
         button(`type`="submit"): icon "search"

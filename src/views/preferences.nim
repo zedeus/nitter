@@ -35,7 +35,7 @@ macro renderPrefs*(): untyped =
 proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string]): VNode =
   buildHtml(tdiv(class="overlay-panel")):
     fieldset(class="preferences"):
-      form(`method`="post", action="/saveprefs"):
+      form(`method`="post", action="/saveprefs", autocomplete="off"):
         refererField path
 
         renderPrefs()
