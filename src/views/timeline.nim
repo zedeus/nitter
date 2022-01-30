@@ -95,7 +95,7 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string;
     if not results.beginning:
       renderNewer(results.query, parseUri(path).path)
 
-    if pinned.isSome:
+    if not prefs.hidePins and pinned.isSome:
       let tweet = get pinned
       renderTweet(tweet, prefs, path, showThread=tweet.hasThread)
 

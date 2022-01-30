@@ -86,7 +86,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
       html = renderTweetSearch(timeline, prefs, getPath())
     return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
-  var profile = await fetchProfile(after, query)
+  var profile = await fetchProfile(after, query, skipPinned=prefs.hidePins)
   template u: untyped = profile.user
 
   if u.suspended:
