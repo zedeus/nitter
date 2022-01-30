@@ -1,3 +1,4 @@
+import jsony
 from ../../types import Error
 
 type
@@ -5,7 +6,7 @@ type
     url*: string
     expandedUrl*: string
     displayUrl*: string
-    indices*: array[2, int]
+    indices*: Slice[int]
 
   ErrorObj* = object
     code*: Error
@@ -18,3 +19,8 @@ proc contains*(codes: set[Error]; errors: Errors): bool =
   for e in errors.errors:
     if e.code in codes:
       return true
+
+proc parseHook*(s: string; i: var int; v: var Slice[int]) =
+  var slice: array[2, int]
+  parseHook(s, i, slice)
+  v = slice[0] ..< slice[1]

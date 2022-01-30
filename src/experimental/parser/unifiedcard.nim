@@ -1,11 +1,8 @@
-import std/[options, tables, strutils, strformat, sugar]
+import std/[options, tables, strformat]
 import jsony
-import ../types/unifiedcard
+import utils
+import ".."/types/[unifiedcard, media]
 from ../../types import Card, CardKind, Video
-from ../../utils import twimg, https
-
-proc getImageUrl(entity: MediaEntity): string =
-  entity.mediaUrlHttps.dup(removePrefix(twimg), removePrefix(https))
 
 proc parseDestination(id: string; card: UnifiedCard; result: var Card) =
   let destination = card.destinationObjects[id].data
@@ -66,6 +63,7 @@ proc parseMedia(component: Component; card: UnifiedCard; result: var Card) =
       durationMs: videoInfo.durationMillis,
       variants: videoInfo.variants
     )
+  of animatedGif: discard
 
 proc parseUnifiedCard*(json: string): Card =
   let card = json.fromJson(UnifiedCard)
@@ -78,7 +76,7 @@ proc parseUnifiedCard*(json: string): Card =
       component.data.parseAppDetails(card, result)
     of mediaWithDetailsHorizontal:
       component.data.parseMediaDetails(card, result)
-    of media, swipeableMedia:
+    of ComponentType.media, swipeableMedia:
       component.parseMedia(card, result)
     of buttonGroup:
       discard

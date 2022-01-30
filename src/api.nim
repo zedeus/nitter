@@ -89,8 +89,8 @@ proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
   else:
     const
       searchMode = ("tweet_search_mode", "live")
-      parse = parseTimeline
-      fetchFunc = fetch
+      parse = parseTweets
+      fetchFunc = fetchRaw
 
   let q = genQueryParam(query)
   if q.len == 0 or q == emptyQuery:

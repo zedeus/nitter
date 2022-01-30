@@ -1,5 +1,5 @@
 import options, tables
-from ../../types import VideoType, VideoVariant
+import media as mediaTypes
 
 type
   UnifiedCard* = object
@@ -38,25 +38,13 @@ type
     id*: string
     destination*: string
 
-  Destination* = object
-    kind*: string
-    data*: tuple[urlData: UrlData]
-
   UrlData* = object
     url*: string
     vanity*: string
 
-  MediaType* = enum
-    photo, video
-
-  MediaEntity* = object
-    kind*: MediaType
-    mediaUrlHttps*: string
-    videoInfo*: Option[VideoInfo]
-
-  VideoInfo* = object
-    durationMillis*: int
-    variants*: seq[VideoVariant]
+  Destination* = object
+    kind*: string
+    data*: tuple[urlData: UrlData]
 
   AppType* = enum
     androidApp, iPhoneApp, iPadApp

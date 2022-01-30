@@ -1,15 +1,14 @@
 import std/[macros, htmlgen, unicode]
-import ../types/common
 import ".."/../[formatters, utils]
 
 type
-  ReplaceSliceKind = enum
+  ReplaceSliceKind* = enum
     rkRemove, rkUrl, rkHashtag, rkMention
 
   ReplaceSlice* = object
-    slice: Slice[int]
-    kind: ReplaceSliceKind
-    url, display: string
+    slice*: Slice[int]
+    kind*: ReplaceSliceKind
+    url*, display*: string
 
 proc cmp*(x, y: ReplaceSlice): int = cmp(x.slice.a, y.slice.b)
 
@@ -27,11 +26,14 @@ proc dedupSlices*(s: var seq[ReplaceSlice]) =
         inc j
     inc i
 
-proc extractUrls*(result: var seq[ReplaceSlice]; url: Url;
-                  textLen: int; hideTwitter = false) =
+proc extractHashtags*(result: var seq[ReplaceSlice]; slice: Slice[int]) =
+  result.add ReplaceSlice(kind: rkHashtag, slice: slice)
+
+proc extractUrls*[T](result: var seq[ReplaceSlice]; entity: T;
+                     textLen: int; hideTwitter = false) =
   let
-    link = url.expandedUrl
-    slice = url.indices[0] ..< url.indices[1]
+    link = entity.expandedUrl
+    slice = entity.indices
 
   if hideTwitter and slice.b.succ >= textLen and link.isTwitterUrl:
     if slice.a < textLen:

@@ -1,4 +1,5 @@
 import options
+import jsony
 import common
 
 type
@@ -41,3 +42,8 @@ type
 
   Color* = object
     red*, green*, blue*: int
+
+proc parseHook*(s: string; i: var int; v: var Slice[int]) =
+  var slice: array[2, int]
+  parseHook(s, i, slice)
+  v = slice[0] ..< slice[1]
