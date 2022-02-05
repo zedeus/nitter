@@ -121,13 +121,17 @@
     background-color: var(--bg_panel);
 
     .tweet-content { 
-        font-size: 18px 
+        font-size: 18px;
     }
     
-    .tweet-body { 
+    .tweet-body {
         display: flex;
         flex-direction: column;
         max-height: calc(100vh - 0.75em * 2);
+    }
+
+    .card-image img {
+        height: auto;
     }
 }
 
