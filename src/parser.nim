@@ -375,7 +375,12 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
 
   result.parseInstructions(global, instructions)
 
-  for e in instructions[0]{"addEntries", "entries"}:
+  var entries: JsonNode
+  for i in instructions:
+    if "addEntries" in i:
+      entries = i{"addEntries", "entries"}
+
+  for e in ? entries:
     let entry = e{"entryId"}.getStr
     if "tweet" in entry or entry.startsWith("sq-I-t") or "tombstone" in entry:
       let tweet = finalizeTweet(global, e.getEntryId)
