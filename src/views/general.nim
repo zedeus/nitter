@@ -93,7 +93,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
     meta(property="og:site_name", content="Nitter")
     meta(property="og:locale", content="en_US")
 
-    if banner.len > 0:
+    if banner.len > 0 and not banner.startsWith('#'):
       let bannerUrl = getPicUrl(banner)
       link(rel="preload", type="image/png", href=bannerUrl, `as`="image")
 
