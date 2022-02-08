@@ -10,7 +10,7 @@ import general
 proc getSmallPic(url: string): string =
   result = url
   if "?" notin url and not url.endsWith("placeholder.png"):
-    result &= ":small"
+    result &= "?name=small"
   result = getPicUrl(result)
 
 proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
@@ -58,7 +58,7 @@ proc renderAlbum(tweet: Tweet): VNode =
             let
               named = "name=" in photo
               orig = photo
-              small = if named: photo else: photo & ":small"
+              small = if named: photo else: photo & "?name=small"
             a(href=getOrigPicUrl(orig), class="still-image", target="_blank"):
               genImg(small)
 

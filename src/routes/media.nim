@@ -94,7 +94,7 @@ proc createMediaRouter*(cfg: Config) =
         url.insert(twimg)
       if not url.startsWith(https):
         url.insert(https)
-      url.add(":orig")
+      url.add("?name=orig")
 
       let uri = parseUri(url)
       cond isTwitterUrl(uri) == true
