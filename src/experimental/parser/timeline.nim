@@ -15,14 +15,16 @@ proc parseUsers*(json: string; after=""): Result[User] =
   if raw.timeline.instructions.len == 0:
     return
 
-  for e in raw.timeline.instructions[0].addEntries.entries:
-    let id = e.entryId.getId
-    if e.entryId.startsWith("user"):
-      if id in raw.globalObjects.users:
-        result.content.add toUser raw.globalObjects.users[id]
-    elif e.entryId.startsWith("cursor"):
-      let cursor = e.content.operation.cursor
-      if cursor.cursorType == "Top":
-        result.top = cursor.value
-      elif cursor.cursorType == "Bottom":
-        result.bottom = cursor.value
+  for i in raw.timeline.instructions:
+    if i.addEntries.entries.len > 0:
+      for e in i.addEntries.entries:
+        let id = e.entryId.getId
+        if e.entryId.startsWith("user"):
+         if id in raw.globalObjects.users:
+           result.content.add toUser raw.globalObjects.users[id]
+        elif e.entryId.startsWith("cursor"):
+         let cursor = e.content.operation.cursor
+         if cursor.cursorType == "Top":
+           result.top = cursor.value
+         elif cursor.cursorType == "Bottom":
+           result.bottom = cursor.value
