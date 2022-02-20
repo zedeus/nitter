@@ -98,8 +98,6 @@
 }
 
 .avatar {
-    position: absolute;
-
     &.round {
         border-radius: 50%;
     }
@@ -133,7 +131,12 @@
     .card-image img {
         height: auto;
     }
+    
+    .avatar {
+        position: absolute;
+    }
 }
+
 
 .attribution {
     display: flex;
