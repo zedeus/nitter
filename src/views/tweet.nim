@@ -100,7 +100,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
           renderVideoDisabled(video, path)
         else:
           let vid = video.variants.filterIt(it.contentType == video.playbackType)
-          let source = getVidUrl(vid[0].url)
+          let source = if prefs.proxyVideos: getVidUrl(vid[0].url) else: vid[0].url
           case video.playbackType
           of mp4:
             if prefs.muteVideos:

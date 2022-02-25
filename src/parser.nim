@@ -76,8 +76,8 @@ proc parseVideo(js: JsonNode): Video =
     views: js{"ext", "mediaStats", "r", "ok", "viewCount"}.getStr,
     available: js{"ext_media_availability", "status"}.getStr == "available",
     title: js{"ext_alt_text"}.getStr,
-    durationMs: js{"video_info", "duration_millis"}.getInt
-    # playbackType: mp4
+    durationMs: js{"video_info", "duration_millis"}.getInt,
+    playbackType: mp4
   )
 
   with title, js{"additional_media_info", "title"}:
