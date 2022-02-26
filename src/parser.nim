@@ -184,7 +184,6 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
 
 proc parseTweet(js: JsonNode): Tweet =
   if js.isNull: return
-
   result = Tweet(
     id: js{"id_str"}.getId,
     threadId: js{"conversation_id_str"}.getId,
