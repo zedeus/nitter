@@ -3,6 +3,7 @@ import strutils, options, tables, times, math
 import packedjson, packedjson/deserialiser
 import types, parserutils, utils
 import experimental/parser/unifiedcard
+import std/strutils
 
 proc parseUser(js: JsonNode; id=""): User =
   if js.isNull: return
@@ -183,12 +184,14 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
 
 proc parseTweet(js: JsonNode): Tweet =
   if js.isNull: return
+
   result = Tweet(
     id: js{"id_str"}.getId,
     threadId: js{"conversation_id_str"}.getId,
     replyId: js{"in_reply_to_status_id_str"}.getId,
     text: js{"full_text"}.getStr,
     time: js{"created_at"}.getTime,
+    source: js{"source"}.getStr.split(">")[1].split("<")[0],
     hasThread: js{"self_thread"}.notNull,
     available: true,
     user: User(id: js{"user_id_str"}.getStr),

@@ -175,6 +175,7 @@ type
     tombstone*: string
     location*: string
     stats*: TweetStats
+    source*: string
     retweet*: Option[Tweet]
     attribution*: Option[User]
     mediaTags*: seq[User]
