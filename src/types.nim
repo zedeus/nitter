@@ -174,8 +174,8 @@ type
     available*: bool
     tombstone*: string
     location*: string
-    stats*: TweetStats
     source*: string
+    stats*: TweetStats
     retweet*: Option[Tweet]
     attribution*: Option[User]
     mediaTags*: seq[User]

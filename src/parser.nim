@@ -3,7 +3,6 @@ import strutils, options, tables, times, math
 import packedjson, packedjson/deserialiser
 import types, parserutils, utils
 import experimental/parser/unifiedcard
-import std/strutils
 
 proc parseUser(js: JsonNode; id=""): User =
   if js.isNull: return
