@@ -189,7 +189,7 @@ proc parseTweet(js: JsonNode): Tweet =
     replyId: js{"in_reply_to_status_id_str"}.getId,
     text: js{"full_text"}.getStr,
     time: js{"created_at"}.getTime,
-    source: js{"source"}.getStr.split(">")[1].split("<")[0],
+    source: getSource(js),
     hasThread: js{"self_thread"}.notNull,
     available: true,
     user: User(id: js{"user_id_str"}.getStr),
