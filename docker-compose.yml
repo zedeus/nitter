@@ -12,6 +12,11 @@ services:
     depends_on:
       - nitter-redis
     restart: unless-stopped
+    healthcheck:
+      test: wget -nv --tries=1 --spider http://127.0.0.1:8080/Jack/status/20 || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 2
 
   nitter-redis:
     image: redis:6-alpine
@@ -20,6 +25,11 @@ services:
     volumes:
       - nitter-redis:/data
     restart: unless-stopped
+    healthcheck:
+      test: redis-cli ping
+      interval: 30s
+      timeout: 5s
+      retries: 2
 
 volumes:
   nitter-redis:
