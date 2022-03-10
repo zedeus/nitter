@@ -25,10 +25,9 @@ proc getGraphList*(id: string): Future[List] {.async.} =
 
 proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} =
   if list.id.len == 0: return
-  let
+  var
     variables = %*{
       "listId": list.id,
-      "cursor": after,
       "withSuperFollowsUserFields": false,
       "withBirdwatchPivots": false,
       "withDownvotePerspective": false,
@@ -36,7 +35,9 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
       "withReactionsPerspective": false,
       "withSuperFollowsTweetFields": false
     }
-    url = graphListMembers ? {"variables": $variables}
+  if after.len > 0:
+    variables["cursor"] = % after
+  let url = graphListMembers ? {"variables": $variables}
   result = parseGraphListMembers(await fetchRaw(url, Api.listMembers), after)
 
 proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
