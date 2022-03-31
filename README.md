@@ -117,22 +117,17 @@ Docker.
 To build and run Nitter in Docker:
 ```bash
 docker build -t nitter:latest .
-docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host nitter:latest
+docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d -p 8080:8080 nitter:latest
 ```
 
-A prebuilt Docker image is provided as well:
-```bash
-docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host zedeus/nitter:latest
-```
+A prebuilt Docker image is provided as well: https://hub.docker.com/r/zedeus/nitter
 
-Using docker-compose to run both Nitter and Redis as different containers:
+Either clone the repository, or download both the `docker-compose.yml` file and the `nitter.conf` file to the same folder
+
 Change `redisHost` from `localhost` to `nitter-redis` in `nitter.conf`, then run:
 ```bash
 docker-compose up -d
 ```
-
-Note the Docker commands expect a `nitter.conf` file in the directory you run
-them.
 
 ### systemd
 
