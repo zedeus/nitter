@@ -134,10 +134,8 @@ proc getTombstone*(js: JsonNode): string =
   result.removeSuffix(" Learn more")
 
 proc getSource*(js: JsonNode): string =
-  let
-    raw_src = js["source"].getStr
-    src = raw_src.substr(raw_src.find('>') + 1, raw_src.rfind('<') - 1)
-  return src
+  let src = js{"source"}.getStr
+  result = src.substr(src.find('>') + 1, src.rfind('<') - 1)
 
 proc extractSlice(js: JsonNode): Slice[int] =
   result = js["indices"][0].getInt ..< js["indices"][1].getInt
