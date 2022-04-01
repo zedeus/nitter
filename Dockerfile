@@ -1,6 +1,5 @@
 FROM nimlang/nim:1.6.2-alpine-regular as nim
 LABEL maintainer="setenforce@protonmail.com"
-EXPOSE 8080
 
 RUN apk --no-cache add libsass-dev pcre
 
@@ -20,4 +19,5 @@ RUN apk --no-cache add pcre
 COPY --from=nim /src/nitter/nitter ./
 COPY --from=nim /src/nitter/nitter.example.conf ./nitter.conf
 COPY --from=nim /src/nitter/public ./public
+EXPOSE 8080
 CMD ./nitter
