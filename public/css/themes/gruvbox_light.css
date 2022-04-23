@@ -1,5 +1,5 @@
 body {
-    --bg_color: #fbf1c7 !important;
+    --bg_color: #fbf1c7;
     --fg_color: #3c3836;
     --fg_faded: #7c6f64;
     --fg_dark: var(--fg_faded);
