@@ -2,7 +2,7 @@ import karax/[karaxdsl, vdom]
 import search, timeline, renderutils
 import ../types
 
-proc renderFollowingUsers*(results: seq[Profile]; prefs: Prefs): VNode =
+proc renderFollowingUsers*(results: seq[User]; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline")):
     for user in results:
       renderUser(user, prefs)
@@ -26,7 +26,7 @@ proc renderHome*(results: Result[Tweet]; prefs: Prefs; path: string): VNode =
 
     renderTimelineTweets(results, prefs, path)
 
-proc renderFollowing*(query: Query; following: seq[Profile]; prefs: Prefs): VNode =
+proc renderFollowing*(query: Query; following: seq[User]; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-container")):
     renderHomeTabs(query)
     renderFollowingUsers(following, prefs)
