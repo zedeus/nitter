@@ -3,7 +3,7 @@ from parameterized import parameterized
 
 text = [
     ['elonmusk/status/1138136540096319488',
-     'Tesla Owners Online', '@Model3Owners',
+     'Trev Page', '@Model3Owners',
      """As of March 58.4% of new car sales in Norway are electric. 
 
 What are we doing wrong? reuters.com/article/us-norwa…"""],

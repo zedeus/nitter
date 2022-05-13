@@ -11,7 +11,7 @@ card = [
     ['nim_lang/status/1136652293510717440',
      'Version 0.20.0 released',
      'We are very proud to announce Nim version 0.20. This is a massive release, both literally and figuratively. It contains more than 1,000 commits and it marks our release candidate for version 1.0!',
-     'nim-lang.org', False],
+     'nim-lang.org', True],
 
     ['voidtarget/status/1094632512926605312',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too)',
