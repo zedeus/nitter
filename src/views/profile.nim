@@ -78,8 +78,11 @@ proc renderPhotoRail(profile: Profile): VNode =
     tdiv(class="photo-rail-grid"):
       for i, photo in profile.photoRail:
         if i == 16: break
+        let photoSuffix =
+          if "format" in photo.url or "placeholder" in photo.url: ""
+          else: ":thumb"
         a(href=(&"/{profile.user.username}/status/{photo.tweetId}#m")):
-          genImg(photo.url & (if "format" in photo.url: "" else: ":thumb"))
+          genImg(photo.url & photoSuffix)
 
 proc renderBanner(banner: string): VNode =
   buildHtml():
