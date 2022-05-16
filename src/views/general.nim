@@ -109,13 +109,17 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
 
       if rss.len > 0:
         meta(property="twitter:card", content="summary")
+      elif video.len > 0:
+        meta(property="twitter:card", content="player")
       else:
         meta(property="twitter:card", content="summary_large_image")
 
     if video.len > 0:
       meta(property="og:video:url", content=video)
       meta(property="og:video:secure_url", content=video)
-      meta(property="og:video:type", content="text/html")
+      meta(property="og:video:type", content="video/mp4")
+      meta(name="twitter:player:stream", content=video)
+      meta(name="twitter:player:stream:content_type", content="video/mp4")
 
     # this is last so images are also preloaded
     # if this is done earlier, Chrome only preloads one image for some reason

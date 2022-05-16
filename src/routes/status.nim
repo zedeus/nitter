@@ -46,8 +46,10 @@ proc createStatusRouter*(cfg: Config) =
         video = ""
 
       if conv.tweet.video.isSome():
-        images = @[get(conv.tweet.video).thumb]
-        video = getVideoEmbed(cfg, conv.tweet.id)
+        let vid = get(conv.tweet.video)
+        images = @[vid.thumb]
+        let vids = vid.variants.filterIt(it.contentType == VideoType.mp4)
+        video = getVidUrl(vids[0].url)
       elif conv.tweet.gif.isSome():
         images = @[get(conv.tweet.gif).thumb]
         video = getPicUrl(get(conv.tweet.gif).url)
