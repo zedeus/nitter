@@ -75,6 +75,7 @@ type
     contentType*: VideoType
     url*: string
     bitrate*: int
+    resolution*: int
 
   Video* = object
     durationMs*: int

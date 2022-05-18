@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, sequtils, strformat, options
+import strutils, sequtils, strformat, options, algorithm
 import karax/[karaxdsl, vdom, vstyles]
 from jester import Request
 
@@ -105,8 +105,11 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
           img(src=thumb)
           renderVideoDisabled(video, path)
         else:
-          let vid = video.variants.filterIt(it.contentType == playbackType)
-          let source = if prefs.proxyVideos: getVidUrl(vid[0].url) else: vid[0].url
+          let
+            vars = video.variants.filterIt(it.contentType == playbackType)
+            vidUrl = vars.sortedByIt(it.resolution)[^1].url
+            source = if prefs.proxyVideos: getVidUrl(vidUrl)
+                     else: vidUrl
           case playbackType
           of mp4:
             if prefs.muteVideos:

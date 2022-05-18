@@ -137,6 +137,21 @@ proc getSource*(js: JsonNode): string =
   let src = js{"source"}.getStr
   result = src.substr(src.find('>') + 1, src.rfind('<') - 1)
 
+proc getMp4Resolution*(url: string): int =
+  # parses the height out of a URL like this one:
+  # https://video.twimg.com/ext_tw_video/<tweet-id>/pu/vid/720x1280/<random>.mp4
+  const vidSep = "/vid/"
+  let
+    vidIdx = url.find(vidSep) + vidSep.len
+    resIdx = url.find('x', vidIdx) + 1
+    res = url[resIdx ..< url.find("/", resIdx)]
+
+  try:
+    return parseInt(res)
+  except ValueError:
+    # cannot determine resolution (e.g. m3u8/non-mp4 video)
+    return 0
+
 proc extractSlice(js: JsonNode): Slice[int] =
   result = js["indices"][0].getInt ..< js["indices"][1].getInt
 
