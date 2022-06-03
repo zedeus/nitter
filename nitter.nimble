@@ -12,15 +12,15 @@ bin           = @["nitter"]
 
 requires "nim >= 1.4.8"
 requires "jester >= 0.5.0"
-requires "karax#fa4a2dc"
+requires "karax#5498909"
 requires "sass#e683aa1"
 requires "nimcrypto#a5742a9"
-requires "markdown#abdbe5e"
+requires "markdown#a661c26"
 requires "packedjson#d11d167"
 requires "supersnappy#2.1.1"
 requires "redpool#8b7c1db"
 requires "https://github.com/zedeus/redis#d0a0e6f"
-requires "zippy#0.7.3"
+requires "zippy#0.9.9"
 requires "flatty#0.2.3"
 requires "jsony#d0e69bd"
 
