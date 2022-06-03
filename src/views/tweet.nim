@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, sequtils, strformat, options
+import strutils, sequtils, strformat, options, algorithm
 import karax/[karaxdsl, vdom, vstyles]
 from jester import Request
 
@@ -62,10 +62,13 @@ proc renderAlbum(tweet: Tweet): VNode =
             a(href=getOrigPicUrl(orig), class="still-image", target="_blank"):
               genImg(small)
 
-proc isPlaybackEnabled(prefs: Prefs; video: Video): bool =
-  case video.playbackType
+proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
+  case playbackType
   of mp4: prefs.mp4Playback
   of m3u8, vmap: prefs.hlsPlayback
+
+proc hasMp4Url(video: Video): bool =
+  video.variants.anyIt(it.contentType == mp4)
 
 proc renderVideoDisabled(video: Video; path: string): VNode =
   buildHtml(tdiv(class="video-overlay")):
@@ -84,9 +87,11 @@ proc renderVideoUnavailable(video: Video): VNode =
       p: text "This media is unavailable"
 
 proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
-  let container =
-    if video.description.len > 0 or video.title.len > 0: " card-container"
-    else: ""
+  let
+    container = if video.description.len == 0 and video.title.len == 0: ""
+                else: " card-container"
+    playbackType = if not prefs.proxyVideos and video.hasMp4Url: mp4
+                   else: video.playbackType
 
   buildHtml(tdiv(class="attachments card")):
     tdiv(class="gallery-video" & container):
@@ -95,13 +100,16 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
         if not video.available:
           img(src=thumb)
           renderVideoUnavailable(video)
-        elif not prefs.isPlaybackEnabled(video):
+        elif not prefs.isPlaybackEnabled(playbackType):
           img(src=thumb)
           renderVideoDisabled(video, path)
         else:
-          let vid = video.variants.filterIt(it.contentType == video.playbackType)
-          let source = getVidUrl(vid[0].url)
-          case video.playbackType
+          let
+            vars = video.variants.filterIt(it.contentType == playbackType)
+            vidUrl = vars.sortedByIt(it.resolution)[^1].url
+            source = if prefs.proxyVideos: getVidUrl(vidUrl)
+                     else: vidUrl
+          case playbackType
           of mp4:
             if prefs.muteVideos:
               video(poster=thumb, controls="", muted=""):
