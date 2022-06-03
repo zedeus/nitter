@@ -10,7 +10,7 @@ import general
 proc getSmallPic(url: string): string =
   result = url
   if "?" notin url and not url.endsWith("placeholder.png"):
-    result &= ":small"
+    result &= "?name=small"
   result = getPicUrl(result)
 
 proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
@@ -57,9 +57,9 @@ proc renderAlbum(tweet: Tweet): VNode =
           tdiv(class="attachment image"):
             let
               named = "name=" in photo
-              orig = if named: photo else: photo & "?name=orig"
+              orig = photo
               small = if named: photo else: photo & "?name=small"
-            a(href=getPicUrl(orig), class="still-image", target="_blank"):
+            a(href=getOrigPicUrl(orig), class="still-image", target="_blank"):
               genImg(small)
 
 proc isPlaybackEnabled(prefs: Prefs; video: Video): bool =

@@ -88,6 +88,20 @@ proc createMediaRouter*(cfg: Config) =
     get "/pic/?":
       resp Http404
 
+    get re"^\/pic\/orig\/(enc)?\/?(.+)":
+      var url = decoded(request, 1)
+      if "twimg.com" notin url:
+        url.insert(twimg)
+      if not url.startsWith(https):
+        url.insert(https)
+      url.add("?name=orig")
+
+      let uri = parseUri(url)
+      cond isTwitterUrl(uri) == true
+
+      let code = await proxyMedia(request, url)
+      check code
+
     get re"^\/pic\/(enc)?\/?(.+)":
       var url = decoded(request, 1)
       if "twimg.com" notin url:
