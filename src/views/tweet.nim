@@ -70,9 +70,9 @@ proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
 proc hasMp4Url(video: Video): bool =
   video.variants.anyIt(it.contentType == mp4)
 
-proc renderVideoDisabled(video: Video; path: string): VNode =
+proc renderVideoDisabled(playbackType: VideoType; path: string): VNode =
   buildHtml(tdiv(class="video-overlay")):
-    case video.playbackType
+    case playbackType
     of mp4:
       p: text "mp4 playback disabled in preferences"
     of m3u8, vmap:
@@ -102,7 +102,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
           renderVideoUnavailable(video)
         elif not prefs.isPlaybackEnabled(playbackType):
           img(src=thumb)
-          renderVideoDisabled(video, path)
+          renderVideoDisabled(playbackType, path)
         else:
           let
             vars = video.variants.filterIt(it.contentType == playbackType)
