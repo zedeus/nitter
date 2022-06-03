@@ -3,9 +3,11 @@ nitter
 *.db
 /tests/__pycache__
 /tests/geckodriver.log
-/tests/downloaded_files/*
+/tests/downloaded_files
+/tests/latest_logs
 /tools/gencss
 /tools/rendermd
 /public/css/style.css
 /public/md/*.html
 nitter.conf
+dump.rdb

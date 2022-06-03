@@ -4,8 +4,8 @@ from parameterized import parameterized
 
 card = [
     ['Thom_Wolf/status/1122466524860702729',
-     'pytorch/fairseq',
-     'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - GitHub - pytorch/fairseq: Facebook AI Research Sequence-to-Sequence Toolkit written in Python.',
+     'facebookresearch/fairseq',
+     'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - GitHub - facebookresearch/fairseq: Facebook AI Research Sequence-to-Sequence Toolkit written in Python.',
      'github.com', True],
 
     ['nim_lang/status/1136652293510717440',
