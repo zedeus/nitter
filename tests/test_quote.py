@@ -8,9 +8,13 @@ text = [
 
 What are we doing wrong? reuters.com/article/us-norwa…"""],
 
-    ['nim_lang/status/924694255364341760',
-     'Hacker News', '@newsycombinator',
-     'Why Rust fails hard at scientific computing andre-ratsimbazafy.com/why-r…']
+    ['nim_lang/status/1491461266849808397#m',
+     'Nim language', '@nim_lang',
+     """What's better than Nim 1.6.0?
+
+Nim 1.6.2 :)
+
+nim-lang.org/blog/2021/12/17…"""]
 ]
 
 image = [
