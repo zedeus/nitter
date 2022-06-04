@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils
+import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 import ".."/[types, utils]
 
 proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
   var c = "icon-" & icon
-  if class.len > 0: c = c & " " & class
+  if class.len > 0: c = &"{c} {class}"
   buildHtml(tdiv(class="icon-container")):
     if href.len > 0:
       a(class=c, title=title, href=href)

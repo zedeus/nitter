@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, strutils, tables, times, hashes, uri
+import asyncdispatch, strutils, strformat, tables, times, hashes, uri
 
 import jester
 
@@ -42,8 +42,8 @@ proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.
 template respRss*(rss, page) =
   if rss.cursor.len == 0:
     let info = case page
-               of "User": " \"$1\" " % @"name"
-               of "List": " $1 " % @"id"
+               of "User": &""" "{@"name"}" """
+               of "List": &""" "{@"id"}" """
                else: " "
 
     resp Http404, showError(page & info & "not found", cfg)
@@ -67,7 +67,7 @@ proc createRssRouter*(cfg: Config) =
 
       let
         cursor = getCursor()
-        key = "search:" & $hash(genQueryUrl(query)) & ":" & cursor
+        key = &"search:{hash(genQueryUrl(query))}:cursor"
 
       var rss = await getCachedRss(key)
       if rss.cursor.len > 0:
@@ -86,7 +86,7 @@ proc createRssRouter*(cfg: Config) =
       let
         cursor = getCursor()
         name = @"name"
-        key = "twitter:" & name & ":" & cursor
+        key = &"twitter:{name}:{cursor}"
 
       var rss = await getCachedRss(key)
       if rss.cursor.len > 0:
@@ -109,7 +109,7 @@ proc createRssRouter*(cfg: Config) =
         of "search": initQuery(params(request), name=name)
         else: Query(fromUser: @[name])
 
-      var key = @"tab" & ":" & @"name" & ":"
+      var key = &"""{@"tab"}:{@"name"}:"""
       if @"tab" == "search":
         key &= $hash(genQueryUrl(query)) & ":"
       key &= getCursor()
@@ -132,11 +132,11 @@ proc createRssRouter*(cfg: Config) =
         cursor = getCursor()
 
       if list.id.len == 0:
-        resp Http404, showError("List \"" & @"slug" & "\" not found", cfg)
+        resp Http404, showError(&"""List "{@"slug"}" not found""", cfg)
 
-      let url = "/i/lists/" & list.id & "/rss"
+      let url = &"/i/lists/{list.id}/rss"
       if cursor.len > 0:
-        redirect(url & "?cursor=" & encodeUrl(cursor, false))
+        redirect(&"{url}?cursor={encodeUrl(cursor, false)}")
       else:
         redirect(url)
 
@@ -146,7 +146,7 @@ proc createRssRouter*(cfg: Config) =
         cursor = getCursor()
         key =
           if cursor.len == 0: "lists:" & @"id"
-          else: "lists:" & @"id" & ":" & cursor
+          else: &"""lists:{@"id"}:{cursor}"""
 
       var rss = await getCachedRss(key)
       if rss.cursor.len > 0:

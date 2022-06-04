@@ -117,7 +117,7 @@ ${renderRssTweets(profile.tweets.content, cfg)}
     <atom:link href="${link}" rel="self" type="application/rss+xml" />
     <title>${xmltree.escape(list.name)} / @${list.username}</title>
     <link>${link}</link>
-    <description>${getDescription(list.name & " by @" & list.username, cfg)}</description>
+    <description>${getDescription(&"{list.name} by @{list.username}", cfg)}</description>
     <language>en-us</language>
     <ttl>40</ttl>
 ${renderRssTweets(tweets, cfg)}
@@ -135,7 +135,7 @@ ${renderRssTweets(tweets, cfg)}
     <atom:link href="${link}" rel="self" type="application/rss+xml" />
     <title>Search results for "${escName}"</title>
     <link>${link}</link>
-    <description>${getDescription("Search \"" & escName & "\"", cfg)}</description>
+    <description>${getDescription(&"Search \"{escName}\"", cfg)}</description>
     <language>en-us</language>
     <ttl>40</ttl>
 ${renderRssTweets(tweets, cfg)}

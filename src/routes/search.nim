@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, uri
+import strutils, strformat, uri
 
 import jester
 
@@ -37,7 +37,7 @@ proc createSearchRouter*(cfg: Config) =
         resp Http404, showError("Invalid search", cfg)
 
     get "/hashtag/@hash":
-      redirect("/search?q=" & encodeUrl("#" & @"hash"))
+      redirect(&"""/search?q={encodeUrl("#" & @"hash")}""")
 
     get "/opensearch":
       let url = getUrlPrefix(cfg) & "/search?q="

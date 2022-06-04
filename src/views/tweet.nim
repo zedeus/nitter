@@ -154,7 +154,7 @@ proc renderPoll(poll: Poll): VNode =
         span(class="poll-choice-value"): text percStr
         span(class="poll-choice-option"): text poll.options[i]
     span(class="poll-info"):
-      text insertSep($poll.votes, ',') & " votes • " & poll.status
+      text &"{insertSep($poll.votes, ',')} votes • {poll.status}"
 
 proc renderCardImage(card: Card): VNode =
   buildHtml(tdiv(class="card-image-container")):

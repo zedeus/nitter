@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, uri
+import strutils, strformat, uri
 
 import jester
 
@@ -10,13 +10,16 @@ export getListTimeline, getGraphList
 
 template respList*(list, timeline, title, vnode: typed) =
   if list.id.len == 0 or list.name.len == 0:
-    resp Http404, showError("List " & @"id" & " not found", cfg)
+    resp Http404, showError(&"""List "{@"id"}" not found""", cfg)
 
   let
     html = renderList(vnode, timeline.query, list)
-    rss = "/i/lists/$1/rss" % [@"id"]
+    rss = &"""/i/lists/{@"id"}/rss"""
 
   resp renderMain(html, request, cfg, prefs, titleText=title, rss=rss, banner=list.banner)
+
+proc title*(list: List): string =
+  &"@{list.username}/{list.name}"
 
 proc createListRouter*(cfg: Config) =
   router list:
@@ -28,24 +31,22 @@ proc createListRouter*(cfg: Config) =
         slug = decodeUrl(@"slug")
         list = await getCachedList(@"name", slug)
       if list.id.len == 0:
-        resp Http404, showError("List \"" & @"slug" & "\" not found", cfg)
-      redirect("/i/lists/" & list.id)
+        resp Http404, showError(&"""List "{@"slug"}" not found""", cfg)
+      redirect(&"/i/lists/{list.id}")
 
     get "/i/lists/@id/?":
       cond '.' notin @"id"
       let
         prefs = cookiePrefs()
         list = await getCachedList(id=(@"id"))
-        title = "@" & list.username & "/" & list.name
         timeline = await getListTimeline(list.id, getCursor())
         vnode = renderTimelineTweets(timeline, prefs, request.path)
-      respList(list, timeline, title, vnode)
+      respList(list, timeline, list.title, vnode)
 
     get "/i/lists/@id/members":
       cond '.' notin @"id"
       let
         prefs = cookiePrefs()
         list = await getCachedList(id=(@"id"))
-        title = "@" & list.username & "/" & list.name
         members = await getGraphListMembers(list, getCursor())
-      respList(list, members, title, renderTimelineUsers(members, prefs, request.path))
+      respList(list, members, list.title, renderTimelineUsers(members, prefs, request.path))
