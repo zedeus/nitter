@@ -14,6 +14,10 @@ var
   clientPool: HttpPool
   tokenPool: seq[Token]
   lastFailed: Time
+  enableLogging = false
+
+template log(str) =
+  if enableLogging: echo "[tokens] ", str
 
 proc getPoolJson*(): JsonNode =
   var
@@ -77,8 +81,10 @@ proc fetchToken(): Future[Token] {.async.} =
 
     return Token(tok: tok, init: time, lastUse: time)
   except Exception as e:
-    lastFailed = getTime()
-    echo "fetching token failed: ", e.msg
+    echo "[tokens] fetching token failed: ", e.msg
+    if "Try again" notin e.msg:
+      echo "[tokens] fetching tokens paused, resuming in 30 minutes"
+      lastFailed = getTime()
 
 proc expired(token: Token): bool =
   let time = getTime()
@@ -100,6 +106,9 @@ proc isReady(token: Token; api: Api): bool =
 proc release*(token: Token; used=false; invalid=false) =
   if token.isNil: return
   if invalid or token.expired:
+    if invalid: log "discarding invalid token"
+    elif token.expired: log "discarding expired token"
+
     let idx = tokenPool.find(token)
     if idx > -1: tokenPool.delete(idx)
   elif used:
@@ -115,6 +124,7 @@ proc getToken*(api: Api): Future[Token] {.async.} =
   if not result.isReady(api):
     release(result)
     result = await fetchToken()
+    log "added new token to pool"
     tokenPool.add result
 
   if not result.isNil:
@@ -143,10 +153,12 @@ proc poolTokens*(amount: int) {.async.} =
     except: discard
 
     if not newToken.isNil:
+      log "added new token to pool"
       tokenPool.add newToken
 
 proc initTokenPool*(cfg: Config) {.async.} =
   clientPool = HttpPool()
+  enableLogging = cfg.enableDebug
 
   while true:
     if tokenPool.countIt(not it.isLimited(Api.timeline)) < cfg.minTokens:
