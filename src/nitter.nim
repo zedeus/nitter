@@ -85,7 +85,6 @@ routes:
       &"An error occurred, please {link} with the URL you tried to visit.", cfg)
 
   error RateLimitError:
-    echo error.exc.name, ": ", error.exc.msg
     const link = a("another instance", href = instancesUrl)
     resp Http429, showError(
       &"Instance has been rate limited.<br>Use {link} or try again later.", cfg)
