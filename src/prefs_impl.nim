@@ -80,7 +80,7 @@ genPrefs:
 
   Media:
     mp4Playback(checkbox, true):
-      "Enable mp4 video playback (only for gifs)"
+      "Enable mp4 video playback"
 
     hlsPlayback(checkbox, false):
       "Enable hls video streaming (requires JavaScript)"
