@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, sequtils, strformat, options, algorithm
+import strutils, sequtils, strformat, options
 import karax/[karaxdsl, vdom, vstyles]
 from jester import Request
 
@@ -90,7 +90,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
   let
     container = if video.description.len == 0 and video.title.len == 0: ""
                 else: " card-container"
-    playbackType = if not prefs.proxyVideos and video.hasMp4Url: mp4
+    playbackType = if prefs.proxyVideos and video.hasMp4Url: mp4
                    else: video.playbackType
 
   buildHtml(tdiv(class="attachments card")):
@@ -105,18 +105,15 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
           renderVideoDisabled(playbackType, path)
         else:
           let
-            vars = video.variants.filterIt(it.contentType == playbackType)
-            vidUrl = vars.sortedByIt(it.resolution)[^1].url
+            vidUrl = video.getVidVariant(playbackType).url
             source = if prefs.proxyVideos: getVidUrl(vidUrl)
                      else: vidUrl
           case playbackType
           of mp4:
             if prefs.muteVideos:
-              video(poster=thumb, controls="", muted=""):
-                source(src=source, `type`="video/mp4")
+              video(src=source, poster=thumb, controls="", muted="", preload="metadata"):
             else:
-              video(poster=thumb, controls=""):
-                source(src=source, `type`="video/mp4")
+              video(src=source, poster=thumb, controls="", preload="metadata"):
           of m3u8, vmap:
             video(poster=thumb, data-url=source, data-autoload="false")
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"

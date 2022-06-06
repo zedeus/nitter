@@ -12,6 +12,7 @@ export httpclient, os, strutils, asyncstreams, base64, re
 
 const
   m3u8Mime* = "application/vnd.apple.mpegurl"
+  mp4Mime* = "video/mp4"
   maxAge* = "max-age=604800"
 
 proc safeFetch*(url: string): Future[string] {.async.} =
@@ -20,56 +21,81 @@ proc safeFetch*(url: string): Future[string] {.async.} =
   except: discard
   finally: client.close()
 
-template respond*(req: asynchttpserver.Request; headers) =
-  var msg = "HTTP/1.1 200 OK\c\L"
-  for k, v in headers:
+template respond*(req: asynchttpserver.Request; code: HttpCode;
+                  headers: seq[(string, string)]) =
+  var msg = "HTTP/1.1 " & $code & "\c\L"
+  for (k, v) in headers:
     msg.add(k & ": " & v & "\c\L")
 
   msg.add "\c\L"
-  yield req.client.send(msg)
+  yield req.client.send(msg, flags={})
+
+proc getContentLength(res: AsyncResponse): string =
+  result = "0"
+  if res.headers.hasKey("content-length"):
+    result = $res.contentLength
+  elif res.headers.hasKey("content-range"):
+    result = res.headers["content-range"]
+    result = result[result.find('/') + 1 .. ^1]
+    if result == "*":
+      result.setLen(0)
 
 proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   result = Http200
+
   let
     request = req.getNativeReq()
-    client = newAsyncHttpClient()
+    hashed = $hash(url)
+
+  if request.headers.getOrDefault("If-None-Match") == hashed:
+    return Http304
+
+  let c = newAsyncHttpClient(headers=newHttpHeaders({
+    "accept": "*/*",
+    "range": $req.headers.getOrDefault("range")
+  }))
 
   try:
-    let res = await client.get(url)
-    if res.status != "200 OK":
+    var res = await c.get(url)
+    if not res.status.startsWith("20"):
       return Http404
 
-    let hashed = $hash(url)
-    if request.headers.getOrDefault("If-None-Match") == hashed:
-      return Http304
-
-    let contentLength =
-      if res.headers.hasKey("content-length"):
-        res.headers["content-length", 0]
-      else:
-        ""
-
-    let headers = newHttpHeaders({
+    var headers = @{
+      "Accept-Ranges": "bytes",
       "Content-Type": res.headers["content-type", 0],
-      "Content-Length": contentLength,
-      "Cache-Control": maxAge,
-      "ETag": hashed
-    })
+      "Cache-Control": maxAge
+    }
 
-    respond(request, headers)
+    var tries = 0
+    while tries <= 10 and res.headers.hasKey("transfer-encoding"):
+      await sleepAsync(100 + tries * 200)
+      res = await c.get(url)
+      tries.inc
+
+    let contentLength = res.getContentLength
+    if contentLength.len > 0:
+      headers.add ("Content-Length", contentLength)
+
+    if res.headers.hasKey("content-range"):
+      headers.add ("Content-Range", $res.headers.getOrDefault("content-range"))
+      respond(request, Http206, headers)
+    else:
+      respond(request, Http200, headers)
 
     var (hasValue, data) = (true, "")
     while hasValue:
       (hasValue, data) = await res.bodyStream.read()
       if hasValue:
-        await request.client.send(data)
+        await request.client.send(data, flags={})
     data.setLen 0
-  except HttpRequestError, ProtocolError, OSError:
+  except OSError: discard
+  except ProtocolError, HttpRequestError:
     result = Http404
   finally:
-    client.close()
+    c.close()
 
-template check*(code): untyped =
+template check*(c): untyped =
+  let code = c
   if code != Http200:
     resp code
   else:
@@ -83,37 +109,27 @@ proc decoded*(req: jester.Request; index: int): string =
   if based: decode(encoded)
   else: decodeUrl(encoded)
 
+proc getPicUrl*(req: jester.Request): string =
+  result = decoded(req, 1)
+  if "twimg.com" notin result:
+    result.insert(twimg)
+  if not result.startsWith(https):
+    result.insert(https)
+
 proc createMediaRouter*(cfg: Config) =
   router media:
     get "/pic/?":
       resp Http404
 
-    get re"^\/pic\/orig\/(enc)?\/?(.+)":
-      var url = decoded(request, 1)
-      if "twimg.com" notin url:
-        url.insert(twimg)
-      if not url.startsWith(https):
-        url.insert(https)
-      url.add("?name=orig")
-
-      let uri = parseUri(url)
-      cond isTwitterUrl(uri) == true
-
-      let code = await proxyMedia(request, url)
-      check code
-
     get re"^\/pic\/(enc)?\/?(.+)":
-      var url = decoded(request, 1)
-      if "twimg.com" notin url:
-        url.insert(twimg)
-      if not url.startsWith(https):
-        url.insert(https)
+      let url = getPicUrl(request)
+      cond isTwitterUrl(parseUri(url)) == true
+      check await proxyMedia(request, url)
 
-      let uri = parseUri(url)
-      cond isTwitterUrl(uri) == true
-
-      let code = await proxyMedia(request, url)
-      check code
+    get re"^\/pic\/orig\/(enc)?\/?(.+)":
+      let url = getPicUrl(request)
+      cond isTwitterUrl(parseUri(url)) == true
+      check await proxyMedia(request, url & "?name=orig")
 
     get re"^\/video\/(enc)?\/?(.+)\/(.+)$":
       let url = decoded(request, 2)
@@ -123,8 +139,7 @@ proc createMediaRouter*(cfg: Config) =
         resp showError("Failed to verify signature", cfg)
 
       if ".mp4" in url or ".ts" in url or ".m4s" in url:
-        let code = await proxyMedia(request, url)
-        check code
+        check await proxyMedia(request, url)
 
       var content: string
       if ".vmap" in url:
