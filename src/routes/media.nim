@@ -121,15 +121,15 @@ proc createMediaRouter*(cfg: Config) =
     get "/pic/?":
       resp Http404
 
-    get re"^\/pic\/(enc)?\/?(.+)":
-      let url = getPicUrl(request)
-      cond isTwitterUrl(parseUri(url)) == true
-      check await proxyMedia(request, url)
-
     get re"^\/pic\/orig\/(enc)?\/?(.+)":
       let url = getPicUrl(request)
       cond isTwitterUrl(parseUri(url)) == true
       check await proxyMedia(request, url & "?name=orig")
+
+    get re"^\/pic\/(enc)?\/?(.+)":
+      let url = getPicUrl(request)
+      cond isTwitterUrl(parseUri(url)) == true
+      check await proxyMedia(request, url)
 
     get re"^\/video\/(enc)?\/?(.+)\/(.+)$":
       let url = decoded(request, 2)
