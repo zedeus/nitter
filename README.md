@@ -34,7 +34,7 @@ XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscW
 
 ## Resources
 
-The wiki contains 
+The wiki contains
 [a list of instances](https://github.com/zedeus/nitter/wiki/Instances) and
 [browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
 maintained by the community.
@@ -67,9 +67,10 @@ Twitter account.
 ## Installation
 
 ### Dependencies
-* libpcre
-* libsass
-* redis
+
+- libpcre
+- libsass
+- redis
 
 To compile Nitter you need a Nim installation, see
 [nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to
@@ -115,18 +116,21 @@ before you can run the container. See below for how to also run Redis using
 Docker.
 
 To build and run Nitter in Docker:
+
 ```bash
 docker build -t nitter:latest .
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host nitter:latest
 ```
 
 A prebuilt Docker image is provided as well:
+
 ```bash
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host zedeus/nitter:latest
 ```
 
 Using docker-compose to run both Nitter and Redis as different containers:
 Change `redisHost` from `localhost` to `nitter-redis` in `nitter.conf`, then run:
+
 ```bash
 docker-compose up -d
 ```
