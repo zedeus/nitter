@@ -135,11 +135,9 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
         let thumb = getSmallPic(gif.thumb)
         let url = getPicUrl(gif.url)
         if prefs.autoplayGifs:
-          video(class="gif", poster=thumb, controls="", autoplay="", muted="", loop=""):
-            source(src=url, `type`="video/mp4")
+          video(src=url, class="gif", poster=thumb, controls="", muted="", loop="", playsinline="", autoplay="")
         else:
-          video(class="gif", poster=thumb, controls="", muted="", loop=""):
-            source(src=url, `type`="video/mp4")
+          video(src=url, class="gif", poster=thumb, controls="", muted="", loop="", playsinline="")
 
 proc renderPoll(poll: Poll): VNode =
   buildHtml(tdiv(class="poll")):
