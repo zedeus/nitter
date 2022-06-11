@@ -107,9 +107,9 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
           case playbackType
           of mp4:
             if prefs.muteVideos:
-              video(src=source, poster=thumb, controls="", muted="", preload="metadata"):
+              video(src=source, poster=thumb, controls="", preload="none", muted=""):
             else:
-              video(src=source, poster=thumb, controls="", preload="metadata"):
+              video(src=source, poster=thumb, controls="", preload="none"):
           of m3u8, vmap:
             video(poster=thumb, data-url=source, data-autoload="false")
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
