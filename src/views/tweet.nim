@@ -16,7 +16,7 @@ proc getSmallPic(url: string): string =
 proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
   let url = getPicUrl(user.getUserPic("_mini"))
   buildHtml():
-    img(class=(prefs.getAvatarClass & " mini"), src=url)
+    img(class=(prefs.getAvatarClass & " mini"), src=url, loading="lazy")
 
 proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
   buildHtml(tdiv):
@@ -97,13 +97,9 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
     tdiv(class="gallery-video" & container):
       tdiv(class="attachment video-container"):
         let thumb = getSmallPic(video.thumb)
-        if not video.available:
-          img(src=thumb)
-          renderVideoUnavailable(video)
-        elif not prefs.isPlaybackEnabled(playbackType):
-          img(src=thumb)
-          renderVideoDisabled(playbackType, path)
-        else:
+        let canPlay = prefs.isPlaybackEnabled(playbackType)
+
+        if video.available and canPlay:
           let
             vidUrl = video.getVidVariant(playbackType).url
             source = if prefs.proxyVideos: getVidUrl(vidUrl)
@@ -119,6 +115,13 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
             tdiv(class="overlay-circle"): span(class="overlay-triangle")
             verbatim "</div>"
+        else:
+          img(src=thumb, loading="lazy", decoding="async")
+          if not canPlay:
+            renderVideoDisabled(playbackType, path)
+          else:
+            renderVideoUnavailable(video)
+
       if container.len > 0:
         tdiv(class="card-content"):
           h2(class="card-title"): text video.title
@@ -156,7 +159,7 @@ proc renderPoll(poll: Poll): VNode =
 proc renderCardImage(card: Card): VNode =
   buildHtml(tdiv(class="card-image-container")):
     tdiv(class="card-image"):
-      img(src=getPicUrl(card.image), alt="")
+      img(src=getPicUrl(card.image), alt="", loading="lazy")
       if card.kind == player:
         tdiv(class="card-overlay"):
           tdiv(class="overlay-circle"):
