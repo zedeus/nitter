@@ -7,6 +7,9 @@ import renderutils
 import ".."/[types, utils, formatters]
 import general
 
+const
+  doctype = "<!DOCTYPE html>\n"
+
 proc getSmallPic(url: string): string =
   result = url
   if "?" notin url and not url.endsWith("placeholder.png"):
@@ -364,7 +367,12 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
           text "Show this thread"
 
-proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): VNode =
-  buildHtml(tdiv(class="tweet-embed")):
+proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): string =
+  let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req)
-    renderTweet(tweet, prefs, path, mainTweet=true)
+
+    body:
+      tdiv(class="tweet-embed"):
+        renderTweet(tweet, prefs, path, mainTweet=true)
+
+  result = doctype & $node
