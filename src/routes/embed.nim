@@ -25,7 +25,7 @@ proc createEmbedRouter*(cfg: Config) =
       if convo == nil or convo.tweet == nil:
         resp Http404
 
-      resp $renderTweetEmbed(convo.tweet, path, prefs, cfg, request)
+      resp renderTweetEmbed(convo.tweet, path, prefs, cfg, request)
 
     get "/embed/Tweet.html":
       let id = @"id"

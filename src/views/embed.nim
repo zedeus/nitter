@@ -15,7 +15,8 @@ proc renderVideoEmbed*(tweet: Tweet; cfg: Config; req: Request): string =
   let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req, video=vidUrl, images=(@[thumb]))
 
-    tdiv(class="embed-video"):
-      renderVideo(get(tweet.video), prefs, "")
+    body:
+      tdiv(class="embed-video"):
+        renderVideo(get(tweet.video), prefs, "")
 
   result = doctype & $node
