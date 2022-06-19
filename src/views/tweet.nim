@@ -374,5 +374,6 @@ proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; re
     body:
       tdiv(class="tweet-embed"):
         renderTweet(tweet, prefs, path, mainTweet=true)
+      script(src="/js/iframeResize.js", `defer`="")
 
   result = doctype & $node
