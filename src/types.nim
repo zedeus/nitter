@@ -104,6 +104,11 @@ type
     near*: string
     sep*: string
 
+  Photo* = object
+    url*: string
+    width*: int
+    height*: int
+
   Gif* = object
     url*: string
     thumb*: string
@@ -185,7 +190,7 @@ type
     poll*: Option[Poll]
     gif*: Option[Gif]
     video*: Option[Video]
-    photos*: seq[string]
+    photos*: seq[Photo]
 
   Result*[T] = object
     content*: seq[T]

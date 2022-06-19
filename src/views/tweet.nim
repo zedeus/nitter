@@ -59,11 +59,11 @@ proc renderAlbum(tweet: Tweet): VNode =
         for photo in photos:
           tdiv(class="attachment image"):
             let
-              named = "name=" in photo
-              orig = photo
-              small = if named: photo else: photo & "?name=small"
+              orig = photo.url
+              named = "name=" in orig
+              small = if named: orig else: orig & "?name=small"
             a(href=getOrigPicUrl(orig), class="still-image", target="_blank"):
-              genImg(small)
+              genImg(small, "", $photo.width, $photo.height)
 
 proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
   case playbackType

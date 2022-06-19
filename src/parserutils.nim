@@ -89,6 +89,10 @@ proc getImageStr*(js: JsonNode): string =
 template getImageVal*(js: JsonNode): string =
   js{"image_value", "url"}.getImageStr
 
+template getImageDimensions*(js: JsonNode): (int, int) =
+  let values = js{"image_values"}
+  (values{"width"}.getInt, values{"height"}.getInt)
+
 proc getCardUrl*(js: JsonNode; kind: CardKind): string =
   result = js{"website_url"}.getStrVal
   if kind == promoVideoConvo:
