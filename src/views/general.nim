@@ -38,7 +38,7 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
 
 proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
                  video=""; images: seq[string] = @[]; banner=""; ogTitle="";
-                 rss=""; canonical=""): VNode =
+                 rss=""; canonical=""; baseTarget=""): VNode =
   var theme = prefs.theme.toTheme
   if "theme" in req.params:
     theme = req.params["theme"].toTheme
@@ -121,6 +121,9 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
     # if this is done earlier, Chrome only preloads one image for some reason
     link(rel="preload", type="font/woff2", `as`="font",
          href="/fonts/fontello.woff2?21002321", crossorigin="anonymous")
+
+    if baseTarget.len > 0:
+      base(target=baseTarget)
 
 proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
                  titleText=""; desc=""; ogTitle=""; rss=""; video="";

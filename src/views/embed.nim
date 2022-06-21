@@ -13,7 +13,7 @@ proc renderVideoEmbed*(tweet: Tweet; cfg: Config; req: Request): string =
   let vidUrl = getVideoEmbed(cfg, tweet.id)
   let prefs = Prefs(hlsPlayback: true)
   let node = buildHtml(html(lang="en")):
-    renderHead(prefs, cfg, req, video=vidUrl, images=(@[thumb]))
+    renderHead(prefs, cfg, req, video=vidUrl, images=(@[thumb]), baseTarget="_parent")
 
     body:
       tdiv(class="embed-video"):

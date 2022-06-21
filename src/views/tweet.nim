@@ -369,7 +369,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
 
 proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): string =
   let node = buildHtml(html(lang="en")):
-    renderHead(prefs, cfg, req)
+    renderHead(prefs, cfg, req, baseTarget="_parent")
 
     body:
       tdiv(class="tweet-embed"):
