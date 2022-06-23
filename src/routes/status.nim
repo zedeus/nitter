@@ -72,3 +72,6 @@ proc createStatusRouter*(cfg: Config) =
 
     get "/i/web/status/@id":
       redirect("/i/status/" & @"id")
+      
+    get "/@name/thread/@id/?":
+      redirect("/$1/status/$2" % [@"name", @"id"])
