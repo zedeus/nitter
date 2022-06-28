@@ -25,6 +25,7 @@ const
   graphList* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
   graphListBySlug* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
   graphListMembers* = graphql / "Ke6urWMeCV2UlKXGRy4sow/ListMembers"
+  graphArticle* = graphql / "rJMGbcr9LTsjVycjUmcnEg/TwitterArticleByRestId"
 
   timelineParams* = {
     "include_profile_interstitial_type": "0",

@@ -20,6 +20,7 @@ type
     userRestId
     userScreenName
     status
+    article
 
   RateLimit* = object
     remaining*: int
@@ -119,6 +120,42 @@ type
     color*: string
 
   PhotoRail* = seq[GalleryPhoto]
+
+  Article* = object
+    title*: string
+    coverImage*: string
+    user*: User
+    time*: DateTime
+    paragraphs*: seq[ArticleParagraph]
+    entities*: seq[ArticleEntity]
+    media*: Table[string, string]
+
+  ArticleParagraph* = object
+    text*: string
+    inlineStyleRanges*: seq[ArticleStyleRange]
+    entityRanges*: seq[ArticleEntityRange]
+  
+  ArticleStyleRange* = object
+    offset*: int
+    length*: int
+    style*: string
+
+  ArticleEntityRange* = object
+    offset*: int
+    length*: int
+    key*: int
+
+  ArticleEntity* = object
+    entityType*: ArticleEntityType
+    url*: string
+    mediaIds*: seq[string]
+    tweetId*: string
+
+  ArticleEntityType* {.pure.}  = enum
+    link = "LINK"
+    media = "MEDIA"
+    tweet = "TWEET"
+    unknown
 
   Poll* = object
     options*: seq[string]
