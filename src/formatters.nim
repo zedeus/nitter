@@ -26,6 +26,8 @@ let
   userPicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
   extRegex = re"(\.[A-z]+)$"
   illegalXmlRegex = re"(*UTF8)[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]"
+  hashtagRegex = re"#(\w+)"
+  mentionRegex = re"@(\w+)"
 
 proc getUrlPrefix*(cfg: Config): string =
   if cfg.useHttps: https & cfg.hostname
@@ -71,6 +73,13 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
 
   if absolute.len > 0 and "href" in result:
     result = result.replace("href=\"/", &"href=\"{absolute}/")
+
+proc replaceHashtagsAndMentions*(body: string): string =
+  result = body
+  result = result.replacef(hashtagRegex, a(
+    "#$1", href = "/search?q=%23$1"))
+  result = result.replacef(mentionRegex, a(
+    "@$1", href = "/$1"))
 
 proc getM3u8Url*(content: string): string =
   var matches: array[1, string]
