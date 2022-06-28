@@ -49,6 +49,9 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
 
   var last = 0
   for er in articleParagraph.entityRanges:
+    # prevent karax from inserting whitespaces to fix wrapping
+    result.add text ""
+
     # flush remaining text
     if er.offset > last:
       result.add verbatim text.runeSubStr(last, er.offset - last).replaceHashtagsAndMentions
