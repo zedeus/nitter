@@ -51,13 +51,13 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
   for er in articleParagraph.entityRanges:
     # flush remaining text
     if er.offset > last:
-      result.add text text.runeSubStr(last, er.offset - last)
+      result.add verbatim text.runeSubStr(last, er.offset - last).replaceHashtagsAndMentions
     
     let entity = article.entities[er.key]
     case entity.entityType
     of ArticleEntityType.link:
       let link = buildHtml(a(href=entity.url)):
-        text text.runeSubStr(er.offset, er.length)
+        verbatim text.runeSubStr(er.offset, er.length).replaceHashtagsAndMentions
       result.add link
     of ArticleEntityType.media:
       for id in entity.mediaIds:
@@ -79,7 +79,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
   
   # flush remaining text
   if last < text.len:
-    result.add text text.runeSubStr(last)
+    result.add verbatim text.runeSubStr(last).replaceHashtagsAndMentions
 
 proc renderNote*(article: Article; prefs: Prefs): VNode =
   let cover = getSmallPic(article.coverImage)
