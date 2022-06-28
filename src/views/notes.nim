@@ -57,7 +57,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
     case entity.entityType
     of ArticleEntityType.link:
       let link = buildHtml(a(href=entity.url)):
-        verbatim text.runeSubStr(er.offset, er.length).replaceHashtagsAndMentions
+        text text.runeSubStr(er.offset, er.length)
       result.add link
     of ArticleEntityType.media:
       for id in entity.mediaIds:
