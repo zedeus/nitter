@@ -2,6 +2,7 @@
     max-width: 600px;
     margin: 0 auto;
     background-color: var(--bg_panel);
+    font-family: sans-serif;
 
     article {
         padding: 20px;
@@ -18,9 +19,12 @@
         margin: 30px 0;
     }
 
-    p {
+    p,
+    li {
         font-size: 18px;
-        font-family: sans-serif;
+    }
+
+    p {
         line-height: 1.5em;
         margin: 30px 0;
         word-wrap: break-word;
@@ -35,6 +39,10 @@
                 margin: 0 auto;
             }
         }
+    }
+
+    li {
+        line-height: 2em;
     }
 
     iframe {
