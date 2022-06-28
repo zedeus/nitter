@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, tables, strformat
+import strutils, tables, strformat, unicode
 import karax/[karaxdsl, vdom, vstyles]
 from jester import Request
 
@@ -31,13 +31,13 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
   for er in articleParagraph.entityRanges:
     # flush remaining text
     if er.offset > last:
-      result.add text text.substr(last, er.offset - 1)
+      result.add text text.runeSubStr(last, er.offset - last)
     
     let entity = article.entities[er.key]
     case entity.entityType
     of ArticleEntityType.link:
       let link = buildHtml(a(href=entity.url)):
-        text text.substr(er.offset, er.offset + er.length - 1)
+        text text.runeSubStr(er.offset, er.length)
       result.add link
     of ArticleEntityType.media:
       for id in entity.mediaIds:
@@ -55,7 +55,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
   
   # flush remaining text
   if last < text.len:
-    result.add text text.substr(last)
+    result.add text text.runeSubStr(last)
 
 proc renderNote*(article: Article; prefs: Prefs): VNode =
   let cover = getSmallPic(article.coverImage)
