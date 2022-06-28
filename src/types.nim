@@ -127,13 +127,30 @@ type
 
   ArticleParagraph* = object
     text*: string
+    baseType*: ArticleType
     inlineStyleRanges*: seq[ArticleStyleRange]
     entityRanges*: seq[ArticleEntityRange]
   
+  ArticleType* {.pure.} = enum
+    headerOne = "header-one"
+    headerTwo = "header-two"
+    headerThree = "header-three"
+    orderedListItem = "ordered-list-item"
+    unorderedListItem = "unordered-list-item"
+    unstyled = "unstyled"
+    atomic = "atomic"
+    unknown
+
   ArticleStyleRange* = object
     offset*: int
     length*: int
-    style*: string
+    style*: ArticleStyle
+  
+  ArticleStyle* {.pure.} = enum
+    bold = "BOLD"
+    italic = "ITALIC"
+    strikethrough = "STRIKETHROUGH"
+    unknown
 
   ArticleEntityRange* = object
     offset*: int
@@ -145,11 +162,13 @@ type
     url*: string
     mediaIds*: seq[string]
     tweetId*: string
+    twemoji*: string
 
-  ArticleEntityType* {.pure.}  = enum
+  ArticleEntityType* {.pure.} = enum
     link = "LINK"
     media = "MEDIA"
     tweet = "TWEET"
+    twemoji = "TWEMOJI"
     unknown
 
   Poll* = object

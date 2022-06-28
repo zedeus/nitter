@@ -432,13 +432,14 @@ proc parseGraphArticle*(js: JsonNode): Article =
   
   for p in content{"blocks"}:
     var paragraph = ArticleParagraph(
-      text: p{"text"}.getStr
+      text: p{"text"}.getStr,
+      baseType: parseEnum[ArticleType](p{"type"}.getStr)
     )
     for sr in p{"inlineStyleRanges"}:
       paragraph.inlineStyleRanges.add ArticleStyleRange(
         offset: sr{"offset"}.getInt,
         length: sr{"length"}.getInt,
-        style: sr{"style"}.getStr
+        style: parseEnum[ArticleStyle](sr{"style"}.getStr)
       )
     for er in p{"entityRanges"}:
       paragraph.entityRanges.add ArticleEntityRange(
@@ -461,6 +462,8 @@ proc parseGraphArticle*(js: JsonNode): Article =
         entity.mediaIds.add jMedia{"mediaId"}.getStr
     of ArticleEntityType.tweet:
       entity.tweetId = jEntity{"data", "tweetId"}.getStr
+    of ArticleEntityType.twemoji:
+      entity.twemoji = jEntity{"data", "url"}.getStr
     else: discard
 
     result.entities.add entity
