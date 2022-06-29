@@ -55,7 +55,7 @@ proc getGraphArticle*(id: string): Future[Article] {.async.} =
   let
     variables = %*{"twitterArticleId": id}
     url = graphArticle ? {"variables": $variables}
-  result = parseGraphArticle(await fetch(url, Api.article))
+  result = parseGraphArticle(await fetch(url, Api.userRestId))
 
 proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return

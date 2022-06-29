@@ -20,7 +20,6 @@ type
     userRestId
     userScreenName
     status
-    article
 
   RateLimit* = object
     remaining*: int
