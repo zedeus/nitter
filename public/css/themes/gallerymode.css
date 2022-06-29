@@ -9,6 +9,7 @@ note2: Enjoy
 */
 
 body {
+    overflow: hidden;
     --bg_color: #101821;
     --fg_color: #FFFFFF;
     --fg_faded: #8899A6;
