@@ -70,7 +70,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
         result.add image
     of ArticleEntityType.twemoji:
       let url = entity.twemoji.getSmallPic
-      let emoji = buildHtml(img(src=url, alt=""))
+      let emoji = buildHtml(img(class="twemoji", src=url, alt=""))
       result.add emoji
     of ArticleEntityType.tweet:
       let url = fmt"/i/status/{entity.tweetId}/embed"
