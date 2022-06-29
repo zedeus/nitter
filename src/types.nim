@@ -18,7 +18,6 @@ type
     listMembers
     userRestId
     status
-    article
 
   RateLimit* = object
     remaining*: int
