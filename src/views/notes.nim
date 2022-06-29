@@ -103,16 +103,19 @@ proc renderNote*(article: Article; prefs: Prefs): VNode =
   var listType = ArticleType.unknown
   var list: VNode = nil
 
+  proc flushList() =
+    if list != nil:
+      main.add list
+      list = nil
+      listType = ArticleType.unknown
+
   for paragraph in article.paragraphs:
     let node = renderNoteParagraph(paragraph, article)
     
     let currentType = paragraph.baseType
     if currentType in [ArticleType.orderedListItem, ArticleType.unorderedListItem]:
       if currentType != listType:
-        # flush last list
-        if list != nil:
-          main.add list
-          list = nil
+        flushList()
 
         case currentType:
         of ArticleType.orderedListItem:
@@ -123,10 +126,10 @@ proc renderNote*(article: Article; prefs: Prefs): VNode =
         listType = currentType
       list.add node
     else:
-      if list != nil:
-        main.add list
-        list = nil
+      flushList()
       main.add node
+  
+  flushList()
 
   buildHtml(tdiv(class="note")):
     img(class="cover", src=(cover), alt="")
