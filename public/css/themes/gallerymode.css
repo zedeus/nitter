@@ -1,0 +1,230 @@
+/* 
+why: why not!
+just some css tweaks for showing tweets as grid and stuff
+author: https://palash.dev
+version: 0.1
+Note: css injection is pretty bad, dont know nim
+note2: Enjoy
+
+*/
+
+body {
+    --bg_color: #101821;
+    --fg_color: #FFFFFF;
+    --fg_faded: #8899A6;
+    --fg_dark: var(--fg_faded);
+    --fg_nav: var(--accent);
+
+    --bg_panel: #15202B;
+    --bg_elements: var(--bg_panel);
+    --bg_overlays: var(--bg_panel);
+    --bg_hover: #192734;
+
+    --grey: var(--fg_faded);
+    --dark_grey: #38444D;
+    --darker_grey: #2A343C;
+    --darkest_grey: #1B2835;
+    --border_grey: #38444D;
+
+    --accent: #1B95E0;
+    --accent_light: #80CEFF;
+    --accent_dark: #2B608A;
+    --accent_border: #1B95E096;
+
+    --play_button: var(--accent);
+    --play_button_hover: var(--accent_light);
+
+    --more_replies_dots: #39719C;
+    --error_red: #FF7266;
+
+    --verified_blue: var(--accent);
+    --icon_text: var(--fg_color);
+
+    --tab: var(--grey);
+    --tab_selected: var(--accent);
+
+    --profile_stat: var(--fg_color);
+}
+
+
+
+.timeline> :last-child {
+    height: 50px;
+    width: 50px;
+    padding-top: 15px;
+    color: rgb(153, 126, 8);
+}
+
+.timeline-item .show-more {
+    background-color: #3b9fdd98;
+    height: 50px;
+    width: 150px;
+}
+
+.show-more {
+    background-color: #3b9fdd98;
+    height: 50px;
+    width: 150px;
+}
+
+.attachment:last-child {
+    margin: 0;
+    max-height: fit-content;
+}
+
+.gallery-row>.still-image {
+    width: 100%;
+    height: 100%;
+}
+
+.still-image img {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+    flex-basis: content;
+    flex-grow: 1;
+}
+
+.still-image {
+    max-height: 100%;
+    max-width: 100%;
+    justify-content: center;
+}
+
+.attachments {
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.container {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.profile-tabs {
+    padding: 0;
+    max-width: 95%;
+    margin: 0 auto;
+}
+
+.timeline {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.timeline-container {
+    max-width: 80%;
+}
+
+.timeline-item {
+    align-items: baseline;
+}
+
+@media only screen and (min-device-width: 0px) and (max-device-width: 350px) {
+    .profile-tab {
+        display: none;
+    }
+
+    .profile-tabs {
+        width: 99%;
+        padding: 0;
+        margin: 0 auto;
+    }
+
+    .timeline-item {
+        padding: 1px;
+        padding-left: 5px;
+        width: 99%;
+        height: 100%;
+    }
+}
+
+@media only screen and (min-device-width: 651px) and (max-device-width: 990px) {
+    .profile-tab {
+        display: none;
+    }
+
+    .timeline-item {
+        padding: 1px;
+        width: 47%;
+        padding-left: 5px;
+        height: 100%;
+    }
+}
+
+@media only screen and (min-device-width: 691px) and (max-device-width: 1500px) {
+    .timeline-item {
+        padding: 1px;
+        width: 47%;
+        height: 100%;
+    }
+}
+
+@media only screen and (min-device-width: 1501px) and (max-device-width: 1800px) {
+    .timeline-item {
+        padding: 1px;
+        width: 25%;
+        height: 100%;
+    }
+}
+
+@media only screen and (min-device-width: 1801px) and (max-device-width: 3099px) {
+    .timeline-item {
+        padding: 1px;
+        width: 20%;
+        height: 100%;
+    }
+}
+
+@media only screen and (min-device-width: 3400px) and (max-device-width: 999999px) {
+    .timeline-item {
+        padding: 1px;
+        width: 5%;
+        height: 100%;
+    }
+}
+
+.tweet-header{
+    max-width: 70%;
+}
+.tweet-body {
+    margin-left: -20px;
+    margin-top: 10px;
+}
+
+.tweet-stats {
+    margin-bottom: 1px;
+    font-size: smaller;
+}
+
+/* Gallery mode */
+.tweet-body {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-self: baseline;
+    justify-content: space-evenly;
+    align-items: inherit;
+    align-content: stretch;
+}
+
+.tweet-avatar>img,
+.thread-line {
+    display: none;
+}
+
+.profile-banner img {
+    height: fit-content;
+    margin-top: -10px;
+    width: 100%;
+}
+
+.profile-tab {
+    max-width: 15%;
+    font-size: smaller !important;
+}
+
+.profile-tabs .timeline-container {
+    width: 85% !important;
+}
