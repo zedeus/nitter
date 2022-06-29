@@ -64,9 +64,11 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
       result.add link
     of ArticleEntityType.media:
       for id in entity.mediaIds:
-        let url = article.media[id].getSmallPic
+        let url = article.media.getOrDefault(id)
+        if url == "":
+          discard
         let image = buildHtml(span(class="image")):
-          img(src=url, alt="")
+          img(src=url.getSmallPic, alt="")
         result.add image
     of ArticleEntityType.twemoji:
       let url = entity.twemoji.getSmallPic
