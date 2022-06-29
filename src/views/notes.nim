@@ -64,7 +64,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
       result.add link
     of ArticleEntityType.media:
       for id in entity.mediaIds:
-        let url: string = article.media[id].getSmallPic
+        let url = article.media[id].getSmallPic
         let image = buildHtml(span(class="image")):
           img(src=url, alt="")
         result.add image
