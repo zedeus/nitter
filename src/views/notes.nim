@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, tables, strformat, unicode
-import karax/[karaxdsl, vdom, vstyles]
+import strutils, tables, unicode
+import karax/[karaxdsl, vdom]
 from jester import Request
 
-import renderutils
+import renderutils, tweet
 import ".."/[types, utils, formatters]
 
 const doctype = "<!DOCTYPE html>\n"
@@ -19,7 +19,7 @@ proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
   buildHtml():
     img(class=(prefs.getAvatarClass & " mini"), src=url)
 
-proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): VNode =
+proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article; tweets: Table[int64, Tweet]; path: string; prefs: Prefs): VNode =
   let text = articleParagraph.text
 
   case articleParagraph.baseType
@@ -75,9 +75,9 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
       let emoji = buildHtml(img(class="twemoji", src=url, alt=""))
       result.add emoji
     of ArticleEntityType.tweet:
-      let url = fmt"/i/status/{entity.tweetId}/embed"
-      let iframe = buildHtml(iframe(src=url, loading="lazy", frameborder="0", style={maxWidth: "100%"}))
-      result.add iframe
+      let tweet = tweets.getOrDefault(entity.tweetId.parseInt, nil)
+      if tweet == nil: discard
+      result.add renderTweet(tweet, prefs, path)
     else: discard
 
     last = er.offset + er.length
@@ -86,7 +86,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article): 
   if last < text.len:
     result.add verbatim text.runeSubStr(last).replaceHashtagsAndMentions
 
-proc renderNote*(article: Article; prefs: Prefs): VNode =
+proc renderNote*(article: Article; tweets: Table[int64, Tweet]; path: string; prefs: Prefs): VNode =
   let cover = getSmallPic(article.coverImage)
   let author = article.user
 
@@ -112,7 +112,7 @@ proc renderNote*(article: Article; prefs: Prefs): VNode =
       listType = ArticleType.unknown
 
   for paragraph in article.paragraphs:
-    let node = renderNoteParagraph(paragraph, article)
+    let node = renderNoteParagraph(paragraph, article, tweets, path, prefs)
     
     let currentType = paragraph.baseType
     if currentType in [ArticleType.orderedListItem, ArticleType.unorderedListItem]:
