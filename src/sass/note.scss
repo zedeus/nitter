@@ -1,5 +1,5 @@
 .note {
-    max-width: 600px;
+    width: 600px;
     margin: 0 auto;
     background-color: var(--bg_panel);
     font-family: sans-serif;
@@ -10,7 +10,7 @@
 
     img.cover {
         margin: 0;
-        max-width: 100%;
+        width: 100%;
     }
 
     h1 {
