@@ -488,6 +488,15 @@ proc parseGraphArticle*(js: JsonNode): Article =
 
     result.entities.add entity
 
-  for media in article{"media"}:
-    result.media[media{"media_id"}.getStr] =
-      media{"media_info", "original_img_url"}.getStr
+  for m in article{"media"}:
+    let mediaInfo = m{"media_info"}
+    var media = ArticleMedia(
+      mediaType: parseEnum[ArticleMediaType](mediaInfo{"__typename"}.getStr)
+    )
+    case media.mediaType
+    of ArticleMediaType.image:
+      media.url = mediaInfo{"original_img_url"}.getStr
+    of ArticleMediaType.gif:
+      media.url = mediaInfo{"variants"}[0]{"url"}.getStr
+    else: discard
+    result.media[m{"media_id"}.getStr] = media
