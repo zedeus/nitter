@@ -84,7 +84,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article; t
     of ArticleEntityType.tweet:
       let tweet = tweets.getOrDefault(entity.tweetId.parseInt, nil)
       if tweet == nil: discard
-      result.add renderTweet(tweet, prefs, path)
+      result.add renderTweet(tweet, prefs, path, mainTweet=true)
     else: discard
 
     last = er.offset + er.length
