@@ -122,7 +122,7 @@ type
     time*: DateTime
     paragraphs*: seq[ArticleParagraph]
     entities*: seq[ArticleEntity]
-    media*: Table[string, string]
+    media*: Table[string, ArticleMedia]
 
   ArticleParagraph* = object
     text*: string
@@ -168,6 +168,15 @@ type
     media = "MEDIA"
     tweet = "TWEET"
     twemoji = "TWEMOJI"
+    unknown
+
+  ArticleMedia* = object
+    mediaType*: ArticleMediaType
+    url*: string
+
+  ArticleMediaType* {.pure.} = enum
+    image = "ApiImage"
+    gif = "ApiGif"
     unknown
 
   Poll* = object
