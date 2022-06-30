@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch
+import asyncdispatch, tables, asyncfutures, sequtils
 import jester, karax/vdom
 import ".."/[types, api]
 import ../views/[notes, tweet, general]
@@ -12,6 +12,18 @@ proc createNotesRouter*(cfg: Config) =
     get "/i/notes/@id":
       let
         prefs = cookiePrefs()
+        path = getPath()
         article = await getGraphArticle(@"id")
-        note = renderNote(article, prefs)
+
+      let tweets = article
+        .entities
+        .filterIt(it.entityType == ArticleEntityType.tweet)
+        .mapIt(getTweet(it.tweetId))
+        .all
+        .await
+        .filterIt(it != nil)
+        .mapIt((it.tweet.id, it.tweet))
+        .toTable
+
+      let note = renderNote(article, tweets, path, prefs)
       resp renderMain(note, request, cfg, prefs, titleText=article.title)
