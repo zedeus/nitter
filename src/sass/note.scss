@@ -4,56 +4,57 @@
     background-color: var(--bg_panel);
     font-family: sans-serif;
 
-    article {
-        padding: 20px;
-    }
-
     img.cover {
         margin: 0;
         width: 100%;
     }
 
-    h1 {
-        display: inherit;
-        font-size: 2.5rem;
-        margin: 30px 0;
-    }
+    article {
+        padding: 20px;
 
-    p,
-    li {
-        font-size: 18px;
-    }
+        &>h1 {
+            display: inherit;
+            font-size: 2.5rem;
+            margin: 30px 0;
+        }
 
-    p {
-        line-height: 1.5em;
-        margin: 30px 0;
-        word-wrap: break-word;
-        white-space: break-spaces;
+        &>p,
+        li {
+            font-size: 18px;
+        }
 
-        .image {
-            text-align: center;
-            width: 100%;
+        &>p {
+            line-height: 1.5em;
+            margin: 30px 0;
+            word-wrap: break-word;
+            white-space: break-spaces;
 
-            img,
-            video {
-                max-width: 100%;
-                border-radius: 20px;
-                margin: 0 auto;
+            .image {
+                text-align: center;
+                width: 100%;
+
+                img,
+                video {
+                    max-width: 100%;
+                    border-radius: 20px;
+                    margin: 0 auto;
+                }
             }
         }
-    }
 
-    img.twemoji {
-        width: 18px;
-        height: 18px;
-    }
+        img.twemoji {
+            width: 18px;
+            height: 18px;
+        }
 
-    li {
-        line-height: 2em;
-    }
+        &>ul>li,
+        &>ol>li {
+            line-height: 2em;
+        }
 
-    iframe {
-        width: 100%;
-        height: 400px;
+        &>iframe {
+            width: 100%;
+            height: 400px;
+        }
     }
 }
