@@ -28,17 +28,17 @@
             margin: 30px 0;
             word-wrap: break-word;
             white-space: break-spaces;
+        }
 
-            .image {
-                text-align: center;
-                width: 100%;
+        &>span.image {
+            text-align: center;
+            width: 100%;
 
-                img,
-                video {
-                    max-width: 100%;
-                    border-radius: 20px;
-                    margin: 0 auto;
-                }
+            img,
+            video {
+                max-width: 100%;
+                border-radius: 20px;
+                margin: 0 auto;
             }
         }
 
