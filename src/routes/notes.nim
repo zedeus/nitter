@@ -15,15 +15,17 @@ proc createNotesRouter*(cfg: Config) =
         path = getPath()
         article = await getGraphArticle(@"id")
 
-      let tweets = article
-        .entities
-        .filterIt(it.entityType == ArticleEntityType.tweet)
-        .mapIt(getTweet(it.tweetId))
-        .all
-        .await
-        .filterIt(it != nil)
-        .mapIt((it.tweet.id, it.tweet))
-        .toTable
+      var tweetFutures: seq[Future[Conversation]]
+      for e in article.entities:
+        if e.entityType == ArticleEntityType.tweet:
+          tweetFutures.add getTweet(e.tweetId)
+
+      let convs = await tweetFutures.all
+
+      var tweets = initTable[int64, Tweet]()
+      for c in convs:
+        if c != nil and c.tweet != nil:
+          tweets[c.tweet.id] = c.tweet
 
       let note = renderNote(article, tweets, path, prefs)
       resp renderMain(note, request, cfg, prefs, titleText=article.title)
