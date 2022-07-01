@@ -437,6 +437,9 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
       result.replies.bottom = e{"content", "itemContent", "value"}.getStr
 
 proc parseGraphArticle*(js: JsonNode): Article =
+  if not js{"errors"}.isNull:
+    return
+
   let article = js{"data", "twitterArticle"}
   let meta = article{"metadata"}
 

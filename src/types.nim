@@ -38,6 +38,7 @@ type
     protectedUser = 22
     couldntAuth = 32
     doesntExist = 34
+    invalidPermission = 37
     userNotFound = 50
     suspended = 63
     rateLimited = 88
@@ -120,7 +121,7 @@ type
 
   PhotoRail* = seq[GalleryPhoto]
 
-  Article* = object
+  Article* = ref object
     title*: string
     coverImage*: string
     user*: User
