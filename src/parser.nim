@@ -417,6 +417,9 @@ proc parsePhotoRail*(js: JsonNode): PhotoRail =
     result.add GalleryPhoto(url: url, tweetId: $t.id)
 
 proc parseGraphArticle*(js: JsonNode): Article =
+  if not js{"errors"}.isNull:
+    return
+
   let article = js{"data", "twitterArticle"}
   let meta = article{"metadata"}
 

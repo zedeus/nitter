@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, tables, asyncfutures, sequtils
+import asyncdispatch, tables, asyncfutures, options
 import jester, karax/vdom
 import ".."/[types, api]
 import ../views/[notes, tweet, general]
@@ -10,10 +10,10 @@ export api, notes, vdom, tweet, general, router_utils
 proc createNotesRouter*(cfg: Config) =
   router notes:
     get "/i/notes/@id":
-      let
-        prefs = cookiePrefs()
-        path = getPath()
-        article = await getGraphArticle(@"id")
+      let article = await getGraphArticle(@"id")
+
+      if article == nil:
+        resp Http404
 
       var tweetFutures: seq[Future[Conversation]]
       for e in article.entities:
@@ -27,5 +27,8 @@ proc createNotesRouter*(cfg: Config) =
         if c != nil and c.tweet != nil:
           tweets[c.tweet.id] = c.tweet
 
-      let note = renderNote(article, tweets, path, prefs)
+      let
+        path = getPath()
+        prefs = cookiePrefs()
+        note = renderNote(article, tweets, path, prefs)
       resp renderMain(note, request, cfg, prefs, titleText=article.title)
