@@ -37,7 +37,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article; t
           result = image
         of ArticleMediaType.gif:
           let video = buildHtml(span(class="image")):
-            video(src=media.url.getVidUrl, controls="", autoplay="")
+            video(src=media.url.getVidUrl, controls="", autoplay="", loop="")
           result = video
         else: discard
     of ArticleEntityType.tweet:
