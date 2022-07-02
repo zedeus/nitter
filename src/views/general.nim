@@ -42,7 +42,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   var theme = prefs.theme.toTheme
   if "theme" in req.params:
     theme = req.params["theme"].toTheme
-    
+
   let ogType =
     if video.len > 0: "video"
     elif rss.len > 0: "object"
@@ -81,7 +81,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
 
     title:
       if titleText.len > 0:
-        text &"{titleText}|{cfg.title}"
+        text &"{titleText} | {cfg.title}"
       else:
         text cfg.title
 
