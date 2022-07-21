@@ -100,6 +100,7 @@
 .avatar {
     &.round {
         border-radius: 50%;
+        -webkit-user-select: none;
     }
     
     &.mini {
@@ -200,6 +201,7 @@
 
 .tweet-stats {
     margin-bottom: -3px;
+    -webkit-user-select: none;
 }
 
 .tweet-stat {
@@ -231,6 +233,7 @@
     left: 0;
     top: 0;
     position: absolute;
+    -webkit-user-select: none;
 
     &:hover {
         background-color: var(--bg_hover);
