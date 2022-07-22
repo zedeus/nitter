@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, tables, unicode
+import strutils, tables, unicode, bitops
 import karax/[karaxdsl, vdom]
 from jester import Request
 
@@ -64,25 +64,65 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article; t
     else:
       result = p.newVNode()
 
-    # Assume the style applies for the entire paragraph
-    for styleRange in articleParagraph.inlineStyleRanges:
-      case styleRange.style
-      of ArticleStyle.bold:
-        result.setAttr("style", "font-weight:bold")
-      of ArticleStyle.italic:
-        result.setAttr("style", "font-style:italic")
-      of ArticleStyle.strikethrough:
-        result.setAttr("style", "text-decoration:line-through")
-      else: discard
+    proc flushPlainText(target: VNode; start: int; len: int): void =
+      if articleParagraph.inlineStyleRanges.len == 0:
+        target.add verbatim text.runeSubStr(start, len).replaceHashtagsAndMentions
+      else:
+
+        proc flushInternal(start: int, len: int, style: int): void =
+          let content = text.runeSubStr(start, len).replaceHashtagsAndMentions
+          echo content, ", ", style
+          if style == 0:
+            target.add text content
+          else:
+            let container = span.newVNode()
+            container.add text content
+            var styleStr = ""
+            if style.testBit(0):
+              styleStr.add "font-weight:bold;"
+            if style.testBit(1):
+              styleStr.add "font-style:italic;"
+            if style.testBit(2):
+              styleStr.add "text-decoration:line-through;"
+            container.setAttr("style", styleStr)
+            target.add container
+
+        var
+          lastStyle = 0
+          lastStart = start
+
+        for i in start..(start + len):
+          var style = 0
+          for styleRange in articleParagraph.inlineStyleRanges:
+            let
+              styleStart = styleRange.offset
+              styleEnd = styleStart + styleRange.length
+            if styleStart <= i and styleEnd >= i:
+              case styleRange.style:
+              of ArticleStyle.bold:
+                style.setBit(0)
+              of ArticleStyle.italic:
+                style.setBit(1)
+              of ArticleStyle.strikethrough:
+                style.setBit(2)
+              else: discard
+          
+          if style != lastStyle:
+            flushInternal(lastStart, i - lastStart, lastStyle)
+
+            lastStyle = style
+            lastStart = i
+        
+        if lastStart < len:
+          flushInternal(lastStart, len - lastStart, lastStyle)
 
     var last = 0
     for er in articleParagraph.entityRanges:
       # prevent karax from inserting whitespaces to fix wrapping
       result.add text ""
 
-      # flush remaining text
       if er.offset > last:
-        result.add verbatim text.runeSubStr(last, er.offset - last).replaceHashtagsAndMentions
+        flushPlainText(result, last, er.offset - last)
 
       let entity = article.entities[er.key]
       case entity.entityType
@@ -100,7 +140,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article; t
 
     # flush remaining text
     if last < text.len:
-      result.add verbatim text.runeSubStr(last).replaceHashtagsAndMentions
+      flushPlainText(result, last, text.len - last)
 
 proc renderNote*(article: Article; tweets: Table[int64, Tweet]; path: string; prefs: Prefs): VNode =
   let cover = getSmallPic(article.coverImage)
