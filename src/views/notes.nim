@@ -71,7 +71,6 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article; t
 
         proc flushInternal(start: int, len: int, style: int): void =
           let content = text.runeSubStr(start, len).replaceHashtagsAndMentions
-          echo content, ", ", style
           if style == 0:
             target.add text content
           else:
@@ -108,11 +107,13 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article; t
               else: discard
           
           if style != lastStyle:
-            flushInternal(lastStart, i - lastStart, lastStyle)
-
+            if i > lastStart:
+              flushInternal(lastStart, i - lastStart - 1, lastStyle)
+              lastStart = i - 1
+            else:
+              lastStart = i
             lastStyle = style
-            lastStart = i
-        
+            
         if lastStart < len:
           flushInternal(lastStart, len - lastStart, lastStyle)
 
