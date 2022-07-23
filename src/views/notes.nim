@@ -96,7 +96,7 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article; t
             let
               styleStart = styleRange.offset
               styleEnd = styleStart + styleRange.length
-            if styleStart <= i and styleEnd >= i:
+            if styleStart <= i and styleEnd > i:
               case styleRange.style:
               of ArticleStyle.bold:
                 style.setBit(0)
@@ -108,11 +108,10 @@ proc renderNoteParagraph(articleParagraph: ArticleParagraph; article: Article; t
           
           if style != lastStyle:
             if i > lastStart:
-              flushInternal(lastStart, i - lastStart - 1, lastStyle)
-              lastStart = i - 1
-            else:
-              lastStart = i
+              flushInternal(lastStart, i - lastStart, lastStyle)
+
             lastStyle = style
+            lastStart = i
             
         if lastStart < len:
           flushInternal(lastStart, len - lastStart, lastStyle)
