@@ -49,9 +49,11 @@ Inspired by the **[Invidious]** project.
 
 ## Roadmap
 
+<br>
+
 <kbd>  <br>  Embeds  <br>  </kbd>    ❯    
-<kbd>  <br>  Account System +  <br>  Timeline Support  <br>  </kbd>    ❯    
-<kbd>  <br>  Archiving  <br>  Tweets / Profiles  <br>  </kbd>    ❯    
+<kbd>  <br>  Account System  <br>  +  <br>  Timeline Support  <br>  </kbd>    ❯    
+<kbd>  <br>  Archiving  <br><br>  Tweets / Profiles  <br>  </kbd>    ❯    
 <kbd>  <br>  Developer API  <br>  </kbd>
 
 <br>
