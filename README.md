@@ -1,25 +1,25 @@
 # Nitter
 
-[![Test Matrix](https://github.com/zedeus/nitter/workflows/CI/CD/badge.svg)](https://github.com/zedeus/nitter/actions?query=workflow%3ACI/CD)
-[![License](https://img.shields.io/github/license/zedeus/nitter?style=flat)](#license)
+[![Badge Status]][Actions]
+[![Badge License]][License]
 
 A free and open source alternative Twitter front-end focused on privacy and
 performance. \
-Inspired by the [Invidious](https://github.com/iv-org/invidious)
+Inspired by the [Invidious]
 project.
 
 - No JavaScript or ads
 - All requests go through the backend, client never talks to Twitter
 - Prevents Twitter from tracking your IP or JavaScript fingerprint
 - Uses Twitter's unofficial API (no rate limits or developer account required)
-- Lightweight (for [@nim_lang](https://nitter.net/nim_lang), 60KB vs 784KB from twitter.com)
+- Lightweight (for [@nim_lang], 60KB vs 784KB from twitter.com)
 - RSS feeds
 - Themes
 - Mobile support (responsive design)
 - AGPLv3 licensed, no proprietary instances permitted
 
-Liberapay: https://liberapay.com/zedeus \
-Patreon: https://patreon.com/nitter \
+[Liberapay]:  \
+[Patreon]:  \
 BTC: bc1qp7q4qz0fgfvftm5hwz3vy284nue6jedt44kxya \
 ETH: 0x66d84bc3fd031b62857ad18c62f1ba072b011925 \
 LTC: ltc1qhsz5nxw6jw9rdtw9qssjeq2h8hqk2f85rdgpkr \
@@ -35,8 +35,8 @@ XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscW
 ## Resources
 
 The wiki contains
-[a list of instances](https://github.com/zedeus/nitter/wiki/Instances) and
-[browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
+[a list of instances][Instances] and
+[browser extensions][Extensions]
 maintained by the community.
 
 ## Why?
@@ -45,10 +45,10 @@ It's impossible to use Twitter without JavaScript enabled. For privacy-minded
 folks, preventing JavaScript analytics and IP-based tracking is important, but
 apart from using a VPN and uBlock/uMatrix, it's impossible. Despite being behind
 a VPN and using heavy-duty adblockers, you can get accurately tracked with your
-[browser's fingerprint](https://restoreprivacy.com/browser-fingerprinting/),
-[no JavaScript required](https://noscriptfingerprint.com/). This all became
+[browser's fingerprint][Fingerprint],
+[no JavaScript required][JavaScript]. This all became
 particularly important after Twitter [removed the
-ability](https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws)
+ability][Advertisers]
 for users to control whether their data gets sent to advertisers.
 
 Using an instance of Nitter (hosted on a VPS for example), you can browse
@@ -62,7 +62,7 @@ Twitter account.
 
 ## Screenshot
 
-![nitter](/screenshot.png)
+![Showcase]
 
 ## Installation
 
@@ -73,7 +73,7 @@ Twitter account.
 - redis
 
 To compile Nitter you need a Nim installation, see
-[nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to
+[nim-lang.org] for details. It is possible to
 install it system-wide or in the user directory you create below.
 
 To compile the scss files, you need to install `libsass`. On Ubuntu and Debian,
@@ -103,13 +103,12 @@ Redis info in `nitter.conf`. To run Redis, either run
 `redis-server --daemonize yes`, or `systemctl enable --now redis` (or
 redis-server depending on the distro). Run Nitter by executing `./nitter` or
 using the systemd service below. You should run Nitter behind a reverse proxy
-such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or
-[Apache](https://github.com/zedeus/nitter/wiki/Apache) for security and
+such as [Nginx] or [Apache] for security and
 performance reasons.
 
 ### Docker
 
-#### NOTE: For ARM64/ARM support, please use [unixfox's image](https://quay.io/repository/unixfox/nitter?tab=tags), more info [here](https://github.com/zedeus/nitter/issues/399#issuecomment-997263495)
+#### NOTE: For ARM64/ARM support, please use [unixfox's image][Unixfox], more info [here][ARM Info]
 
 To run Nitter with Docker, you'll need to install and run Redis separately
 before you can run the container. See below for how to also run Redis using
@@ -179,5 +178,37 @@ lines). If you're running the Docker image, you can do this:
 
 ## Contact
 
-Feel free to join our [Matrix channel](https://matrix.to/#/#nitter:matrix.org).
+Feel free to join our [Matrix channel][Matrix].
 You can email me at zedeus@pm.me if you wish to contact me personally.
+
+
+<!----------------------------------------------------------------------------->
+
+[nim-lang.org]: https://nim-lang.org/install.html
+[Advertisers]: https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws
+[Fingerprint]: https://restoreprivacy.com/browser-fingerprinting/
+[JavaScript]: https://noscriptfingerprint.com/
+[Invidious]: https://github.com/iv-org/invidious
+[Liberapay]: https://liberapay.com/zedeus
+[@nim_lang]: https://nitter.net/nim_lang
+[ARM Info]: https://github.com/zedeus/nitter/issues/399#issuecomment-997263495
+[Unixfox]: https://quay.io/repository/unixfox/nitter?tab=tags
+[Actions]: https://github.com/zedeus/nitter/actions
+[Patreon]: https://patreon.com/nitter
+[Matrix]: https://matrix.to/#/#nitter:matrix.org
+
+[Extensions]: https://github.com/zedeus/nitter/wiki/Extensions
+[Instances]: https://github.com/zedeus/nitter/wiki/Instances
+[Apache]: https://github.com/zedeus/nitter/wiki/Apache
+[Nginx]: https://github.com/zedeus/nitter/wiki/Nginx
+
+[Showcase]: screenshot.png
+[License]: LICENSE
+
+<!---------------------------------[ Badges ]---------------------------------->
+
+[Badge License]: https://img.shields.io/github/license/zedeus/nitter?style=flat
+[Badge Status]: https://github.com/zedeus/nitter/workflows/CI/CD/badge.svg
+
+
+<!---------------------------------[ Buttons ]--------------------------------->
