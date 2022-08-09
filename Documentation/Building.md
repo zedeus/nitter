@@ -107,3 +107,11 @@ implemented. If you're running Nitter with systemd, you can check stdout like
 this: `journalctl -u nitter.service` (add `--follow` to see just the last 15
 lines). If you're running the Docker image, you can do this:
 `docker logs --follow *nitter container id*`
+
+
+<!----------------------------------------------------------------------------->
+
+[nim-lang.org]: https://nim-lang.org/install.html
+[ARM Info]: https://github.com/zedeus/nitter/issues/399#issuecomment-997263495
+[Unixfox]: https://quay.io/repository/unixfox/nitter?tab=tags
+

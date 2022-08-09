@@ -29,6 +29,9 @@ Inspired by the **[Invidious]** project.
 [![Button Instances]][Instances]   
 [![Button Extensions]][Extensions]
 
+[![Button Building]][Building]   
+[![Button Support]][Support]
+
 <br>
 <br>
 
@@ -67,7 +70,7 @@ Inspired by the **[Invidious]** project.
 <br>
 <br>
 
-## Why?
+## Why
 
 It's impossible to use Twitter without JavaScript enabled. For privacy-minded
 folks, preventing JavaScript analytics and IP-based tracking is important, but
@@ -101,14 +104,11 @@ if you wish to speak to me personally.
 
 <!----------------------------------------------------------------------------->
 
-[nim-lang.org]: https://nim-lang.org/install.html
 [Advertisers]: https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws
 [Fingerprint]: https://restoreprivacy.com/browser-fingerprinting/
 [JavaScript]: https://noscriptfingerprint.com/
 [Invidious]: https://github.com/iv-org/invidious
 [@nim_lang]: https://nitter.net/nim_lang
-[ARM Info]: https://github.com/zedeus/nitter/issues/399#issuecomment-997263495
-[Unixfox]: https://quay.io/repository/unixfox/nitter?tab=tags
 [Actions]: https://github.com/zedeus/nitter/actions
 [Matrix]: https://matrix.to/#/#nitter:matrix.org
 
@@ -117,7 +117,9 @@ if you wish to speak to me personally.
 [Apache]: https://github.com/zedeus/nitter/wiki/Apache
 [Nginx]: https://github.com/zedeus/nitter/wiki/Nginx
 
+[Building]: Documentation/Building.md
 [Showcase]: screenshot.png
+[Support]: Documentation/Support.md
 [License]: LICENSE
 
 <!---------------------------------[ Badges ]---------------------------------->
@@ -130,4 +132,6 @@ if you wish to speak to me personally.
 <!---------------------------------[ Buttons ]--------------------------------->
 
 [Button Extensions]: https://img.shields.io/badge/Extensions-009CAB.svg?style=for-the-badge&logoColor=white&logo=GitExtensions
+[Button Building]: https://img.shields.io/badge/Building-blue.svg?style=for-the-badge&logoColor=white&logo=GitBook
+[Button Support]: https://img.shields.io/badge/Support_Us-FF5C83.svg?style=for-the-badge&logoColor=white&logo=GitHubSponsors
 [Button Instances]: https://img.shields.io/badge/Instances-DE4F4F.svg?style=for-the-badge&logoColor=white&logo=ROS
