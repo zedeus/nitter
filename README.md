@@ -10,10 +10,10 @@
 <br>
 <br>
 
-<img
+[<img
     src = 'public/logo.png'
     width = 200
-/>
+/>][Website]
 
 
 # Nitter
@@ -110,6 +110,7 @@ if you wish to speak to me personally.
 [Invidious]: https://github.com/iv-org/invidious
 [@nim_lang]: https://nitter.net/nim_lang
 [Actions]: https://github.com/zedeus/nitter/actions
+[Website]: https://nitter.net/
 [Matrix]: https://matrix.to/#/#nitter:matrix.org
 
 [Extensions]: https://github.com/zedeus/nitter/wiki/Extensions
