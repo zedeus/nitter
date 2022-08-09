@@ -34,33 +34,16 @@ Inspired by the **[Invidious]** project.
 
 ## Features
 
-**No Advertisements**
+<kbd>  <br>  <b>Prevents</b><br><br><br>  Ｆｉｎｇｅｒｐｒｉｎｔｉｎｇ  <br><br><br>  ＩＰ　Ｔｒａｃｋｉｎｇ  <br><br>  </kbd>   
+<kbd>  <br>  <b>Lightweight</b><br><br><br>  For [@nim_lang], `60KB` vs  <br><br><br>  `784KB` from Twitter.com  <br><br>  </kbd>   
+<kbd>  <br>  <b>Provides</b><br><br><br>  ＲＳＳ　Ｆｅｅｄｓ  <br><br><br>  Ｔｈｅｍｅｓ  <br><br>  </kbd>
 
-**No Account Required**
+<kbd>  <br>  <b>No</b><br><br><br>                 Ａｃｃｏｕｎｔ　Ｒｅｑｕｉｒｅｄ         Ａｄｖｅｒｔｉｓｅｍｅｎｔｓ                      <br><br><br>  Ｒａｔｅ　Ｌｉｍｉｔｉｎｇ                    ＪａｖａＳｃｒｉｐｔ       <br><br>  </kbd>
 
-**No JavaScript**
+<kbd>  <br>         <b>Mobile Support</b>         <br><br><br>  *Responsive*  <br>  *Design*  <br><br>  </kbd>   
+<kbd>  <br>         <b>AGPLv3 Licensed</b>         <br><br><br>  *Forbids Proprietary*  <br>  *Instances*  <br><br>  </kbd>   
+<kbd>  <br>        <b>Decoupled        <br><br>  From  <br><br>  Twitter</b>  <br><br>  </kbd>
 
-**No Rate Limiting**
-
-**Prevents IP Tracking**
-
-**Prevents Fingerprinting**
-
-**Decoupled From Twitter**
-
-**Lightweight** <br>
-*For [@nim_lang], `60KB` vs* <br>
-*`784KB` from twitter.com*
-
-**RSS Feeds**
-
-**Themes**
-
-**Mobile Support** <br>
-*Responsive Design*
-
-**AGPLv3 Licensed** <br>
-*Forbids Proprietary Instances*
 
 <br>
 <br>
