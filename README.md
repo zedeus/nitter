@@ -1,12 +1,38 @@
-# Nitter
 
-[![Badge Status]][Actions]
+<br>
+
+<div align = center>
+
+[![Badge Status]][Actions]   
+[![Badge Matrix]][Matrix]   
 [![Badge License]][License]
 
-A free and open source alternative Twitter front-end focused on privacy and
-performance. \
-Inspired by the [Invidious]
-project.
+<br>
+<br>
+
+<img
+    src = 'public/logo.png'
+    width = 200
+/>
+
+
+# Nitter
+
+*A free and open source alternative Twitter* <br>
+*front-end focused on privacy and performance.*
+
+Inspired by the **[Invidious]** project.
+
+<br>
+<br>
+
+[![Button Instances]][Instances]   
+[![Button Extensions]][Extensions]
+
+<br>
+<br>
+
+## Features
 
 - No JavaScript or ads
 - All requests go through the backend, client never talks to Twitter
@@ -18,12 +44,8 @@ project.
 - Mobile support (responsive design)
 - AGPLv3 licensed, no proprietary instances permitted
 
-[Liberapay]:  \
-[Patreon]:  \
-BTC: bc1qp7q4qz0fgfvftm5hwz3vy284nue6jedt44kxya \
-ETH: 0x66d84bc3fd031b62857ad18c62f1ba072b011925 \
-LTC: ltc1qhsz5nxw6jw9rdtw9qssjeq2h8hqk2f85rdgpkr \
-XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscWGWJCczFLe9RFhM3d1zpL
+<br>
+<br>
 
 ## Roadmap
 
@@ -32,12 +54,12 @@ XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscW
 - Archiving tweets/profiles
 - Developer API
 
-## Resources
+![Showcase]
 
-The wiki contains
-[a list of instances][Instances] and
-[browser extensions][Extensions]
-maintained by the community.
+</div>
+
+<br>
+<br>
 
 ## Why?
 
@@ -60,126 +82,15 @@ In the future a simple account system will be added that lets you follow Twitter
 users, allowing you to have a clean chronological timeline without needing a
 Twitter account.
 
-## Screenshot
-
-![Showcase]
-
-## Installation
-
-### Dependencies
-
-- libpcre
-- libsass
-- redis
-
-To compile Nitter you need a Nim installation, see
-[nim-lang.org] for details. It is possible to
-install it system-wide or in the user directory you create below.
-
-To compile the scss files, you need to install `libsass`. On Ubuntu and Debian,
-you can use `libsass-dev`.
-
-Redis is required for caching and in the future for account info. It should be
-available on most distros as `redis` or `redis-server` (Ubuntu/Debian).
-Running it with the default config is fine, Nitter's default config is set to
-use the default Redis port and localhost.
-
-Here's how to create a `nitter` user, clone the repo, and build the project
-along with the scss and md files.
-
-```bash
-# useradd -m nitter
-# su nitter
-$ git clone https://github.com/zedeus/nitter
-$ cd nitter
-$ nimble build -d:release
-$ nimble scss
-$ nimble md
-$ cp nitter.example.conf nitter.conf
-```
-
-Set your hostname, port, HMAC key, https (must be correct for cookies), and
-Redis info in `nitter.conf`. To run Redis, either run
-`redis-server --daemonize yes`, or `systemctl enable --now redis` (or
-redis-server depending on the distro). Run Nitter by executing `./nitter` or
-using the systemd service below. You should run Nitter behind a reverse proxy
-such as [Nginx] or [Apache] for security and
-performance reasons.
-
-### Docker
-
-#### NOTE: For ARM64/ARM support, please use [unixfox's image][Unixfox], more info [here][ARM Info]
-
-To run Nitter with Docker, you'll need to install and run Redis separately
-before you can run the container. See below for how to also run Redis using
-Docker.
-
-To build and run Nitter in Docker:
-
-```bash
-docker build -t nitter:latest .
-docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host nitter:latest
-```
-
-A prebuilt Docker image is provided as well:
-
-```bash
-docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host zedeus/nitter:latest
-```
-
-Using docker-compose to run both Nitter and Redis as different containers:
-Change `redisHost` from `localhost` to `nitter-redis` in `nitter.conf`, then run:
-
-```bash
-docker-compose up -d
-```
-
-Note the Docker commands expect a `nitter.conf` file in the directory you run
-them.
-
-### systemd
-
-To run Nitter via systemd you can use this service file:
-
-```ini
-[Unit]
-Description=Nitter (An alternative Twitter front-end)
-After=syslog.target
-After=network.target
-
-[Service]
-Type=simple
-
-# set user and group
-User=nitter
-Group=nitter
-
-# configure location
-WorkingDirectory=/home/nitter/nitter
-ExecStart=/home/nitter/nitter/nitter
-
-Restart=always
-RestartSec=15
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Then enable and run the service:
-`systemctl enable --now nitter.service`
-
-### Logging
-
-Nitter currently prints some errors to stdout, and there is no real logging
-implemented. If you're running Nitter with systemd, you can check stdout like
-this: `journalctl -u nitter.service` (add `--follow` to see just the last 15
-lines). If you're running the Docker image, you can do this:
-`docker logs --follow *nitter container id*`
+<br>
+<br>
 
 ## Contact
 
-Feel free to join our [Matrix channel][Matrix].
-You can email me at zedeus@pm.me if you wish to contact me personally.
+You can email me at zedeus@pm.me <br>
+if you wish to speak to me personally.
+
+<br>
 
 
 <!----------------------------------------------------------------------------->
@@ -189,12 +100,10 @@ You can email me at zedeus@pm.me if you wish to contact me personally.
 [Fingerprint]: https://restoreprivacy.com/browser-fingerprinting/
 [JavaScript]: https://noscriptfingerprint.com/
 [Invidious]: https://github.com/iv-org/invidious
-[Liberapay]: https://liberapay.com/zedeus
 [@nim_lang]: https://nitter.net/nim_lang
 [ARM Info]: https://github.com/zedeus/nitter/issues/399#issuecomment-997263495
 [Unixfox]: https://quay.io/repository/unixfox/nitter?tab=tags
 [Actions]: https://github.com/zedeus/nitter/actions
-[Patreon]: https://patreon.com/nitter
 [Matrix]: https://matrix.to/#/#nitter:matrix.org
 
 [Extensions]: https://github.com/zedeus/nitter/wiki/Extensions
@@ -207,8 +116,12 @@ You can email me at zedeus@pm.me if you wish to contact me personally.
 
 <!---------------------------------[ Badges ]---------------------------------->
 
-[Badge License]: https://img.shields.io/github/license/zedeus/nitter?style=flat
-[Badge Status]: https://github.com/zedeus/nitter/workflows/CI/CD/badge.svg
+[Badge License]: https://img.shields.io/badge/License-AGPL3-015d93.svg?style=for-the-badge&labelColor=blue
+[Badge Matrix]: https://img.shields.io/badge/Matrix-0b9e72.svg?style=for-the-badge&labelColor=0DBD8B&logoColor=white&logo=Matrix
+[Badge Status]: https://img.shields.io/github/workflow/status/zedeus/nitter/CI-CD?style=for-the-badge&labelColor=86238f&color=641a6b
 
 
 <!---------------------------------[ Buttons ]--------------------------------->
+
+[Button Extensions]: https://img.shields.io/badge/Extensions-009CAB.svg?style=for-the-badge&logoColor=white&logo=GitExtensions
+[Button Instances]: https://img.shields.io/badge/Instances-DE4F4F.svg?style=for-the-badge&logoColor=white&logo=ROS
