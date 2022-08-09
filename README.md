@@ -128,8 +128,6 @@ if you wish to speak to me personally.
 
 [Extensions]: https://github.com/zedeus/nitter/wiki/Extensions
 [Instances]: https://github.com/zedeus/nitter/wiki/Instances
-[Apache]: https://github.com/zedeus/nitter/wiki/Apache
-[Nginx]: https://github.com/zedeus/nitter/wiki/Nginx
 
 [Building]: Documentation/Building.md
 [Showcase]: screenshot.png

@@ -1,8 +1,20 @@
-### Dependencies
 
-- libpcre
-- libsass
-- redis
+# Building
+
+*How to build your own instance of **Nitter**.*
+
+<br>
+
+## Dependencies
+
+-   `libpcre`
+
+-   `libsass`
+
+-   `redis`
+
+<br>
+<br>
 
 To compile Nitter you need a Nim installation, see
 [nim-lang.org] for details. It is possible to
@@ -19,15 +31,15 @@ use the default Redis port and localhost.
 Here's how to create a `nitter` user, clone the repo, and build the project
 along with the scss and md files.
 
-```bash
+```Shell
 # useradd -m nitter
 # su nitter
-$ git clone https://github.com/zedeus/nitter
-$ cd nitter
-$ nimble build -d:release
-$ nimble scss
-$ nimble md
-$ cp nitter.example.conf nitter.conf
+git clone https://github.com/zedeus/nitter
+cd nitter
+nimble build -d:release
+nimble scss
+nimble md
+cp nitter.example.conf nitter.conf
 ```
 
 Set your hostname, port, HMAC key, https (must be correct for cookies), and
@@ -38,7 +50,10 @@ using the systemd service below. You should run Nitter behind a reverse proxy
 such as [Nginx] or [Apache] for security and
 performance reasons.
 
-### Docker
+<br>
+<br>
+
+## Docker
 
 #### NOTE: For ARM64/ARM support, please use [unixfox's image][Unixfox], more info [here][ARM Info]
 
@@ -48,28 +63,31 @@ Docker.
 
 To build and run Nitter in Docker:
 
-```bash
+```Shell
 docker build -t nitter:latest .
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host nitter:latest
 ```
 
 A prebuilt Docker image is provided as well:
 
-```bash
+```Shell
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host zedeus/nitter:latest
 ```
 
 Using docker-compose to run both Nitter and Redis as different containers:
 Change `redisHost` from `localhost` to `nitter-redis` in `nitter.conf`, then run:
 
-```bash
+```Shell
 docker-compose up -d
 ```
 
 Note the Docker commands expect a `nitter.conf` file in the directory you run
 them.
 
-### systemd
+<br>
+<br>
+
+## Systemd
 
 To run Nitter via systemd you can use this service file:
 
@@ -98,7 +116,15 @@ WantedBy=multi-user.target
 ```
 
 Then enable and run the service:
-`systemctl enable --now nitter.service`
+
+```Shell
+systemctl enable    \
+    --now           \
+    nitter.service
+```
+
+<br>
+<br>
 
 ### Logging
 
@@ -108,10 +134,14 @@ this: `journalctl -u nitter.service` (add `--follow` to see just the last 15
 lines). If you're running the Docker image, you can do this:
 `docker logs --follow *nitter container id*`
 
+<br>
+
 
 <!----------------------------------------------------------------------------->
 
 [nim-lang.org]: https://nim-lang.org/install.html
 [ARM Info]: https://github.com/zedeus/nitter/issues/399#issuecomment-997263495
 [Unixfox]: https://quay.io/repository/unixfox/nitter?tab=tags
+[Apache]: https://github.com/zedeus/nitter/wiki/Apache
+[Nginx]: https://github.com/zedeus/nitter/wiki/Nginx
 
