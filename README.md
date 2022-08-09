@@ -74,24 +74,35 @@ Inspired by the **[Invidious]** project.
 
 ## Why
 
-It's impossible to use Twitter without JavaScript enabled. For privacy-minded
-folks, preventing JavaScript analytics and IP-based tracking is important, but
-apart from using a VPN and uBlock/uMatrix, it's impossible. Despite being behind
-a VPN and using heavy-duty adblockers, you can get accurately tracked with your
-[browser's fingerprint][Fingerprint],
-[no JavaScript required][JavaScript]. This all became
-particularly important after Twitter [removed the
-ability][Advertisers]
-for users to control whether their data gets sent to advertisers.
+It's impossible to use Twitter without JavaScript enabled.
 
-Using an instance of Nitter (hosted on a VPS for example), you can browse
-Twitter without JavaScript while retaining your privacy. In addition to
-respecting your privacy, Nitter is on average around 15 times lighter than
-Twitter, and in most cases serves pages faster (eg. timelines load 2-4x faster).
+For privacy - minded folks, preventing JavaScript analytics <br>
+and IP - based tracking is important, but apart from using <br>
+a VPN and uBlock / uMatrix, it's impossible.
 
-In the future a simple account system will be added that lets you follow Twitter
-users, allowing you to have a clean chronological timeline without needing a
-Twitter account.
+Despite being behind a VPN and using heavy-duty <br>
+ad - blockers, you can get accurately tracked with <br>
+your browser's **[Fingerprint]**, no **[JavaScript]** required.
+
+This all became particularly important after Twitter <br>
+removed the ability for users to control whether <br>
+their data gets sent to **[Advertisers]**.
+
+<br>
+
+### Nitter
+
+Using an instance of Nitter, hosted on a VPS for example, <br>
+you can browse Twitter without JavaScript while retaining <br>
+your privacy.
+
+In addition to respecting your privacy, Nitter is on average <br>
+around 15 times lighter than Twitter  and in most cases it <br>
+serves pages faster ( timelines load `2 - 4` times faster )
+
+In the future a simple account system will be added that <br>
+lets you follow Twitter users, allowing you to have a clean <br>
+chronological timeline without needing a Twitter account.
 
 <br>
 <br>
