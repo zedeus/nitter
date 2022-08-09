@@ -73,9 +73,9 @@
         }
     }
 
-    .profile-joindate, .profile-location, profile-website {
+    .profile-joindate, .profile-location, .profile-website {
         color: var(--fg_faded);
-        margin: 2px 0;
+        margin: 1px 0;
         width: 100%;
     }
 }
