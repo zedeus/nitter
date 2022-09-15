@@ -12,7 +12,7 @@ bin           = @["nitter"]
 
 requires "nim >= 1.4.8"
 requires "jester >= 0.5.0"
-requires "karax#5498909"
+requires "karax#6abcb77"
 requires "sass#e683aa1"
 requires "nimcrypto#a5742a9"
 requires "markdown#a661c26"
