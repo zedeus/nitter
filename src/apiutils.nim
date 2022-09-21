@@ -61,12 +61,22 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   try:
     var resp: AsyncResponse
     pool.use(genHeaders(token)):
-      resp = await c.get($url)
-      result = await resp.body
+      template getContent =
+        resp = await c.get($url)
+        result = await resp.body
 
-      if resp.status == $Http503:
-        badClient = true
-        raise newException(InternalError, result)
+      getContent()
+
+      # Twitter randomly returns 401 errors with an empty body quite often.
+      # Retrying the request usually works.
+      var attempt = 0
+      while resp.status == "401 Unauthorized" and result.len == 0 and attempt < 3:
+        inc attempt
+        getContent()
+
+    if resp.status == $Http503:
+      badClient = true
+      raise newException(InternalError, result)
 
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
