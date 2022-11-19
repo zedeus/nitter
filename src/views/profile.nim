@@ -12,7 +12,7 @@ proc renderStat(num: int; class: string; text=""): VNode =
     span(class="profile-stat-num"):
       text insertSep($num, ',')
 
-proc renderUserCard*(user: User; prefs: Prefs): VNode =
+proc renderUserCard*(user: User; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="profile-card")):
     tdiv(class="profile-card-info"):
       let
@@ -24,9 +24,15 @@ proc renderUserCard*(user: User; prefs: Prefs): VNode =
       a(class="profile-card-avatar", href=url, target="_blank"):
         genImg(user.getUserPic(size))
 
-      tdiv(class="profile-card-tabs-name"):
-        linkUser(user, class="profile-card-fullname")
-        linkUser(user, class="profile-card-username")
+      tdiv(class="profile-card-tabs-name-and-follow"):
+        tdiv():
+          linkUser(user, class="profile-card-fullname")
+          linkUser(user, class="profile-card-username")
+        let following = isFollowing(user.username, prefs.following)
+        if not following:
+          buttonReferer "/follow/" & user.username, "Follow", path, "profile-card-follow-button"
+        else:
+          buttonReferer "/unfollow/" & user.username, "Unfollow", path, "profile-card-follow-button"
 
     tdiv(class="profile-card-extra"):
       if user.bio.len > 0:
@@ -109,7 +115,7 @@ proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
 
     let sticky = if prefs.stickyProfile: " sticky" else: ""
     tdiv(class=(&"profile-tab{sticky}")):
-      renderUserCard(profile.user, prefs)
+      renderUserCard(profile.user, prefs, path)
       if profile.photoRail.len > 0:
         renderPhotoRail(profile)
 
