@@ -11,17 +11,17 @@ bin           = @["nitter"]
 # Dependencies
 
 requires "nim >= 1.4.8"
-requires "jester >= 0.5.0"
+requires "jester#baca3f"
 requires "karax#6abcb77"
 requires "sass#e683aa1"
-requires "nimcrypto#a5742a9"
+requires "nimcrypto#b41129f"
 requires "markdown#a661c26"
 requires "packedjson#9e6fbb6"
-requires "supersnappy#2.1.1"
+requires "supersnappy#6c94198"
 requires "redpool#8b7c1db"
 requires "https://github.com/zedeus/redis#d0a0e6f"
-requires "zippy#0.9.11"
-requires "flatty#0.2.3"
+requires "zippy#61922b9"
+requires "flatty#9f885d7"
 requires "jsony#d0e69bd"
 
 
