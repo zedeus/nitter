@@ -12,7 +12,7 @@ let
   twRegex = re"(?<=(?<!\S)https:\/\/|(?<=\s))(www\.|mobile\.)?twitter\.com"
   twLinkRegex = re"""<a href="https:\/\/twitter.com([^"]+)">twitter\.com(\S+)</a>"""
 
-  ytRegex = re"([A-z.]+\.)?youtu(be\.com|\.be)"
+  ytRegex = re(r"([A-z.]+\.)?youtu(be\.com|\.be)", {reStudy, reIgnoreCase})
   igRegex = re"(www\.)?instagram\.com"
 
   rdRegex = re"(?<![.b])((www|np|new|amp|old)\.)?reddit.com"
