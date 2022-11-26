@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, strutils, strformat, tables, times, hashes, uri
+import asyncdispatch, tables, times, hashes, uri
 
 import jester
 

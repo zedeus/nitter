@@ -28,13 +28,13 @@ template `?`*(js: JsonNode): untyped =
   if j.isNull: return
   j
 
-template `with`*(ident, value, body): untyped =
-  block:
+template with*(ident, value, body): untyped =
+  if true:
     let ident {.inject.} = value
     if ident != nil: body
 
-template `with`*(ident; value: JsonNode; body): untyped =
-  block:
+template with*(ident; value: JsonNode; body): untyped =
+  if true:
     let ident {.inject.} = value
     if value.notNull: body
 
