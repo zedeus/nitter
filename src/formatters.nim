@@ -56,8 +56,6 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
 
   if prefs.replaceYouTube.len > 0 and "youtu" in result:
     result = result.replace(ytRegex, prefs.replaceYouTube)
-    if prefs.replaceYouTube in result:
-      result = result.replace("/c/", "/")
 
   if prefs.replaceTwitter.len > 0 and ("twitter.com" in body or tco in body):
     result = result.replace(tco, &"{https}{prefs.replaceTwitter}/t.co")
