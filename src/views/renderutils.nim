@@ -55,12 +55,12 @@ proc genCheckbox*(pref, label: string; state: bool): VNode =
     else: input(name=pref, `type`="checkbox")
     span(class="checkbox")
 
-proc genInput*(pref, label, state, placeholder: string; class=""): VNode =
+proc genInput*(pref, label, state, placeholder: string; class=""; autofocus=true): VNode =
   let p = placeholder
   buildHtml(tdiv(class=("pref-group pref-input " & class))):
     if label.len > 0:
       label(`for`=pref): text label
-    if state.len == 0:
+    if autofocus and state.len == 0:
       input(name=pref, `type`="text", placeholder=p, value=state, autofocus="")
     else:
       input(name=pref, `type`="text", placeholder=p, value=state)
