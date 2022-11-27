@@ -48,7 +48,7 @@ type
     vanity*: string
 
   MediaType* = enum
-    photo, video
+    photo, video, model3d
 
   MediaEntity* = object
     kind*: MediaType
@@ -102,4 +102,5 @@ proc enumHook*(s: string; v: var MediaType) =
   v = case s
       of "video": video
       of "photo": photo
+      of "model3d": model3d
       else: echo "ERROR: Unknown enum value (MediaType): ", s; photo
