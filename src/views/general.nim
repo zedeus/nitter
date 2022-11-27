@@ -81,7 +81,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
 
     title:
       if titleText.len > 0:
-        text &"{titleText}|{cfg.title}"
+        text titleText & " | " & cfg.title
       else:
         text cfg.title
 

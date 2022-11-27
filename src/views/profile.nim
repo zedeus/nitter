@@ -108,7 +108,7 @@ proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
         renderBanner(profile.user.banner)
 
     let sticky = if prefs.stickyProfile: " sticky" else: ""
-    tdiv(class=(&"profile-tab{sticky}")):
+    tdiv(class=("profile-tab" & sticky)):
       renderUserCard(profile.user, prefs)
       if profile.photoRail.len > 0:
         renderPhotoRail(profile)
