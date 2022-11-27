@@ -82,7 +82,7 @@ proc parseUnifiedCard*(json: string): Card =
       component.parseMedia(card, result)
     of buttonGroup:
       discard
-    of unknown:
+    of ComponentType.unknown:
       echo "ERROR: Unknown component type: ", json
 
     case component.kind
