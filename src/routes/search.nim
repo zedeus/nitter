@@ -44,4 +44,4 @@ proc createSearchRouter*(cfg: Config) =
     get "/opensearch":
       let url = getUrlPrefix(cfg) & "/search?q="
       resp Http200, {"Content-Type": "application/opensearchdescription+xml"},
-                    generateOpenSearchXML(cfg.title, cfg.hostname, url)
+                     generateOpenSearchXML(cfg.title, cfg.hostname, url)

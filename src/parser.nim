@@ -45,7 +45,6 @@ proc parseGraphList*(js: JsonNode): List =
     banner: list{"custom_banner_media", "media_info", "url"}.getImageStr
   )
 
-
 proc parsePoll(js: JsonNode): Poll =
   let vals = js{"binding_values"}
   # name format is pollNchoice_*
