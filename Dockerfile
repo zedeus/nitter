@@ -9,7 +9,7 @@ COPY nitter.nimble .
 RUN nimble install -y --depsOnly
 
 COPY . .
-RUN nimble build -d:danger -d:lto -d:strip \
+RUN nimble build -d:danger -d:lto -d:strip -d:nimDebugDlOpen \
     && nimble scss \
     && nimble md
 
