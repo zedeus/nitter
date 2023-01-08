@@ -23,7 +23,7 @@ proc genParams*(pars: openArray[(string, string)] = @[]; cursor="";
     result &= ("count", count)
   if cursor.len > 0:
     # The raw cursor often has plus signs, which sometimes get turned into spaces,
-    # so we need to them back into a plus
+    # so we need to turn them back into a plus
     if " " in cursor:
       result &= ("cursor", cursor.replace(" ", "+"))
     else:
@@ -69,9 +69,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
       # Twitter randomly returns 401 errors with an empty body quite often.
       # Retrying the request usually works.
-      var attempt = 0
-      while resp.status == "401 Unauthorized" and result.len == 0 and attempt < 3:
-        inc attempt
+      if resp.status == "401 Unauthorized" and result.len == 0:
         getContent()
 
     if resp.status == $Http503:
