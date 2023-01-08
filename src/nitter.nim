@@ -56,6 +56,7 @@ settings:
   port = Port(cfg.port)
   staticDir = cfg.staticDir
   bindAddr = cfg.address
+  reusePort = true
 
 routes:
   get "/":
