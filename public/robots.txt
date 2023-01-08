@@ -1,4 +1,5 @@
 User-agent: *
 Disallow: /
+Crawl-delay: 1
 User-agent: Twitterbot
 Disallow:
