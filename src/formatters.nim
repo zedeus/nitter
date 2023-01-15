@@ -13,7 +13,6 @@ let
   twLinkRegex = re"""<a href="https:\/\/twitter.com([^"]+)">twitter\.com(\S+)</a>"""
 
   ytRegex = re(r"([A-z.]+\.)?youtu(be\.com|\.be)", {reStudy, reIgnoreCase})
-  igRegex = re"(www\.)?instagram\.com"
 
   rdRegex = re"(?<![.b])((www|np|new|amp|old)\.)?reddit.com"
   rdShortRegex = re"(?<![.b])redd\.it\/"
@@ -69,9 +68,6 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
     result = result.replace(rdRegex, prefs.replaceReddit)
     if prefs.replaceReddit in result and "/gallery/" in result:
       result = result.replace("/gallery/", "/comments/")
-
-  if prefs.replaceInstagram.len > 0 and "instagram.com" in result:
-    result = result.replace(igRegex, prefs.replaceInstagram)
 
   if absolute.len > 0 and "href" in result:
     result = result.replace("href=\"/", &"href=\"{absolute}/")

@@ -107,10 +107,6 @@ genPrefs:
       "Reddit -> Teddit/Libreddit"
       placeholder: "Teddit hostname"
 
-    replaceInstagram(input, ""):
-      "Instagram -> Bibliogram"
-      placeholder: "Bibliogram hostname"
-
 iterator allPrefs*(): Pref =
   for k, v in prefList:
     for pref in v:
