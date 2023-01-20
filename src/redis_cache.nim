@@ -154,7 +154,7 @@ proc getCachedTweet*(id: int64): Future[Tweet] {.async.} =
     tweet.deserialize(Tweet)
   else:
     result = await getStatus($id)
-    if result.isNil:
+    if not result.isNil:
       await cache(result)
 
 proc getCachedPhotoRail*(name: string): Future[PhotoRail] {.async.} =
