@@ -19,7 +19,8 @@ const
   tweet* = timelineApi / "conversation"
 
   graphql = api / "graphql"
-  graphUser* = graphql / "I5nvpI91ljifos1Y3Lltyg/UserByRestId"
+  graphUser* = graphql / "7mjxD3-C6BxitPMVQ6w0-Q/UserByScreenName"
+  graphUserById* = graphql / "I5nvpI91ljifos1Y3Lltyg/UserByRestId"
   graphList* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
   graphListBySlug* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
   graphListMembers* = graphql / "Ke6urWMeCV2UlKXGRy4sow/ListMembers"

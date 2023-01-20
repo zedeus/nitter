@@ -1,3 +1,4 @@
+import options
 import user
 
 type
@@ -10,3 +11,4 @@ type
   UserResult = object
     legacy*: RawUser
     restId*: string
+    reason*: Option[string]

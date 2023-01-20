@@ -4,11 +4,22 @@ import packedjson
 import types, query, formatters, consts, apiutils, parser
 import experimental/parser as newParser
 
-proc getGraphUser*(id: string): Future[User] {.async.} =
+proc getGraphUser*(username: string): Future[User] {.async.} =
+  if username.len == 0: return
+  let
+    variables = """{
+      "screen_name": "$1",
+      "withSafetyModeUserFields": false,
+      "withSuperFollowsUserFields": false
+    }""" % [username]
+    js = await fetchRaw(graphUser ? {"variables": variables}, Api.userScreenName)
+  result = parseGraphUser(js)
+
+proc getGraphUserById*(id: string): Future[User] {.async.} =
   if id.len == 0 or id.any(c => not c.isDigit): return
   let
-    variables = %*{"userId": id, "withSuperFollowsUserFields": true}
-    js = await fetchRaw(graphUser ? {"variables": $variables}, Api.userRestId)
+    variables = """{"userId": "$1", "withSuperFollowsUserFields": true}""" % [id]
+    js = await fetchRaw(graphUserById ? {"variables": variables}, Api.userRestId)
   result = parseGraphUser(js)
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
@@ -46,20 +57,6 @@ proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
     ps = genParams({"list_id": id, "ranking_mode": "reverse_chronological"}, after)
     url = listTimeline ? ps
   result = parseTimeline(await fetch(url, Api.timeline), after)
-
-proc getUser*(username: string): Future[User] {.async.} =
-  if username.len == 0: return
-  let
-    ps = genParams({"screen_name": username})
-    json = await fetchRaw(userShow ? ps, Api.userShow)
-  result = parseUser(json, username)
-
-proc getUserById*(userId: string): Future[User] {.async.} =
-  if userId.len == 0: return
-  let
-    ps = genParams({"user_id": userId})
-    json = await fetchRaw(userShow ? ps, Api.userShow)
-  result = parseUser(json)
 
 proc getTimeline*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
   if id.len == 0: return

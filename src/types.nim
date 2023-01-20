@@ -17,6 +17,7 @@ type
     listBySlug
     listMembers
     userRestId
+    userScreenName
     status
 
   RateLimit* = object
