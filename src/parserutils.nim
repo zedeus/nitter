@@ -133,10 +133,6 @@ proc getTombstone*(js: JsonNode): string =
   result = js{"tombstoneInfo", "richText", "text"}.getStr
   result.removeSuffix(" Learn more")
 
-proc getSource*(js: JsonNode): string =
-  let src = js{"source"}.getStr
-  result = src.substr(src.find('>') + 1, src.rfind('<') - 1)
-
 proc getMp4Resolution*(url: string): int =
   # parses the height out of a URL like this one:
   # https://video.twimg.com/ext_tw_video/<tweet-id>/pu/vid/720x1280/<random>.mp4
