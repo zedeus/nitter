@@ -101,16 +101,21 @@ proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
   except InternalError:
     return Result[T](beginning: true, query: query)
 
-proc getTweetImpl(id: string; after=""): Future[Conversation] {.async.} =
-  let url = tweet / (id & ".json") ? genParams(cursor=after)
-  result = parseConversation(await fetch(url, Api.tweet), id)
+proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = tweetVariables % [id, cursor]
+    params = {"variables": variables, "features": tweetFeatures}
+    js = await fetch(graphTweet ? params, Api.tweetDetail)
+  result = parseGraphConversation(js, id)
 
 proc getReplies*(id, after: string): Future[Result[Chain]] {.async.} =
-  result = (await getTweetImpl(id, after)).replies
+  result = (await getGraphTweet(id, after)).replies
   result.beginning = after.len == 0
 
 proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
-  result = await getTweetImpl(id)
+  result = await getGraphTweet(id)
   if after.len > 0:
     result.replies = await getReplies(id, after)
 

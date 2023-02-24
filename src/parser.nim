@@ -72,8 +72,8 @@ proc parseGif(js: JsonNode): Gif =
 proc parseVideo(js: JsonNode): Video =
   result = Video(
     thumb: js{"media_url_https"}.getImageStr,
-    views: js{"ext", "mediaStats", "r", "ok", "viewCount"}.getStr,
-    available: js{"ext_media_availability", "status"}.getStr == "available",
+    views: js{"ext", "mediaStats", "r", "ok", "viewCount"}.getStr($js{"mediaStats", "viewCount"}.getInt),
+    available: js{"ext_media_availability", "status"}.getStr.toLowerAscii == "available",
     title: js{"ext_alt_text"}.getStr,
     durationMs: js{"video_info", "duration_millis"}.getInt
     # playbackType: mp4
@@ -185,7 +185,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
      result.url.len == 0 or result.url.startsWith("card://"):
     result.url = getPicUrl(result.image)
 
-proc parseTweet(js: JsonNode): Tweet =
+proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
   if js.isNull: return
   result = Tweet(
     id: js{"id_str"}.getId,
@@ -193,7 +193,6 @@ proc parseTweet(js: JsonNode): Tweet =
     replyId: js{"in_reply_to_status_id_str"}.getId,
     text: js{"full_text"}.getStr,
     time: js{"created_at"}.getTime,
-    source: getSource(js),
     hasThread: js{"self_thread"}.notNull,
     available: true,
     user: User(id: js{"user_id_str"}.getStr),
@@ -218,7 +217,7 @@ proc parseTweet(js: JsonNode): Tweet =
     result.retweet = some Tweet(id: rt.getId)
     return
 
-  with jsCard, js{"card"}:
+  if jsCard.kind != JNull:
     let name = jsCard{"name"}.getStr
     if "poll" in name:
       if "image" in name:
@@ -295,64 +294,17 @@ proc parseGlobalObjects(js: JsonNode): GlobalObjects =
     result.users[k] = parseUser(v, k)
 
   for k, v in tweets:
-    var tweet = parseTweet(v)
+    var tweet = parseTweet(v, v{"card"})
     if tweet.user.id in result.users:
       tweet.user = result.users[tweet.user.id]
     result.tweets[k] = tweet
-
-proc parseThread(js: JsonNode; global: GlobalObjects): tuple[thread: Chain, self: bool] =
-  result.thread = Chain()
-
-  let thread = js{"content", "item", "content", "conversationThread"}
-  with cursor, thread{"showMoreCursor"}:
-    result.thread.cursor = cursor{"value"}.getStr
-    result.thread.hasMore = true
-
-  for t in thread{"conversationComponents"}:
-    let content = t{"conversationTweetComponent", "tweet"}
-
-    if content{"displayType"}.getStr == "SelfThread":
-      result.self = true
-
-    var tweet = finalizeTweet(global, content{"id"}.getStr)
-    if not tweet.available:
-      tweet.tombstone = getTombstone(content{"tombstone"})
-    result.thread.content.add tweet
-
-proc parseConversation*(js: JsonNode; tweetId: string): Conversation =
-  result = Conversation(replies: Result[Chain](beginning: true))
-  let global = parseGlobalObjects(? js)
-
-  let instructions = ? js{"timeline", "instructions"}
-  if instructions.len == 0:
-    return
-
-  for e in instructions[0]{"addEntries", "entries"}:
-    let entry = e{"entryId"}.getStr
-    if "tweet" in entry or "tombstone" in entry:
-      let tweet = finalizeTweet(global, e.getEntryId)
-      if $tweet.id != tweetId:
-        result.before.content.add tweet
-      else:
-        result.tweet = tweet
-    elif "conversationThread" in entry:
-      let (thread, self) = parseThread(e, global)
-      if thread.content.len > 0:
-        if self:
-          result.after = thread
-        else:
-          result.replies.content.add thread
-    elif "cursor-showMore" in entry:
-      result.replies.bottom = e.getCursor
-    elif "cursor-bottom" in entry:
-      result.replies.bottom = e.getCursor
 
 proc parseStatus*(js: JsonNode): Tweet =
   with e, js{"errors"}:
     if e.getError == tweetNotFound:
       return
 
-  result = parseTweet(js)
+  result = parseTweet(js, js{"card"})
   if not result.isNil:
     result.user = parseUser(js{"user"})
 
@@ -409,7 +361,7 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
 proc parsePhotoRail*(js: JsonNode): PhotoRail =
   for tweet in js:
     let
-      t = parseTweet(tweet)
+      t = parseTweet(tweet, js{"card"})
       url = if t.photos.len > 0: t.photos[0]
             elif t.video.isSome: get(t.video).thumb
             elif t.gif.isSome: get(t.gif).thumb
@@ -418,3 +370,61 @@ proc parsePhotoRail*(js: JsonNode): PhotoRail =
 
     if url.len == 0: continue
     result.add GalleryPhoto(url: url, tweetId: $t.id)
+
+proc parseGraphTweet(js: JsonNode): Tweet =
+  if js.kind == JNull:
+    return Tweet(available: false)
+
+  var jsCard = copy(js{"card", "legacy"})
+  if jsCard.kind != JNull:
+    var values = newJObject()
+    for val in jsCard["binding_values"]:
+      values[val["key"].getStr] = val["value"]
+    jsCard["binding_values"] = values
+
+  result = parseTweet(js{"legacy"}, jsCard)
+  result.user = parseUser(js{"core", "user_results", "result", "legacy"})
+
+  if result.quote.isSome:
+    result.quote = some(parseGraphTweet(js{"quoted_status_result", "result"}))
+
+proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
+  let thread = js{"content", "items"}
+  for t in js{"content", "items"}:
+    let entryId = t{"entryId"}.getStr
+    if "cursor-showmore" in entryId:
+      let cursor = t{"item", "itemContent", "value"}
+      result.thread.cursor = cursor.getStr
+      result.thread.hasMore = true
+    elif "tweet" in entryId:
+      let tweet = parseGraphTweet(t{"item", "itemContent", "tweet_results", "result"})
+      result.thread.content.add tweet
+
+      if t{"item", "itemContent", "tweetDisplayType"}.getStr == "SelfThread":
+        result.self = true
+
+proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
+  result = Conversation(replies: Result[Chain](beginning: true))
+
+  let instructions = ? js{"data", "threaded_conversation_with_injections_v2", "instructions"}
+  if instructions.len == 0:
+    return
+
+  for e in instructions[0]{"entries"}:
+    let entryId = e{"entryId"}.getStr
+    # echo entryId
+    if entryId.startsWith("tweet"):
+      let tweet = parseGraphTweet(e{"content", "itemContent", "tweet_results", "result"})
+
+      if $tweet.id == tweetId:
+        result.tweet = tweet
+      else:
+        result.before.content.add tweet
+    elif entryId.startsWith("conversationthread"):
+      let (thread, self) = parseGraphThread(e)
+      if self:
+        result.after = thread
+      else:
+        result.replies.content.add thread
+    elif entryId.startsWith("cursor-bottom"):
+      result.replies.bottom = e{"content", "itemContent", "value"}.getStr
