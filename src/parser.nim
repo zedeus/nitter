@@ -372,7 +372,7 @@ proc parsePhotoRail*(js: JsonNode): PhotoRail =
     result.add GalleryPhoto(url: url, tweetId: $t.id)
 
 proc parseGraphTweet(js: JsonNode): Tweet =
-  if js.kind == JNull:
+  if js.kind == JNull or js{"__typename"}.getStr == "TweetUnavailable":
     return Tweet(available: false)
 
   var jsCard = copy(js{"card", "legacy"})
@@ -415,6 +415,9 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
     # echo entryId
     if entryId.startsWith("tweet"):
       let tweet = parseGraphTweet(e{"content", "itemContent", "tweet_results", "result"})
+
+      if not tweet.available:
+        tweet.id = parseBiggestInt(entryId.getId())
 
       if $tweet.id == tweetId:
         result.tweet = tweet
