@@ -289,3 +289,45 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
 
   tweet.text = orig.replacedWith(replacements, textSlice)
                    .strip(leading=false)
+
+proc expandNoteTweetEntities*(tweet: Tweet; noteTweet: JsonNode) =
+  let
+    text = noteTweet{"text"}.getStr
+    orig = text.toRunes
+    ent = ? noteTweet{"entity_set"}
+    hasCard = tweet.card.isSome
+
+  var replacements = newSeq[ReplaceSlice]()
+
+  with urls, ent{"urls"}:
+    for u in urls:
+      let urlStr = u["url"].getStr
+      if urlStr.len == 0 or urlStr notin text:
+        continue
+      replacements.extractUrls(u, orig.len, hideTwitter = false)
+      if hasCard and u{"url"}.getStr == get(tweet.card).url:
+        get(tweet.card).url = u{"expanded_url"}.getStr
+
+  if "hashtags" in ent:
+    for hashtag in ent["hashtags"]:
+      replacements.extractHashtags(hashtag)
+
+  if "symbols" in ent:
+    for symbol in ent["symbols"]:
+      replacements.extractHashtags(symbol)
+
+  if "user_mentions" in ent:
+    for mention in ent["user_mentions"]:
+      let
+        name = mention{"screen_name"}.getStr
+        slice = mention.extractSlice
+        idx = tweet.reply.find(name)
+
+      replacements.add ReplaceSlice(kind: rkMention, slice: slice,
+        url: "/" & name, display: mention["name"].getStr)
+
+  replacements.deduplicate
+  replacements.sort(cmp)
+
+  tweet.text = orig.replacedWith(replacements, 0..orig.len)
+                   .strip(leading=false)

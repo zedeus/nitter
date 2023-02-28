@@ -85,7 +85,7 @@ const
   "responsive_web_edit_tweet_api_enabled": false,
   "tweetypie_unmention_optimization_enabled": false,
   "vibe_api_enabled": false,
-  "longform_notetweets_consumption_enabled": false,
+  "longform_notetweets_consumption_enabled": true,
   "responsive_web_text_conversations_enabled": false,
   "responsive_web_enhance_cards_enabled": false,
   "interactive_text_enabled": false
