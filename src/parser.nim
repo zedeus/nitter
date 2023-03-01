@@ -385,9 +385,8 @@ proc parseGraphTweet(js: JsonNode): Tweet =
   result = parseTweet(js{"legacy"}, jsCard)
   result.user = parseUser(js{"core", "user_results", "result", "legacy"})
 
-  var note_tweet = js{"note_tweet", "note_tweet_results", "result"}
-  if note_tweet.kind != JNull:
-    result.expandNoteTweetEntities(note_tweet)
+  with noteTweet, js{"note_tweet", "note_tweet_results", "result"}:
+    result.expandNoteTweetEntities(noteTweet)
 
   if result.quote.isSome:
     result.quote = some(parseGraphTweet(js{"quoted_status_result", "result"}))
