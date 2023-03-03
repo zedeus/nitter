@@ -301,7 +301,7 @@ proc parseGlobalObjects(js: JsonNode): GlobalObjects =
 
 proc parseStatus*(js: JsonNode): Tweet =
   with e, js{"errors"}:
-    if e.getError == tweetNotFound:
+    if e.getError in {tweetNotFound, tweetUnavailable, tweetCensored}:
       return
 
   result = parseTweet(js, js{"card"})

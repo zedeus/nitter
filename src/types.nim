@@ -47,6 +47,8 @@ type
     forbidden = 200
     badToken = 239
     noCsrf = 353
+    tweetUnavailable = 421
+    tweetCensored = 422
 
   User* = object
     id*: string
