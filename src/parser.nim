@@ -204,11 +204,11 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
     )
   )
 
+  result.expandTweetEntities(js)
+
   # fix for pinned threads
   if result.hasThread and result.threadId == 0:
     result.threadId = js{"self_thread", "id_str"}.getId
-
-  result.expandTweetEntities(js)
 
   if js{"is_quote_status"}.getBool:
     result.quote = some Tweet(id: js{"quoted_status_id_str"}.getId)

@@ -42,7 +42,7 @@ no_thumb = [
 
     ['nim_lang/status/1082989146040340480',
      'Nim in 2018: A short recap',
-     '36 votes and 46 comments so far on Reddit',
+     'Posted by u/miran1 - 36 votes and 46 comments',
      'reddit.com']
 ]
 
