@@ -44,6 +44,7 @@ type
     invalidToken = 89
     listIdOrSlug = 112
     tweetNotFound = 144
+    tweetNotAuthorized = 179
     forbidden = 200
     badToken = 239
     noCsrf = 353
