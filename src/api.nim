@@ -7,12 +7,9 @@ import experimental/parser as newParser
 proc getGraphUser*(username: string): Future[User] {.async.} =
   if username.len == 0: return
   let
-    variables = """{
-      "screen_name": "$1",
-      "withSafetyModeUserFields": false,
-      "withSuperFollowsUserFields": false
-    }""" % [username]
-    js = await fetchRaw(graphUser ? {"variables": variables}, Api.userScreenName)
+    variables = %*{"screen_name": username}
+    params = {"variables": $variables, "features": userFeatures}
+    js = await fetchRaw(graphUser ? params, Api.userScreenName)
   result = parseGraphUser(js)
 
 proc getGraphUserById*(id: string): Future[User] {.async.} =
@@ -21,6 +18,16 @@ proc getGraphUserById*(id: string): Future[User] {.async.} =
     variables = """{"userId": "$1", "withSuperFollowsUserFields": true}""" % [id]
     js = await fetchRaw(graphUserById ? {"variables": variables}, Api.userRestId)
   result = parseGraphUser(js)
+
+proc getGraphUserTweets*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = userTweetsVariables % [id, cursor]
+    params = {"variables": variables, "features": userTweetsFeatures}
+    url = if replies: graphUserTweetsAndReplies else: graphUserTweets
+    js = await fetch(url ? params, Api.tweetDetail)
+  result = parseGraphTimeline(js, after)
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let

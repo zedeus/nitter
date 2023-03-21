@@ -19,6 +19,7 @@ type
     listMembers
     userRestId
     userScreenName
+    userTweets
     status
 
   RateLimit* = object

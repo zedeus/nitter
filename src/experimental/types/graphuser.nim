@@ -11,4 +11,5 @@ type
   UserResult = object
     legacy*: RawUser
     restId*: string
+    isBlueVerified*: bool
     reason*: Option[string]

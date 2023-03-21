@@ -47,8 +47,8 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
   let
     timeline =
       case query.kind
-      of posts: getTimeline(userId, after)
-      of replies: getTimeline(userId, after, replies=true)
+      of posts: getGraphUserTweets(userId, after)
+      of replies: getGraphUserTweets(userId, after, replies=true)
       of media: getMediaTimeline(userId, after)
       else: getSearch[Tweet](query, after)
 
@@ -64,6 +64,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
     let tweet = await getCachedTweet(user.pinnedTweet)
     if not tweet.isNil:
       tweet.pinned = true
+      tweet.user = user
       pinned = some tweet
 
   result = Profile(

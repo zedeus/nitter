@@ -11,6 +11,7 @@ proc parseGraphUser*(json: string): User =
 
   result = toUser raw.data.user.result.legacy
   result.id = raw.data.user.result.restId
+  result.verified = result.verified or raw.data.user.result.isBlueVerified
 
 proc parseGraphListMembers*(json, cursor: string): Result[User] =
   result = Result[User](
