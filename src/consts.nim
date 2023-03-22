@@ -10,14 +10,12 @@ const
   photoRail* = api / "1.1/statuses/media_timeline.json"
   status* = api / "1.1/statuses/show"
   search* = api / "2/search/adaptive.json"
-
-  timelineApi = api / "2/timeline"
-  mediaTimeline* = timelineApi / "media"
-  listTimeline* = timelineApi / "list.json"
+  listTimeline* = api / "2/timeline/list.json"
 
   graphql = api / "graphql"
   graphUserTweets* = graphql / "9rys0A7w1EyqVd2ME0QCJg/UserTweets"
   graphUserTweetsAndReplies* = graphql / "ehMCHF3Mkgjsfz_aImqOsg/UserTweetsAndReplies"
+  graphUserMedia* = graphql / "MA_EP2a21zpzNWKRkaPBMg/UserMedia"
   graphTweet* = graphql / "6I7Hm635Q6ftv69L8VrSeQ/TweetDetail"
   graphUser* = graphql / "8mPfHBetXOg-EHAyeVxUoA/UserByScreenName"
   graphUserById* = graphql / "nI8WydSd-X-lQIVo6bdktQ/UserByRestId"

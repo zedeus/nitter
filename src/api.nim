@@ -30,6 +30,15 @@ proc getGraphUserTweets*(id: string; after=""; replies=false): Future[Timeline] 
     js = await fetch(url ? params, apiId)
   result = parseGraphTimeline(js, after)
 
+proc getGraphUserMedia*(id: string; after=""): Future[Timeline] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = userTweetsVariables % [id, cursor]
+    params = {"variables": variables, "features": tweetFeatures}
+    js = await fetch(graphUserMedia ? params, Api.userMedia)
+  result = parseGraphTimeline(js, after)
+
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let
     variables = %*{"screenName": name, "listSlug": list, "withHighlightedLabel": false}

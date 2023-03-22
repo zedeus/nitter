@@ -49,7 +49,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
       case query.kind
       of posts: getGraphUserTweets(userId, after)
       of replies: getGraphUserTweets(userId, after, replies=true)
-      of media: getMediaTimeline(userId, after)
+      of media: getGraphUserMedia(userId, after)
       else: getSearch[Tweet](query, after)
 
     rail =
