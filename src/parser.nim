@@ -428,7 +428,7 @@ proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
 proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
   result = Conversation(replies: Result[Chain](beginning: true))
 
-  let instructions = ? js{"data", "threaded_conversation_with_injections_v2", "instructions"}
+  let instructions = ? js{"data", "threaded_conversation_with_injections", "instructions"}
   if instructions.len == 0:
     return
 
@@ -436,15 +436,16 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
     let entryId = e{"entryId"}.getStr
     # echo entryId
     if entryId.startsWith("tweet"):
-      let tweet = parseGraphTweet(e{"content", "itemContent", "tweet_results", "result"})
+      with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
+        let tweet = parseGraphTweet(tweetResult)
 
-      if not tweet.available:
-        tweet.id = parseBiggestInt(entryId.getId())
+        if not tweet.available:
+          tweet.id = parseBiggestInt(entryId.getId())
 
-      if $tweet.id == tweetId:
-        result.tweet = tweet
-      else:
-        result.before.content.add tweet
+        if $tweet.id == tweetId:
+          result.tweet = tweet
+        else:
+          result.before.content.add tweet
     elif entryId.startsWith("conversationthread"):
       let (thread, self) = parseGraphThread(e)
       if self:
@@ -457,17 +458,18 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
 proc parseGraphTimeline*(js: JsonNode; after=""): Timeline =
   result = Timeline(beginning: after.len == 0)
 
-  let instructions = ? js{"data", "user", "result", "timeline_v2", "timeline", "instructions"}
+  let instructions = ? js{"data", "user", "result", "timeline", "timeline", "instructions"}
   if instructions.len == 0:
     return
 
   for e in instructions[instructions.len - 1]{"entries"}:
     let entryId = e{"entryId"}.getStr
     if entryId.startsWith("tweet"):
-      let tweet = parseGraphTweet(e{"content", "itemContent", "tweet_results", "result"})
-      if not tweet.available:
-        tweet.id = parseBiggestInt(entryId.getId())
-      result.content.add tweet
+      with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
+        let tweet = parseGraphTweet(tweetResult)
+        if not tweet.available:
+          tweet.id = parseBiggestInt(entryId.getId())
+        result.content.add tweet
     elif entryId.startsWith("cursor-bottom"):
       result.bottom = e{"content", "value"}.getStr
     elif "cursor-top" notin entryId:

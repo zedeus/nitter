@@ -10,16 +10,16 @@ type
 
   Api* {.pure.} = enum
     tweetDetail
-    userShow
     timeline
     search
-    tweet
     list
     listBySlug
     listMembers
     userRestId
     userScreenName
     userTweets
+    userTweetsAndReplies
+    userMedia
     status
 
   RateLimit* = object

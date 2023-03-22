@@ -24,9 +24,10 @@ proc getGraphUserTweets*(id: string; after=""; replies=false): Future[Timeline] 
   let
     cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
     variables = userTweetsVariables % [id, cursor]
-    params = {"variables": variables, "features": userTweetsFeatures}
-    url = if replies: graphUserTweetsAndReplies else: graphUserTweets
-    js = await fetch(url ? params, Api.tweetDetail)
+    params = {"variables": variables, "features": tweetFeatures}
+    (url, apiId) = if replies: (graphUserTweetsAndReplies, Api.userTweetsAndReplies)
+                   else: (graphUserTweets, Api.userTweets)
+    js = await fetch(url ? params, apiId)
   result = parseGraphTimeline(js, after)
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
@@ -63,18 +64,6 @@ proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
   let
     ps = genParams({"list_id": id, "ranking_mode": "reverse_chronological"}, after)
     url = listTimeline ? ps
-  result = parseTimeline(await fetch(url, Api.timeline), after)
-
-proc getTimeline*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
-  if id.len == 0: return
-  let
-    ps = genParams({"userId": id, "include_tweet_replies": $replies}, after)
-    url = timeline / (id & ".json") ? ps
-  result = parseTimeline(await fetch(url, Api.timeline), after)
-
-proc getMediaTimeline*(id: string; after=""): Future[Timeline] {.async.} =
-  if id.len == 0: return
-  let url = mediaTimeline / (id & ".json") ? genParams(cursor=after)
   result = parseTimeline(await fetch(url, Api.timeline), after)
 
 proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
