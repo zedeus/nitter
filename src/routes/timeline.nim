@@ -47,9 +47,9 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
   let
     timeline =
       case query.kind
-      of posts: getGraphUserTweets(userId, after)
-      of replies: getGraphUserTweets(userId, after, replies=true)
-      of media: getGraphUserMedia(userId, after)
+      of posts: getGraphUserTweets(userId, TimelineKind.tweets, after)
+      of replies: getGraphUserTweets(userId, TimelineKind.replies, after)
+      of media: getGraphUserTweets(userId, TimelineKind.media, after)
       else: getSearch[Tweet](query, after)
 
     rail =

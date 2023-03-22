@@ -58,15 +58,7 @@ const
   ## photos: "result_filter: photos"
   ## videos: "result_filter: videos"
 
-  userFeatures* = """{
-  "responsive_web_twitter_blue_verified_badge_is_enabled": true,
-  "responsive_web_graphql_exclude_directive_enabled": true,
-  "responsive_web_graphql_skip_user_profile_image_extensions_enabled": true,
-  "responsive_web_graphql_timeline_navigation_enabled": false,
-  "verified_phone_label_enabled": false
-}"""
-
-  tweetFeatures* = """{
+  gqlFeatures* = """{
   "longform_notetweets_consumption_enabled": true,
   "longform_notetweets_richtext_consumption_enabled": true,
   "responsive_web_twitter_blue_verified_badge_is_enabled": true,

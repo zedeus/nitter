@@ -8,6 +8,11 @@ type
   RateLimitError* = object of CatchableError
   InternalError* = object of CatchableError
 
+  TimelineKind* {.pure.} = enum
+    tweets
+    replies
+    media
+
   Api* {.pure.} = enum
     tweetDetail
     timeline
