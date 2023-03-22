@@ -15,8 +15,9 @@ proc getGraphUser*(username: string): Future[User] {.async.} =
 proc getGraphUserById*(id: string): Future[User] {.async.} =
   if id.len == 0 or id.any(c => not c.isDigit): return
   let
-    variables = """{"userId": "$1", "withSuperFollowsUserFields": true}""" % [id]
-    js = await fetchRaw(graphUserById ? {"variables": variables}, Api.userRestId)
+    variables = %*{"userId": id, "withSuperFollowsUserFields": true}
+    params = {"variables": $variables, "features": tweetFeatures}
+    js = await fetchRaw(graphUserById ? params, Api.userRestId)
   result = parseGraphUser(js)
 
 proc getGraphUserTweets*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
