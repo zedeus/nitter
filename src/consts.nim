@@ -19,9 +19,9 @@ const
   graphTweet* = graphql / "6I7Hm635Q6ftv69L8VrSeQ/TweetDetail"
   graphUser* = graphql / "8mPfHBetXOg-EHAyeVxUoA/UserByScreenName"
   graphUserById* = graphql / "nI8WydSd-X-lQIVo6bdktQ/UserByRestId"
-  graphList* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
-  graphListBySlug* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
-  graphListMembers* = graphql / "Ke6urWMeCV2UlKXGRy4sow/ListMembers"
+  graphListById* = graphql / "iTpgCtbdxrsJfyx0cFjHqg/ListByRestId"
+  graphListBySlug* = graphql / "-kmqNvm5Y-cVrfvBy6docg/ListBySlug"
+  graphListMembers* = graphql / "P4NpVZDqUD_7MEM84L-8nw/ListMembers"
 
   timelineParams* = {
     "include_profile_interstitial_type": "0",

@@ -35,31 +35,29 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Timel
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let
-    variables = %*{"screenName": name, "listSlug": list, "withHighlightedLabel": false}
-    url = graphListBySlug ? {"variables": $variables}
-  result = parseGraphList(await fetch(url, Api.listBySlug))
+    variables = %*{"screenName": name, "listSlug": list}
+    params = {"variables": $variables, "features": gqlFeatures}
+  result = parseGraphList(await fetch(graphListBySlug ? params, Api.listBySlug))
 
 proc getGraphList*(id: string): Future[List] {.async.} =
   let
-    variables = %*{"listId": id, "withHighlightedLabel": false}
-    url = graphList ? {"variables": $variables}
-  result = parseGraphList(await fetch(url, Api.list))
+    variables = %*{"listId": id}
+    params = {"variables": $variables, "features": gqlFeatures}
+  result = parseGraphList(await fetch(graphListById ? params, Api.list))
 
 proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} =
   if list.id.len == 0: return
   var
     variables = %*{
       "listId": list.id,
-      "withSuperFollowsUserFields": false,
       "withBirdwatchPivots": false,
       "withDownvotePerspective": false,
       "withReactionsMetadata": false,
-      "withReactionsPerspective": false,
-      "withSuperFollowsTweetFields": false
+      "withReactionsPerspective": false
     }
   if after.len > 0:
     variables["cursor"] = % after
-  let url = graphListMembers ? {"variables": $variables}
+  let url = graphListMembers ? {"variables": $variables, "features": gqlFeatures}
   result = parseGraphListMembers(await fetchRaw(url, Api.listMembers), after)
 
 proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
