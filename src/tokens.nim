@@ -41,10 +41,12 @@ proc getPoolJson*(): JsonNode =
       let
         maxReqs =
           case api
-          of Api.listMembers, Api.listBySlug, Api.list,
-             Api.userRestId, Api.userScreenName, Api.userTweets, Api.tweetDetail: 500
+          of Api.status: 180
+          of Api.search: 250
           of Api.timeline: 187
-          else: 180
+          of Api.listMembers, Api.listBySlug, Api.list, Api.tweetDetail,
+             Api.userTweets, Api.userTweetsAndReplies, Api.userMedia,
+             Api.userRestId, Api.userScreenName: 500
         reqs = maxReqs - token.apis[api].remaining
 
       reqsPerApi[$api] = reqsPerApi.getOrDefault($api, 0) + reqs
