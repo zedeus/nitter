@@ -90,14 +90,14 @@ routes:
     resp Http429, showError(
       &"Instance has been rate limited.<br>Use {link} or try again later.", cfg)
 
-  extend unsupported, ""
-  extend preferences, ""
-  extend resolver, ""
   extend rss, ""
+  extend status, ""
   extend search, ""
   extend timeline, ""
-  extend list, ""
-  extend status, ""
   extend media, ""
+  extend list, ""
+  extend preferences, ""
+  extend resolver, ""
   extend embed, ""
   extend debug, ""
+  extend unsupported, ""

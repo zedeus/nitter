@@ -124,7 +124,7 @@ proc createTimelineRouter*(cfg: Config) =
 
     get "/@name/?@tab?/?":
       cond '.' notin @"name"
-      cond @"name" notin ["pic", "gif", "video"]
+      cond @"name" notin ["pic", "gif", "video", "search", "settings", "login", "intent", "i"]
       cond @"tab" in ["with_replies", "media", "search", ""]
       let
         prefs = cookiePrefs()
