@@ -31,7 +31,16 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Timel
                    of TimelineKind.replies: (graphUserTweetsAndReplies, Api.userTweetsAndReplies)
                    of TimelineKind.media: (graphUserMedia, Api.userMedia)
     js = await fetch(url ? params, apiId)
-  result = parseGraphTimeline(js, after)
+  result = parseGraphTimeline(js, "user", after)
+
+proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = listTweetsVariables % [id, cursor]
+    params = {"variables": variables, "features": gqlFeatures}
+    js = await fetch(graphListTweets ? params, Api.listTweets)
+  result = parseGraphTimeline(js, "list", after)
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let
@@ -60,12 +69,27 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
   let url = graphListMembers ? {"variables": $variables, "features": gqlFeatures}
   result = parseGraphListMembers(await fetchRaw(url, Api.listMembers), after)
 
-proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
+proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
   if id.len == 0: return
   let
-    ps = genParams({"list_id": id, "ranking_mode": "reverse_chronological"}, after)
-    url = listTimeline ? ps
-  result = parseTimeline(await fetch(url, Api.timeline), after)
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = tweetVariables % [id, cursor]
+    params = {"variables": variables, "features": gqlFeatures}
+    js = await fetch(graphTweet ? params, Api.tweetDetail)
+  result = parseGraphConversation(js, id)
+
+proc getReplies*(id, after: string): Future[Result[Chain]] {.async.} =
+  result = (await getGraphTweet(id, after)).replies
+  result.beginning = after.len == 0
+
+proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
+  result = await getGraphTweet(id)
+  if after.len > 0:
+    result.replies = await getReplies(id, after)
+
+proc getStatus*(id: string): Future[Tweet] {.async.} =
+  let url = status / (id & ".json") ? genParams()
+  result = parseStatus(await fetch(url, Api.status))
 
 proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return
@@ -97,28 +121,6 @@ proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
     result.query = query
   except InternalError:
     return Result[T](beginning: true, query: query)
-
-proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
-  if id.len == 0: return
-  let
-    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
-    variables = tweetVariables % [id, cursor]
-    params = {"variables": variables, "features": gqlFeatures}
-    js = await fetch(graphTweet ? params, Api.tweetDetail)
-  result = parseGraphConversation(js, id)
-
-proc getReplies*(id, after: string): Future[Result[Chain]] {.async.} =
-  result = (await getGraphTweet(id, after)).replies
-  result.beginning = after.len == 0
-
-proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
-  result = await getGraphTweet(id)
-  if after.len > 0:
-    result.replies = await getReplies(id, after)
-
-proc getStatus*(id: string): Future[Tweet] {.async.} =
-  let url = status / (id & ".json") ? genParams()
-  result = parseStatus(await fetch(url, Api.status))
 
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
   let client = newAsyncHttpClient(maxRedirects=0)

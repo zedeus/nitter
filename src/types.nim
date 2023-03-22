@@ -20,6 +20,7 @@ type
     list
     listBySlug
     listMembers
+    listTweets
     userRestId
     userScreenName
     userTweets

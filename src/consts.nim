@@ -10,7 +10,6 @@ const
   photoRail* = api / "1.1/statuses/media_timeline.json"
   status* = api / "1.1/statuses/show"
   search* = api / "2/search/adaptive.json"
-  listTimeline* = api / "2/timeline/list.json"
 
   graphql = api / "graphql"
   graphUserTweets* = graphql / "9rys0A7w1EyqVd2ME0QCJg/UserTweets"
@@ -22,6 +21,7 @@ const
   graphListById* = graphql / "iTpgCtbdxrsJfyx0cFjHqg/ListByRestId"
   graphListBySlug* = graphql / "-kmqNvm5Y-cVrfvBy6docg/ListBySlug"
   graphListMembers* = graphql / "P4NpVZDqUD_7MEM84L-8nw/ListMembers"
+  graphListTweets* = graphql / "jZntL0oVJSdjhmPcdbw_eA/ListLatestTweetsTimeline"
 
   timelineParams* = {
     "include_profile_interstitial_type": "0",
@@ -93,6 +93,16 @@ const
 
   userTweetsVariables* = """{
   "userId": "$1", $2
+  "count": 20,
+  "includePromotedContent": false,
+  "withDownvotePerspective": false,
+  "withReactionsMetadata": false,
+  "withReactionsPerspective": false,
+  "withVoice": false
+}"""
+
+  listTweetsVariables* = """{
+  "listId": "$1", $2
   "count": 20,
   "includePromotedContent": false,
   "withDownvotePerspective": false,

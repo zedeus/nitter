@@ -159,7 +159,7 @@ proc createRssRouter*(cfg: Config) =
 
       let
         list = await getCachedList(id=id)
-        timeline = await getListTimeline(list.id, cursor)
+        timeline = await getGraphListTweets(list.id, cursor)
       rss.cursor = timeline.bottom
       rss.feed = renderListRss(timeline.content, list, cfg)
 

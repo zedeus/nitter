@@ -455,10 +455,13 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
     elif entryId.startsWith("cursor-bottom"):
       result.replies.bottom = e{"content", "itemContent", "value"}.getStr
 
-proc parseGraphTimeline*(js: JsonNode; after=""): Timeline =
+proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Timeline =
   result = Timeline(beginning: after.len == 0)
 
-  let instructions = ? js{"data", "user", "result", "timeline", "timeline", "instructions"}
+  let instructions =
+    if root == "list": ? js{"data", "list", "tweets_timeline", "timeline", "instructions"}
+    else: ? js{"data", "user", "result", "timeline", "timeline", "instructions"}
+
   if instructions.len == 0:
     return
 
