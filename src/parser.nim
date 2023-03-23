@@ -475,5 +475,3 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Timeline =
         result.content.add tweet
     elif entryId.startsWith("cursor-bottom"):
       result.bottom = e{"content", "value"}.getStr
-    elif "cursor-top" notin entryId:
-      echo e
