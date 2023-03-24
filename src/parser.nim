@@ -317,19 +317,6 @@ proc parseGlobalObjects(js: JsonNode): GlobalObjects =
       tweet.user = result.users[tweet.user.id]
     result.tweets[k] = tweet
 
-proc parseStatus*(js: JsonNode): Tweet =
-  with e, js{"errors"}:
-    if e.getError in {tweetNotFound, tweetUnavailable, tweetCensored, doesntExist,
-                      tweetNotAuthorized, suspended}:
-      return
-
-  result = parseTweet(js, js{"card"})
-  if not result.isNil:
-    result.user = parseUser(js{"user"})
-
-    with quote, js{"quoted_status"}:
-      result.quote = some parseStatus(js{"quoted_status"})
-
 proc parseInstructions[T](res: var Result[T]; global: GlobalObjects; js: JsonNode) =
   if js.kind != JArray or js.len == 0:
     return
@@ -424,6 +411,10 @@ proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
 
       if t{"item", "itemContent", "tweetDisplayType"}.getStr == "SelfThread":
         result.self = true
+
+proc parseGraphTweetResult*(js: JsonNode): Tweet =
+  with tweet, js{"data", "tweetResult", "result"}:
+    result = parseGraphTweet(tweet)
 
 proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
   result = Conversation(replies: Result[Chain](beginning: true))

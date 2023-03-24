@@ -12,12 +12,13 @@ const
   search* = api / "2/search/adaptive.json"
 
   graphql = api / "graphql"
+  graphUser* = graphql / "8mPfHBetXOg-EHAyeVxUoA/UserByScreenName"
+  graphUserById* = graphql / "nI8WydSd-X-lQIVo6bdktQ/UserByRestId"
   graphUserTweets* = graphql / "9rys0A7w1EyqVd2ME0QCJg/UserTweets"
   graphUserTweetsAndReplies* = graphql / "ehMCHF3Mkgjsfz_aImqOsg/UserTweetsAndReplies"
   graphUserMedia* = graphql / "MA_EP2a21zpzNWKRkaPBMg/UserMedia"
   graphTweet* = graphql / "6I7Hm635Q6ftv69L8VrSeQ/TweetDetail"
-  graphUser* = graphql / "8mPfHBetXOg-EHAyeVxUoA/UserByScreenName"
-  graphUserById* = graphql / "nI8WydSd-X-lQIVo6bdktQ/UserByRestId"
+  graphTweetResult* = graphql / "rt-rHeSJ-2H9O9gxWQcPcg/TweetResultByRestId"
   graphListById* = graphql / "iTpgCtbdxrsJfyx0cFjHqg/ListByRestId"
   graphListBySlug* = graphql / "-kmqNvm5Y-cVrfvBy6docg/ListBySlug"
   graphListMembers* = graphql / "P4NpVZDqUD_7MEM84L-8nw/ListMembers"
@@ -89,6 +90,16 @@ const
   "withReactionsMetadata": false,
   "withReactionsPerspective": false,
   "withVoice": false
+}"""
+
+  tweetResultVariables* = """{
+  "tweetId": "$1",
+  "includePromotedContent": false,
+  "withDownvotePerspective": false,
+  "withReactionsMetadata": false,
+  "withReactionsPerspective": false,
+  "withVoice": false,
+  "withCommunity": false
 }"""
 
   userTweetsVariables* = """{

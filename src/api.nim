@@ -69,6 +69,14 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
   let url = graphListMembers ? {"variables": $variables, "features": gqlFeatures}
   result = parseGraphListMembers(await fetchRaw(url, Api.listMembers), after)
 
+proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
+  if id.len == 0: return
+  let
+    variables = tweetResultVariables % id
+    params = {"variables": variables, "features": gqlFeatures}
+    js = await fetch(graphTweetResult ? params, Api.tweetResult)
+  result = parseGraphTweetResult(js)
+
 proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
   if id.len == 0: return
   let
@@ -86,10 +94,6 @@ proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
   result = await getGraphTweet(id)
   if after.len > 0:
     result.replies = await getReplies(id, after)
-
-proc getStatus*(id: string): Future[Tweet] {.async.} =
-  let url = status / (id & ".json") ? genParams()
-  result = parseStatus(await fetch(url, Api.status))
 
 proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return

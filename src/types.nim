@@ -15,6 +15,7 @@ type
 
   Api* {.pure.} = enum
     tweetDetail
+    tweetResult
     timeline
     search
     list
@@ -26,7 +27,6 @@ type
     userTweets
     userTweetsAndReplies
     userMedia
-    status
 
   RateLimit* = object
     remaining*: int
