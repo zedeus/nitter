@@ -7,6 +7,7 @@ genPrefsType()
 type
   RateLimitError* = object of CatchableError
   InternalError* = object of CatchableError
+  BadClientError* = object of CatchableError
 
   TimelineKind* {.pure.} = enum
     tweets

@@ -85,6 +85,10 @@ routes:
     resp Http500, showError(
       &"An error occurred, please {link} with the URL you tried to visit.", cfg)
 
+  error BadClientError:
+    echo error.exc.name, ": ", error.exc.msg
+    resp Http500, showError("Network error occured, please try again.", cfg)
+
   error RateLimitError:
     const link = a("another instance", href = instancesUrl)
     resp Http429, showError(
