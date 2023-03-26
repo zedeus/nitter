@@ -17,6 +17,7 @@ type
     twitterListDetails
     communityDetails
     mediaWithDetailsHorizontal
+    hidden
     unknown
 
   Component* = object
@@ -71,11 +72,11 @@ type
   Text = object
     content: string
 
-  HasTypeField = Component | Destination | MediaEntity | AppStoreData
+  TypeField = Component | Destination | MediaEntity | AppStoreData
 
 converter fromText*(text: Text): string = text.content
 
-proc renameHook*(v: var HasTypeField; fieldName: var string) =
+proc renameHook*(v: var TypeField; fieldName: var string) =
   if fieldName == "type":
     fieldName = "kind"
 
@@ -89,6 +90,7 @@ proc enumHook*(s: string; v: var ComponentType) =
       of "twitter_list_details": twitterListDetails
       of "community_details": communityDetails
       of "media_with_details_horizontal": mediaWithDetailsHorizontal
+      of "commerce_drop_details": hidden
       else: echo "ERROR: Unknown enum value (ComponentType): ", s; unknown
 
 proc enumHook*(s: string; v: var AppType) =

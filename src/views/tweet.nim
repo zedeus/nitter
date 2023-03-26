@@ -328,7 +328,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if tweet.attribution.isSome:
         renderAttribution(tweet.attribution.get(), prefs)
 
-      if tweet.card.isSome:
+      if tweet.card.isSome and tweet.card.get().kind != hidden:
         renderCard(tweet.card.get(), prefs, path)
 
       if tweet.photos.len > 0:

@@ -158,6 +158,7 @@ type
     imageDirectMessage = "image_direct_message"
     audiospace = "audiospace"
     newsletterPublication = "newsletter_publication"
+    hidden
     unknown
     
   Card* = object
