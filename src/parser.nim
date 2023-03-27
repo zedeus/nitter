@@ -437,6 +437,18 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
           result.tweet = tweet
         else:
           result.before.content.add tweet
+    elif entryId.startsWith("tombstone"):
+      let id = entryId.getId()
+      let tweet = Tweet(
+        id: parseBiggestInt(id),
+        available: false,
+        text: e{"content", "itemContent"}.getTombstone
+      )
+
+      if id == tweetId:
+        result.tweet = tweet
+      else:
+        result.before.content.add tweet
     elif entryId.startsWith("conversationthread"):
       let (thread, self) = parseGraphThread(e)
       if self:
