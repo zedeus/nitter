@@ -72,11 +72,6 @@ template fetchImpl(result, fetchBody) {.dirty.} =
         if resp.status == $Http400 and "TimeoutError" in result:
           getContent()
 
-        # Twitter randomly returns 401 errors with an empty body quite often.
-        # Retrying the request usually works.
-        if resp.status == $Http401 and result.len == 0:
-          getContent()
-
         if resp.status == $Http503:
           badClient = true
           raise newException(BadClientError, "Bad client")
