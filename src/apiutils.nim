@@ -67,14 +67,19 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
       getContent()
 
-      # Twitter randomly returns 401 errors with an empty body quite often.
-      # Retrying the request usually works.
-      if resp.status == "401 Unauthorized" and result.len == 0:
-        getContent()
+      if not resp.status.startsWith("2"):
+        # Twitter sometimes times out, retry.
+        if resp.status == $Http400 and "TimeoutError" in result:
+          getContent()
 
-      if resp.status == $Http503:
-        badClient = true
-        raise newException(BadClientError, "Bad client")
+        # Twitter randomly returns 401 errors with an empty body quite often.
+        # Retrying the request usually works.
+        if resp.status == $Http401 and result.len == 0:
+          getContent()
+
+        if resp.status == $Http503:
+          badClient = true
+          raise newException(BadClientError, "Bad client")
 
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
