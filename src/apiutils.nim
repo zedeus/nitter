@@ -67,14 +67,9 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
       getContent()
 
-      if not resp.status.startsWith("2"):
-        # Twitter sometimes times out, retry.
-        if resp.status == $Http400 and "TimeoutError" in result:
-          getContent()
-
-        if resp.status == $Http503:
-          badClient = true
-          raise newException(BadClientError, "Bad client")
+      if resp.status == $Http503:
+        badClient = true
+        raise newException(BadClientError, "Bad client")
 
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
