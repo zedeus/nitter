@@ -1,0 +1,42 @@
+name: Run tests
+
+on:
+  push:
+    paths-ignore:
+      - "*.md"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Cache nimble
+        id: cache-nimble
+        uses: actions/cache@v3
+        with:
+          path: ~/.nimble
+          key: nimble-${{ hashFiles('*.nimble') }}
+          restore-keys: "nimble-"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "pip"
+      - uses: jiro4989/setup-nim-action@v1
+        with:
+          nim-version: "1.x"
+      - run: nimble build -d:release -Y
+      - run: pip install seleniumbase
+      - run: seleniumbase install chromedriver
+      - uses: supercharge/redis-github-action@1.5.0
+      - name: Prepare Nitter
+        run: |
+          sudo apt install libsass-dev -y
+          cp nitter.example.conf nitter.conf
+          nimble md
+          nimble scss
+      - name: Run tests
+        run: |
+          ./nitter &
+          pytest -n4 tests
