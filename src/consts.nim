@@ -15,6 +15,7 @@ const
   timelineApi = api / "2/timeline"
   timeline* = timelineApi / "profile"
   mediaTimeline* = timelineApi / "media"
+  favorites* = timelineApi / "favorites"
   listTimeline* = timelineApi / "list.json"
   tweet* = timelineApi / "conversation"
 

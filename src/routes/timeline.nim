@@ -16,6 +16,7 @@ proc getQuery*(request: Request; tab, name: string): Query =
   case tab
   of "with_replies": getReplyQuery(name)
   of "media": getMediaQuery(name)
+  of "favorites": getFavoritesQuery(name)
   of "search": initQuery(params(request), name=name)
   else: Query(fromUser: @[name])
 
@@ -27,7 +28,7 @@ template skipIf[T](cond: bool; default; body: Future[T]): Future[T] =
   else:
     body
 
-proc fetchProfile*(after: string; query: Query; skipRail=false;
+proc fetchProfile*(after: string; query: Query; cfg: Config; skipRail=false;
                    skipPinned=false): Future[Profile] {.async.} =
   let
     name = query.fromUser[0]
@@ -50,6 +51,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
       of posts: getTimeline(userId, after)
       of replies: getTimeline(userId, after, replies=true)
       of media: getMediaTimeline(userId, after)
+      of favorites: getFavorites(userId, cfg, after)
       else: getSearch[Tweet](query, after)
 
     rail =
@@ -83,10 +85,10 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
   if query.fromUser.len != 1:
     let
       timeline = await getSearch[Tweet](query, after)
-      html = renderTweetSearch(timeline, prefs, getPath())
+      html = renderTweetSearch(timeline, cfg, prefs, getPath())
     return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
-  var profile = await fetchProfile(after, query, skipPinned=prefs.hidePins)
+  var profile = await fetchProfile(after, query, cfg, skipPinned=prefs.hidePins)
   template u: untyped = profile.user
 
   if u.suspended:
@@ -94,7 +96,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
 
   if profile.user.id.len == 0: return
 
-  let pHtml = renderProfile(profile, prefs, getPath())
+  let pHtml = renderProfile(profile, cfg, prefs, getPath())
   result = renderMain(pHtml, request, cfg, prefs, pageTitle(u), pageDesc(u),
                       rss=rss, images = @[u.getUserPic("_400x400")],
                       banner=u.banner)
@@ -124,7 +126,7 @@ proc createTimelineRouter*(cfg: Config) =
     get "/@name/?@tab?/?":
       cond '.' notin @"name"
       cond @"name" notin ["pic", "gif", "video"]
-      cond @"tab" in ["with_replies", "media", "search", ""]
+      cond @"tab" in ["with_replies", "media", "search", "favorites", ""]
       let
         prefs = cookiePrefs()
         after = getCursor()
@@ -140,9 +142,9 @@ proc createTimelineRouter*(cfg: Config) =
           var timeline = await getSearch[Tweet](query, after)
           if timeline.content.len == 0: resp Http404
           timeline.beginning = true
-          resp $renderTweetSearch(timeline, prefs, getPath())
+          resp $renderTweetSearch(timeline, cfg, prefs, getPath())
         else:
-          var profile = await fetchProfile(after, query, skipRail=true)
+          var profile = await fetchProfile(after, query, cfg, skipRail=true)
           if profile.tweets.content.len == 0: resp Http404
           profile.tweets.beginning = true
           resp $renderTimelineTweets(profile.tweets, prefs, getPath())

@@ -65,6 +65,16 @@ proc getTimeline*(id: string; after=""; replies=false): Future[Timeline] {.async
     url = timeline / (id & ".json") ? ps
   result = parseTimeline(await fetch(url, Api.timeline), after)
 
+proc getFavorites*(id: string; cfg: Config; after=""): Future[Timeline] {.async.} =
+  if id.len == 0: return
+  let
+    ps = genParams({"userId": id}, after)
+    url = consts.favorites / (id & ".json") ? ps
+    headers = genHeaders()
+  headers.add("Cookie", cfg.cookieHeader)
+  headers.add("x-csrf-token", cfg.xCsrfToken)
+  result = parseTimeline(await fetch(url, Api.favorites, headers), after)
+
 proc getMediaTimeline*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let url = mediaTimeline / (id & ".json") ? genParams(cursor=after)
