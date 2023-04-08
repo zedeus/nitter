@@ -70,11 +70,7 @@ proc getFavorites*(id: string; cfg: Config; after=""): Future[Timeline] {.async.
   let
     ps = genParams({"userId": id}, after)
     url = consts.favorites / (id & ".json") ? ps
-    headers = newHttpHeaders({
-      "Cookie": cfg.cookieHeader,
-      "x-csrf-token": cfg.xCsrfToken
-    })
-  result = parseTimeline(await fetch(url, Api.favorites, headers), after)
+  result = parseTimeline(await fetch(url, Api.favorites), after)
 
 proc getMediaTimeline*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return

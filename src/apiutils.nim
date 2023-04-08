@@ -3,6 +3,7 @@ import httpclient, asyncdispatch, options, strutils, uri
 import jsony, packedjson, zippy
 import types, tokens, consts, parserutils, http_pool
 import experimental/types/common
+import config
 
 const
   rlRemaining = "x-rate-limit-remaining"
@@ -42,6 +43,10 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
     "accept": "*/*",
     "DNT": "1"
   })
+  if len(cfg.cookieHeader) != 0:
+      result.add("Cookie", cfg.cookieHeader)
+  if len(cfg.xCsrfToken) != 0:
+      result.add("x-csrf-token", cfg.xCsrfToken)
 
 template updateToken() =
   if api != Api.search and resp.headers.hasKey(rlRemaining):

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import parsecfg except Config
 import types, strutils
+from os import getEnv
 
 proc get*[T](config: parseCfg.Config; section, key: string; default: T): T =
   let val = config.getSectionValue(section, key)
@@ -46,3 +47,7 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
   )
 
   return (conf, cfg)
+
+
+let configPath = getEnv("NITTER_CONF_FILE", "./nitter.conf")
+let (cfg*, fullCfg*) = getConfig(configPath)
