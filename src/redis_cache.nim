@@ -118,11 +118,11 @@ proc getUserId*(username: string): Future[string] {.async.} =
   pool.withAcquire(r):
     result = await r.hGet(name.uidKey, name)
     if result == redisNil:
-      let user = await getUser(username)
+      let user = await getGraphUser(username)
       if user.suspended:
         return "suspended"
       else:
-        await cacheUserId(name, user.id)
+        await all(cacheUserId(name, user.id), cache(user))
         return user.id
 
 proc getCachedUser*(username: string; fetch=true): Future[User] {.async.} =
@@ -130,8 +130,7 @@ proc getCachedUser*(username: string; fetch=true): Future[User] {.async.} =
   if prof != redisNil:
     prof.deserialize(User)
   elif fetch:
-    let userId = await getUserId(username)
-    result = await getGraphUser(userId)
+    result = await getGraphUser(username)
     await cache(result)
 
 proc getCachedUsername*(userId: string): Future[string] {.async.} =
@@ -142,9 +141,11 @@ proc getCachedUsername*(userId: string): Future[string] {.async.} =
   if username != redisNil:
     result = username
   else:
-    let user = await getUserById(userId)
+    let user = await getGraphUserById(userId)
     result = user.username
     await setEx(key, baseCacheTime, result)
+    if result.len > 0 and user.id.len > 0:
+      await all(cacheUserId(result, user.id), cache(user))
 
 proc getCachedTweet*(id: int64): Future[Tweet] {.async.} =
   if id == 0: return
@@ -153,7 +154,7 @@ proc getCachedTweet*(id: int64): Future[Tweet] {.async.} =
     tweet.deserialize(Tweet)
   else:
     result = await getStatus($id)
-    if result.isNil:
+    if not result.isNil:
       await cache(result)
 
 proc getCachedPhotoRail*(name: string): Future[PhotoRail] {.async.} =

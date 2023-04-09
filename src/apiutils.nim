@@ -23,7 +23,7 @@ proc genParams*(pars: openArray[(string, string)] = @[]; cursor="";
     result &= ("count", count)
   if cursor.len > 0:
     # The raw cursor often has plus signs, which sometimes get turned into spaces,
-    # so we need to them back into a plus
+    # so we need to turn them back into a plus
     if " " in cursor:
       result &= ("cursor", cursor.replace(" ", "+"))
     else:
@@ -61,12 +61,20 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   try:
     var resp: AsyncResponse
     pool.use(genHeaders(token)):
-      resp = await c.get($url)
-      result = await resp.body
+      template getContent =
+        resp = await c.get($url)
+        result = await resp.body
 
-      if resp.status == $Http503:
-        badClient = true
-        raise newException(InternalError, result)
+      getContent()
+
+      # Twitter randomly returns 401 errors with an empty body quite often.
+      # Retrying the request usually works.
+      if resp.status == "401 Unauthorized" and result.len == 0:
+        getContent()
+
+    if resp.status == $Http503:
+      badClient = true
+      raise newException(InternalError, result)
 
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":

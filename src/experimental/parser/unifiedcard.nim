@@ -66,6 +66,8 @@ proc parseMedia(component: Component; card: UnifiedCard; result: var Card) =
       durationMs: videoInfo.durationMillis,
       variants: videoInfo.variants
     )
+  of model3d:
+    result.title = "Unsupported 3D model ad"
 
 proc parseUnifiedCard*(json: string): Card =
   let card = json.fromJson(UnifiedCard)
@@ -82,6 +84,8 @@ proc parseUnifiedCard*(json: string): Card =
       component.parseMedia(card, result)
     of buttonGroup:
       discard
+    of ComponentType.unknown:
+      echo "ERROR: Unknown component type: ", json
 
     case component.kind
     of twitterListDetails:

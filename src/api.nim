@@ -4,11 +4,22 @@ import packedjson
 import types, query, formatters, consts, apiutils, parser
 import experimental/parser as newParser
 
-proc getGraphUser*(id: string): Future[User] {.async.} =
+proc getGraphUser*(username: string): Future[User] {.async.} =
+  if username.len == 0: return
+  let
+    variables = """{
+      "screen_name": "$1",
+      "withSafetyModeUserFields": false,
+      "withSuperFollowsUserFields": false
+    }""" % [username]
+    js = await fetchRaw(graphUser ? {"variables": variables}, Api.userScreenName)
+  result = parseGraphUser(js)
+
+proc getGraphUserById*(id: string): Future[User] {.async.} =
   if id.len == 0 or id.any(c => not c.isDigit): return
   let
-    variables = %*{"userId": id, "withSuperFollowsUserFields": true}
-    js = await fetchRaw(graphUser ? {"variables": $variables}, Api.userRestId)
+    variables = """{"userId": "$1", "withSuperFollowsUserFields": true}""" % [id]
+    js = await fetchRaw(graphUserById ? {"variables": variables}, Api.userRestId)
   result = parseGraphUser(js)
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
@@ -53,20 +64,6 @@ proc getListTimeline*(id: string; after=""): Future[Timeline] {.async.} =
     url = listTimeline ? ps
   result = parseTimeline(await fetch(url, Api.timeline), after)
 
-proc getUser*(username: string): Future[User] {.async.} =
-  if username.len == 0: return
-  let
-    ps = genParams({"screen_name": username})
-    json = await fetchRaw(userShow ? ps, Api.userShow)
-  result = parseUser(json, username)
-
-proc getUserById*(userId: string): Future[User] {.async.} =
-  if userId.len == 0: return
-  let
-    ps = genParams({"user_id": userId})
-    json = await fetchRaw(userShow ? ps, Api.userShow)
-  result = parseUser(json)
-
 proc getTimeline*(id: string; after=""; replies=false): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
@@ -110,16 +107,21 @@ proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
   except InternalError:
     return Result[T](beginning: true, query: query)
 
-proc getTweetImpl(id: string; after=""): Future[Conversation] {.async.} =
-  let url = tweet / (id & ".json") ? genParams(cursor=after)
-  result = parseConversation(await fetch(url, Api.tweet), id)
+proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = tweetVariables % [id, cursor]
+    params = {"variables": variables, "features": tweetFeatures}
+    js = await fetch(graphTweet ? params, Api.tweetDetail)
+  result = parseGraphConversation(js, id)
 
 proc getReplies*(id, after: string): Future[Result[Chain]] {.async.} =
-  result = (await getTweetImpl(id, after)).replies
+  result = (await getGraphTweet(id, after)).replies
   result.beginning = after.len == 0
 
 proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
-  result = await getTweetImpl(id)
+  result = await getGraphTweet(id)
   if after.len > 0:
     result.replies = await getReplies(id, after)
 

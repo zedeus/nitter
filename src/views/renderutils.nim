@@ -3,6 +3,14 @@ import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 import ".."/[types, utils]
 
+const smallWebp* = "?name=small&format=webp"
+
+proc getSmallPic*(url: string): string =
+  result = url
+  if "?" notin url and not url.endsWith("placeholder.png"):
+    result &= smallWebp
+  result = getPicUrl(result)
+
 proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
   var c = "icon-" & icon
   if class.len > 0: c = &"{c} {class}"
@@ -55,12 +63,12 @@ proc genCheckbox*(pref, label: string; state: bool): VNode =
     else: input(name=pref, `type`="checkbox")
     span(class="checkbox")
 
-proc genInput*(pref, label, state, placeholder: string; class=""): VNode =
+proc genInput*(pref, label, state, placeholder: string; class=""; autofocus=true): VNode =
   let p = placeholder
   buildHtml(tdiv(class=("pref-group pref-input " & class))):
     if label.len > 0:
       label(`for`=pref): text label
-    if state.len == 0:
+    if autofocus and state.len == 0:
       input(name=pref, `type`="text", placeholder=p, value=state, autofocus="")
     else:
       input(name=pref, `type`="text", placeholder=p, value=state)

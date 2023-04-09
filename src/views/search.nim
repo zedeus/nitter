@@ -88,7 +88,7 @@ proc renderSearchPanel*(query: Query): VNode =
             genDate("until", query.until)
         tdiv:
           span(class="search-title"): text "Near"
-          genInput("near", "", query.near, placeholder="Location...")
+          genInput("near", "", query.near, "Location...", autofocus=false)
 
 proc renderTweetSearch*(results: Result[Tweet]; prefs: Prefs; path: string;
                         pinned=none(Tweet)): VNode =

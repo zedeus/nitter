@@ -50,7 +50,7 @@ proc renderUserCard*(user: User; prefs: Prefs): VNode =
           span:
             let url = replaceUrls(user.website, prefs)
             icon "link"
-            a(href=url): text shortLink(url)
+            a(href=url): text url.shortLink
 
       tdiv(class="profile-joindate"):
         span(title=getJoinDateFull(user)):
@@ -108,7 +108,7 @@ proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
         renderBanner(profile.user.banner)
 
     let sticky = if prefs.stickyProfile: " sticky" else: ""
-    tdiv(class=(&"profile-tab{sticky}")):
+    tdiv(class=("profile-tab" & sticky)):
       renderUserCard(profile.user, prefs)
       if profile.photoRail.len > 0:
         renderPhotoRail(profile)

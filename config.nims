@@ -1,5 +1,6 @@
 --define:ssl
 --define:useStdLib
+--threads:off
 
 # workaround httpbeast file upload bug
 --assertions:off

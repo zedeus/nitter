@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, strutils, strformat, sequtils, uri, options, times
+import asyncdispatch, strutils, sequtils, uri, options, times
 import jester, karax/vdom
 
 import router_utils
@@ -102,7 +102,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
 template respTimeline*(timeline: typed) =
   let t = timeline
   if t.len == 0:
-    resp Http404, showError(&"""User "{@"name"}" not found""", cfg)
+    resp Http404, showError("User \"" & @"name" & "\" not found", cfg)
   resp t
 
 template respUserId*() =

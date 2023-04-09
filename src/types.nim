@@ -9,6 +9,7 @@ type
   InternalError* = object of CatchableError
 
   Api* {.pure.} = enum
+    tweetDetail
     userShow
     timeline
     search
@@ -17,6 +18,7 @@ type
     listBySlug
     listMembers
     userRestId
+    userScreenName
     status
 
   RateLimit* = object
@@ -43,9 +45,12 @@ type
     invalidToken = 89
     listIdOrSlug = 112
     tweetNotFound = 144
+    tweetNotAuthorized = 179
     forbidden = 200
     badToken = 239
     noCsrf = 353
+    tweetUnavailable = 421
+    tweetCensored = 422
 
   User* = object
     id*: string
@@ -240,6 +245,7 @@ type
     available*: bool
     tombstone*: string
     location*: string
+    # Unused, needed for backwards compat
     source*: string
     stats*: TweetStats
     retweet*: Option[Tweet]

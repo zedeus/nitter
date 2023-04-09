@@ -12,8 +12,7 @@ let
   twRegex = re"(?<=(?<!\S)https:\/\/|(?<=\s))(www\.|mobile\.)?twitter\.com"
   twLinkRegex = re"""<a href="https:\/\/twitter.com([^"]+)">twitter\.com(\S+)</a>"""
 
-  ytRegex = re"([A-z.]+\.)?youtu(be\.com|\.be)"
-  igRegex = re"(www\.)?instagram\.com"
+  ytRegex = re(r"([A-z.]+\.)?youtu(be\.com|\.be)", {reStudy, reIgnoreCase})
 
   rdRegex = re"(?<![.b])((www|np|new|amp|old)\.)?reddit.com"
   rdShortRegex = re"(?<![.b])redd\.it\/"
@@ -58,24 +57,19 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
 
   if prefs.replaceYouTube.len > 0 and "youtu" in result:
     result = result.replace(ytRegex, prefs.replaceYouTube)
-    if prefs.replaceYouTube in result:
-      result = result.replace("/c/", "/")
 
   if prefs.replaceTwitter.len > 0 and ("twitter.com" in body or tco in body):
-    result = result.replace(tco, &"{https}{prefs.replaceTwitter}/t.co")
+    result = result.replace(tco, https & prefs.replaceTwitter & "/t.co")
     result = result.replace(cards, prefs.replaceTwitter & "/cards")
     result = result.replace(twRegex, prefs.replaceTwitter)
     result = result.replacef(twLinkRegex, a(
-      prefs.replaceTwitter & "$2", href = &"{https}{prefs.replaceTwitter}$1"))
+      prefs.replaceTwitter & "$2", href = https & prefs.replaceTwitter & "$1"))
 
   if prefs.replaceReddit.len > 0 and ("reddit.com" in result or "redd.it" in result):
     result = result.replace(rdShortRegex, prefs.replaceReddit & "/comments/")
     result = result.replace(rdRegex, prefs.replaceReddit)
     if prefs.replaceReddit in result and "/gallery/" in result:
       result = result.replace("/gallery/", "/comments/")
-
-  if prefs.replaceInstagram.len > 0 and "instagram.com" in result:
-    result = result.replace(igRegex, prefs.replaceInstagram)
 
   if absolute.len > 0 and "href" in result:
     result = result.replace("href=\"/", &"href=\"{absolute}/")

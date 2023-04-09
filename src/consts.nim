@@ -19,7 +19,9 @@ const
   tweet* = timelineApi / "conversation"
 
   graphql = api / "graphql"
-  graphUser* = graphql / "I5nvpI91ljifos1Y3Lltyg/UserByRestId"
+  graphTweet* = graphql / "6lWNh96EXDJCXl05SAtn_g/TweetDetail"
+  graphUser* = graphql / "7mjxD3-C6BxitPMVQ6w0-Q/UserByScreenName"
+  graphUserById* = graphql / "I5nvpI91ljifos1Y3Lltyg/UserByRestId"
   graphList* = graphql / "JADTh6cjebfgetzvF3tQvQ/List"
   graphListBySlug* = graphql / "ErWsz9cObLel1BF-HjuBlA/ListBySlug"
   graphListMembers* = graphql / "Ke6urWMeCV2UlKXGRy4sow/ListMembers"
@@ -58,3 +60,34 @@ const
   ## user:   "result_filter: user"
   ## photos: "result_filter: photos"
   ## videos: "result_filter: videos"
+
+  tweetVariables* = """{
+  "focalTweetId": "$1",
+  $2
+  "includePromotedContent": false,
+  "withBirdwatchNotes": false,
+  "withDownvotePerspective": false,
+  "withReactionsMetadata": false,
+  "withReactionsPerspective": false,
+  "withSuperFollowsTweetFields": false,
+  "withSuperFollowsUserFields": false,
+  "withVoice": false,
+  "withV2Timeline": true
+}"""
+
+  tweetFeatures* = """{
+  "graphql_is_translatable_rweb_tweet_is_translatable_enabled": false,
+  "responsive_web_graphql_timeline_navigation_enabled": false,
+  "standardized_nudges_misinfo": false,
+  "verified_phone_label_enabled": false,
+  "responsive_web_twitter_blue_verified_badge_is_enabled": false,
+  "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": false,
+  "view_counts_everywhere_api_enabled": false,
+  "responsive_web_edit_tweet_api_enabled": false,
+  "tweetypie_unmention_optimization_enabled": false,
+  "vibe_api_enabled": false,
+  "longform_notetweets_consumption_enabled": true,
+  "responsive_web_text_conversations_enabled": false,
+  "responsive_web_enhance_cards_enabled": false,
+  "interactive_text_enabled": false
+}"""

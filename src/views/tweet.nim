@@ -7,14 +7,7 @@ import renderutils
 import ".."/[types, utils, formatters]
 import general
 
-const
-  doctype = "<!DOCTYPE html>\n"
-
-proc getSmallPic(url: string): string =
-  result = url
-  if "?" notin url and not url.endsWith("placeholder.png"):
-    result &= "?name=small"
-  result = getPicUrl(result)
+const doctype = "<!DOCTYPE html>\n"
 
 proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
   let url = getPicUrl(user.getUserPic("_mini"))
@@ -60,9 +53,8 @@ proc renderAlbum(tweet: Tweet): VNode =
           tdiv(class="attachment image"):
             let
               named = "name=" in photo
-              orig = photo
-              small = if named: photo else: photo & "?name=small"
-            a(href=getOrigPicUrl(orig), class="still-image", target="_blank"):
+              small = if named: photo else: photo & smallWebp
+            a(href=getOrigPicUrl(photo), class="still-image", target="_blank"):
               genImg(small)
 
 proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
@@ -355,7 +347,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         renderQuote(tweet.quote.get(), prefs, path)
 
       if mainTweet:
-        p(class="tweet-published"): text &"{getTime(tweet)} · {tweet.source}"
+        p(class="tweet-published"): text &"{getTime(tweet)}"
 
       if tweet.mediaTags.len > 0:
         renderMediaTags(tweet.mediaTags)

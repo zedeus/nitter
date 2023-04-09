@@ -83,7 +83,7 @@ genPrefs:
       "Enable mp4 video playback (only for gifs)"
 
     hlsPlayback(checkbox, false):
-      "Enable hls video streaming (requires JavaScript)"
+      "Enable HLS video streaming (requires JavaScript)"
 
     proxyVideos(checkbox, true):
       "Proxy video streaming through the server (might be slow)"
@@ -106,10 +106,6 @@ genPrefs:
     replaceReddit(input, ""):
       "Reddit -> Teddit/Libreddit"
       placeholder: "Teddit hostname"
-
-    replaceInstagram(input, ""):
-      "Instagram -> Bibliogram"
-      placeholder: "Bibliogram hostname"
 
 iterator allPrefs*(): Pref =
   for k, v in prefList:
