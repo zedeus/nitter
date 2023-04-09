@@ -43,10 +43,6 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
     "accept": "*/*",
     "DNT": "1"
   })
-  if len(cfg.cookieHeader) != 0:
-      result.add("Cookie", cfg.cookieHeader)
-  if len(cfg.xCsrfToken) != 0:
-      result.add("x-csrf-token", cfg.xCsrfToken)
 
 template updateToken() =
   if api != Api.search and resp.headers.hasKey(rlRemaining):
@@ -105,6 +101,12 @@ template fetchImpl(result, additional_headers, fetchBody) {.dirty.} =
     raise rateLimitError()
 
 proc fetch*(url: Uri; api: Api; additional_headers: HttpHeaders = newHttpHeaders()): Future[JsonNode] {.async.} =
+
+  if len(cfg.cookieHeader) != 0:
+      additional_headers.add("Cookie", cfg.cookieHeader)
+  if len(cfg.xCsrfToken) != 0:
+      additional_headers.add("x-csrf-token", cfg.xCsrfToken)
+
   var body: string
   fetchImpl(body, additional_headers):
     if body.startsWith('{') or body.startsWith('['):
