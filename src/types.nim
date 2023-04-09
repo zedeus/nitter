@@ -38,6 +38,7 @@ type
     protectedUser = 22
     couldntAuth = 32
     doesntExist = 34
+    invalidPermission = 37
     userNotFound = 50
     suspended = 63
     rateLimited = 88
@@ -119,6 +120,70 @@ type
     color*: string
 
   PhotoRail* = seq[GalleryPhoto]
+
+  Article* = ref object
+    title*: string
+    coverImage*: string
+    user*: User
+    time*: DateTime
+    paragraphs*: seq[ArticleParagraph]
+    entities*: seq[ArticleEntity]
+    media*: Table[string, ArticleMedia]
+
+  ArticleParagraph* = object
+    text*: string
+    baseType*: ArticleType
+    inlineStyleRanges*: seq[ArticleStyleRange]
+    entityRanges*: seq[ArticleEntityRange]
+  
+  ArticleType* {.pure.} = enum
+    headerOne = "header-one"
+    headerTwo = "header-two"
+    headerThree = "header-three"
+    orderedListItem = "ordered-list-item"
+    unorderedListItem = "unordered-list-item"
+    unstyled = "unstyled"
+    atomic = "atomic"
+    unknown
+
+  ArticleStyleRange* = object
+    offset*: int
+    length*: int
+    style*: ArticleStyle
+  
+  ArticleStyle* {.pure.} = enum
+    bold = "BOLD"
+    italic = "ITALIC"
+    strikethrough = "STRIKETHROUGH"
+    unknown
+
+  ArticleEntityRange* = object
+    offset*: int
+    length*: int
+    key*: int
+
+  ArticleEntity* = object
+    entityType*: ArticleEntityType
+    url*: string
+    mediaIds*: seq[string]
+    tweetId*: string
+    twemoji*: string
+
+  ArticleEntityType* {.pure.} = enum
+    link = "LINK"
+    media = "MEDIA"
+    tweet = "TWEET"
+    twemoji = "TWEMOJI"
+    unknown
+
+  ArticleMedia* = object
+    mediaType*: ArticleMediaType
+    url*: string
+
+  ArticleMediaType* {.pure.} = enum
+    image = "ApiImage"
+    gif = "ApiGif"
+    unknown
 
   Poll* = object
     options*: seq[string]

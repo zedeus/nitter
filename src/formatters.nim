@@ -26,6 +26,8 @@ let
   userPicRegex = re"_(normal|bigger|mini|200x200|400x400)(\.[A-z]+)$"
   extRegex = re"(\.[A-z]+)$"
   illegalXmlRegex = re"(*UTF8)[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]"
+  hashtagRegex = re"\B#(\w*[A-Za-z]\w*)\b"
+  mentionRegex = re"\B@(\w{1,15})\b"
 
 proc getUrlPrefix*(cfg: Config): string =
   if cfg.useHttps: https & cfg.hostname
@@ -71,6 +73,13 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
 
   if absolute.len > 0 and "href" in result:
     result = result.replace("href=\"/", &"href=\"{absolute}/")
+
+proc replaceHashtagsAndMentions*(body: string): string =
+  result = body
+  result = result.replacef(hashtagRegex, a(
+    "#$1", href = "/search?q=%23$1"))
+  result = result.replacef(mentionRegex, a(
+    "@$1", href = "/$1"))
 
 proc getM3u8Url*(content: string): string =
   var matches: array[1, string]
@@ -121,14 +130,14 @@ proc getTime*(tweet: Tweet): string =
 proc getRfc822Time*(tweet: Tweet): string =
   tweet.time.format("ddd', 'dd MMM yyyy HH:mm:ss 'GMT'")
 
-proc getShortTime*(tweet: Tweet): string =
+proc getShortTime*(time: DateTime): string =
   let now = now()
-  let since = now - tweet.time
+  let since = now - time
 
-  if now.year != tweet.time.year:
-    result = tweet.time.format("d MMM yyyy")
+  if now.year != time.year:
+    result = time.format("d MMM yyyy")
   elif since.inDays >= 1:
-    result = tweet.time.format("MMM d")
+    result = time.format("MMM d")
   elif since.inHours >= 1:
     result = $since.inHours & "h"
   elif since.inMinutes >= 1:

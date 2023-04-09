@@ -435,3 +435,71 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
         result.replies.content.add thread
     elif entryId.startsWith("cursor-bottom"):
       result.replies.bottom = e{"content", "itemContent", "value"}.getStr
+
+proc parseGraphArticle*(js: JsonNode): Article =
+  if not js{"errors"}.isNull:
+    return
+
+  let article = js{"data", "twitterArticle"}
+  let meta = article{"metadata"}
+
+  result = Article(
+    title: article{"title"}.getStr,
+    coverImage: article{"cover_image", "media_info", "original_img_url"}.getStr,
+    user: meta{"authorResults", "result", "legacy"}.parseUser,
+    time: meta{"publishedAtMs"}.getStr.parseInt.div(1000).fromUnix.utc,
+  )
+
+  let
+    content = article{"data", "contentStateJson"}.getStr.parseJson
+  
+  for p in content{"blocks"}:
+    var paragraph = ArticleParagraph(
+      text: p{"text"}.getStr,
+      baseType: parseEnum[ArticleType](p{"type"}.getStr)
+    )
+    for sr in p{"inlineStyleRanges"}:
+      paragraph.inlineStyleRanges.add ArticleStyleRange(
+        offset: sr{"offset"}.getInt,
+        length: sr{"length"}.getInt,
+        style: parseEnum[ArticleStyle](sr{"style"}.getStr)
+      )
+    for er in p{"entityRanges"}:
+      paragraph.entityRanges.add ArticleEntityRange(
+        offset: er{"offset"}.getInt,
+        length: er{"length"}.getInt,
+        key: er{"key"}.getInt
+      )
+    result.paragraphs.add paragraph
+  
+  # Note: This is a map but the indices are integers so it's fine.
+  for _, jEntity in content{"entityMap"}:
+    var entity = ArticleEntity(
+      entityType: parseEnum[ArticleEntityType] jEntity{"type"}.getStr,
+    )
+    case entity.entityType
+    of ArticleEntityType.link:
+      entity.url = jEntity{"data", "url"}.getStr
+    of ArticleEntityType.media:
+      for jMedia in jEntity{"data", "mediaItems"}:
+        entity.mediaIds.add jMedia{"mediaId"}.getStr
+    of ArticleEntityType.tweet:
+      entity.tweetId = jEntity{"data", "tweetId"}.getStr
+    of ArticleEntityType.twemoji:
+      entity.twemoji = jEntity{"data", "url"}.getStr
+    else: discard
+
+    result.entities.add entity
+
+  for m in article{"media"}:
+    let mediaInfo = m{"media_info"}
+    var media = ArticleMedia(
+      mediaType: parseEnum[ArticleMediaType](mediaInfo{"__typename"}.getStr)
+    )
+    case media.mediaType
+    of ArticleMediaType.image:
+      media.url = mediaInfo{"original_img_url"}.getStr
+    of ArticleMediaType.gif:
+      media.url = mediaInfo{"variants"}[0]{"url"}.getStr
+    else: discard
+    result.media[m{"media_id"}.getStr] = media

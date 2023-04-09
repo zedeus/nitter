@@ -21,5 +21,5 @@ proc createUnsupportedRouter*(cfg: Config) =
       feature()
 
     get "/i/@i?/?@j?":
-      cond @"i" notin ["status", "lists" , "user"]
+      cond @"i" notin ["status", "lists" , "user", "notes"]
       feature()

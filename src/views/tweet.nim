@@ -38,7 +38,7 @@ proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
 
         span(class="tweet-date"):
           a(href=getLink(tweet), title=tweet.getTime):
-            text tweet.getShortTime
+            text tweet.time.getShortTime
 
 proc renderAlbum(tweet: Tweet): VNode =
   let
@@ -253,7 +253,7 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
 
       span(class="tweet-date"):
         a(href=getLink(quote), title=quote.getTime):
-          text quote.getShortTime
+          text quote.time.getShortTime
 
     if quote.reply.len > 0:
       renderReply(quote)

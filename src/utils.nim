@@ -15,6 +15,7 @@ const
     "pic.twitter.com",
     "twimg.com",
     "abs.twimg.com",
+    "abs-0.twimg.com",
     "pbs.twimg.com",
     "video.twimg.com"
   ]
