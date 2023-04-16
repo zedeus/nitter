@@ -3,6 +3,7 @@ import asyncdispatch, httpclient, uri, strutils, sequtils, sugar
 import packedjson
 import types, query, formatters, consts, apiutils, parser
 import experimental/parser as newParser
+import config
 
 proc getGraphUser*(username: string): Future[User] {.async.} =
   if username.len == 0: return
@@ -86,11 +87,18 @@ proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   result = parsePhotoRail(await fetch(url, Api.timeline))
 
 proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
+
+  let additional_headers = newHttpHeaders()
+
   when T is User:
     const
       searchMode = ("result_filter", "user")
       parse = parseUsers
       fetchFunc = fetchRaw
+    if len(cfg.cookieHeader) != 0:
+      additional_headers.add("Cookie", cfg.cookieHeader)
+    if len(cfg.xCsrfToken) != 0:
+      additional_headers.add("x-csrf-token", cfg.xCsrfToken)
   else:
     const
       searchMode = ("tweet_search_mode", "live")
@@ -103,7 +111,7 @@ proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
 
   let url = search ? genParams(searchParams & @[("q", q), searchMode], after)
   try:
-    result = parse(await fetchFunc(url, Api.search), after)
+    result = parse(await fetchFunc(url, Api.search, additional_headers), after)
     result.query = query
   except InternalError:
     return Result[T](beginning: true, query: query)
