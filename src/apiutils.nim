@@ -108,7 +108,7 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
     updateToken()
 
     let error = result.getError
-    if error in {invalidToken, forbidden, badToken}:
+    if error in {invalidToken, badToken}:
       echo "fetch error: ", result.getError
       release(token, invalid=true)
       raise rateLimitError()
@@ -123,7 +123,7 @@ proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
 
     if result.startsWith("{\"errors"):
       let errors = result.fromJson(Errors)
-      if errors in {invalidToken, forbidden, badToken}:
+      if errors in {invalidToken, badToken}:
         echo "fetch error: ", errors
         release(token, invalid=true)
         raise rateLimitError()
