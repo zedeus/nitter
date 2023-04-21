@@ -69,6 +69,24 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
   let url = graphListMembers ? {"variables": $variables, "features": gqlFeatures}
   result = parseGraphListMembers(await fetchRaw(url, Api.listMembers), after)
 
+proc getGraphSearch*(query: Query; after=""): Future[Result[Tweet]] {.async.} =
+  let q = genQueryParam(query)
+  if q.len == 0 or q == emptyQuery: return
+  var
+    variables = %*{
+      "rawQuery": q,
+      "count": 20,
+      "product": "Latest",
+      "withDownvotePerspective": false,
+      "withReactionsMetadata": false,
+      "withReactionsPerspective": false
+    }
+  if after.len > 0:
+    variables["cursor"] = % after
+  let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
+  result = parseGraphSearch(await fetch(url, Api.search), after)
+  result.query = query
+
 proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
   if id.len == 0: return
   let
@@ -99,32 +117,24 @@ proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return
   let
     ps = genParams({"screen_name": name, "trim_user": "true"},
-                   count="18", ext=false)
+                    count="18", ext=false)
     url = photoRail ? ps
   result = parsePhotoRail(await fetch(url, Api.timeline))
 
-proc getSearch*[T](query: Query; after=""): Future[Result[T]] {.async.} =
-  when T is User:
-    const
-      searchMode = ("result_filter", "user")
-      parse = parseUsers
-      fetchFunc = fetchRaw
-  else:
-    const
-      searchMode = ("tweet_search_mode", "live")
-      parse = parseTimeline
-      fetchFunc = fetch
+proc getUserSearch*(query: Query; page="1"): Future[Result[User]] {.async.} =
+  var url = userSearch ? {
+    "q": query.text,
+    "skip_status": "1",
+    "count": "20",
+    "page": page
+  }
 
-  let q = genQueryParam(query)
-  if q.len == 0 or q == emptyQuery:
-    return Result[T](beginning: true, query: query)
-
-  let url = search ? genParams(searchParams & @[("q", q), searchMode], after)
-  try:
-    result = parse(await fetchFunc(url, Api.search), after)
-    result.query = query
-  except InternalError:
-    return Result[T](beginning: true, query: query)
+  result = parseUsers(await fetchRaw(url, Api.userSearch))
+  result.query = query
+  if page.len == 0:
+    result.bottom = "2"
+  elif page.allCharsInSet(Digits):
+    result.bottom = $(parseInt(page) + 1)
 
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
   let client = newAsyncHttpClient(maxRedirects=0)

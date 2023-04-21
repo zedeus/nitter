@@ -359,7 +359,7 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
       result.top = e.getCursor
     elif "cursor-bottom" in entry:
       result.bottom = e.getCursor
-    elif entry.startsWith("sq-C"):
+    elif entry.startsWith("sq-cursor"):
       with cursor, e{"content", "operation", "cursor"}:
         if cursor{"cursorType"}.getStr == "Bottom":
           result.bottom = cursor{"value"}.getStr
@@ -382,6 +382,12 @@ proc parsePhotoRail*(js: JsonNode): PhotoRail =
 proc parseGraphTweet(js: JsonNode): Tweet =
   if js.kind == JNull or js{"__typename"}.getStr == "TweetUnavailable":
     return Tweet(available: false)
+
+  if js{"__typename"}.getStr == "TweetTombstone":
+    return Tweet(
+      available: false,
+      text: js{"tombstone", "text"}.getTombstone
+    )
 
   var jsCard = copy(js{"card", "legacy"})
   if jsCard.kind != JNull:
@@ -444,7 +450,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
       let tweet = Tweet(
         id: parseBiggestInt(id),
         available: false,
-        text: e{"content", "itemContent"}.getTombstone
+        text: e{"content", "itemContent", "tombstoneInfo", "richText"}.getTombstone
       )
 
       if id == tweetId:
@@ -465,18 +471,44 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Timeline =
 
   let instructions =
     if root == "list": ? js{"data", "list", "tweets_timeline", "timeline", "instructions"}
-    else: ? js{"data", "user", "result", "timeline", "timeline", "instructions"}
+    else: ? js{"data", "user", "result", "timeline_v2", "timeline", "instructions"}
 
   if instructions.len == 0:
     return
 
-  for e in instructions[instructions.len - 1]{"entries"}:
-    let entryId = e{"entryId"}.getStr
-    if entryId.startsWith("tweet"):
-      with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
-        let tweet = parseGraphTweet(tweetResult)
-        if not tweet.available:
-          tweet.id = parseBiggestInt(entryId.getId())
-        result.content.add tweet
-    elif entryId.startsWith("cursor-bottom"):
-      result.bottom = e{"content", "value"}.getStr
+  for i in instructions:
+    if i{"type"}.getStr == "TimelineAddEntries":
+      for e in i{"entries"}:
+        let entryId = e{"entryId"}.getStr
+        if entryId.startsWith("tweet"):
+          with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
+            let tweet = parseGraphTweet(tweetResult)
+            if not tweet.available:
+              tweet.id = parseBiggestInt(entryId.getId())
+            result.content.add tweet
+        elif entryId.startsWith("cursor-bottom"):
+          result.bottom = e{"content", "value"}.getStr
+
+proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
+  result = Timeline(beginning: after.len == 0)
+
+  let instructions = js{"data", "search_by_raw_query", "search_timeline", "timeline", "instructions"}
+  if instructions.len == 0:
+    return
+
+  for instruction in instructions:
+    let typ = instruction{"type"}.getStr
+    if typ == "TimelineAddEntries":
+      for e in instructions[0]{"entries"}:
+        let entryId = e{"entryId"}.getStr
+        if entryId.startsWith("tweet"):
+          with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
+            let tweet = parseGraphTweet(tweetResult)
+            if not tweet.available:
+              tweet.id = parseBiggestInt(entryId.getId())
+            result.content.add tweet
+        elif entryId.startsWith("cursor-bottom"):
+          result.bottom = e{"content", "value"}.getStr
+    elif typ == "TimelineReplaceEntry":
+      if instruction{"entry_id_to_replace"}.getStr.startsWith("cursor-bottom"):
+        result.bottom = instruction{"entry", "content", "value"}.getStr

@@ -19,6 +19,7 @@ type
     tweetResult
     timeline
     search
+    userSearch
     list
     listBySlug
     listMembers

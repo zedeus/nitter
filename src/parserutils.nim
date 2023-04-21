@@ -130,11 +130,8 @@ proc getBanner*(js: JsonNode): string =
       return
 
 proc getTombstone*(js: JsonNode): string =
-  result = js{"tombstoneInfo", "richText", "text"}.getStr
+  result = js{"text"}.getStr
   result.removeSuffix(" Learn more")
-
-  if result.len == 0:
-    result = js{"tombstoneInfo", "text"}.getStr
 
 proc getMp4Resolution*(url: string): int =
   # parses the height out of a URL like this one:
