@@ -4,6 +4,9 @@ on:
   push:
     paths-ignore:
       - "*.md"
+    branches-ignore:
+      - master
+  workflow_call:
 
 jobs:
   test:
