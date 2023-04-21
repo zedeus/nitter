@@ -45,6 +45,7 @@ type
     null = 0
     noUserMatches = 17
     protectedUser = 22
+    paramsMissing = 25
     couldntAuth = 32
     doesntExist = 34
     userNotFound = 50

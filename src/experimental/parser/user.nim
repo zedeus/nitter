@@ -80,7 +80,6 @@ proc parseUser*(json: string; username=""): User =
 proc parseUsers*(json: string; after=""): Result[User] =
   result = Result[User](beginning: after.len == 0)
 
-  if json[0] == '[':
-    let raw = json.fromJson(seq[RawUser])
-    for user in raw:
-      result.content.add user.toUser
+  let raw = json.fromJson(seq[RawUser])
+  for user in raw:
+    result.content.add user.toUser

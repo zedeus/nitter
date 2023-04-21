@@ -69,24 +69,6 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
   let url = graphListMembers ? {"variables": $variables, "features": gqlFeatures}
   result = parseGraphListMembers(await fetchRaw(url, Api.listMembers), after)
 
-proc getGraphSearch*(query: Query; after=""): Future[Result[Tweet]] {.async.} =
-  let q = genQueryParam(query)
-  if q.len == 0 or q == emptyQuery: return
-  var
-    variables = %*{
-      "rawQuery": q,
-      "count": 20,
-      "product": "Latest",
-      "withDownvotePerspective": false,
-      "withReactionsMetadata": false,
-      "withReactionsPerspective": false
-    }
-  if after.len > 0:
-    variables["cursor"] = % after
-  let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
-  result = parseGraphSearch(await fetch(url, Api.search), after)
-  result.query = query
-
 proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
   if id.len == 0: return
   let
@@ -113,15 +95,30 @@ proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
   if after.len > 0:
     result.replies = await getReplies(id, after)
 
-proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
-  if name.len == 0: return
-  let
-    ps = genParams({"screen_name": name, "trim_user": "true"},
-                    count="18", ext=false)
-    url = photoRail ? ps
-  result = parsePhotoRail(await fetch(url, Api.timeline))
+proc getGraphSearch*(query: Query; after=""): Future[Result[Tweet]] {.async.} =
+  let q = genQueryParam(query)
+  if q.len == 0 or q == emptyQuery:
+    return Result[Tweet](query: query, beginning: true)
+
+  var
+    variables = %*{
+      "rawQuery": q,
+      "count": 20,
+      "product": "Latest",
+      "withDownvotePerspective": false,
+      "withReactionsMetadata": false,
+      "withReactionsPerspective": false
+    }
+  if after.len > 0:
+    variables["cursor"] = % after
+  let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
+  result = parseGraphSearch(await fetch(url, Api.search), after)
+  result.query = query
 
 proc getUserSearch*(query: Query; page="1"): Future[Result[User]] {.async.} =
+  if query.text.len == 0:
+    return Result[User](query: query, beginning: true)
+
   var url = userSearch ? {
     "q": query.text,
     "skip_status": "1",
@@ -135,6 +132,14 @@ proc getUserSearch*(query: Query; page="1"): Future[Result[User]] {.async.} =
     result.bottom = "2"
   elif page.allCharsInSet(Digits):
     result.bottom = $(parseInt(page) + 1)
+
+proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
+  if name.len == 0: return
+  let
+    ps = genParams({"screen_name": name, "trim_user": "true"},
+                    count="18", ext=false)
+    url = photoRail ? ps
+  result = parsePhotoRail(await fetch(url, Api.timeline))
 
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
   let client = newAsyncHttpClient(maxRedirects=0)
