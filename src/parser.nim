@@ -380,14 +380,19 @@ proc parsePhotoRail*(js: JsonNode): PhotoRail =
     result.add GalleryPhoto(url: url, tweetId: $t.id)
 
 proc parseGraphTweet(js: JsonNode): Tweet =
-  if js.kind == JNull or js{"__typename"}.getStr == "TweetUnavailable":
+  if js.kind == JNull:
     return Tweet(available: false)
 
-  if js{"__typename"}.getStr == "TweetTombstone":
+  case js{"__typename"}.getStr
+  of "TweetUnavailable":
+    return Tweet(available: false)
+  of "TweetTombstone":
     return Tweet(
       available: false,
       text: js{"tombstone", "text"}.getTombstone
     )
+  of "TweetWithVisibilityResults":
+    return parseGraphTweet(js{"tweet"})
 
   var jsCard = copy(js{"card", "legacy"})
   if jsCard.kind != JNull:
