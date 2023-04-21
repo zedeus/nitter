@@ -45,9 +45,10 @@ type
     null = 0
     noUserMatches = 17
     protectedUser = 22
-    paramsMissing = 25
+    missingParams = 25
     couldntAuth = 32
     doesntExist = 34
+    invalidParam = 47
     userNotFound = 50
     suspended = 63
     rateLimited = 88
