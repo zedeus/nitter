@@ -85,19 +85,23 @@ routes:
     resp Http500, showError(
       &"An error occurred, please {link} with the URL you tried to visit.", cfg)
 
+  error BadClientError:
+    echo error.exc.name, ": ", error.exc.msg
+    resp Http500, showError("Network error occured, please try again.", cfg)
+
   error RateLimitError:
     const link = a("another instance", href = instancesUrl)
     resp Http429, showError(
       &"Instance has been rate limited.<br>Use {link} or try again later.", cfg)
 
-  extend unsupported, ""
-  extend preferences, ""
-  extend resolver, ""
   extend rss, ""
+  extend status, ""
   extend search, ""
   extend timeline, ""
-  extend list, ""
-  extend status, ""
   extend media, ""
+  extend list, ""
+  extend preferences, ""
+  extend resolver, ""
   extend embed, ""
   extend debug, ""
+  extend unsupported, ""

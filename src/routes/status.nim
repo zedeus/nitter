@@ -16,17 +16,21 @@ proc createStatusRouter*(cfg: Config) =
   router status:
     get "/@name/status/@id/?":
       cond '.' notin @"name"
-      cond not @"id".any(c => not c.isDigit)
+      let id = @"id"
+
+      if id.len > 19 or id.any(c => not c.isDigit):
+        resp Http404, showError("Invalid tweet ID", cfg)
+
       let prefs = cookiePrefs()
 
       # used for the infinite scroll feature
       if @"scroll".len > 0:
-        let replies = await getReplies(@"id", getCursor())
+        let replies = await getReplies(id, getCursor())
         if replies.content.len == 0:
           resp Http404, ""
         resp $renderReplies(replies, prefs, getPath())
 
-      let conv = await getTweet(@"id", getCursor())
+      let conv = await getTweet(id, getCursor())
       if conv == nil:
         echo "nil conv"
 

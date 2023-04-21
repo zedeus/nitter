@@ -27,11 +27,15 @@ proc createSearchRouter*(cfg: Config) =
       of users:
         if "," in q:
           redirect("/" & q)
-        let users = await getSearch[User](query, getCursor())
+        var users: Result[User]
+        try:
+          users = await getUserSearch(query, getCursor())
+        except InternalError:
+          users = Result[User](beginning: true, query: query)
         resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs, title)
       of tweets:
         let
-          tweets = await getSearch[Tweet](query, getCursor())
+          tweets = await getGraphSearch(query, getCursor())
           rss = "/search/rss?" & genQueryUrl(query)
         resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
                         request, cfg, prefs, title, rss=rss)

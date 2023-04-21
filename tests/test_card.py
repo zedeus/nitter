@@ -3,11 +3,6 @@ from parameterized import parameterized
 
 
 card = [
-    ['Thom_Wolf/status/1122466524860702729',
-     'facebookresearch/fairseq',
-     'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - GitHub - facebookresearch/fairseq: Facebook AI Research Sequence-to-Sequence Toolkit written in Python.',
-     'github.com', True],
-
     ['nim_lang/status/1136652293510717440',
      'Version 0.20.0 released',
      'We are very proud to announce Nim version 0.20. This is a massive release, both literally and figuratively. It contains more than 1,000 commits and it marks our release candidate for version 1.0!',
@@ -25,6 +20,11 @@ card = [
 ]
 
 no_thumb = [
+    ['Thom_Wolf/status/1122466524860702729',
+     'facebookresearch/fairseq',
+     'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - GitHub - facebookresearch/fairseq: Facebook AI Research Sequence-to-Sequence Toolkit written in Python.',
+     'github.com'],
+
     ['brent_p/status/1088857328680488961',
      'Hts Nim Sugar',
      'hts-nim is a library that allows one to use htslib via the nim programming language. Nim is a garbage-collected language that compiles to C and often has similar performance. I have become very...',

@@ -17,8 +17,8 @@ proc genParams*(pars: openArray[(string, string)] = @[]; cursor="";
     result &= p
   if ext:
     result &= ("ext", "mediaStats")
-    result &= ("include_ext_alt_text", "true")
-    result &= ("include_ext_media_availability", "true")
+    result &= ("include_ext_alt_text", "1")
+    result &= ("include_ext_media_availability", "1")
   if count.len > 0:
     result &= ("count", count)
   if cursor.len > 0:
@@ -44,7 +44,7 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
   })
 
 template updateToken() =
-  if api != Api.search and resp.headers.hasKey(rlRemaining):
+  if resp.headers.hasKey(rlRemaining):
     let
       remaining = parseInt(resp.headers[rlRemaining])
       reset = parseInt(resp.headers[rlReset])
@@ -67,14 +67,9 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
       getContent()
 
-      # Twitter randomly returns 401 errors with an empty body quite often.
-      # Retrying the request usually works.
-      if resp.status == "401 Unauthorized" and result.len == 0:
-        getContent()
-
-    if resp.status == $Http503:
-      badClient = true
-      raise newException(InternalError, result)
+      if resp.status == $Http503:
+        badClient = true
+        raise newException(BadClientError, "Bad client")
 
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
@@ -89,6 +84,9 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     if resp.status == $Http400:
       raise newException(InternalError, $url)
   except InternalError as e:
+    raise e
+  except BadClientError as e:
+    release(token, used=true)
     raise e
   except Exception as e:
     echo "error: ", e.name, ", msg: ", e.msg, ", token: ", token[], ", url: ", url
