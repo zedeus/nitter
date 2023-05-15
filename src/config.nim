@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import parsecfg except Config
-import types, strutils
+import types, strutils, std/os
 
 proc get*[T](config: parseCfg.Config; section, key: string; default: T): T =
-  let val = config.getSectionValue(section, key)
+  let envKey = "NITTER_" & section.toUpperAscii & "_" & key.toUpperAscii
+  let envVal = getEnv(envKey)
+  let val = if envVal.len == 0: config.getSectionValue(section, key) else: envVal
   if val.len == 0: return default
 
   when T is int: parseInt(val)
@@ -11,7 +13,7 @@ proc get*[T](config: parseCfg.Config; section, key: string; default: T): T =
   elif T is string: val
 
 proc getConfig*(path: string): (Config, parseCfg.Config) =
-  var cfg = loadConfig(path)
+  var cfg = try: loadConfig(path) except IOError: parseCfg.Config()
 
   let conf = Config(
     # Server
