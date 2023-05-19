@@ -35,11 +35,6 @@ no_thumb = [
      'A sample of a Qt app written using mostly nim. Contribute to sinkingsugar/nimqt-example development by creating an account on GitHub.',
      'github.com'],
 
-    ['mobile_test/status/490378953744318464',
-     'Nantasket Beach',
-     'Explore this photo titled Nantasket Beach by Ben Sandofsky (@sandofsky) on 500px',
-     '500px.com'],
-
     ['nim_lang/status/1082989146040340480',
      'Nim in 2018: A short recap',
      'Posted by u/miran1 - 36 votes and 46 comments',
