@@ -384,7 +384,7 @@ proc parseGraphTweet(js: JsonNode): Tweet =
     return Tweet(available: false)
 
   case js{"__typename"}.getStr
-  of "TweetUnavailable":
+  of "TweetUnavailable", "TweetPreviewDisplay":
     return Tweet(available: false)
   of "TweetTombstone":
     return Tweet(
