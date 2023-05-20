@@ -17,13 +17,13 @@ proc genParams*(pars: openArray[(string, string)] = @[]; cursor="";
     result &= p
   if ext:
     result &= ("ext", "mediaStats")
-    result &= ("include_ext_alt_text", "true")
-    result &= ("include_ext_media_availability", "true")
+    result &= ("include_ext_alt_text", "1")
+    result &= ("include_ext_media_availability", "1")
   if count.len > 0:
     result &= ("count", count)
   if cursor.len > 0:
     # The raw cursor often has plus signs, which sometimes get turned into spaces,
-    # so we need to them back into a plus
+    # so we need to turn them back into a plus
     if " " in cursor:
       result &= ("cursor", cursor.replace(" ", "+"))
     else:
@@ -44,7 +44,7 @@ proc genHeaders*(token: Token = nil): HttpHeaders =
   })
 
 template updateToken() =
-  if api != Api.search and resp.headers.hasKey(rlRemaining):
+  if resp.headers.hasKey(rlRemaining):
     let
       remaining = parseInt(resp.headers[rlRemaining])
       reset = parseInt(resp.headers[rlReset])
@@ -61,12 +61,15 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   try:
     var resp: AsyncResponse
     pool.use(genHeaders(token)):
-      resp = await c.get($url)
-      result = await resp.body
+      template getContent =
+        resp = await c.get($url)
+        result = await resp.body
+
+      getContent()
 
       if resp.status == $Http503:
         badClient = true
-        raise newException(InternalError, result)
+        raise newException(BadClientError, "Bad client")
 
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
@@ -81,6 +84,9 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     if resp.status == $Http400:
       raise newException(InternalError, $url)
   except InternalError as e:
+    raise e
+  except BadClientError as e:
+    release(token, used=true)
     raise e
   except Exception as e:
     echo "error: ", e.name, ", msg: ", e.msg, ", token: ", token[], ", url: ", url
@@ -100,7 +106,7 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
     updateToken()
 
     let error = result.getError
-    if error in {invalidToken, forbidden, badToken}:
+    if error in {invalidToken, badToken}:
       echo "fetch error: ", result.getError
       release(token, invalid=true)
       raise rateLimitError()
@@ -115,7 +121,7 @@ proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
 
     if result.startsWith("{\"errors"):
       let errors = result.fromJson(Errors)
-      if errors in {invalidToken, forbidden, badToken}:
+      if errors in {invalidToken, badToken}:
         echo "fetch error: ", errors
         release(token, invalid=true)
         raise rateLimitError()

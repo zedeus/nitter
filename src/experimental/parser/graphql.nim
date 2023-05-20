@@ -1,11 +1,17 @@
+import options
 import jsony
 import user, ../types/[graphuser, graphlistmembers]
 from ../../types import User, Result, Query, QueryKind
 
 proc parseGraphUser*(json: string): User =
   let raw = json.fromJson(GraphUser)
+
+  if raw.data.user.result.reason.get("") == "Suspended":
+    return User(suspended: true)
+
   result = toUser raw.data.user.result.legacy
   result.id = raw.data.user.result.restId
+  result.verified = result.verified or raw.data.user.result.isBlueVerified
 
 proc parseGraphListMembers*(json, cursor: string): Result[User] =
   result = Result[User](

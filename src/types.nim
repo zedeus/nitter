@@ -7,17 +7,28 @@ genPrefsType()
 type
   RateLimitError* = object of CatchableError
   InternalError* = object of CatchableError
+  BadClientError* = object of CatchableError
+
+  TimelineKind* {.pure.} = enum
+    tweets
+    replies
+    media
 
   Api* {.pure.} = enum
-    userShow
+    tweetDetail
+    tweetResult
     timeline
     search
-    tweet
+    userSearch
     list
     listBySlug
     listMembers
+    listTweets
     userRestId
-    status
+    userScreenName
+    userTweets
+    userTweetsAndReplies
+    userMedia
 
   RateLimit* = object
     remaining*: int
@@ -34,17 +45,22 @@ type
     null = 0
     noUserMatches = 17
     protectedUser = 22
+    missingParams = 25
     couldntAuth = 32
     doesntExist = 34
+    invalidParam = 47
     userNotFound = 50
     suspended = 63
     rateLimited = 88
     invalidToken = 89
     listIdOrSlug = 112
     tweetNotFound = 144
+    tweetNotAuthorized = 179
     forbidden = 200
     badToken = 239
     noCsrf = 353
+    tweetUnavailable = 421
+    tweetCensored = 422
 
   User* = object
     id*: string
@@ -145,6 +161,7 @@ type
     imageDirectMessage = "image_direct_message"
     audiospace = "audiospace"
     newsletterPublication = "newsletter_publication"
+    hidden
     unknown
     
   Card* = object
@@ -175,6 +192,7 @@ type
     available*: bool
     tombstone*: string
     location*: string
+    # Unused, needed for backwards compat
     source*: string
     stats*: TweetStats
     retweet*: Option[Tweet]

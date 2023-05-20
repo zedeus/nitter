@@ -63,12 +63,10 @@ proc renderSearchPanel*(query: Query): VNode =
     hiddenField("f", "tweets")
     genInput("q", "", query.text, "Enter search...", class="pref-inline")
     button(`type`="submit"): icon "search"
-    if isPanelOpen(query):
-      input(id="search-panel-toggle", `type`="checkbox", checked="")
-    else:
-      input(id="search-panel-toggle", `type`="checkbox")
-    label(`for`="search-panel-toggle"):
-      icon "down"
+
+    input(id="search-panel-toggle", `type`="checkbox", checked=isPanelOpen(query))
+    label(`for`="search-panel-toggle"): icon "down"
+
     tdiv(class="search-panel"):
       for f in @["filter", "exclude"]:
         span(class="search-title"): text capitalize(f)
@@ -88,7 +86,7 @@ proc renderSearchPanel*(query: Query): VNode =
             genDate("until", query.until)
         tdiv:
           span(class="search-title"): text "Near"
-          genInput("near", "", query.near, placeholder="Location...")
+          genInput("near", "", query.near, "Location...", autofocus=false)
 
 proc renderTweetSearch*(results: Result[Tweet]; prefs: Prefs; path: string;
                         pinned=none(Tweet)): VNode =

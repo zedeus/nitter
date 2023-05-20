@@ -3,6 +3,14 @@ import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 import ".."/[types, utils]
 
+const smallWebp* = "?name=small&format=webp"
+
+proc getSmallPic*(url: string): string =
+  result = url
+  if "?" notin url and not url.endsWith("placeholder.png"):
+    result &= smallWebp
+  result = getPicUrl(result)
+
 proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
   var c = "icon-" & icon
   if class.len > 0: c = &"{c} {class}"
@@ -51,29 +59,23 @@ proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNod
 proc genCheckbox*(pref, label: string; state: bool): VNode =
   buildHtml(label(class="pref-group checkbox-container")):
     text label
-    if state: input(name=pref, `type`="checkbox", checked="")
-    else: input(name=pref, `type`="checkbox")
+    input(name=pref, `type`="checkbox", checked=state)
     span(class="checkbox")
 
-proc genInput*(pref, label, state, placeholder: string; class=""): VNode =
+proc genInput*(pref, label, state, placeholder: string; class=""; autofocus=true): VNode =
   let p = placeholder
   buildHtml(tdiv(class=("pref-group pref-input " & class))):
     if label.len > 0:
       label(`for`=pref): text label
-    if state.len == 0:
-      input(name=pref, `type`="text", placeholder=p, value=state, autofocus="")
-    else:
-      input(name=pref, `type`="text", placeholder=p, value=state)
+    input(name=pref, `type`="text", placeholder=p, value=state, autofocus=(autofocus and state.len == 0))
 
 proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
   buildHtml(tdiv(class="pref-group pref-input")):
     label(`for`=pref): text label
     select(name=pref):
       for opt in options:
-        if opt == state:
-          option(value=opt, selected=""): text opt
-        else:
-          option(value=opt): text opt
+        option(value=opt, selected=(opt == state)):
+          text opt
 
 proc genDate*(pref, state: string): VNode =
   buildHtml(span(class="date-input")):
@@ -85,12 +87,9 @@ proc genImg*(url: string; class=""): VNode =
     img(src=getPicUrl(url), class=class, alt="", loading="lazy", decoding="async")
 
 proc getTabClass*(query: Query; tab: QueryKind): string =
-  result = "tab-item"
-  if query.kind == tab:
-    result &= " active"
+  if query.kind == tab: "tab-item active"
+  else: "tab-item"
 
 proc getAvatarClass*(prefs: Prefs): string =
-  if prefs.squareAvatars:
-    "avatar"
-  else:
-    "avatar round"
+  if prefs.squareAvatars: "avatar"
+  else: "avatar round"

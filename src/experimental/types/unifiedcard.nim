@@ -17,6 +17,8 @@ type
     twitterListDetails
     communityDetails
     mediaWithDetailsHorizontal
+    hidden
+    unknown
 
   Component* = object
     kind*: ComponentType
@@ -47,7 +49,7 @@ type
     vanity*: string
 
   MediaType* = enum
-    photo, video
+    photo, video, model3d
 
   MediaEntity* = object
     kind*: MediaType
@@ -70,10 +72,37 @@ type
   Text = object
     content: string
 
-  HasTypeField = Component | Destination | MediaEntity | AppStoreData
+  TypeField = Component | Destination | MediaEntity | AppStoreData
 
 converter fromText*(text: Text): string = text.content
 
-proc renameHook*(v: var HasTypeField; fieldName: var string) =
+proc renameHook*(v: var TypeField; fieldName: var string) =
   if fieldName == "type":
     fieldName = "kind"
+
+proc enumHook*(s: string; v: var ComponentType) =
+  v = case s
+      of "details": details
+      of "media": media
+      of "swipeable_media": swipeableMedia
+      of "button_group": buttonGroup
+      of "app_store_details": appStoreDetails
+      of "twitter_list_details": twitterListDetails
+      of "community_details": communityDetails
+      of "media_with_details_horizontal": mediaWithDetailsHorizontal
+      of "commerce_drop_details": hidden
+      else: echo "ERROR: Unknown enum value (ComponentType): ", s; unknown
+
+proc enumHook*(s: string; v: var AppType) =
+  v = case s
+      of "android_app": androidApp
+      of "iphone_app": iPhoneApp
+      of "ipad_app": iPadApp
+      else: echo "ERROR: Unknown enum value (AppType): ", s; androidApp
+
+proc enumHook*(s: string; v: var MediaType) =
+  v = case s
+      of "video": video
+      of "photo": photo
+      of "model3d": model3d
+      else: echo "ERROR: Unknown enum value (MediaType): ", s; photo

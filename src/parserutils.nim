@@ -28,13 +28,13 @@ template `?`*(js: JsonNode): untyped =
   if j.isNull: return
   j
 
-template `with`*(ident, value, body): untyped =
-  block:
+template with*(ident, value, body): untyped =
+  if true:
     let ident {.inject.} = value
     if ident != nil: body
 
-template `with`*(ident; value: JsonNode; body): untyped =
-  block:
+template with*(ident; value: JsonNode; body): untyped =
+  if true:
     let ident {.inject.} = value
     if value.notNull: body
 
@@ -130,12 +130,8 @@ proc getBanner*(js: JsonNode): string =
       return
 
 proc getTombstone*(js: JsonNode): string =
-  result = js{"tombstoneInfo", "richText", "text"}.getStr
+  result = js{"text"}.getStr
   result.removeSuffix(" Learn more")
-
-proc getSource*(js: JsonNode): string =
-  let src = js{"source"}.getStr
-  result = src.substr(src.find('>') + 1, src.rfind('<') - 1)
 
 proc getMp4Resolution*(url: string): int =
   # parses the height out of a URL like this one:
@@ -234,47 +230,37 @@ proc expandUserEntities*(user: var User; js: JsonNode) =
   user.bio = user.bio.replacef(unRegex, unReplace)
                      .replacef(htRegex, htReplace)
 
-proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
-  let
-    orig = tweet.text.toRunes
-    textRange = js{"display_text_range"}
-    textSlice = textRange{0}.getInt .. textRange{1}.getInt
-    hasQuote = js{"is_quote_status"}.getBool
-    hasCard = tweet.card.isSome
-
-  var replyTo = ""
-  if tweet.replyId != 0:
-    with reply, js{"in_reply_to_screen_name"}:
-      tweet.reply.add reply.getStr
-      replyTo = reply.getStr
-
-  let ent = ? js{"entities"}
+proc expandTextEntities(tweet: Tweet; entities: JsonNode; text: string; textSlice: Slice[int];
+                        replyTo=""; hasQuote=false) =
+  let hasCard = tweet.card.isSome
 
   var replacements = newSeq[ReplaceSlice]()
 
-  with urls, ent{"urls"}:
+  with urls, entities{"urls"}:
     for u in urls:
       let urlStr = u["url"].getStr
-      if urlStr.len == 0 or urlStr notin tweet.text:
+      if urlStr.len == 0 or urlStr notin text:
         continue
+
       replacements.extractUrls(u, textSlice.b, hideTwitter = hasQuote)
+
       if hasCard and u{"url"}.getStr == get(tweet.card).url:
         get(tweet.card).url = u{"expanded_url"}.getStr
 
-  with media, ent{"media"}:
+  with media, entities{"media"}:
     for m in media:
       replacements.extractUrls(m, textSlice.b, hideTwitter = true)
 
-  if "hashtags" in ent:
-    for hashtag in ent["hashtags"]:
+  if "hashtags" in entities:
+    for hashtag in entities["hashtags"]:
       replacements.extractHashtags(hashtag)
 
-  if "symbols" in ent:
-    for symbol in ent["symbols"]:
+  if "symbols" in entities:
+    for symbol in entities["symbols"]:
       replacements.extractHashtags(symbol)
 
-  if "user_mentions" in ent:
-    for mention in ent["user_mentions"]:
+  if "user_mentions" in entities:
+    for mention in entities["user_mentions"]:
       let
         name = mention{"screen_name"}.getStr
         slice = mention.extractSlice
@@ -291,5 +277,27 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   replacements.deduplicate
   replacements.sort(cmp)
 
-  tweet.text = orig.replacedWith(replacements, textSlice)
-                   .strip(leading=false)
+  tweet.text = text.toRunes.replacedWith(replacements, textSlice).strip(leading=false)
+
+proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
+  let
+    entities = ? js{"entities"}
+    hasQuote = js{"is_quote_status"}.getBool
+    textRange = js{"display_text_range"}
+    textSlice = textRange{0}.getInt .. textRange{1}.getInt
+
+  var replyTo = ""
+  if tweet.replyId != 0:
+    with reply, js{"in_reply_to_screen_name"}:
+      replyTo = reply.getStr
+      tweet.reply.add replyTo
+
+  tweet.expandTextEntities(entities, tweet.text, textSlice, replyTo, hasQuote)
+
+proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
+  let
+    entities = ? js{"entity_set"}
+    text = js{"text"}.getStr
+    textSlice = 0..text.runeLen
+
+  tweet.expandTextEntities(entities, text, textSlice)

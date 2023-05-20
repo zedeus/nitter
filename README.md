@@ -1,6 +1,7 @@
 # Nitter
 
-[![Test Matrix](https://github.com/zedeus/nitter/workflows/CI/CD/badge.svg)](https://github.com/zedeus/nitter/actions?query=workflow%3ACI/CD)
+[![Test Matrix](https://github.com/zedeus/nitter/workflows/Tests/badge.svg)](https://github.com/zedeus/nitter/actions/workflows/run-tests.yml)
+[![Test Matrix](https://github.com/zedeus/nitter/workflows/Docker/badge.svg)](https://github.com/zedeus/nitter/actions/workflows/build-docker.yml)
 [![License](https://img.shields.io/github/license/zedeus/nitter?style=flat)](#license)
 
 A free and open source alternative Twitter front-end focused on privacy and
@@ -34,7 +35,7 @@ XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscW
 
 ## Resources
 
-The wiki contains 
+The wiki contains
 [a list of instances](https://github.com/zedeus/nitter/wiki/Instances) and
 [browser extensions](https://github.com/zedeus/nitter/wiki/Extensions)
 maintained by the community.
@@ -67,9 +68,10 @@ Twitter account.
 ## Installation
 
 ### Dependencies
-* libpcre
-* libsass
-* redis
+
+- libpcre
+- libsass
+- redis
 
 To compile Nitter you need a Nim installation, see
 [nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to
@@ -108,25 +110,32 @@ performance reasons.
 
 ### Docker
 
-#### NOTE: For ARM64/ARM support, please use [unixfox's image](https://quay.io/repository/unixfox/nitter?tab=tags), more info [here](https://github.com/zedeus/nitter/issues/399#issuecomment-997263495)
+Page for the Docker image: https://hub.docker.com/r/zedeus/nitter
+
+#### NOTE: For ARM64 support, please use the separate ARM64 docker image: [`zedeus/nitter:latest-arm64`](https://hub.docker.com/r/zedeus/nitter/tags).
 
 To run Nitter with Docker, you'll need to install and run Redis separately
 before you can run the container. See below for how to also run Redis using
 Docker.
 
 To build and run Nitter in Docker:
+
 ```bash
 docker build -t nitter:latest .
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host nitter:latest
 ```
 
+Note: For ARM64, use this Dockerfile: [`Dockerfile.arm64`](https://github.com/zedeus/nitter/blob/master/Dockerfile.arm64).
+
 A prebuilt Docker image is provided as well:
+
 ```bash
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host zedeus/nitter:latest
 ```
 
 Using docker-compose to run both Nitter and Redis as different containers:
 Change `redisHost` from `localhost` to `nitter-redis` in `nitter.conf`, then run:
+
 ```bash
 docker-compose up -d
 ```

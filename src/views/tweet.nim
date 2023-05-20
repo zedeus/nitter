@@ -7,11 +7,7 @@ import renderutils
 import ".."/[types, utils, formatters]
 import general
 
-proc getSmallPic(url: string): string =
-  result = url
-  if "?" notin url and not url.endsWith("placeholder.png"):
-    result &= "?name=small"
-  result = getPicUrl(result)
+const doctype = "<!DOCTYPE html>\n"
 
 proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
   let url = getPicUrl(user.getUserPic("_mini"))
@@ -57,9 +53,8 @@ proc renderAlbum(tweet: Tweet): VNode =
           tdiv(class="attachment image"):
             let
               named = "name=" in photo
-              orig = photo
-              small = if named: photo else: photo & "?name=small"
-            a(href=getOrigPicUrl(orig), class="still-image", target="_blank"):
+              small = if named: photo else: photo & smallWebp
+            a(href=getOrigPicUrl(photo), class="still-image", target="_blank"):
               genImg(small)
 
 proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
@@ -106,12 +101,10 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
                      else: vidUrl
           case playbackType
           of mp4:
-            if prefs.muteVideos:
-              video(src=source, poster=thumb, controls="", preload="none", muted=""):
-            else:
-              video(src=source, poster=thumb, controls="", preload="none"):
+            video(poster=thumb, controls="", muted=prefs.muteVideos):
+              source(src=source, `type`="video/mp4")
           of m3u8, vmap:
-            video(poster=thumb, data-url=source, data-autoload="false")
+            video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
             tdiv(class="overlay-circle"): span(class="overlay-triangle")
             verbatim "</div>"
@@ -132,12 +125,9 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
     tdiv(class="gallery-gif", style={maxHeight: "unset"}):
       tdiv(class="attachment"):
-        let thumb = getSmallPic(gif.thumb)
-        let url = getPicUrl(gif.url)
-        if prefs.autoplayGifs:
-          video(src=url, class="gif", poster=thumb, controls="", muted="", loop="", playsinline="", autoplay="")
-        else:
-          video(src=url, class="gif", poster=thumb, controls="", muted="", loop="", playsinline="")
+        video(class="gif", poster=getSmallPic(gif.thumb), autoplay=prefs.autoplayGifs,
+              controls="", muted="", loop=""):
+          source(src=getPicUrl(gif.url), `type`="video/mp4")
 
 proc renderPoll(poll: Poll): VNode =
   buildHtml(tdiv(class="poll")):
@@ -331,7 +321,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if tweet.attribution.isSome:
         renderAttribution(tweet.attribution.get(), prefs)
 
-      if tweet.card.isSome:
+      if tweet.card.isSome and tweet.card.get().kind != hidden:
         renderCard(tweet.card.get(), prefs, path)
 
       if tweet.photos.len > 0:
@@ -350,7 +340,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         renderQuote(tweet.quote.get(), prefs, path)
 
       if mainTweet:
-        p(class="tweet-published"): text &"{getTime(tweet)} · {tweet.source}"
+        p(class="tweet-published"): text &"{getTime(tweet)}"
 
       if tweet.mediaTags.len > 0:
         renderMediaTags(tweet.mediaTags)
@@ -362,7 +352,12 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
           text "Show this thread"
 
-proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): VNode =
-  buildHtml(tdiv(class="tweet-embed")):
+proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): string =
+  let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req)
-    renderTweet(tweet, prefs, path, mainTweet=true)
+
+    body:
+      tdiv(class="tweet-embed"):
+        renderTweet(tweet, prefs, path, mainTweet=true)
+
+  result = doctype & $node

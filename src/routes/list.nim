@@ -6,7 +6,6 @@ import jester
 import router_utils
 import ".."/[types, redis_cache, api]
 import ../views/[general, timeline, list]
-export getListTimeline, getGraphList
 
 template respList*(list, timeline, title, vnode: typed) =
   if list.id.len == 0 or list.name.len == 0:
@@ -39,7 +38,7 @@ proc createListRouter*(cfg: Config) =
       let
         prefs = cookiePrefs()
         list = await getCachedList(id=(@"id"))
-        timeline = await getListTimeline(list.id, getCursor())
+        timeline = await getGraphListTweets(list.id, getCursor())
         vnode = renderTimelineTweets(timeline, prefs, request.path)
       respList(list, timeline, list.title, vnode)
 
