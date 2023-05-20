@@ -381,16 +381,15 @@ proc parsePhotoRail*(js: JsonNode): PhotoRail =
 
 proc parseGraphTweet(js: JsonNode): Tweet =
   if js.kind == JNull:
-    return Tweet(available: false)
+    return Tweet()
 
   case js{"__typename"}.getStr
-  of "TweetUnavailable", "TweetPreviewDisplay":
-    return Tweet(available: false)
+  of "TweetUnavailable":
+    return Tweet()
   of "TweetTombstone":
-    return Tweet(
-      available: false,
-      text: js{"tombstone", "text"}.getTombstone
-    )
+    return Tweet(text: js{"tombstone", "text"}.getTombstone)
+  of "TweetPreviewDisplay":
+    return Tweet(text: "You're unable to view this Tweet because it's only available to the Subscribers of the account owner.")
   of "TweetWithVisibilityResults":
     return parseGraphTweet(js{"tweet"})
 

@@ -11,13 +11,13 @@ const
   userSearch* = api / "1.1/users/search.json"
 
   graphql = api / "graphql"
-  graphUser* = graphql / "8mPfHBetXOg-EHAyeVxUoA/UserByScreenName"
-  graphUserById* = graphql / "nI8WydSd-X-lQIVo6bdktQ/UserByRestId"
-  graphUserTweets* = graphql / "9rys0A7w1EyqVd2ME0QCJg/UserTweets"
-  graphUserTweetsAndReplies* = graphql / "ehMCHF3Mkgjsfz_aImqOsg/UserTweetsAndReplies"
-  graphUserMedia* = graphql / "MA_EP2a21zpzNWKRkaPBMg/UserMedia"
-  graphTweet* = graphql / "6I7Hm635Q6ftv69L8VrSeQ/TweetDetail"
-  graphTweetResult* = graphql / "rt-rHeSJ-2H9O9gxWQcPcg/TweetResultByRestId"
+  graphUser* = graphql / "pVrmNaXcxPjisIvKtLDMEA/UserByScreenName"
+  graphUserById* = graphql / "1YAM811Q8Ry4XyPpJclURQ/UserByRestId"
+  graphUserTweets* = graphql / "WzJjibAcDa-oCjCcLOotcg/UserTweets"
+  graphUserTweetsAndReplies* = graphql / "fn9oRltM1N4thkh5CVusPg/UserTweetsAndReplies"
+  graphUserMedia* = graphql / "qQoeS7szGavsi8-ehD2AWg/UserMedia"
+  graphTweet* = graphql / "miKSMGb2R1SewIJv2-ablQ/TweetDetail"
+  graphTweetResult* = graphql / "0kc0a_7TTr3dvweZlMslsQ/TweetResultByRestId"
   graphSearchTimeline* = graphql / "gkjsKepM6gl_HmFWoWKfgg/SearchTimeline"
   graphListById* = graphql / "iTpgCtbdxrsJfyx0cFjHqg/ListByRestId"
   graphListBySlug* = graphql / "-kmqNvm5Y-cVrfvBy6docg/ListBySlug"
@@ -50,10 +50,13 @@ const
 
   gqlFeatures* = """{
   "blue_business_profile_image_shape_enabled": false,
+  "creator_subscriptions_tweet_preview_api_enabled": true,
   "freedom_of_speech_not_reach_fetch_enabled": false,
   "graphql_is_translatable_rweb_tweet_is_translatable_enabled": false,
+  "highlights_tweets_tab_ui_enabled": false,
   "interactive_text_enabled": false,
   "longform_notetweets_consumption_enabled": true,
+  "longform_notetweets_inline_media_enabled": false,
   "longform_notetweets_richtext_consumption_enabled": true,
   "longform_notetweets_rich_text_read_enabled": false,
   "responsive_web_edit_tweet_api_enabled": false,
@@ -63,6 +66,7 @@ const
   "responsive_web_graphql_timeline_navigation_enabled": false,
   "responsive_web_text_conversations_enabled": false,
   "responsive_web_twitter_blue_verified_badge_is_enabled": true,
+  "rweb_lists_timeline_redesign_enabled": true,
   "spaces_2022_h2_clipping": true,
   "spaces_2022_h2_spaces_communities": true,
   "standardized_nudges_misinfo": false,
