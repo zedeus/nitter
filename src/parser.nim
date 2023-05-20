@@ -84,8 +84,8 @@ proc parseVideo(js: JsonNode): Video =
     views: js{"ext", "mediaStats", "r", "ok", "viewCount"}.getStr($js{"mediaStats", "viewCount"}.getInt),
     available: js{"ext_media_availability", "status"}.getStr.toLowerAscii == "available",
     title: js{"ext_alt_text"}.getStr,
-    durationMs: js{"video_info", "duration_millis"}.getInt
-    # playbackType: mp4
+    durationMs: js{"video_info", "duration_millis"}.getInt,
+    playbackType: m3u8
   )
 
   with title, js{"additional_media_info", "title"}:
@@ -98,6 +98,9 @@ proc parseVideo(js: JsonNode): Video =
     let
       contentType = parseEnum[VideoType](v{"content_type"}.getStr("summary"))
       url = v{"url"}.getStr
+
+    if contentType == mp4:
+      result.playbackType = mp4
 
     result.variants.add VideoVariant(
       contentType: contentType,

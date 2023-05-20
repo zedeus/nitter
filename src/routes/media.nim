@@ -13,7 +13,7 @@ export httpclient, os, strutils, asyncstreams, base64, re
 const
   m3u8Mime* = "application/vnd.apple.mpegurl"
   mp4Mime* = "video/mp4"
-  maxAge* = "max-age=604800"
+  maxAge* = "public, max-age=604800, must-revalidate"
 
 proc safeFetch*(url: string): Future[string] {.async.} =
   let client = newAsyncHttpClient()
@@ -61,9 +61,12 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
       return Http404
 
     var headers = @{
-      "Accept-Ranges": "bytes",
-      "Content-Type": res.headers["content-type", 0],
-      "Cache-Control": maxAge
+      "accept-ranges": "bytes",
+      "content-type": $res.headers.getOrDefault("content-type"),
+      "cache-control": maxAge,
+      "age": $res.headers.getOrDefault("age"),
+      "date": $res.headers.getOrDefault("date"),
+      "last-modified": $res.headers.getOrDefault("last-modified")
     }
 
     var tries = 0
@@ -74,10 +77,10 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
 
     let contentLength = res.getContentLength
     if contentLength.len > 0:
-      headers.add ("Content-Length", contentLength)
+      headers.add ("content-length", contentLength)
 
     if res.headers.hasKey("content-range"):
-      headers.add ("Content-Range", $res.headers.getOrDefault("content-range"))
+      headers.add ("content-range", $res.headers.getOrDefault("content-range"))
       respond(request, Http206, headers)
     else:
       respond(request, Http200, headers)
