@@ -153,7 +153,7 @@ proc getCachedTweet*(id: int64): Future[Tweet] {.async.} =
   if tweet != redisNil:
     tweet.deserialize(Tweet)
   else:
-    result = await getStatus($id)
+    result = await getGraphTweetResult($id)
     if not result.isNil:
       await cache(result)
 

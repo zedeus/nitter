@@ -106,14 +106,10 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
                      else: vidUrl
           case playbackType
           of mp4:
-            if prefs.muteVideos:
-              video(poster=thumb, controls="", muted=""):
-                source(src=source, `type`="video/mp4")
-            else:
-              video(poster=thumb, controls=""):
-                source(src=source, `type`="video/mp4")
+            video(poster=thumb, controls="", muted=prefs.muteVideos):
+              source(src=source, `type`="video/mp4")
           of m3u8, vmap:
-            video(poster=thumb, data-url=source, data-autoload="false")
+            video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
             tdiv(class="overlay-circle"): span(class="overlay-triangle")
             verbatim "</div>"
@@ -127,14 +123,9 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
     tdiv(class="gallery-gif", style={maxHeight: "unset"}):
       tdiv(class="attachment"):
-        let thumb = getSmallPic(gif.thumb)
-        let url = getPicUrl(gif.url)
-        if prefs.autoplayGifs:
-          video(class="gif", poster=thumb, controls="", autoplay="", muted="", loop=""):
-            source(src=url, `type`="video/mp4")
-        else:
-          video(class="gif", poster=thumb, controls="", muted="", loop=""):
-            source(src=url, `type`="video/mp4")
+        video(class="gif", poster=getSmallPic(gif.thumb), autoplay=prefs.autoplayGifs,
+              controls="", muted="", loop=""):
+          source(src=getPicUrl(gif.url), `type`="video/mp4")
 
 proc renderPoll(poll: Poll): VNode =
   buildHtml(tdiv(class="poll")):
@@ -328,7 +319,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if tweet.attribution.isSome:
         renderAttribution(tweet.attribution.get(), prefs)
 
-      if tweet.card.isSome:
+      if tweet.card.isSome and tweet.card.get().kind != hidden:
         renderCard(tweet.card.get(), prefs, path)
 
       if tweet.photos.len > 0:
