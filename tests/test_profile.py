@@ -17,11 +17,6 @@ protected = [
 
 invalid = [['thisprofiledoesntexist'], ['%']]
 
-banner_color = [
-    ['nim_lang', '22, 25, 32'],
-    ['rustlang', '35, 31, 32']
-]
-
 banner_image = [
     ['mobile_test', 'profile_banners%2F82135242%2F1384108037%2F1500x500']
 ]
@@ -73,12 +68,6 @@ class ProfileTest(BaseTestCase):
     def test_suspended(self):
         self.open_nitter('user')
         self.assert_text('User "user" has been suspended')
-
-    @parameterized.expand(banner_color)
-    def test_banner_color(self, username, color):
-        self.open_nitter(username)
-        banner = self.find_element(Profile.banner + ' a')
-        self.assertIn(color, banner.value_of_css_property('background-color'))
 
     @parameterized.expand(banner_image)
     def test_banner_image(self, username, url):

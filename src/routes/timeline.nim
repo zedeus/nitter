@@ -48,11 +48,11 @@ proc fetchProfile*(after: string; query: Query; cfg: Config; skipRail=false;
   let
     timeline =
       case query.kind
-      of posts: getTimeline(userId, after)
-      of replies: getTimeline(userId, after, replies=true)
-      of media: getMediaTimeline(userId, after)
+      of posts: getGraphUserTweets(userId, TimelineKind.tweets, after)
+      of replies: getGraphUserTweets(userId, TimelineKind.replies, after)
+      of media: getGraphUserTweets(userId, TimelineKind.media, after)
       of favorites: getFavorites(userId, cfg, after)
-      else: getSearch[Tweet](query, after)
+      else: getGraphSearch(query, after)
 
     rail =
       skipIf(skipRail or query.kind == media, @[]):
@@ -66,6 +66,7 @@ proc fetchProfile*(after: string; query: Query; cfg: Config; skipRail=false;
     let tweet = await getCachedTweet(user.pinnedTweet)
     if not tweet.isNil:
       tweet.pinned = true
+      tweet.user = user
       pinned = some tweet
 
   result = Profile(
@@ -84,7 +85,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
                    rss, after: string): Future[string] {.async.} =
   if query.fromUser.len != 1:
     let
-      timeline = await getSearch[Tweet](query, after)
+      timeline = await getGraphSearch(query, after)
       html = renderTweetSearch(timeline, cfg, prefs, getPath())
     return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
@@ -125,7 +126,7 @@ proc createTimelineRouter*(cfg: Config) =
 
     get "/@name/?@tab?/?":
       cond '.' notin @"name"
-      cond @"name" notin ["pic", "gif", "video"]
+      cond @"name" notin ["pic", "gif", "video", "search", "settings", "login", "intent", "i"]
       cond @"tab" in ["with_replies", "media", "search", "favorites", ""]
       let
         prefs = cookiePrefs()
@@ -139,7 +140,7 @@ proc createTimelineRouter*(cfg: Config) =
       # used for the infinite scroll feature
       if @"scroll".len > 0:
         if query.fromUser.len != 1:
-          var timeline = await getSearch[Tweet](query, after)
+          var timeline = await getGraphSearch(query, after)
           if timeline.content.len == 0: resp Http404
           timeline.beginning = true
           resp $renderTweetSearch(timeline, cfg, prefs, getPath())

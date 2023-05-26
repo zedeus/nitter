@@ -130,7 +130,7 @@ proc getBanner*(js: JsonNode): string =
       return
 
 proc getTombstone*(js: JsonNode): string =
-  result = js{"tombstoneInfo", "richText", "text"}.getStr
+  result = js{"text"}.getStr
   result.removeSuffix(" Learn more")
 
 proc getMp4Resolution*(url: string): int =
