@@ -1,9 +1,12 @@
-name: Run tests
+name: Tests
 
 on:
   push:
     paths-ignore:
       - "*.md"
+    branches-ignore:
+      - master
+  workflow_call:
 
 jobs:
   test:

@@ -2,7 +2,7 @@ import std/[algorithm, unicode, re, strutils, strformat, options, nre]
 import jsony
 import utils, slices
 import ../types/user as userType
-from ../../types import User, Error
+from ../../types import Result, User, Error
 
 let
   unRegex = re.re"(^|[^A-z0-9-_./?])@([A-z0-9_]{1,15})"
@@ -76,3 +76,12 @@ proc parseUser*(json: string; username=""): User =
     else: echo "[error - parseUser]: ", error
 
   result = toUser json.fromJson(RawUser)
+
+proc parseUsers*(json: string; after=""): Result[User] =
+  result = Result[User](beginning: after.len == 0)
+
+  # starting with '{' means it's an error
+  if json[0] == '[':
+    let raw = json.fromJson(seq[RawUser])
+    for user in raw:
+      result.content.add user.toUser
