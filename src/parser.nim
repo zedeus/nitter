@@ -33,7 +33,7 @@ proc parseGraphUser(js: JsonNode): User =
   result = parseUser(user{"legacy"})
 
   if "is_blue_verified" in user:
-    result.verified = true
+    result.verified = user{"is_blue_verified"}.getBool()
 
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
