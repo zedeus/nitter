@@ -490,6 +490,10 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Timeline =
             if not tweet.available:
               tweet.id = parseBiggestInt(entryId.getId())
             result.content.add tweet
+        elif entryId.startsWith("profile-conversation") or entryId.startsWith("homeConversation"):
+          let (thread, self) = parseGraphThread(e)
+          for tweet in thread.content:
+            result.content.add tweet
         elif entryId.startsWith("cursor-bottom"):
           result.bottom = e{"content", "value"}.getStr
 
