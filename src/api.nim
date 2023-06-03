@@ -94,6 +94,24 @@ proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
     js = await fetch(graphTweet ? params, Api.tweetDetail)
   result = parseGraphConversation(js, id)
 
+proc getGraphFavoriters*(id: string; after=""): Future[UsersTimeline] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = reactorsVariables % [id, cursor]
+    params = {"variables": variables, "features": gqlFeatures}
+    js = await fetch(graphFavoriters ? params, Api.favoriters)
+  result = parseGraphFavoritersTimeline(js, id)
+
+proc getGraphRetweeters*(id: string; after=""): Future[UsersTimeline] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = reactorsVariables % [id, cursor]
+    params = {"variables": variables, "features": gqlFeatures}
+    js = await fetch(graphRetweeters ? params, Api.retweeters)
+  result = parseGraphRetweetersTimeline(js, id)
+
 proc getReplies*(id, after: string): Future[Result[Chain]] {.async.} =
   result = (await getGraphTweet(id, after)).replies
   result.beginning = after.len == 0

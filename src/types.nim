@@ -30,6 +30,8 @@ type
     userTweets
     userTweetsAndReplies
     userMedia
+    favoriters
+    retweeters
 
   RateLimit* = object
     remaining*: int
@@ -224,6 +226,7 @@ type
     replies*: Result[Chain]
 
   Timeline* = Result[Tweet]
+  UsersTimeline* = Result[User]
 
   Profile* = object
     user*: User

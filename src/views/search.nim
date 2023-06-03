@@ -121,3 +121,8 @@ proc renderUserSearch*(results: Result[User]; prefs: Prefs): VNode =
 
     renderSearchTabs(results.query)
     renderTimelineUsers(results, prefs)
+
+proc renderUserList*(results: Result[User]; prefs: Prefs): VNode =
+  buildHtml(tdiv(class="timeline-container")):
+    tdiv(class="timeline-header")
+    renderTimelineUsers(results, prefs)
