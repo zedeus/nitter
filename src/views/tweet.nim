@@ -187,7 +187,7 @@ proc renderStats(stats: TweetStats; views: string; tweet: Tweet): VNode =
       span(class="tweet-stat"): icon "comment", formatStat(stats.replies)
     a(href=getLink(tweet, false) & "/retweeters"):
       span(class="tweet-stat"): icon "retweet", formatStat(stats.retweets)
-    a(href=getLink(tweet)):
+    a(href="/search?q=quoted_tweet_id:" & $tweet.id):
       span(class="tweet-stat"): icon "quote", formatStat(stats.quotes)
     a(href=getLink(tweet, false) & "/favoriters"):
       span(class="tweet-stat"): icon "heart", formatStat(stats.likes)
