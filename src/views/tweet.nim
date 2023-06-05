@@ -181,14 +181,19 @@ func formatStat(stat: int): string =
   if stat > 0: insertSep($stat, ',')
   else: ""
 
-proc renderStats(stats: TweetStats; views: string): VNode =
+proc renderStats(stats: TweetStats; views: string; tweet: Tweet): VNode =
   buildHtml(tdiv(class="tweet-stats")):
-    span(class="tweet-stat"): icon "comment", formatStat(stats.replies)
-    span(class="tweet-stat"): icon "retweet", formatStat(stats.retweets)
-    span(class="tweet-stat"): icon "quote", formatStat(stats.quotes)
-    span(class="tweet-stat"): icon "heart", formatStat(stats.likes)
-    if views.len > 0:
-      span(class="tweet-stat"): icon "play", insertSep(views, ',')
+    a(href=getLink(tweet)):
+      span(class="tweet-stat"): icon "comment", formatStat(stats.replies)
+    a(href=getLink(tweet, false) & "/retweeters"):
+      span(class="tweet-stat"): icon "retweet", formatStat(stats.retweets)
+    a(href=getLink(tweet)):
+      span(class="tweet-stat"): icon "quote", formatStat(stats.quotes)
+    a(href=getLink(tweet, false) & "/favoriters"):
+      span(class="tweet-stat"): icon "heart", formatStat(stats.likes)
+    a(href=getLink(tweet)):
+      if views.len > 0:
+        span(class="tweet-stat"): icon "play", insertSep(views, ',')
 
 proc renderReply(tweet: Tweet): VNode =
   buildHtml(tdiv(class="replying-to")):
@@ -344,7 +349,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         renderMediaTags(tweet.mediaTags)
 
       if not prefs.hideTweetStats:
-        renderStats(tweet.stats, views)
+        renderStats(tweet.stats, views, tweet)
 
       if showThread:
         a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
