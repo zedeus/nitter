@@ -230,8 +230,11 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
   # graphql
   with rt, js{"retweeted_status_result", "result"}:
     # needed due to weird edgecase where the actual tweet data isn't included
-    if "legacy" in rt:
-      result.retweet = some parseGraphTweet(rt)
+    var rt_tweet = rt
+    if "tweet" in rt:
+      rt_tweet = rt{"tweet"}
+    if "legacy" in rt_tweet:
+      result.retweet = some parseGraphTweet(rt_tweet)
       return
 
   if jsCard.kind != JNull:
