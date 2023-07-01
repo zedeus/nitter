@@ -4,6 +4,9 @@ import user, ../types/[graphuser, graphlistmembers]
 from ../../types import User, Result, Query, QueryKind
 
 proc parseGraphUser*(json: string): User =
+  if json.len == 0 or json[0] != '{':
+    return
+
   let raw = json.fromJson(GraphUser)
 
   if raw.data.user.result.reason.get("") == "Suspended":
