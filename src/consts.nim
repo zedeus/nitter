@@ -8,6 +8,9 @@ const
   activate* = $(api / "1.1/guest/activate.json")
 
   photoRail* = api / "1.1/statuses/media_timeline.json"
+
+  timelineApi = api / "2/timeline"
+  favorites* = timelineApi / "favorites"
   userSearch* = api / "1.1/users/search.json"
 
   graphql = api / "graphql"
@@ -23,6 +26,8 @@ const
   graphListBySlug* = graphql / "-kmqNvm5Y-cVrfvBy6docg/ListBySlug"
   graphListMembers* = graphql / "P4NpVZDqUD_7MEM84L-8nw/ListMembers"
   graphListTweets* = graphql / "jZntL0oVJSdjhmPcdbw_eA/ListLatestTweetsTimeline"
+  graphFavoriters* = graphql / "mDc_nU8xGv0cLRWtTaIEug/Favoriters"
+  graphRetweeters* = graphql / "RCR9gqwYD1NEgi9FWzA50A/Retweeters"
 
   timelineParams* = {
     "include_profile_interstitial_type": "0",
@@ -118,4 +123,10 @@ const
   "withReactionsMetadata": false,
   "withReactionsPerspective": false,
   "withVoice": false
+}"""
+
+  reactorsVariables* = """{
+  "tweetId" : "$1", $2
+  "count" : 20,
+  "includePromotedContent": false
 }"""

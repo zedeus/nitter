@@ -26,9 +26,12 @@ type
     listTweets
     userRestId
     userScreenName
+    favorites
     userTweets
     userTweetsAndReplies
     userMedia
+    favoriters
+    retweeters
 
   RateLimit* = object
     remaining*: int
@@ -106,7 +109,7 @@ type
     variants*: seq[VideoVariant]
 
   QueryKind* = enum
-    posts, replies, media, users, tweets, userList
+    posts, replies, media, users, tweets, userList, favorites
 
   Query* = object
     kind*: QueryKind
@@ -223,6 +226,7 @@ type
     replies*: Result[Chain]
 
   Timeline* = Result[Tweet]
+  UsersTimeline* = Result[User]
 
   Profile* = object
     user*: User
@@ -268,6 +272,9 @@ type
     redisConns*: int
     redisMaxConns*: int
     redisPassword*: string
+
+    cookieHeader*: string
+    xCsrfToken*: string
 
   Rss* = object
     feed*, cursor*: string

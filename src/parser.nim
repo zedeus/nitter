@@ -497,6 +497,33 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Timeline =
         elif entryId.startsWith("cursor-bottom"):
           result.bottom = e{"content", "value"}.getStr
 
+proc parseGraphUsersTimeline(js: JsonNode; root: string; key: string; after=""): UsersTimeline =
+  result = UsersTimeline(beginning: after.len == 0)
+
+  let instructions = ? js{"data", key, "timeline", "instructions"}
+
+  if instructions.len == 0:
+    return
+
+  for i in instructions:
+    if i{"type"}.getStr == "TimelineAddEntries":
+      for e in i{"entries"}:
+        let entryId = e{"entryId"}.getStr
+        if entryId.startsWith("user"):
+          with graphUser, e{"content", "itemContent"}:
+            let user = parseGraphUser(graphUser)
+            result.content.add user
+        elif entryId.startsWith("cursor-bottom"):
+          result.bottom = e{"content", "value"}.getStr
+        elif entryId.startsWith("cursor-top"):
+          result.top = e{"content", "value"}.getStr
+
+proc parseGraphFavoritersTimeline*(js: JsonNode; root: string; after=""): UsersTimeline =
+  return parseGraphUsersTimeline(js, root, "favoriters_timeline", after)
+
+proc parseGraphRetweetersTimeline*(js: JsonNode; root: string; after=""): UsersTimeline =
+  return parseGraphUsersTimeline(js, root, "retweeters_timeline", after)
+
 proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
   result = Timeline(beginning: after.len == 0)
 

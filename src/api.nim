@@ -3,6 +3,7 @@ import asyncdispatch, httpclient, uri, strutils, sequtils, sugar
 import packedjson
 import types, query, formatters, consts, apiutils, parser
 import experimental/parser as newParser
+import config
 
 proc getGraphUser*(username: string): Future[User] {.async.} =
   if username.len == 0: return
@@ -69,6 +70,13 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
   let url = graphListMembers ? {"variables": $variables, "features": gqlFeatures}
   result = parseGraphListMembers(await fetchRaw(url, Api.listMembers), after)
 
+proc getFavorites*(id: string; cfg: Config; after=""): Future[Timeline] {.async.} =
+  if id.len == 0: return
+  let
+    ps = genParams({"userId": id}, after)
+    url = consts.favorites / (id & ".json") ? ps
+  result = parseTimeline(await fetch(url, Api.favorites), after)
+
 proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
   if id.len == 0: return
   let
@@ -85,6 +93,24 @@ proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
     params = {"variables": variables, "features": gqlFeatures}
     js = await fetch(graphTweet ? params, Api.tweetDetail)
   result = parseGraphConversation(js, id)
+
+proc getGraphFavoriters*(id: string; after=""): Future[UsersTimeline] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = reactorsVariables % [id, cursor]
+    params = {"variables": variables, "features": gqlFeatures}
+    js = await fetch(graphFavoriters ? params, Api.favoriters)
+  result = parseGraphFavoritersTimeline(js, id)
+
+proc getGraphRetweeters*(id: string; after=""): Future[UsersTimeline] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    variables = reactorsVariables % [id, cursor]
+    params = {"variables": variables, "features": gqlFeatures}
+    js = await fetch(graphRetweeters ? params, Api.retweeters)
+  result = parseGraphRetweetersTimeline(js, id)
 
 proc getReplies*(id, after: string): Future[Result[Chain]] {.async.} =
   result = (await getGraphTweet(id, after)).replies

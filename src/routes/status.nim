@@ -5,7 +5,7 @@ import jester, karax/vdom
 
 import router_utils
 import ".."/[types, formatters, api]
-import ../views/[general, status]
+import ../views/[general, status, timeline, search]
 
 export uri, sequtils, options, sugar
 export router_utils
@@ -14,6 +14,29 @@ export status
 
 proc createStatusRouter*(cfg: Config) =
   router status:
+    get "/@name/status/@id/@reactors":
+      cond '.' notin @"name"
+      let id = @"id"
+
+      if id.len > 19 or id.any(c => not c.isDigit):
+        resp Http404, showError("Invalid tweet ID", cfg)
+
+      let prefs = cookiePrefs()
+
+      # used for the infinite scroll feature
+      if @"scroll".len > 0:
+        let replies = await getReplies(id, getCursor())
+        if replies.content.len == 0:
+          resp Http404, ""
+        resp $renderReplies(replies, prefs, getPath())
+
+      if @"reactors" == "favoriters":
+        resp renderMain(renderUserList(await getGraphFavoriters(id, getCursor()), prefs),
+                        request, cfg, prefs)
+      elif @"reactors" == "retweeters":
+        resp renderMain(renderUserList(await getGraphRetweeters(id, getCursor()), prefs),
+                        request, cfg, prefs)
+
     get "/@name/status/@id/?":
       cond '.' notin @"name"
       let id = @"id"

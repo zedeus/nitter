@@ -99,7 +99,7 @@ proc renderProtected(username: string): VNode =
       h2: text "This account's tweets are protected."
       p: text &"Only confirmed followers have access to @{username}'s tweets."
 
-proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
+proc renderProfile*(profile: var Profile; cfg: Config; prefs: Prefs; path: string): VNode =
   profile.tweets.query.fromUser = @[profile.user.username]
 
   buildHtml(tdiv(class="profile-tabs")):
@@ -116,4 +116,4 @@ proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
     if profile.user.protected:
       renderProtected(profile.user.username)
     else:
-      renderTweetSearch(profile.tweets, prefs, path, profile.pinned)
+      renderTweetSearch(profile.tweets, cfg, prefs, path, profile.pinned)
