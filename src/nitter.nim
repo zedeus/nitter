@@ -2,7 +2,6 @@
 import asyncdispatch, strformat, logging
 from net import Port
 from htmlgen import a
-from os import getEnv
 
 import jester
 
@@ -14,9 +13,6 @@ import routes/[
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 const issuesUrl = "https://github.com/zedeus/nitter/issues"
-
-let configPath = getEnv("NITTER_CONF_FILE", "./nitter.conf")
-let (cfg, fullCfg) = getConfig(configPath)
 
 if not cfg.enableDebug:
   # Silence Jester's query warning

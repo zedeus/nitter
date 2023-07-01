@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import parsecfg except Config
 import types, strutils
+from os import getEnv
 
 proc get*[T](config: parseCfg.Config; section, key: string; default: T): T =
   let val = config.getSectionValue(section, key)
@@ -40,7 +41,13 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     enableRss: cfg.get("Config", "enableRSS", true),
     enableDebug: cfg.get("Config", "enableDebug", false),
     proxy: cfg.get("Config", "proxy", ""),
-    proxyAuth: cfg.get("Config", "proxyAuth", "")
+    proxyAuth: cfg.get("Config", "proxyAuth", ""),
+    cookieHeader: cfg.get("Config", "cookieHeader", ""),
+    xCsrfToken: cfg.get("Config", "xCsrfToken", "")
   )
 
   return (conf, cfg)
+
+
+let configPath = getEnv("NITTER_CONF_FILE", "./nitter.conf")
+let (cfg*, fullCfg*) = getConfig(configPath)

@@ -8,6 +8,9 @@ const
   activate* = $(api / "1.1/guest/activate.json")
 
   photoRail* = api / "1.1/statuses/media_timeline.json"
+
+  timelineApi = api / "2/timeline"
+  favorites* = timelineApi / "favorites"
   userSearch* = api / "1.1/users/search.json"
 
   graphql = api / "graphql"
