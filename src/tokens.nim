@@ -2,19 +2,18 @@
 import asyncdispatch, httpclient, times, sequtils, json, random
 import strutils, tables
 import types, consts
+import std/random
 
 const
   maxConcurrentReqs = 5  # max requests at a time per token, to avoid race conditions
   maxLastUse = 1.hours   # if a token is unused for 60 minutes, it expires
   maxAge = 2.hours + 55.minutes  # tokens expire after 3 hours
-  failDelay = initDuration(minutes=30)
+  failDelay = initDuration(minutes=0)
 
 var
   tokenPool: seq[Token]
   lastFailed: Time
   enableLogging = false
-
-let headers = newHttpHeaders({"authorization": auth})
 
 template log(str) =
   if enableLogging: echo "[tokens] ", str
@@ -67,6 +66,9 @@ proc fetchToken(): Future[Token] {.async.} =
   if getTime() - lastFailed < failDelay:
     raise rateLimitError()
 
+  let auth = sample(bearerTokens)
+  let headers = newHttpHeaders({"authorization": auth})
+
   let client = newAsyncHttpClient(headers=headers)
 
   try:
@@ -76,7 +78,7 @@ proc fetchToken(): Future[Token] {.async.} =
       tok = tokNode.getStr($(tokNode.getInt))
       time = getTime()
 
-    return Token(tok: tok, init: time, lastUse: time)
+    return Token(tok: tok, bearerTok: auth, init: time, lastUse: time)
   except Exception as e:
     echo "[tokens] fetching token failed: ", e.msg
     if "Try again" notin e.msg:
