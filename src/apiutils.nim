@@ -50,7 +50,7 @@ template updateToken() =
       reset = parseInt(resp.headers[rlReset])
     token.setRateLimit(api, remaining, reset)
 
-template fetchImpl(result, fetchBody) {.dirty.} =
+template fetchImpl(result, additional_headers, fetchBody) {.dirty.} =
   once:
     pool = HttpPool()
 
@@ -60,7 +60,10 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
   try:
     var resp: AsyncResponse
-    pool.use(genHeaders(token)):
+    var headers = genHeaders(token)
+    for key, value in additional_headers.pairs():
+      headers.add(key, value)
+    pool.use(headers):
       template getContent =
         resp = await c.get($url)
         result = await resp.body
@@ -94,9 +97,9 @@ template fetchImpl(result, fetchBody) {.dirty.} =
       release(token, invalid=true)
     raise rateLimitError()
 
-proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
+proc fetch*(url: Uri; api: Api; additional_headers: HttpHeaders = newHttpHeaders()): Future[JsonNode] {.async.} =
   var body: string
-  fetchImpl body:
+  fetchImpl(body, additional_headers):
     if body.startsWith('{') or body.startsWith('['):
       result = parseJson(body)
     else:
@@ -111,8 +114,8 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
       release(token, invalid=true)
       raise rateLimitError()
 
-proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
-  fetchImpl result:
+proc fetchRaw*(url: Uri; api: Api; additional_headers: HttpHeaders = newHttpHeaders()): Future[string] {.async.} =
+  fetchImpl(result, additional_headers):
     if not (result.startsWith('{') or result.startsWith('[')):
       echo resp.status, ": ", result, " --- url: ", url
       result.setLen(0)

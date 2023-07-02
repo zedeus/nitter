@@ -37,7 +37,7 @@ proc createSearchRouter*(cfg: Config) =
         let
           tweets = await getGraphSearch(query, getCursor())
           rss = "/search/rss?" & genQueryUrl(query)
-        resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
+        resp renderMain(renderTweetSearch(tweets, cfg, prefs, getPath()),
                         request, cfg, prefs, title, rss=rss)
       else:
         resp Http404, showError("Invalid search", cfg)
