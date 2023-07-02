@@ -36,6 +36,7 @@ type
 
   Token* = ref object
     tok*: string
+    bearerTok*: string
     init*: Time
     lastUse*: Time
     pending*: int
