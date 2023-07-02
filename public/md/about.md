@@ -12,7 +12,8 @@ privacy and performance. The source is available on GitHub at
 * RSS feeds
 * Themes
 * Mobile support (responsive design)
-* AGPLv3 licensed, no proprietary instances permitted
+* AGPLv3 licensed (if you provide access to a modified version of Nitter, you
+  must make the source code available to your users under the same license)
 
 Nitter's GitHub wiki contains
 [instances](https://github.com/zedeus/nitter/wiki/Instances) and

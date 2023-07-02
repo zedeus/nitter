@@ -17,7 +17,8 @@ project.
 - RSS feeds
 - Themes
 - Mobile support (responsive design)
-- AGPLv3 licensed, no proprietary instances permitted
+- AGPLv3 licensed (if you provide access to a modified version of Nitter, you
+  must make the source code available to your users under the same license)
 
 Liberapay: https://liberapay.com/zedeus \
 Patreon: https://patreon.com/nitter \
