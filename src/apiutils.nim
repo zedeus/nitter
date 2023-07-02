@@ -32,7 +32,7 @@ proc genParams*(pars: openArray[(string, string)] = @[]; cursor="";
 proc genHeaders*(token: Token = nil): HttpHeaders =
   result = newHttpHeaders({
     "connection": "keep-alive",
-    "authorization": if token == nill: "" else: token.bearerTok,
+    "authorization": if token == nil: "" else: token.bearerTok,
     "content-type": "application/json",
     "x-guest-token": if token == nil: "" else: token.tok,
     "x-twitter-active-user": "yes",
