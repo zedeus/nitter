@@ -3,17 +3,19 @@ import asyncdispatch, httpclient, times, sequtils, json, random
 import strutils, tables
 import types, consts
 import std/random
+import std/tables
+import std/sequtils
 
 const
   maxConcurrentReqs = 5  # max requests at a time per token, to avoid race conditions
   maxLastUse = 1.hours   # if a token is unused for 60 minutes, it expires
   maxAge = 2.hours + 55.minutes  # tokens expire after 3 hours
-  failDelay = initDuration(minutes=0)
+  failDelay = initDuration(minutes=5)
 
 var
   tokenPool: seq[Token]
-  lastFailed: Time
   enableLogging = false
+  failedBearerTokens: Table[string, Time]
 
 template log(str) =
   if enableLogging: echo "[tokens] ", str
@@ -63,10 +65,15 @@ proc rateLimitError*(): ref RateLimitError =
   newException(RateLimitError, "rate limited")
 
 proc fetchToken(): Future[Token] {.async.} =
-  if getTime() - lastFailed < failDelay:
+  let eligibleBearerTokens = bearerTokens
+    .filter(proc (x: string): bool = not failedBearerTokens.hasKey(x) or getTime() - failedBearerTokens[x] >= failDelay)
+
+  if len(eligibleBearerTokens) == 0:
+    echo "[tokens] all bearer tokens failed recently"
     raise rateLimitError()
 
-  let auth = sample(bearerTokens)
+  let auth = sample(eligibleBearerTokens)
+  log "using token " & auth
   let headers = newHttpHeaders({"authorization": auth})
 
   let client = newAsyncHttpClient(headers=headers)
@@ -82,8 +89,7 @@ proc fetchToken(): Future[Token] {.async.} =
   except Exception as e:
     echo "[tokens] fetching token failed: ", e.msg
     if "Try again" notin e.msg:
-      echo "[tokens] fetching tokens paused, resuming in 30 minutes"
-      lastFailed = getTime()
+      failedBearerTokens[auth] = getTime()
   finally:
     client.close()
 
@@ -107,8 +113,11 @@ proc isReady(token: Token; api: Api): bool =
 proc release*(token: Token; used=false; invalid=false) =
   if token.isNil: return
   if invalid or token.expired:
-    if invalid: log "discarding invalid token"
-    elif token.expired: log "discarding expired token"
+    if invalid:
+      log "discarding invalid token"
+      failedBearerTokens[token.bearerTok] = getTime()
+    elif token.expired:
+      log "discarding expired token"
 
     let idx = tokenPool.find(token)
     if idx > -1: tokenPool.delete(idx)
