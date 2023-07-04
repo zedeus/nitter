@@ -114,10 +114,10 @@ proc release*(token: Token; used=false; invalid=false) =
   if token.isNil: return
   if invalid or token.expired:
     if invalid:
-      log "discarding invalid token"
+      log "discarding invalid token " & token.bearerTok
       failedBearerTokens[token.bearerTok] = getTime()
     elif token.expired:
-      log "discarding expired token"
+      log "discarding expired token " & token.bearerTok
 
     let idx = tokenPool.find(token)
     if idx > -1: tokenPool.delete(idx)
