@@ -65,12 +65,12 @@ proc rateLimitError*(): ref RateLimitError =
   newException(RateLimitError, "rate limited")
 
 proc fetchToken(): Future[Token] {.async.} =
-  let eligibleBearerTokens = bearerTokens
+  var eligibleBearerTokens = bearerTokens
     .filter(proc (x: string): bool = not failedBearerTokens.hasKey(x) or getTime() - failedBearerTokens[x] >= failDelay)
 
   if len(eligibleBearerTokens) == 0:
     echo "[tokens] all bearer tokens failed recently"
-    raise rateLimitError()
+    eligibleBearerTokens = bearerTokens.toSeq()
 
   let auth = sample(eligibleBearerTokens)
   log "using token " & auth
