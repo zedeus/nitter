@@ -73,7 +73,10 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
                    rss, after: string): Future[string] {.async.} =
   if query.fromUser.len != 1:
     let
-      timeline = await getGraphSearch(query, after)
+      # timeline = await getGraphSearch(query, after)
+      timeline = Profile(tweets: Timeline(beginning: true, content: @[Chain(content:
+        @[Tweet(tombstone: "This features is unavailable for now")]
+      )]))
       html = renderTweetSearch(timeline.tweets, prefs, getPath())
     return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
