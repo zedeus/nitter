@@ -377,7 +377,11 @@ proc parseGraphTweet(js: JsonNode): Tweet =
   of "TweetUnavailable":
     return Tweet()
   of "TweetTombstone":
-    return Tweet(text: js{"tombstone", "text"}.getTombstone)
+    with text, js{"tombstone", "richText"}:
+      return Tweet(text: text.getTombstone)
+    with text, js{"tombstone", "text"}:
+      return Tweet(text: text.getTombstone)
+    return Tweet()
   of "TweetPreviewDisplay":
     return Tweet(text: "You're unable to view this Tweet because it's only available to the Subscribers of the account owner.")
   of "TweetWithVisibilityResults":
@@ -486,12 +490,13 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
         elif entryId.startsWith("cursor-bottom"):
           result.tweets.bottom = e{"content", "value"}.getStr
     if after.len == 0 and i{"__typename"}.getStr == "TimelinePinEntry":
-      let entryId = i{"entry", "entryId"}.getEntryId
       with tweetResult, i{"entry", "content", "content", "tweetResult", "result"}:
         let tweet = parseGraphTweet(tweetResult)
         tweet.pinned = true
-        if not tweet.available:
-          tweet.id = parseBiggestInt(entryId)
+        if not tweet.available and tweet.tombstone.len == 0:
+          let entryId = i{"entry", "entryId"}.getEntryId
+          if entryId.len > 0:
+            tweet.id = parseBiggestInt(entryId)
         result.pinned = some tweet
 
 proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
