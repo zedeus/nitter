@@ -66,8 +66,8 @@ class ProfileTest(BaseTestCase):
         self.assert_text(f'User "{username}" not found')
 
     def test_suspended(self):
-        self.open_nitter('user')
-        self.assert_text('User "user" has been suspended')
+        self.open_nitter('suspendme')
+        self.assert_text('User "suspendme" has been suspended')
 
     @parameterized.expand(banner_image)
     def test_banner_image(self, username, url):

@@ -110,3 +110,29 @@
     margin-left: 58px;
     padding: 7px 0;
 }
+
+.timeline-item.thread.more-replies-thread {
+    padding: 0 0.75em;
+
+    &::before {
+        top: 40px;
+        margin-bottom: 31px;
+    }
+
+    .more-replies {
+        display: flex;
+        padding-top: unset !important;
+        margin-top: 8px;
+
+        &::before {
+            display: inline-block;
+            position: relative;
+            top: -1px;
+            line-height: 0.4em;
+        }
+
+        .more-replies-text {
+            display: inline;
+        }
+    }
+}

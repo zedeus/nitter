@@ -7,20 +7,20 @@ import experimental/parser as newParser
 proc getGraphUser*(username: string): Future[User] {.async.} =
   if username.len == 0: return
   let
-    variables = %*{"screen_name": username}
-    params = {"variables": $variables, "features": gqlFeatures}
+    variables = """{"screen_name": "$1"}""" % username
+    params = {"variables": variables, "features": gqlFeatures}
     js = await fetchRaw(graphUser ? params, Api.userScreenName)
   result = parseGraphUser(js)
 
 proc getGraphUserById*(id: string): Future[User] {.async.} =
   if id.len == 0 or id.any(c => not c.isDigit): return
   let
-    variables = %*{"userId": id}
-    params = {"variables": $variables, "features": gqlFeatures}
+    variables = """{"rest_id": "$1"}""" % id
+    params = {"variables": variables, "features": gqlFeatures}
     js = await fetchRaw(graphUserById ? params, Api.userRestId)
   result = parseGraphUser(js)
 
-proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Timeline] {.async.} =
+proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profile] {.async.} =
   if id.len == 0: return
   let
     cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
@@ -40,7 +40,7 @@ proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
     variables = listTweetsVariables % [id, cursor]
     params = {"variables": variables, "features": gqlFeatures}
     js = await fetch(graphListTweets ? params, Api.listTweets)
-  result = parseGraphTimeline(js, "list", after)
+  result = parseGraphTimeline(js, "list", after).tweets
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let
@@ -50,8 +50,8 @@ proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
 
 proc getGraphList*(id: string): Future[List] {.async.} =
   let
-    variables = %*{"listId": id}
-    params = {"variables": $variables, "features": gqlFeatures}
+    variables = """{"listId": "$1"}""" % id
+    params = {"variables": variables, "features": gqlFeatures}
   result = parseGraphList(await fetch(graphListById ? params, Api.list))
 
 proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} =
@@ -72,7 +72,7 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
 proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
   if id.len == 0: return
   let
-    variables = tweetResultVariables % id
+    variables = """{"rest_id": "$1"}""" % id
     params = {"variables": variables, "features": gqlFeatures}
     js = await fetch(graphTweetResult ? params, Api.tweetResult)
   result = parseGraphTweetResult(js)
@@ -95,10 +95,10 @@ proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
   if after.len > 0:
     result.replies = await getReplies(id, after)
 
-proc getGraphSearch*(query: Query; after=""): Future[Result[Tweet]] {.async.} =
+proc getGraphSearch*(query: Query; after=""): Future[Profile] {.async.} =
   let q = genQueryParam(query)
   if q.len == 0 or q == emptyQuery:
-    return Result[Tweet](query: query, beginning: true)
+    return Profile(tweets: Timeline(query: query, beginning: true))
 
   var
     variables = %*{
@@ -112,8 +112,8 @@ proc getGraphSearch*(query: Query; after=""): Future[Result[Tweet]] {.async.} =
   if after.len > 0:
     variables["cursor"] = % after
   let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
-  result = parseGraphSearch(await fetch(url, Api.search), after)
-  result.query = query
+  result = Profile(tweets: parseGraphSearch(await fetch(url, Api.search), after))
+  result.tweets.query = query
 
 proc getUserSearch*(query: Query; page="1"): Future[Result[User]] {.async.} =
   if query.text.len == 0:

@@ -2,7 +2,7 @@
 import uri, sequtils, strutils
 
 const
-  auth* = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+  auth* = "Bearer AAAAAAAAAAAAAAAAAAAAAFQODgEAAAAAVHTp76lzh3rFzcHbmHVvQxYYpTw%3DckAlMINMjmCwxUcaXbAN4XqJVdgMJaHqNOFgPMK0zN1qLqLQCF"
 
   api = parseUri("https://api.twitter.com")
   activate* = $(api / "1.1/guest/activate.json")
@@ -11,18 +11,18 @@ const
   userSearch* = api / "1.1/users/search.json"
 
   graphql = api / "graphql"
-  graphUser* = graphql / "pVrmNaXcxPjisIvKtLDMEA/UserByScreenName"
-  graphUserById* = graphql / "1YAM811Q8Ry4XyPpJclURQ/UserByRestId"
-  graphUserTweets* = graphql / "WzJjibAcDa-oCjCcLOotcg/UserTweets"
-  graphUserTweetsAndReplies* = graphql / "fn9oRltM1N4thkh5CVusPg/UserTweetsAndReplies"
-  graphUserMedia* = graphql / "qQoeS7szGavsi8-ehD2AWg/UserMedia"
-  graphTweet* = graphql / "miKSMGb2R1SewIJv2-ablQ/TweetDetail"
-  graphTweetResult* = graphql / "0kc0a_7TTr3dvweZlMslsQ/TweetResultByRestId"
+  graphUser* = graphql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
+  graphUserById* = graphql / "oPppcargziU1uDQHAUmH-A/UserResultByIdQuery"
+  graphUserTweets* = graphql / "3JNH4e9dq1BifLxAa3UMWg/UserWithProfileTweetsQueryV2"
+  graphUserTweetsAndReplies* = graphql / "8IS8MaO-2EN6GZZZb8jF0g/UserWithProfileTweetsAndRepliesQueryV2"
+  graphUserMedia* = graphql / "PDfFf8hGeJvUCiTyWtw4wQ/MediaTimelineV2"
+  graphTweet* = graphql / "83h5UyHZ9wEKBVzALX8R_g/ConversationTimelineV2"
+  graphTweetResult* = graphql / "sITyJdhRPpvpEjg4waUmTA/TweetResultByIdQuery"
   graphSearchTimeline* = graphql / "gkjsKepM6gl_HmFWoWKfgg/SearchTimeline"
   graphListById* = graphql / "iTpgCtbdxrsJfyx0cFjHqg/ListByRestId"
   graphListBySlug* = graphql / "-kmqNvm5Y-cVrfvBy6docg/ListBySlug"
   graphListMembers* = graphql / "P4NpVZDqUD_7MEM84L-8nw/ListMembers"
-  graphListTweets* = graphql / "jZntL0oVJSdjhmPcdbw_eA/ListLatestTweetsTimeline"
+  graphListTweets* = graphql / "BbGLL1ZfMibdFNWlk7a0Pw/ListTimeline"
 
   timelineParams* = {
     "include_profile_interstitial_type": "0",
@@ -49,10 +49,13 @@ const
   }.toSeq
 
   gqlFeatures* = """{
+  "android_graphql_skip_api_media_color_palette": false,
   "blue_business_profile_image_shape_enabled": false,
+  "creator_subscriptions_subscription_count_enabled": false,
   "creator_subscriptions_tweet_preview_api_enabled": true,
   "freedom_of_speech_not_reach_fetch_enabled": false,
   "graphql_is_translatable_rweb_tweet_is_translatable_enabled": false,
+  "hidden_profile_likes_enabled": false,
   "highlights_tweets_tab_ui_enabled": false,
   "interactive_text_enabled": false,
   "longform_notetweets_consumption_enabled": true,
@@ -64,15 +67,25 @@ const
   "responsive_web_graphql_exclude_directive_enabled": true,
   "responsive_web_graphql_skip_user_profile_image_extensions_enabled": false,
   "responsive_web_graphql_timeline_navigation_enabled": false,
+  "responsive_web_media_download_video_enabled": false,
   "responsive_web_text_conversations_enabled": false,
+  "responsive_web_twitter_article_tweet_consumption_enabled": false,
   "responsive_web_twitter_blue_verified_badge_is_enabled": true,
   "rweb_lists_timeline_redesign_enabled": true,
   "spaces_2022_h2_clipping": true,
   "spaces_2022_h2_spaces_communities": true,
   "standardized_nudges_misinfo": false,
+  "subscriptions_verification_info_enabled": true,
+  "subscriptions_verification_info_reason_enabled": true,
+  "subscriptions_verification_info_verified_since_enabled": true,
+  "super_follow_badge_privacy_enabled": false,
+  "super_follow_exclusive_tweet_notifications_enabled": false,
+  "super_follow_tweet_api_enabled": false,
+  "super_follow_user_api_enabled": false,
   "tweet_awards_web_tipping_enabled": false,
   "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": false,
   "tweetypie_unmention_optimization_enabled": false,
+  "unified_cards_ad_metadata_container_dynamic_card_content_query_enabled": false,
   "verified_phone_label_enabled": false,
   "vibe_api_enabled": false,
   "view_counts_everywhere_api_enabled": false
@@ -81,41 +94,15 @@ const
   tweetVariables* = """{
   "focalTweetId": "$1",
   $2
-  "withBirdwatchNotes": false,
-  "includePromotedContent": false,
-  "withDownvotePerspective": false,
-  "withReactionsMetadata": false,
-  "withReactionsPerspective": false,
-  "withVoice": false
-}"""
-
-  tweetResultVariables* = """{
-  "tweetId": "$1",
-  "includePromotedContent": false,
-  "withDownvotePerspective": false,
-  "withReactionsMetadata": false,
-  "withReactionsPerspective": false,
-  "withVoice": false,
-  "withCommunity": false
+  "includeHasBirdwatchNotes": false
 }"""
 
   userTweetsVariables* = """{
-  "userId": "$1", $2
-  "count": 20,
-  "includePromotedContent": false,
-  "withDownvotePerspective": false,
-  "withReactionsMetadata": false,
-  "withReactionsPerspective": false,
-  "withVoice": false,
-  "withV2Timeline": true
+  "rest_id": "$1", $2
+  "count": 20
 }"""
 
   listTweetsVariables* = """{
-  "listId": "$1", $2
-  "count": 20,
-  "includePromotedContent": false,
-  "withDownvotePerspective": false,
-  "withReactionsMetadata": false,
-  "withReactionsPerspective": false,
-  "withVoice": false
+  "rest_id": "$1", $2
+  "count": 20
 }"""
