@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, strformat, sequtils, algorithm, uri, options
+import strutils, strformat, algorithm, uri, options
 import karax/[karaxdsl, vdom]
 
 import ".."/[types, query, formatters]
@@ -43,19 +43,17 @@ proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="thread-line")):
     let sortedThread = thread.sortedByIt(it.id)
     for i, tweet in sortedThread:
+      # thread has a gap, display "more replies" link
+      if i > 0 and tweet.replyId != sortedThread[i - 1].id:
+        tdiv(class="timeline-item thread more-replies-thread"):
+          tdiv(class="more-replies"):
+            a(class="more-replies-text", href=getLink(tweet)):
+              text "more replies"
+
       let show = i == thread.high and sortedThread[0].id != tweet.threadId
       let header = if tweet.pinned or tweet.retweet.isSome: "with-header " else: ""
       renderTweet(tweet, prefs, path, class=(header & "thread"),
                   index=i, last=(i == thread.high), showThread=show)
-
-proc threadFilter(tweets: openArray[Tweet]; threads: openArray[int64]; it: Tweet): seq[Tweet] =
-  result = @[it]
-  if it.retweet.isSome or it.replyId in threads: return
-  for t in tweets:
-    if t.id == result[0].replyId:
-      result.insert t
-    elif t.replyId == result[0].id:
-      result.add t
 
 proc renderUser(user: User; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-item")):
@@ -89,7 +87,7 @@ proc renderTimelineUsers*(results: Result[User]; prefs: Prefs; path=""): VNode =
     else:
       renderNoMore()
 
-proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string;
+proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
                            pinned=none(Tweet)): VNode =
   buildHtml(tdiv(class="timeline")):
     if not results.beginning:
@@ -105,26 +103,26 @@ proc renderTimelineTweets*(results: Result[Tweet]; prefs: Prefs; path: string;
       else:
         renderNoneFound()
     else:
-      var
-        threads: seq[int64]
-        retweets: seq[int64]
+      var retweets: seq[int64]
 
-      for tweet in results.content:
-        let rt = if tweet.retweet.isSome: get(tweet.retweet).id else: 0
+      for thread in results.content:
+        if thread.content.len == 1:
+          let
+            tweet = thread.content[0]
+            retweetId = if tweet.retweet.isSome: get(tweet.retweet).id else: 0
 
-        if tweet.id in threads or rt in retweets or tweet.id in retweets or
-           tweet.pinned and prefs.hidePins: continue
+          if retweetId in retweets or tweet.id in retweets or
+             tweet.pinned and prefs.hidePins:
+            continue
 
-        let thread = results.content.threadFilter(threads, tweet)
-        if thread.len < 2:
           var hasThread = tweet.hasThread
-          if rt != 0:
-            retweets &= rt
+          if retweetId != 0 and tweet.retweet.isSome:
+            retweets &= retweetId
             hasThread = get(tweet.retweet).hasThread
           renderTweet(tweet, prefs, path, showThread=hasThread)
         else:
-          renderThread(thread, prefs, path)
-          threads &= thread.mapIt(it.id)
+          renderThread(thread.content, prefs, path)
 
-      renderMore(results.query, results.bottom)
+      if results.bottom.len > 0:
+        renderMore(results.query, results.bottom)
       renderToTop()

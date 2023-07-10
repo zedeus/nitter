@@ -14,15 +14,14 @@ proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
   buildHtml():
     img(class=(prefs.getAvatarClass & " mini"), src=url)
 
-proc renderHeader(tweet: Tweet; retweet: string; prefs: Prefs): VNode =
+proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VNode =
   buildHtml(tdiv):
-    if retweet.len > 0:
-      tdiv(class="retweet-header"):
-        span: icon "retweet", retweet & " retweeted"
-
-    if tweet.pinned:
+    if pinned:
       tdiv(class="pinned"):
         span: icon "pin", "Pinned Tweet"
+    elif retweet.len > 0:
+      tdiv(class="retweet-header"):
+        span: icon "retweet", retweet & " retweeted"
 
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.user.username)):
@@ -290,7 +289,10 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if tweet.quote.isSome:
         renderQuote(tweet.quote.get(), prefs, path)
 
-  let fullTweet = tweet
+  let
+    fullTweet = tweet
+    pinned = tweet.pinned
+
   var retweet: string
   var tweet = fullTweet
   if tweet.retweet.isSome:
@@ -303,7 +305,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
 
     tdiv(class="tweet-body"):
       var views = ""
-      renderHeader(tweet, retweet, prefs)
+      renderHeader(tweet, retweet, pinned, prefs)
 
       if not afterTweet and index == 0 and tweet.reply.len > 0 and
          (tweet.reply.len > 1 or tweet.reply[0] != tweet.user.username):

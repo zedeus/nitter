@@ -3,7 +3,7 @@ import user
 
 type
   GraphUser* = object
-    data*: tuple[user: UserData]
+    data*: tuple[userResult: UserData]
 
   UserData* = object
     result*: UserResult
@@ -12,4 +12,4 @@ type
     legacy*: RawUser
     restId*: string
     isBlueVerified*: bool
-    reason*: Option[string]
+    unavailableReason*: Option[string]

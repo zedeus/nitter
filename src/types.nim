@@ -222,7 +222,7 @@ type
     after*: Chain
     replies*: Result[Chain]
 
-  Timeline* = Result[Tweet]
+  Timeline* = Result[Chain]
 
   Profile* = object
     user*: User
@@ -274,3 +274,6 @@ type
 
 proc contains*(thread: Chain; tweet: Tweet): bool =
   thread.content.anyIt(it.id == tweet.id)
+
+proc add*(timeline: var seq[Chain]; tweet: Tweet) =
+  timeline.add Chain(content: @[tweet])

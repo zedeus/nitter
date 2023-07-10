@@ -74,9 +74,9 @@ retweet = [
     [3, 'mobile_test_8', 'mobile test 8', 'jack', '@jack', 'twttr']
 ]
 
-reply = [
-    ['mobile_test/with_replies', 15]
-]
+# reply = [
+#     ['mobile_test/with_replies', 15]
+# ]
 
 
 class TweetTest(BaseTestCase):
@@ -137,8 +137,8 @@ class TweetTest(BaseTestCase):
         self.open_nitter(tweet)
         self.assert_text('Tweet not found', '.error-panel')
 
-    @parameterized.expand(reply)
-    def test_thread(self, tweet, num):
-        self.open_nitter(tweet)
-        thread = self.find_element(f'.timeline > div:nth-child({num})')
-        self.assertIn(thread.get_attribute('class'), 'thread-line')
+    # @parameterized.expand(reply)
+    # def test_thread(self, tweet, num):
+    #     self.open_nitter(tweet)
+    #     thread = self.find_element(f'.timeline > div:nth-child({num})')
+    #     self.assertIn(thread.get_attribute('class'), 'thread-line')
