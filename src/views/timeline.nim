@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, strformat, sequtils, algorithm, uri, options
+import strutils, strformat, algorithm, uri, options
 import karax/[karaxdsl, vdom]
 
 import ".."/[types, query, formatters]
@@ -123,5 +123,6 @@ proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
         else:
           renderThread(thread.content, prefs, path)
 
-      renderMore(results.query, results.bottom)
+      if results.bottom.len > 0:
+        renderMore(results.query, results.bottom)
       renderToTop()

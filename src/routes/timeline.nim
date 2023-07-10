@@ -56,7 +56,10 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
     of posts: await getGraphUserTweets(userId, TimelineKind.tweets, after)
     of replies: await getGraphUserTweets(userId, TimelineKind.replies, after)
     of media: await getGraphUserTweets(userId, TimelineKind.media, after)
-    else: await getGraphSearch(query, after)
+    else: Profile(tweets: Timeline(beginning: true, content: @[Chain(content:
+      @[Tweet(tombstone: "Tweet search is unavailable for now")]
+    )]))
+    # else: await getGraphSearch(query, after)
 
   result.user = await user
   result.photoRail = await rail

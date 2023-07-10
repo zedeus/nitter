@@ -13,34 +13,38 @@ export search
 
 proc createSearchRouter*(cfg: Config) =
   router search:
-    # get "/search/?":
-    #   let q = @"q"
-    #   if q.len > 500:
-    #     resp Http400, showError("Search input too long.", cfg)
+    get "/search/?":
+      let q = @"q"
+      if q.len > 500:
+        resp Http400, showError("Search input too long.", cfg)
 
-    #   let
-    #     prefs = cookiePrefs()
-    #     query = initQuery(params(request))
-    #     title = "Search" & (if q.len > 0: " (" & q & ")" else: "")
+      let
+        prefs = cookiePrefs()
+        query = initQuery(params(request))
+        title = "Search" & (if q.len > 0: " (" & q & ")" else: "")
 
-    #   case query.kind
-    #   of users:
-    #     if "," in q:
-    #       redirect("/" & q)
-    #     var users: Result[User]
-    #     try:
-    #       users = await getUserSearch(query, getCursor())
-    #     except InternalError:
-    #       users = Result[User](beginning: true, query: query)
-    #     resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs, title)
-    #   of tweets:
-    #     let
-    #       tweets = await getGraphSearch(query, getCursor())
-    #       rss = "/search/rss?" & genQueryUrl(query)
-    #     resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
-    #                     request, cfg, prefs, title, rss=rss)
-    #   else:
-    #     resp Http404, showError("Invalid search", cfg)
+      case query.kind
+      of users:
+        if "," in q:
+          redirect("/" & q)
+        var users: Result[User]
+        try:
+          users = await getUserSearch(query, getCursor())
+        except InternalError:
+          users = Result[User](beginning: true, query: query)
+        resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs, title)
+      of tweets:
+        # let
+        #   tweets = await getGraphSearch(query, getCursor())
+        #   rss = "/search/rss?" & genQueryUrl(query)
+        # resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
+        #                 request, cfg, prefs, title, rss=rss)
+        var fakeTimeline = Timeline(beginning: true)
+        fakeTimeline.content.add Tweet(tombstone: "Tweet search is unavailable for now")
+
+        resp renderMain(renderTweetSearch(fakeTimeline, prefs, getPath()), request, cfg, prefs, title)
+      else:
+        resp Http404, showError("Invalid search", cfg)
 
     get "/hashtag/@hash":
       redirect("/search?q=" & encodeUrl("#" & @"hash"))
