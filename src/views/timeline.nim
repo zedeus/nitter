@@ -39,7 +39,7 @@ proc renderNoneFound(): VNode =
     h2(class="timeline-none"):
       text "No items found"
 
-proc renderThread(thread: seq[Tweet]; prefs: Prefs; path: string): VNode =
+proc renderThread(thread: Tweets; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="thread-line")):
     let sortedThread = thread.sortedByIt(it.id)
     for i, tweet in sortedThread:
@@ -106,9 +106,9 @@ proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
       var retweets: seq[int64]
 
       for thread in results.content:
-        if thread.content.len == 1:
+        if thread.len == 1:
           let
-            tweet = thread.content[0]
+            tweet = thread[0]
             retweetId = if tweet.retweet.isSome: get(tweet.retweet).id else: 0
 
           if retweetId in retweets or tweet.id in retweets or
@@ -121,7 +121,7 @@ proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
             hasThread = get(tweet.retweet).hasThread
           renderTweet(tweet, prefs, path, showThread=hasThread)
         else:
-          renderThread(thread.content, prefs, path)
+          renderThread(thread, prefs, path)
 
       if results.bottom.len > 0:
         renderMore(results.query, results.bottom)
