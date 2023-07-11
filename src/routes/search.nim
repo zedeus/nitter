@@ -40,7 +40,7 @@ proc createSearchRouter*(cfg: Config) =
         # resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
         #                 request, cfg, prefs, title, rss=rss)
         var fakeTimeline = Timeline(beginning: true)
-        fakeTimeline.content.add Tweet(tombstone: "Tweet search is unavailable for now")
+        fakeTimeline.content.add Tweet(tombstone: "Tweet search isn't implemented right now")
 
         resp renderMain(renderTweetSearch(fakeTimeline, prefs, getPath()), request, cfg, prefs, title)
       else:
