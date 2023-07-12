@@ -9,6 +9,7 @@ const
 
   photoRail* = api / "1.1/statuses/media_timeline.json"
   userSearch* = api / "1.1/users/search.json"
+  tweetSearch* = api / "1.1/search/tweets.json"
 
   graphql = api / "graphql"
   graphUser* = graphql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"

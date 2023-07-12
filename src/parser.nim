@@ -82,11 +82,15 @@ proc parseVideo(js: JsonNode): Video =
   result = Video(
     thumb: js{"media_url_https"}.getImageStr,
     views: js{"ext", "mediaStats", "r", "ok", "viewCount"}.getStr($js{"mediaStats", "viewCount"}.getInt),
-    available: js{"ext_media_availability", "status"}.getStr.toLowerAscii == "available",
+    available: true,
     title: js{"ext_alt_text"}.getStr,
     durationMs: js{"video_info", "duration_millis"}.getInt
     # playbackType: mp4
   )
+
+  with status, js{"ext_media_availability", "status"}:
+    if status.getStr.len > 0 and status.getStr.toLowerAscii != "available":
+      result.available = false
 
   with title, js{"additional_media_info", "title"}:
     result.title = title.getStr
@@ -219,7 +223,9 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
   if result.hasThread and result.threadId == 0:
     result.threadId = js{"self_thread", "id_str"}.getId
 
-  if js{"is_quote_status"}.getBool:
+  if "retweeted_status" in js:
+    result.retweet = some Tweet()
+  elif js{"is_quote_status"}.getBool:
     result.quote = some Tweet(id: js{"quoted_status_id_str"}.getId)
 
   # legacy
@@ -280,6 +286,30 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
                                         "withheld" in result.text):
       result.text.removeSuffix(" Learn more.")
       result.available = false
+
+proc parseLegacyTweet(js: JsonNode): Tweet =
+  result = parseTweet(js, js{"card"})
+  if not result.isNil and result.available:
+    result.user = parseUser(js{"user"})
+
+    if result.quote.isSome:
+      result.quote = some parseLegacyTweet(js{"quoted_status"})
+
+proc parseTweetSearch*(js: JsonNode): Timeline =
+  if js.kind == JNull or "statuses" notin js:
+    return Timeline(beginning: true)
+
+  for tweet in js{"statuses"}:
+    let parsed = parseLegacyTweet(tweet)
+
+    if parsed.retweet.isSome:
+      parsed.retweet = some parseLegacyTweet(tweet{"retweeted_status"})
+
+    result.content.add @[parsed]
+
+  let cursor = js{"search_metadata", "next_results"}.getStr
+  if cursor.len > 0 and "max_id" in cursor:
+    result.bottom = cursor[cursor.find("=") + 1 .. cursor.find("&q=")]
 
 proc finalizeTweet(global: GlobalObjects; id: string): Tweet =
   let intId = if id.len > 0: parseBiggestInt(id) else: 0

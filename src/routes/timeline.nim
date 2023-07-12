@@ -56,8 +56,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
     of posts: await getGraphUserTweets(userId, TimelineKind.tweets, after)
     of replies: await getGraphUserTweets(userId, TimelineKind.replies, after)
     of media: await getGraphUserTweets(userId, TimelineKind.media, after)
-    else: Profile(tweets: Timeline(beginning: true, content: @[@[Tweet(tombstone: "Tweet search is unavailable for now")]]))
-    # else: await getGraphSearch(query, after)
+    else: Profile(tweets: await getTweetSearch(query, after))
 
   result.user = await user
   result.photoRail = await rail
@@ -71,9 +70,8 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
                    rss, after: string): Future[string] {.async.} =
   if query.fromUser.len != 1:
     let
-      # timeline = await getGraphSearch(query, after)
-      timeline = Profile(tweets: Timeline(beginning: true, content: @[@[Tweet(tombstone: "This features is unavailable for now")]]))
-      html = renderTweetSearch(timeline.tweets, prefs, getPath())
+      timeline = await getTweetSearch(query, after)
+      html = renderTweetSearch(timeline, prefs, getPath())
     return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
   var profile = await fetchProfile(after, query, skipPinned=prefs.hidePins)

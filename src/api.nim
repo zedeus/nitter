@@ -115,6 +115,22 @@ proc getGraphSearch*(query: Query; after=""): Future[Profile] {.async.} =
   result = Profile(tweets: parseGraphSearch(await fetch(url, Api.search), after))
   result.tweets.query = query
 
+proc getTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
+  let q = genQueryParam(query)
+  if q.len == 0 or q == emptyQuery:
+    return Timeline(query: query, beginning: true)
+
+  let url = tweetSearch ? genParams({
+    "q": q,
+    "tweet_search_mode": "live",
+    "max_id": after
+  })
+
+  result = parseTweetSearch(await fetch(url, Api.search))
+  result.query = query
+  if after.len == 0:
+    result.beginning = true
+
 proc getUserSearch*(query: Query; page="1"): Future[Result[User]] {.async.} =
   if query.text.len == 0:
     return Result[User](query: query, beginning: true)

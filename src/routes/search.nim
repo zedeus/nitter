@@ -34,15 +34,11 @@ proc createSearchRouter*(cfg: Config) =
           users = Result[User](beginning: true, query: query)
         resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs, title)
       of tweets:
-        # let
-        #   tweets = await getGraphSearch(query, getCursor())
-        #   rss = "/search/rss?" & genQueryUrl(query)
-        # resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
-        #                 request, cfg, prefs, title, rss=rss)
-        var fakeTimeline = Timeline(beginning: true)
-        fakeTimeline.content.add Tweet(tombstone: "Tweet search is unavailable for now")
-
-        resp renderMain(renderTweetSearch(fakeTimeline, prefs, getPath()), request, cfg, prefs, title)
+        let
+          tweets = await getTweetSearch(query, getCursor())
+          rss = "/search/rss?" & genQueryUrl(query)
+        resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
+                        request, cfg, prefs, title, rss=rss)
       else:
         resp Http404, showError("Invalid search", cfg)
 

@@ -27,7 +27,7 @@ proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.
   else:
     var q = query
     q.fromUser = names
-    profile = await getGraphSearch(q, after)
+    profile.tweets = await getTweetSearch(q, after)
     # this is kinda dumb
     profile.user = User(
       username: name,
@@ -59,29 +59,29 @@ template respRss*(rss, page) =
 
 proc createRssRouter*(cfg: Config) =
   router rss:
-    # get "/search/rss":
-    #   cond cfg.enableRss
-    #   if @"q".len > 200:
-    #     resp Http400, showError("Search input too long.", cfg)
+    get "/search/rss":
+      cond cfg.enableRss
+      if @"q".len > 200:
+        resp Http400, showError("Search input too long.", cfg)
 
-    #   let query = initQuery(params(request))
-    #   if query.kind != tweets:
-    #     resp Http400, showError("Only Tweet searches are allowed for RSS feeds.", cfg)
+      let query = initQuery(params(request))
+      if query.kind != tweets:
+        resp Http400, showError("Only Tweet searches are allowed for RSS feeds.", cfg)
 
-    #   let
-    #     cursor = getCursor()
-    #     key = redisKey("search", $hash(genQueryUrl(query)), cursor)
+      let
+        cursor = getCursor()
+        key = redisKey("search", $hash(genQueryUrl(query)), cursor)
 
-    #   var rss = await getCachedRss(key)
-    #   if rss.cursor.len > 0:
-    #     respRss(rss, "Search")
+      var rss = await getCachedRss(key)
+      if rss.cursor.len > 0:
+        respRss(rss, "Search")
 
-    #   let tweets = await getGraphSearch(query, cursor)
-    #   rss.cursor = tweets.bottom
-    #   rss.feed = renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg)
+      let tweets = await getTweetSearch(query, cursor)
+      rss.cursor = tweets.bottom
+      rss.feed = renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg)
 
-    #   await cacheRss(key, rss)
-    #   respRss(rss, "Search")
+      await cacheRss(key, rss)
+      respRss(rss, "Search")
 
     get "/@name/rss":
       cond cfg.enableRss
