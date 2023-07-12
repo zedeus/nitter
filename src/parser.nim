@@ -387,6 +387,10 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
           result.top = cursor{"value"}.getStr
 
 proc parsePhotoRail*(js: JsonNode): PhotoRail =
+  with error, js{"error"}:
+    if error.getStr == "Not authorized.":
+      return
+
   for tweet in js:
     let
       t = parseTweet(tweet, js{"tweet_card"})
