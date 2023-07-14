@@ -87,7 +87,7 @@ routes:
 
   error BadClientError:
     echo error.exc.name, ": ", error.exc.msg
-    resp Http500, showError("Network error occured, please try again.", cfg)
+    resp Http500, showError("Network error occurred, please try again.", cfg)
 
   error RateLimitError:
     const link = a("another instance", href = instancesUrl)
