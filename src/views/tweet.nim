@@ -232,7 +232,7 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
         else:
           text "This tweet is unavailable"
 
-  buildHtml(tdiv(class="quote quote-big")):
+  buildHtml(tdiv(class="quote quote-big", "data-tweet-id" = $quote.id)):
     a(class="quote-link", href=getLink(quote))
 
     tdiv(class="tweet-name-row"):
@@ -277,7 +277,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
     divClass = "thread-last " & class
 
   if not tweet.available:
-    return buildHtml(tdiv(class=divClass & "unavailable timeline-item")):
+    return buildHtml(tdiv(class=divClass & "unavailable timeline-item", "data-tweet-id" = $tweet.id)):
       tdiv(class="unavailable-box"):
         if tweet.tombstone.len > 0:
           text tweet.tombstone
@@ -299,7 +299,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
     tweet = tweet.retweet.get
     retweet = fullTweet.user.fullname
 
-  buildHtml(tdiv(class=("timeline-item " & divClass))):
+  buildHtml(tdiv(class=("timeline-item " & divClass), "data-tweet-id" = $tweet.id)):
     if not mainTweet:
       a(class="tweet-link", href=getLink(tweet))
 
