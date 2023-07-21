@@ -18,6 +18,7 @@ type
     tweetDetail
     tweetResult
     timeline
+    photoRail
     search
     userSearch
     list

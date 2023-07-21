@@ -33,6 +33,13 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
     js = await fetch(url ? params, apiId)
   result = parseGraphTimeline(js, "user", after)
 
+proc getTimeline*(id: string; after=""; replies=false): Future[Profile] {.async.} =
+  if id.len == 0: return
+  let
+    ps = genParams({"userId": id, "include_tweet_replies": $replies}, after)
+    url = oldUserTweets / (id & ".json") ? ps
+  result = parseTimeline(await fetch(url, Api.timeline), after)
+
 proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
@@ -155,7 +162,7 @@ proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
     ps = genParams({"screen_name": name, "trim_user": "true"},
                     count="18", ext=false)
     url = photoRail ? ps
-  result = parsePhotoRail(await fetch(url, Api.timeline))
+  result = parsePhotoRail(await fetch(url, Api.photoRail))
 
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
   let client = newAsyncHttpClient(maxRedirects=0)

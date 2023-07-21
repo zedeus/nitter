@@ -329,6 +329,16 @@ proc finalizeTweet(global: GlobalObjects; id: string): Tweet =
     else:
       result.retweet = some Tweet()
 
+proc parsePin(js: JsonNode; global: GlobalObjects): Tweet =
+  let pin = js{"pinEntry", "entry", "entryId"}.getStr
+  if pin.len == 0: return
+
+  let id = pin.getId
+  if id notin global.tweets: return
+
+  global.tweets[id].pinned = true
+  return finalizeTweet(global, id)
+
 proc parseGlobalObjects(js: JsonNode): GlobalObjects =
   result = GlobalObjects()
   let
@@ -339,24 +349,28 @@ proc parseGlobalObjects(js: JsonNode): GlobalObjects =
     result.users[k] = parseUser(v, k)
 
   for k, v in tweets:
-    var tweet = parseTweet(v, v{"tweet_card"})
+    var tweet = parseTweet(v, v{"card"})
     if tweet.user.id in result.users:
       tweet.user = result.users[tweet.user.id]
     result.tweets[k] = tweet
 
-proc parseInstructions[T](res: var Result[T]; global: GlobalObjects; js: JsonNode) =
+proc parseInstructions(res: var Profile; global: GlobalObjects; js: JsonNode) =
   if js.kind != JArray or js.len == 0:
     return
 
   for i in js:
+    if res.tweets.beginning and i{"pinEntry"}.notNull:
+      with pin, parsePin(i, global):
+        res.pinned = some pin
+
     with r, i{"replaceEntry", "entry"}:
       if "top" in r{"entryId"}.getStr:
-        res.top = r.getCursor
+        res.tweets.top = r.getCursor
       elif "bottom" in r{"entryId"}.getStr:
-        res.bottom = r.getCursor
+        res.tweets.bottom = r.getCursor
 
-proc parseTimeline*(js: JsonNode; after=""): Timeline =
-  result = Timeline(beginning: after.len == 0)
+proc parseTimeline*(js: JsonNode; after=""): Profile =
+  result = Profile(tweets: Timeline(beginning: after.len == 0))
   let global = parseGlobalObjects(? js)
 
   let instructions = ? js{"timeline", "instructions"}
@@ -374,17 +388,17 @@ proc parseTimeline*(js: JsonNode; after=""): Timeline =
     if "tweet" in entry or entry.startsWith("sq-I-t") or "tombstone" in entry:
       let tweet = finalizeTweet(global, e.getEntryId)
       if not tweet.available: continue
-      result.content.add tweet
+      result.tweets.content.add tweet
     elif "cursor-top" in entry:
-      result.top = e.getCursor
+      result.tweets.top = e.getCursor
     elif "cursor-bottom" in entry:
-      result.bottom = e.getCursor
+      result.tweets.bottom = e.getCursor
     elif entry.startsWith("sq-cursor"):
       with cursor, e{"content", "operation", "cursor"}:
         if cursor{"cursorType"}.getStr == "Bottom":
-          result.bottom = cursor{"value"}.getStr
+          result.tweets.bottom = cursor{"value"}.getStr
         else:
-          result.top = cursor{"value"}.getStr
+          result.tweets.top = cursor{"value"}.getStr
 
 proc parsePhotoRail*(js: JsonNode): PhotoRail =
   with error, js{"error"}:

@@ -11,6 +11,8 @@ const
   userSearch* = api / "1.1/users/search.json"
   tweetSearch* = api / "1.1/search/tweets.json"
 
+  oldUserTweets* = api / "2/timeline/profile"
+
   graphql = api / "graphql"
   graphUser* = graphql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
   graphUserById* = graphql / "oPppcargziU1uDQHAUmH-A/UserResultByIdQuery"
@@ -97,6 +99,18 @@ const
   $2
   "includeHasBirdwatchNotes": false
 }"""
+
+  oldUserTweetsVariables* = """{
+  "userId": "$1", $2
+  "count": 20,
+  "includePromotedContent": false,
+  "withDownvotePerspective": false,
+  "withReactionsMetadata": false,
+  "withReactionsPerspective": false,
+  "withVoice": false,
+  "withV2Timeline": true
+}
+"""
 
   userTweetsVariables* = """{
   "rest_id": "$1", $2

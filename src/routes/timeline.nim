@@ -53,7 +53,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
 
   result =
     case query.kind
-    of posts: await getGraphUserTweets(userId, TimelineKind.tweets, after)
+    of posts: await getTimeline(userId, after)
     of replies: await getGraphUserTweets(userId, TimelineKind.replies, after)
     of media: await getGraphUserTweets(userId, TimelineKind.media, after)
     else: Profile(tweets: await getTweetSearch(query, after))
