@@ -33,12 +33,12 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
     js = await fetch(url ? params, apiId)
   result = parseGraphTimeline(js, "user", after)
 
-proc getTimeline*(id: string; after=""; replies=false): Future[Profile] {.async.} =
-  if id.len == 0: return
-  let
-    ps = genParams({"userId": id, "include_tweet_replies": $replies}, after)
-    url = oldUserTweets / (id & ".json") ? ps
-  result = parseTimeline(await fetch(url, Api.timeline), after)
+# proc getTimeline*(id: string; after=""; replies=false): Future[Profile] {.async.} =
+#   if id.len == 0: return
+#   let
+#     ps = genParams({"userId": id, "include_tweet_replies": $replies}, after)
+#     url = oldUserTweets / (id & ".json") ? ps
+#   result = parseTimeline(await fetch(url, Api.timeline), after)
 
 proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
@@ -123,20 +123,22 @@ proc getGraphSearch*(query: Query; after=""): Future[Profile] {.async.} =
   result.tweets.query = query
 
 proc getTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
-  let q = genQueryParam(query)
+  var q = genQueryParam(query)
+
   if q.len == 0 or q == emptyQuery:
     return Timeline(query: query, beginning: true)
 
+  if after.len > 0:
+    q &= " max_id:" & after
+
   let url = tweetSearch ? genParams({
-    "q": q,
-    "tweet_search_mode": "live",
-    "max_id": after
+    "q": q ,
+    "modules": "status",
+    "result_type": "recent",
   })
 
-  result = parseTweetSearch(await fetch(url, Api.search))
+  result = parseTweetSearch(await fetch(url, Api.search), after)
   result.query = query
-  if after.len == 0:
-    result.beginning = true
 
 proc getUserSearch*(query: Query; page="1"): Future[Result[User]] {.async.} =
   if query.text.len == 0:

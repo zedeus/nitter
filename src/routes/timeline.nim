@@ -53,7 +53,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
 
   result =
     case query.kind
-    of posts: await getTimeline(userId, after)
+    # of posts: await getTimeline(userId, after)
     of replies: await getGraphUserTweets(userId, TimelineKind.replies, after)
     of media: await getGraphUserTweets(userId, TimelineKind.media, after)
     else: Profile(tweets: await getTweetSearch(query, after))
@@ -61,10 +61,18 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
   result.user = await user
   result.photoRail = await rail
 
+  result.tweets.query = query
+
   if result.user.protected or result.user.suspended:
     return
 
-  result.tweets.query = query
+  if not skipPinned and query.kind == posts and
+     result.user.pinnedTweet > 0 and after.len == 0:
+    let tweet = await getCachedTweet(result.user.pinnedTweet)
+    if not tweet.isNil:
+      tweet.pinned = true
+      tweet.user = result.user
+      result.pinned = some tweet
 
 proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
                    rss, after: string): Future[string] {.async.} =

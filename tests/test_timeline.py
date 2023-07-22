@@ -1,12 +1,12 @@
 from base import BaseTestCase, Timeline
 from parameterized import parameterized
 
-normal = [['mobile_test'], ['mobile_test_2']]
+normal = [['jack'], ['elonmusk']]
 
-after = [['mobile_test', 'HBaAgJPsqtGNhA0AAA%3D%3D'],
-         ['mobile_test_2', 'HBaAgJPsqtGNhA0AAA%3D%3D']]
+after = [['jack', '1681686036294803456'],
+         ['elonmusk', '1681686036294803456']]
 
-no_more = [['mobile_test_8?cursor=HBaAwJCsk%2F6%2FtgQAAA%3D%3D']]
+no_more = [['mobile_test_8?cursor=1000']]
 
 empty = [['emptyuser'], ['mobile_test_10']]
 

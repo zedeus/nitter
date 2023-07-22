@@ -9,9 +9,9 @@ const
 
   photoRail* = api / "1.1/statuses/media_timeline.json"
   userSearch* = api / "1.1/users/search.json"
-  tweetSearch* = api / "1.1/search/tweets.json"
+  tweetSearch* = api / "1.1/search/universal.json"
 
-  oldUserTweets* = api / "2/timeline/profile"
+  # oldUserTweets* = api / "2/timeline/profile"
 
   graphql = api / "graphql"
   graphUser* = graphql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
@@ -28,27 +28,28 @@ const
   graphListTweets* = graphql / "BbGLL1ZfMibdFNWlk7a0Pw/ListTimeline"
 
   timelineParams* = {
-    "include_profile_interstitial_type": "0",
-    "include_blocking": "0",
-    "include_blocked_by": "0",
-    "include_followed_by": "0",
-    "include_want_retweets": "0",
-    "include_mute_edge": "0",
-    "include_can_dm": "0",
-    "include_can_media_tag": "1",
-    "include_ext_is_blue_verified": "1",
-    "skip_status": "1",
-    "cards_platform": "Web-12",
-    "include_cards": "1",
-    "include_composer_source": "0",
-    "include_reply_count": "1",
+    "cards_platform": "Web-13",
     "tweet_mode": "extended",
-    "include_entities": "1",
-    "include_user_entities": "1",
-    "include_ext_media_color": "0",
+    "ui_lang": "en-US",
     "send_error_codes": "1",
     "simple_quoted_tweet": "1",
-    "include_quote_count": "1"
+    "skip_status": "1",
+    "include_blocked_by": "0",
+    "include_blocking": "0",
+    "include_can_dm": "0",
+    "include_can_media_tag": "1",
+    "include_cards": "1",
+    "include_composer_source": "0",
+    "include_entities": "1",
+    "include_ext_is_blue_verified": "1",
+    "include_ext_media_color": "0",
+    "include_followed_by": "0",
+    "include_mute_edge": "0",
+    "include_profile_interstitial_type": "0",
+    "include_quote_count": "1",
+    "include_reply_count": "1",
+    "include_user_entities": "1",
+    "include_want_retweets": "0",
   }.toSeq
 
   gqlFeatures* = """{
@@ -100,17 +101,17 @@ const
   "includeHasBirdwatchNotes": false
 }"""
 
-  oldUserTweetsVariables* = """{
-  "userId": "$1", $2
-  "count": 20,
-  "includePromotedContent": false,
-  "withDownvotePerspective": false,
-  "withReactionsMetadata": false,
-  "withReactionsPerspective": false,
-  "withVoice": false,
-  "withV2Timeline": true
-}
-"""
+#   oldUserTweetsVariables* = """{
+#   "userId": "$1", $2
+#   "count": 20,
+#   "includePromotedContent": false,
+#   "withDownvotePerspective": false,
+#   "withReactionsMetadata": false,
+#   "withReactionsPerspective": false,
+#   "withVoice": false,
+#   "withV2Timeline": true
+# }
+# """
 
   userTweetsVariables* = """{
   "rest_id": "$1", $2
