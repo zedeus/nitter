@@ -41,7 +41,8 @@ proc getPoolJson*(): JsonNode =
       let
         maxReqs =
           case api
-          of Api.photoRail, Api.search: 180
+          of Api.search: 100000
+          of Api.photoRail: 180
           of Api.timeline: 187
           of Api.userTweets: 300
           of Api.userTweetsAndReplies, Api.userRestId,
