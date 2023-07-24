@@ -5,7 +5,7 @@ function insertBeforeLast(node, elem) {
 }
 
 function getLoadMore(doc) {
-    return doc.querySelector('.show-more:not(.timeline-item)');
+    return doc.querySelector(".show-more:not(.timeline-item)");
 }
 
 function isDuplicate(item, itemClass) {
@@ -15,18 +15,19 @@ function isDuplicate(item, itemClass) {
     return document.querySelector(itemClass + " .tweet-link[href='" + href + "']") != null;
 }
 
-window.onload = function() {
+window.onload = function () {
     const url = window.location.pathname;
     const isTweet = url.indexOf("/status/") !== -1;
     const containerClass = isTweet ? ".replies" : ".timeline";
-    const itemClass = containerClass + ' > div:not(.top-ref)';
+    const itemClass = containerClass + " > div:not(.top-ref)";
 
     var html = document.querySelector("html");
     var container = document.querySelector(containerClass);
     var loading = false;
 
-    window.addEventListener('scroll', function() {
+    function handleScroll(failed) {
         if (loading) return;
+
         if (html.scrollTop + html.clientHeight >= html.scrollHeight - 3000) {
             loading = true;
             var loadMore = getLoadMore(document);
@@ -35,13 +36,15 @@ window.onload = function() {
             loadMore.children[0].text = "Loading...";
 
             var url = new URL(loadMore.children[0].href);
-            url.searchParams.append('scroll', 'true');
+            url.searchParams.append("scroll", "true");
 
             fetch(url.toString()).then(function (response) {
+                if (response.status === 404) throw "error";
+
                 return response.text();
             }).then(function (html) {
                 var parser = new DOMParser();
-                var doc = parser.parseFromString(html, 'text/html');
+                var doc = parser.parseFromString(html, "text/html");
                 loadMore.remove();
 
                 for (var item of doc.querySelectorAll(itemClass)) {
@@ -57,10 +60,18 @@ window.onload = function() {
                 if (isTweet) container.appendChild(newLoadMore);
                 else insertBeforeLast(container, newLoadMore);
             }).catch(function (err) {
-                console.warn('Something went wrong.', err);
-                loading = true;
+                console.warn("Something went wrong.", err);
+                if (failed > 3) {
+                    loadMore.children[0].text = "Error";
+                    return;
+                }
+
+                loading = false;
+                handleScroll((failed || 0) + 1);
             });
         }
-    });
+    }
+
+    window.addEventListener("scroll", () => handleScroll());
 };
 // @license-end
