@@ -35,7 +35,7 @@ proc createSearchRouter*(cfg: Config) =
         resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs, title)
       of tweets:
         let
-          tweets = await getGraphSearch(query, getCursor())
+          tweets = await getTweetSearch(query, getCursor())
           rss = "/search/rss?" & genQueryUrl(query)
         resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
                         request, cfg, prefs, title, rss=rss)

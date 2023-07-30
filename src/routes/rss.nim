@@ -27,14 +27,12 @@ proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.
   else:
     var q = query
     q.fromUser = names
-    profile = Profile(
-      tweets: await getGraphSearch(q, after),
-      # this is kinda dumb
-      user: User(
-        username: name,
-        fullname: names.join(" | "),
-        userpic: "https://abs.twimg.com/sticky/default_profile_images/default_profile.png"
-      )
+    profile.tweets = await getTweetSearch(q, after)
+    # this is kinda dumb
+    profile.user = User(
+      username: name,
+      fullname: names.join(" | "),
+      userpic: "https://abs.twimg.com/sticky/default_profile_images/default_profile.png"
     )
 
   if profile.user.suspended:
@@ -78,7 +76,7 @@ proc createRssRouter*(cfg: Config) =
       if rss.cursor.len > 0:
         respRss(rss, "Search")
 
-      let tweets = await getGraphSearch(query, cursor)
+      let tweets = await getTweetSearch(query, cursor)
       rss.cursor = tweets.bottom
       rss.feed = renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg)
 
@@ -112,7 +110,7 @@ proc createRssRouter*(cfg: Config) =
           case tab
           of "with_replies": getReplyQuery(name)
           of "media": getMediaQuery(name)
-          of "search": initQuery(params(request), name=name)
+          # of "search": initQuery(params(request), name=name)
           else: Query(fromUser: @[name])
 
       let searchKey = if tab != "search": ""

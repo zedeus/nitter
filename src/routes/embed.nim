@@ -10,22 +10,22 @@ export api, embed, vdom, tweet, general, router_utils
 proc createEmbedRouter*(cfg: Config) =
   router embed:
     get "/i/videos/tweet/@id":
-      let convo = await getTweet(@"id")
-      if convo == nil or convo.tweet == nil or convo.tweet.video.isNone:
+      let tweet = await getGraphTweetResult(@"id")
+      if tweet == nil or tweet.video.isNone:
         resp Http404
 
-      resp renderVideoEmbed(convo.tweet, cfg, request)
+      resp renderVideoEmbed(tweet, cfg, request)
 
     get "/@user/status/@id/embed":
       let
-        convo = await getTweet(@"id")
+        tweet = await getGraphTweetResult(@"id")
         prefs = cookiePrefs()
         path = getPath()
 
-      if convo == nil or convo.tweet == nil:
+      if tweet == nil:
         resp Http404
 
-      resp renderTweetEmbed(convo.tweet, path, prefs, cfg, request)
+      resp renderTweetEmbed(tweet, path, prefs, cfg, request)
 
     get "/embed/Tweet.html":
       let id = @"id"

@@ -16,7 +16,12 @@ card = [
     ['FluentAI/status/1116417904831029248',
      'Amazon’s Alexa isn’t just AI — thousands of humans are listening',
      'One of the only ways to improve Alexa is to have human beings check it for errors',
-     'theverge.com', True]
+     'theverge.com', True],
+
+    ['nim_lang/status/1082989146040340480',
+     'Nim in 2018: A short recap',
+     'There were several big news in the Nim world in 2018 – two new major releases, partnership with Status, and much more. But let us go chronologically.',
+     'nim-lang.org', True]
 ]
 
 no_thumb = [
@@ -33,12 +38,7 @@ no_thumb = [
     ['voidtarget/status/1133028231672582145',
      'sinkingsugar/nimqt-example',
      'A sample of a Qt app written using mostly nim. Contribute to sinkingsugar/nimqt-example development by creating an account on GitHub.',
-     'github.com'],
-
-    ['nim_lang/status/1082989146040340480',
-     'Nim in 2018: A short recap',
-     'Posted by u/miran1 - 36 votes and 46 comments',
-     'reddit.com']
+     'github.com']
 ]
 
 playable = [
@@ -52,17 +52,6 @@ playable = [
      '#nim #c++ #ACCUConfNim is a statically typed systems and applications programming language which offers perhaps some of the most powerful metaprogramming cap...',
      'youtube.com']
 ]
-
-# promo = [
-    # ['BangOlufsen/status/1145698701517754368',
-    #  'Upgrade your journey', '',
-    #  'www.bang-olufsen.com'],
-
-    # ['BangOlufsen/status/1154934429900406784',
-    #  'Learn more about Beosound Shape', '',
-    #  'www.bang-olufsen.com']
-# ]
-
 
 class CardTest(BaseTestCase):
     @parameterized.expand(card)
@@ -98,13 +87,3 @@ class CardTest(BaseTestCase):
         self.assert_element_visible('.card-overlay')
         if len(description) > 0:
             self.assert_text(description, c.description)
-
-    # @parameterized.expand(promo)
-    # def test_card_promo(self, tweet, title, description, destination):
-    #     self.open_nitter(tweet)
-    #     c = Card(Conversation.main + " ")
-    #     self.assert_text(title, c.title)
-    #     self.assert_text(destination, c.destination)
-    #     self.assert_element_visible('.video-overlay')
-    #     if len(description) > 0:
-    #         self.assert_text(description, c.description)
