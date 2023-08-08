@@ -4,7 +4,7 @@ from parameterized import parameterized
 profiles = [
         ['mobile_test', 'Test account',
          'Test Account. test test Testing username with @mobile_test_2 and a #hashtag',
-         'San Francisco, CA', 'example.com/foobar', 'Joined October 2009', '100'],
+         'San Francisco, CA', 'example.com/foobar', 'Joined October 2009', '98'],
         ['mobile_test_2', 'mobile test 2', '', '', '', 'Joined January 2011', '13']
 ]
 

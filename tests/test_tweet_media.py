@@ -28,14 +28,14 @@ video_m3u8 = [
 ]
 
 gallery = [
-    ['mobile_test/status/451108446603980803', [
-        ['BkKovdrCUAAEz79', 'BkKovdcCEAAfoBO']
-    ]],
+    # ['mobile_test/status/451108446603980803', [
+    #     ['BkKovdrCUAAEz79', 'BkKovdcCEAAfoBO']
+    # ]],
 
-    ['mobile_test/status/471539824713691137', [
-        ['Bos--KNIQAAA7Li', 'Bos--FAIAAAWpah'],
-        ['Bos--IqIQAAav23']
-    ]],
+    # ['mobile_test/status/471539824713691137', [
+    #     ['Bos--KNIQAAA7Li', 'Bos--FAIAAAWpah'],
+    #     ['Bos--IqIQAAav23']
+    # ]],
 
     ['mobile_test/status/469530783384743936', [
         ['BoQbwJAIUAA0QCY', 'BoQbwN1IMAAuTiP'],

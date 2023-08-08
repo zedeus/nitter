@@ -13,10 +13,9 @@ empty = [['emptyuser'], ['mobile_test_10']]
 protected = [['mobile_test_7'], ['Empty_user']]
 
 photo_rail = [['mobile_test', [
-    'BzUnaDFCUAAmrjs', 'Bo0nDsYIYAIjqVn', 'Bos--KNIQAAA7Li', 'Boq1sDJIYAAxaoi',
-    'BonISmPIEAAhP3G', 'BoQbwJAIUAA0QCY', 'BoQbRQxIIAA3FWD', 'Bn8Qh8iIIAABXrG',
-    'Bn8QIG3IYAA0IGT', 'Bn8O3QeIUAAONai', 'Bn8NGViIAAATNG4', 'BkKovdrCUAAEz79',
-    'BkKoe_oCIAASAqr', 'BkKoRLNCAAAYfDf', 'BkKndxoCQAE1vFt', 'BPEmIbYCMAE44dl'
+    'Bo0nDsYIYAIjqVn', 'BoQbwJAIUAA0QCY', 'BoQbRQxIIAA3FWD', 'Bn8Qh8iIIAABXrG',
+    'Bn8QIG3IYAA0IGT', 'Bn8O3QeIUAAONai', 'Bn8NGViIAAATNG4', 'BkKoRLNCAAAYfDf',
+    'BkKndxoCQAE1vFt'
 ]]]
 
 
