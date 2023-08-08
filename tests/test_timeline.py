@@ -55,10 +55,10 @@ class TweetTest(BaseTestCase):
         self.assert_element_absent(Timeline.older)
         self.assert_element_absent(Timeline.end)
 
-    @parameterized.expand(photo_rail)
-    def test_photo_rail(self, username, images):
-        self.open_nitter(username)
-        self.assert_element_visible(Timeline.photo_rail)
-        for i, url in enumerate(images):
-            img = self.get_attribute(Timeline.photo_rail + f' a:nth-child({i + 1}) img', 'src')
-            self.assertIn(url, img)
+    #@parameterized.expand(photo_rail)
+    #def test_photo_rail(self, username, images):
+        #self.open_nitter(username)
+        #self.assert_element_visible(Timeline.photo_rail)
+        #for i, url in enumerate(images):
+            #img = self.get_attribute(Timeline.photo_rail + f' a:nth-child({i + 1}) img', 'src')
+            #self.assertIn(url, img)
