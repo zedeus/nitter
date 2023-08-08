@@ -148,6 +148,12 @@ proc getMp4Resolution*(url: string): int =
     # cannot determine resolution (e.g. m3u8/non-mp4 video)
     return 0
 
+proc getVideoViewCount*(js: JsonNode): string =
+  with stats, js{"ext_media_stats"}:
+    return stats{"view_count"}.getStr($stats{"viewCount"}.getInt)
+
+  return $js{"mediaStats", "viewCount"}.getInt(0)
+
 proc extractSlice(js: JsonNode): Slice[int] =
   result = js["indices"][0].getInt ..< js["indices"][1].getInt
 

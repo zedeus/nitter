@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, options, times, math
+import strutils, options, times, math, tables
 import packedjson, packedjson/deserialiser
 import types, parserutils, utils
 import experimental/parser/unifiedcard
@@ -81,7 +81,7 @@ proc parseGif(js: JsonNode): Gif =
 proc parseVideo(js: JsonNode): Video =
   result = Video(
     thumb: js{"media_url_https"}.getImageStr,
-    views: js{"ext", "mediaStats", "r", "ok", "viewCount"}.getStr($js{"mediaStats", "viewCount"}.getInt),
+    views: getVideoViewCount(js),
     available: true,
     title: js{"ext_alt_text"}.getStr,
     durationMs: js{"video_info", "duration_millis"}.getInt
@@ -312,6 +312,54 @@ proc parseTweetSearch*(js: JsonNode; after=""): Timeline =
 
   if result.content.len > 0:
     result.bottom = $(result.content[^1][0].id - 1)
+
+proc parseUserTimelineTweet(tweet: JsonNode; users: TableRef[string, User]): Tweet =
+  result = parseTweet(tweet, tweet{"card"})
+
+  if result.isNil or not result.available:
+    return
+
+  with user, tweet{"user"}:
+    let userId = user{"id_str"}.getStr
+    if user{"ext_is_blue_verified"}.getBool(false):
+      users[userId].verified = users[userId].verified or true
+    result.user = users[userId]
+
+proc parseUserTimeline*(js: JsonNode; after=""): Profile =
+  result = Profile(tweets: Timeline(beginning: after.len == 0))
+
+  if js.kind == JNull or "response" notin js or "twitter_objects" notin js:
+    return
+
+  var users = newTable[string, User]()
+  for userId, user in js{"twitter_objects", "users"}:
+    users[userId] = parseUser(user)
+
+  for entity in js{"response", "timeline"}:
+    let
+      tweetId = entity{"tweet", "id"}.getId
+      isPinned = entity{"tweet", "is_pinned"}.getBool(false)
+
+    with tweet, js{"twitter_objects", "tweets", $tweetId}:
+      var parsed = parseUserTimelineTweet(tweet, users)
+
+      if not parsed.isNil and parsed.available:
+        if parsed.quote.isSome:
+          parsed.quote = some parseUserTimelineTweet(tweet{"quoted_status"}, users)
+
+        if parsed.retweet.isSome:
+          let retweet = parseUserTimelineTweet(tweet{"retweeted_status"}, users)
+          if retweet.quote.isSome:
+            retweet.quote = some parseUserTimelineTweet(tweet{"retweeted_status", "quoted_status"}, users)
+          parsed.retweet = some retweet
+
+      if isPinned:
+        parsed.pinned = true
+        result.pinned = some parsed
+      else:
+        result.tweets.content.add parsed
+
+  result.tweets.bottom = js{"response", "cursor", "bottom"}.getStr
 
 # proc finalizeTweet(global: GlobalObjects; id: string): Tweet =
 #   let intId = if id.len > 0: parseBiggestInt(id) else: 0

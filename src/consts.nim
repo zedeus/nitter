@@ -7,6 +7,7 @@ const
   api = parseUri("https://api.twitter.com")
   activate* = $(api / "1.1/guest/activate.json")
 
+  legacyUserTweets* = api / "1.1/timeline/user.json"
   photoRail* = api / "1.1/statuses/media_timeline.json"
   userSearch* = api / "1.1/users/search.json"
   tweetSearch* = api / "1.1/search/universal.json"
@@ -28,28 +29,20 @@ const
   graphListTweets* = graphql / "BbGLL1ZfMibdFNWlk7a0Pw/ListTimeline"
 
   timelineParams* = {
-    "cards_platform": "Web-13",
-    "tweet_mode": "extended",
-    "ui_lang": "en-US",
-    "send_error_codes": "1",
-    "simple_quoted_tweet": "1",
-    "skip_status": "1",
-    "include_blocked_by": "0",
-    "include_blocking": "0",
-    "include_can_dm": "0",
     "include_can_media_tag": "1",
     "include_cards": "1",
-    "include_composer_source": "0",
     "include_entities": "1",
-    "include_ext_is_blue_verified": "1",
-    "include_ext_media_color": "0",
-    "include_followed_by": "0",
-    "include_mute_edge": "0",
     "include_profile_interstitial_type": "0",
     "include_quote_count": "1",
     "include_reply_count": "1",
     "include_user_entities": "1",
-    "include_want_retweets": "0",
+    "include_ext_reply_count": "1",
+    "include_ext_is_blue_verified": "1",
+    "include_ext_media_color": "0",
+    "cards_platform": "Web-13",
+    "tweet_mode": "extended",
+    "send_error_codes": "1",
+    "simple_quoted_tweet": "1"
   }.toSeq
 
   gqlFeatures* = """{

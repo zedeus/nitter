@@ -40,6 +40,16 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
 #     url = oldUserTweets / (id & ".json") ? ps
 #   result = parseTimeline(await fetch(url, Api.timeline), after)
 
+proc getUserTimeline*(id: string; after=""): Future[Profile] {.async.} =
+  var ps = genParams({"id": id})
+  if after.len > 0:
+    ps.add ("down_cursor", after)
+
+  let
+    url = legacyUserTweets ? ps
+    js = await fetch(url, Api.userTimeline)
+  result = parseUserTimeline(js, after)
+
 proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let

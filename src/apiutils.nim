@@ -16,8 +16,8 @@ proc genParams*(pars: openArray[(string, string)] = @[]; cursor="";
   for p in pars:
     result &= p
   if ext:
-    result &= ("ext", "mediaStats,isBlueVerified,isVerified,blue,blueVerified")
     result &= ("include_ext_alt_text", "1")
+    result &= ("include_ext_media_stats", "1")
     result &= ("include_ext_media_availability", "1")
   if count.len > 0:
     result &= ("count", count)
