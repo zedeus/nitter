@@ -19,6 +19,8 @@ proc getPoolJson*(): JsonNode =
     totalPending = 0
     reqsPerApi: Table[string, int]
 
+  let now = epochTime()
+
   for account in accountPool:
     totalPending.inc(account.pending)
     list[account.id] = %*{
@@ -27,6 +29,9 @@ proc getPoolJson*(): JsonNode =
     }
 
     for api in account.apis.keys:
+      if (now.int - account.apis[api].reset) / 60 > 15:
+        continue
+
       list[account.id]["apis"][$api] = %account.apis[api].remaining
 
       let
