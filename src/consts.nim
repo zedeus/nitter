@@ -2,17 +2,13 @@
 import uri, sequtils, strutils
 
 const
-  auth* = "Bearer AAAAAAAAAAAAAAAAAAAAAFQODgEAAAAAVHTp76lzh3rFzcHbmHVvQxYYpTw%3DckAlMINMjmCwxUcaXbAN4XqJVdgMJaHqNOFgPMK0zN1qLqLQCF"
+  consumerKey* = "3nVuSoBZnx6U4vzUxf5w"
+  consumerSecret* = "Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys"
 
   api = parseUri("https://api.twitter.com")
   activate* = $(api / "1.1/guest/activate.json")
 
-  legacyUserTweets* = api / "1.1/timeline/user.json"
   photoRail* = api / "1.1/statuses/media_timeline.json"
-  userSearch* = api / "1.1/users/search.json"
-  tweetSearch* = api / "1.1/search/universal.json"
-
-  # oldUserTweets* = api / "2/timeline/profile"
 
   graphql = api / "graphql"
   graphUser* = graphql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
