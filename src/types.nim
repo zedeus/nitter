@@ -32,6 +32,8 @@ type
   RateLimit* = object
     remaining*: int
     reset*: int
+    limited*: bool
+    limitedAt*: int
 
   GuestAccount* = ref object
     id*: string

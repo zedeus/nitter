@@ -3,7 +3,9 @@ import asyncdispatch, times, json, random, strutils, tables
 import types
 
 # max requests at a time per account to avoid race conditions
-const maxConcurrentReqs = 5
+const
+  maxConcurrentReqs = 5
+  dayInSeconds = 24 * 60 * 60
 
 var
   accountPool: seq[GuestAccount]
@@ -19,7 +21,7 @@ proc getPoolJson*(): JsonNode =
     totalPending = 0
     reqsPerApi: Table[string, int]
 
-  let now = epochTime()
+  let now = epochTime().int
 
   for account in accountPool:
     totalPending.inc(account.pending)
@@ -29,10 +31,17 @@ proc getPoolJson*(): JsonNode =
     }
 
     for api in account.apis.keys:
-      if (now.int - account.apis[api].reset) / 60 > 15:
-        continue
+      let obj = %*{}
+      if account.apis[api].limited:
+        obj["limited"] = %true
 
-      list[account.id]["apis"][$api] = %account.apis[api].remaining
+      if account.apis[api].reset > now.int:
+        obj["remaining"] = %account.apis[api].remaining
+
+      list[account.id]["apis"][$api] = obj
+
+      if "remaining" notin obj:
+        continue
 
       let
         maxReqs =
@@ -65,7 +74,12 @@ proc isLimited(account: GuestAccount; api: Api): bool =
 
   if api in account.apis:
     let limit = account.apis[api]
-    return (limit.remaining <= 10 and limit.reset > epochTime().int)
+
+    if limit.limited and (epochTime().int - limit.limitedAt) > dayInSeconds:
+      account.apis[api].limited = false
+      echo "account limit reset, api: ", api, ", id: ", account.id
+
+    return limit.limited or (limit.remaining <= 10 and limit.reset > epochTime().int)
   else:
     return false
 

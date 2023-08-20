@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import httpclient, asyncdispatch, options, strutils, uri, times, math
+import httpclient, asyncdispatch, options, strutils, uri, times, math, tables
 import jsony, packedjson, zippy, oauth1
 import types, tokens, consts, parserutils, http_pool
 import experimental/types/common
@@ -128,6 +128,16 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
       echo "fetch error: ", result.getError
       release(account, invalid=true)
       raise rateLimitError()
+
+    if body.startsWith("{\"errors"):
+      let errors = body.fromJson(Errors)
+      if errors in {invalidToken, badToken}:
+        echo "fetch error: ", errors
+        release(account, invalid=true)
+        raise rateLimitError()
+      elif errors in {rateLimited}:
+        account.apis[api].limited = true
+        echo "rate limited, api: ", $api, ", reqs left: ", account.apis[api].remaining, ", id: ", account.id
 
 proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
   fetchImpl result:
