@@ -77,7 +77,7 @@ proc isLimited(account: GuestAccount; api: Api): bool =
 
     if limit.limited and (epochTime().int - limit.limitedAt) > dayInSeconds:
       account.apis[api].limited = false
-      echo "account limit reset, api: ", api, ", id: ", account.id
+      log "resetting limit, api: ", api, ", id: ", account.id
 
     return limit.limited or (limit.remaining <= 10 and limit.reset > epochTime().int)
   else:

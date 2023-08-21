@@ -138,7 +138,7 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
       elif errors in {rateLimited}:
         account.apis[api].limited = true
         account.apis[api].limitedAt = epochTime().int
-        echo "rate limited, api: ", $api, ", reqs left: ", account.apis[api].remaining, ", id: ", account.id
+        echo "[accounts] rate limited, api: ", api, ", reqs left: ", account.apis[api].remaining, ", id: ", account.id
 
 proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
   fetchImpl result:
