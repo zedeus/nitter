@@ -40,6 +40,9 @@ jobs:
           nimble md
           nimble scss
       - name: Run tests
+        env:
+          GUEST_ACCOUNTS: ${{ secrets.GUEST_ACCOUNTS }}
         run: |
+          echo $GUEST_ACCOUNTS > ./guest_accounts.json
           ./nitter &
           pytest -n4 tests
