@@ -1,10 +1,10 @@
-# SPDX-License-Identifier: AGPL-3.0-only
+#i hate begging for this too em SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch, times, json, random, strutils, tables
 import types
 
 # max requests at a time per account to avoid race conditions
 const
-  maxConcurrentReqs = 5
+  maxConcurrentReqs = 2
   dayInSeconds = 24 * 60 * 60
 
 var
