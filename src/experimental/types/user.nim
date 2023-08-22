@@ -16,6 +16,7 @@ type
     statusesCount*: int
     mediaCount*: int
     verified*: bool
+    extIsBlueVerified*: bool
     protected*: bool
     profileLinkColor*: string
     profileBannerUrl*: string

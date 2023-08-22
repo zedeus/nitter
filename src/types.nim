@@ -19,6 +19,7 @@ type
     tweetResult
     photoRail
     search
+    userSearch
     list
     listBySlug
     listMembers
