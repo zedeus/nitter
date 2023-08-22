@@ -19,6 +19,7 @@ proc getPoolJson*(): JsonNode =
     list = newJObject()
     totalReqs = 0
     totalPending = 0
+    totalLimited = 0
     reqsPerApi: Table[string, int]
 
   let now = epochTime().int
@@ -31,34 +32,40 @@ proc getPoolJson*(): JsonNode =
     }
 
     for api in account.apis.keys:
-      let obj = %*{}
-      if account.apis[api].limited:
-        obj["limited"] = %true
+      let
+        apiStatus = account.apis[api]
+        obj = %*{}
 
-      if account.apis[api].reset > now.int:
-        obj["remaining"] = %account.apis[api].remaining
+      if apiStatus.limited:
+        obj["limited"] = %true
+        inc totalLimited
+
+      if apiStatus.reset > now.int:
+        obj["remaining"] = %apiStatus.remaining
+
+      if "remaining" notin obj and not apiStatus.limited:
+        continue
 
       list[account.id]["apis"][$api] = obj
-
-      if "remaining" notin obj:
-        continue
 
       let
         maxReqs =
           case api
           of Api.search: 50
+          of Api.tweetDetail: 150
           of Api.photoRail: 180
           of Api.userTweets, Api.userTweetsAndReplies, Api.userMedia,
-             Api.userRestId, Api.userScreenName,
-             Api.tweetDetail, Api.tweetResult,
+             Api.userRestId, Api.userScreenName, Api.tweetResult,
              Api.list, Api.listTweets, Api.listMembers, Api.listBySlug: 500
-        reqs = maxReqs - account.apis[api].remaining
+          of Api.userSearch: 900
+        reqs = maxReqs - apiStatus.remaining
 
       reqsPerApi[$api] = reqsPerApi.getOrDefault($api, 0) + reqs
       totalReqs.inc(reqs)
 
   return %*{
     "amount": accountPool.len,
+    "limited": totalLimited,
     "requests": totalReqs,
     "pending": totalPending,
     "apis": reqsPerApi,
