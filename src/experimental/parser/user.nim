@@ -85,3 +85,10 @@ proc parseUsers*(json: string; after=""): Result[User] =
     let raw = json.fromJson(seq[RawUser])
     for user in raw:
       result.content.add user.toUser
+
+proc parseTypeahead*(json: string): Result[User] =
+  result = Result[User](beginning: true)
+
+  let raw = json.fromJson(Typeahead)
+  for user in raw.users:
+    result.content.add user.toUser

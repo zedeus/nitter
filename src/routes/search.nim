@@ -29,7 +29,7 @@ proc createSearchRouter*(cfg: Config) =
           redirect("/" & q)
         var users: Result[User]
         try:
-          users = await getUserSearch(query, getCursor())
+          users = await getUserSearch(query)
         except InternalError:
           users = Result[User](beginning: true, query: query)
         resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs, title)

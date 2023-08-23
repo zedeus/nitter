@@ -9,7 +9,7 @@ const
   activate* = $(api / "1.1/guest/activate.json")
 
   photoRail* = api / "1.1/statuses/media_timeline.json"
-  userSearch* = api / "1.1/users/search.json"
+  userSearch* = api / "1.1/search/typeahead.json"
 
   graphql = api / "graphql"
   graphUser* = graphql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
