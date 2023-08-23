@@ -42,6 +42,3 @@ type
 
   Color* = object
     red*, green*, blue*: int
-
-  Typeahead* = object
-    users*: seq[RawUser]

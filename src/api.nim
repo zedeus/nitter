@@ -115,16 +115,22 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
   result = parseGraphSearch(await fetch(url, Api.search), after)
   result.query = query
 
-proc getUserSearch*(query: Query): Future[Result[User]] {.async.} =
+proc getUserSearch*(query: Query; page="1"): Future[Result[User]] {.async.} =
   if query.text.len == 0:
     return Result[User](query: query, beginning: true)
 
   let
-    url = userSearch ? genParams({"q": query.text, "result_type": "users"})
+    page = if page.len == 0: "1" else: page
+    url = userSearch ? genParams({"q": query.text, "skip_status": "1", "page": page})
     js = await fetchRaw(url, Api.userSearch)
 
-  result = parseTypeahead(js)
+  result = parseUsers(js)
+
   result.query = query
+  if page.len == 0:
+    result.bottom = "2"
+  elif page.allCharsInSet(Digits):
+    result.bottom = $(parseInt(page) + 1)
 
 proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return
