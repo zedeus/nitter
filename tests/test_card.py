@@ -13,11 +13,6 @@ card = [
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too) - obsplugin.nim',
      'gist.github.com', True],
 
-    ['FluentAI/status/1116417904831029248',
-     'Amazon’s Alexa isn’t just AI — thousands of humans are listening',
-     'One of the only ways to improve Alexa is to have human beings check it for errors',
-     'theverge.com', True],
-
     ['nim_lang/status/1082989146040340480',
      'Nim in 2018: A short recap',
      'There were several big news in the Nim world in 2018 – two new major releases, partnership with Status, and much more. But let us go chronologically.',
@@ -25,6 +20,11 @@ card = [
 ]
 
 no_thumb = [
+    ['FluentAI/status/1116417904831029248',
+     'Amazon’s Alexa isn’t just AI — thousands of humans are listening',
+     'One of the only ways to improve Alexa is to have human beings check it for errors',
+     'theverge.com'],
+
     ['Thom_Wolf/status/1122466524860702729',
      'facebookresearch/fairseq',
      'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - GitHub - facebookresearch/fairseq: Facebook AI Research Sequence-to-Sequence Toolkit written in Python.',

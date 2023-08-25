@@ -324,7 +324,7 @@ proc parseGraphTweet(js: JsonNode): Tweet =
   of "TweetWithVisibilityResults":
     return parseGraphTweet(js{"tweet"})
 
-  var jsCard = copy(js{"tweet_card", "legacy"})
+  var jsCard = copy(js{"card", "legacy"})
   if jsCard.kind != JNull:
     var values = newJObject()
     for val in jsCard["binding_values"]:
@@ -342,7 +342,6 @@ proc parseGraphTweet(js: JsonNode): Tweet =
     result.quote = some(parseGraphTweet(js{"quoted_status_result", "result"}))
 
 proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
-  let thread = js{"content", "items"}
   for t in js{"content", "items"}:
     let entryId = t{"entryId"}.getStr
     if "cursor-showmore" in entryId:
@@ -350,11 +349,16 @@ proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
       result.thread.cursor = cursor.getStr
       result.thread.hasMore = true
     elif "tweet" in entryId:
-      let tweet = parseGraphTweet(t{"item", "content", "tweetResult", "result"})
-      result.thread.content.add tweet
+      let
+        isLegacy = t{"item"}.hasKey("itemContent")
+        (contentKey, resultKey) = if isLegacy: ("itemContent", "tweet_results")
+                                  else: ("content", "tweetResult")
 
-      if t{"item", "content", "tweetDisplayType"}.getStr == "SelfThread":
-        result.self = true
+      with content, t{"item", contentKey}:
+        result.thread.content.add parseGraphTweet(content{resultKey, "result"})
+
+        if content{"tweetDisplayType"}.getStr == "SelfThread":
+          result.self = true
 
 proc parseGraphTweetResult*(js: JsonNode): Tweet =
   with tweet, js{"data", "tweet_result", "result"}:
@@ -363,14 +367,14 @@ proc parseGraphTweetResult*(js: JsonNode): Tweet =
 proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
   result = Conversation(replies: Result[Chain](beginning: true))
 
-  let instructions = ? js{"data", "timeline_response", "instructions"}
+  let instructions = ? js{"data", "threaded_conversation_with_injections_v2", "instructions"}
   if instructions.len == 0:
     return
 
   for e in instructions[0]{"entries"}:
     let entryId = e{"entryId"}.getStr
     if entryId.startsWith("tweet"):
-      with tweetResult, e{"content", "content", "tweetResult", "result"}:
+      with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
         let tweet = parseGraphTweet(tweetResult)
 
         if not tweet.available:
@@ -385,7 +389,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
       let tweet = Tweet(
         id: parseBiggestInt(id),
         available: false,
-        text: e{"content", "content", "tombstoneInfo", "richText"}.getTombstone
+        text: e{"content", "itemContent", "tombstoneInfo", "richText"}.getTombstone
       )
 
       if id == tweetId:
@@ -397,9 +401,10 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
       if self:
         result.after = thread
       else:
+        echo "adding thread: ", thread.content.len
         result.replies.content.add thread
     elif entryId.startsWith("cursor-bottom"):
-      result.replies.bottom = e{"content", "content", "value"}.getStr
+      result.replies.bottom = e{"content", "itemContent", "value"}.getStr
 
 proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
   result = Profile(tweets: Timeline(beginning: after.len == 0))
