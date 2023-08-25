@@ -401,7 +401,6 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
       if self:
         result.after = thread
       else:
-        echo "adding thread: ", thread.content.len
         result.replies.content.add thread
     elif entryId.startsWith("cursor-bottom"):
       result.replies.bottom = e{"content", "itemContent", "value"}.getStr
