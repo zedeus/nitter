@@ -4,7 +4,7 @@ import packedjson, packedjson/deserialiser
 import types, parserutils, utils
 import experimental/parser/unifiedcard
 
-proc parseGraphTweet(js: JsonNode): Tweet
+proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet
 
 proc parseUser(js: JsonNode; id=""): User =
   if js.isNull: return
@@ -306,7 +306,7 @@ proc parsePhotoRail*(js: JsonNode): PhotoRail =
     if url.len == 0: continue
     result.add GalleryPhoto(url: url, tweetId: $t.id)
 
-proc parseGraphTweet(js: JsonNode): Tweet =
+proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet =
   if js.kind == JNull:
     return Tweet()
 
@@ -322,9 +322,9 @@ proc parseGraphTweet(js: JsonNode): Tweet =
   of "TweetPreviewDisplay":
     return Tweet(text: "You're unable to view this Tweet because it's only available to the Subscribers of the account owner.")
   of "TweetWithVisibilityResults":
-    return parseGraphTweet(js{"tweet"})
+    return parseGraphTweet(js{"tweet"}, isLegacy)
 
-  var jsCard = copy(js{"card", "legacy"})
+  var jsCard = copy(js{if isLegacy: "card" else: "tweet_card", "legacy"})
   if jsCard.kind != JNull:
     var values = newJObject()
     for val in jsCard["binding_values"]:
@@ -339,7 +339,7 @@ proc parseGraphTweet(js: JsonNode): Tweet =
     result.expandNoteTweetEntities(noteTweet)
 
   if result.quote.isSome:
-    result.quote = some(parseGraphTweet(js{"quoted_status_result", "result"}))
+    result.quote = some(parseGraphTweet(js{"quoted_status_result", "result"}, isLegacy))
 
 proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
   for t in js{"content", "items"}:
@@ -355,14 +355,14 @@ proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
                                   else: ("content", "tweetResult")
 
       with content, t{"item", contentKey}:
-        result.thread.content.add parseGraphTweet(content{resultKey, "result"})
+        result.thread.content.add parseGraphTweet(content{resultKey, "result"}, isLegacy)
 
         if content{"tweetDisplayType"}.getStr == "SelfThread":
           result.self = true
 
 proc parseGraphTweetResult*(js: JsonNode): Tweet =
   with tweet, js{"data", "tweet_result", "result"}:
-    result = parseGraphTweet(tweet)
+    result = parseGraphTweet(tweet, false)
 
 proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
   result = Conversation(replies: Result[Chain](beginning: true))
@@ -375,7 +375,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
     let entryId = e{"entryId"}.getStr
     if entryId.startsWith("tweet"):
       with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
-        let tweet = parseGraphTweet(tweetResult)
+        let tweet = parseGraphTweet(tweetResult, true)
 
         if not tweet.available:
           tweet.id = parseBiggestInt(entryId.getId())
@@ -421,7 +421,7 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
         let entryId = e{"entryId"}.getStr
         if entryId.startsWith("tweet"):
           with tweetResult, e{"content", "content", "tweetResult", "result"}:
-            let tweet = parseGraphTweet(tweetResult)
+            let tweet = parseGraphTweet(tweetResult, false)
             if not tweet.available:
               tweet.id = parseBiggestInt(entryId.getId())
             result.tweets.content.add tweet
@@ -432,7 +432,7 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
           result.tweets.bottom = e{"content", "value"}.getStr
     if after.len == 0 and i{"__typename"}.getStr == "TimelinePinEntry":
       with tweetResult, i{"entry", "content", "content", "tweetResult", "result"}:
-        let tweet = parseGraphTweet(tweetResult)
+        let tweet = parseGraphTweet(tweetResult, false)
         tweet.pinned = true
         if not tweet.available and tweet.tombstone.len == 0:
           let entryId = i{"entry", "entryId"}.getEntryId
@@ -454,7 +454,7 @@ proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
         let entryId = e{"entryId"}.getStr
         if entryId.startsWith("tweet"):
           with tweetRes, e{"content", "itemContent", "tweet_results", "result"}:
-            let tweet = parseGraphTweet(tweetRes)
+            let tweet = parseGraphTweet(tweetRes, true)
             if not tweet.available:
               tweet.id = parseBiggestInt(entryId.getId())
             result.content.add tweet
