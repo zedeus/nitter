@@ -1,5 +1,5 @@
-#i hate begging for this too em SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, times, json, random, strutils, tables
+#SPDX-License-Identifier: AGPL-3.0-only
+import asyncdispatch, times, json, random, strutils, tables, sets
 import types
 
 # max requests at a time per account to avoid race conditions
@@ -19,14 +19,16 @@ proc getPoolJson*(): JsonNode =
     list = newJObject()
     totalReqs = 0
     totalPending = 0
-    totalLimited = 0
+    limited: HashSet[string]
     reqsPerApi: Table[string, int]
 
   let now = epochTime().int
 
   for account in accountPool:
     totalPending.inc(account.pending)
-    list[account.id] = %*{
+
+    var includeAccount = false
+    let accountJson = %*{
       "apis": newJObject(),
       "pending": account.pending,
     }
@@ -36,17 +38,18 @@ proc getPoolJson*(): JsonNode =
         apiStatus = account.apis[api]
         obj = %*{}
 
-      if apiStatus.limited:
-        obj["limited"] = %true
-        inc totalLimited
-
       if apiStatus.reset > now.int:
         obj["remaining"] = %apiStatus.remaining
 
       if "remaining" notin obj and not apiStatus.limited:
         continue
 
-      list[account.id]["apis"][$api] = obj
+      if apiStatus.limited:
+        obj["limited"] = %true
+        limited.incl account.id
+
+      accountJson{"apis", $api} = obj
+      includeAccount = true
 
       let
         maxReqs =
@@ -64,9 +67,12 @@ proc getPoolJson*(): JsonNode =
       reqsPerApi[$api] = reqsPerApi.getOrDefault($api, 0) + reqs
       totalReqs.inc(reqs)
 
+    if includeAccount:
+      list[account.id] = accountJson
+
   return %*{
     "amount": accountPool.len,
-    "limited": totalLimited,
+    "limited": limited.card,
     "requests": totalReqs,
     "pending": totalPending,
     "apis": reqsPerApi,
