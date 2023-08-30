@@ -32,7 +32,7 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
         if cfg.enableRss and rss.len > 0:
           icon "rss-feed", title="RSS Feed", href=rss
         icon "bird", title="Open in Twitter", href=canonical
-        a(href="https://liberapay.com/zedeus"): verbatim lp
+        a(href="https://liberapay.com/zedeus", title="Liberapay — zedeus"): verbatim lp
         icon "info", title="About", href="/about"
         icon "cog", title="Preferences", href=("/settings?referer=" & encodeUrl(path))
 
