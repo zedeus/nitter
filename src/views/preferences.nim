@@ -10,7 +10,8 @@ macro renderPrefs*(): untyped =
     ident("buildHtml"), ident("tdiv"), nnkStmtList.newTree())
 
   for header, options in prefList:
-    result[2].add nnkCall.newTree(
+    var prefGroup = nnkCall.newTree(ident("fieldset"), nnkStmtList.newTree())
+    prefGroup[1].add nnkCall.newTree(
       ident("legend"),
       nnkStmtList.newTree(
         nnkCommand.newTree(ident("text"), newLit(header))))
@@ -30,20 +31,21 @@ macro renderPrefs*(): untyped =
         else:
           stmt[0].add newLit(pref.options)
 
-      result[2].add stmt
+      prefGroup[1].add stmt
+
+    result[2].add prefGroup
 
 proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string]): VNode =
-  buildHtml(tdiv(class="overlay-panel")):
-    fieldset(class="preferences"):
-      form(`method`="post", action="/saveprefs", autocomplete="off"):
-        refererField path
+  buildHtml(tdiv(class="overlay-panel preferences")):
+    form(`method`="post", action="/saveprefs", autocomplete="off"):
+      refererField path
 
-        renderPrefs()
+      renderPrefs()
 
-        h4(class="note"):
-          text "Preferences are stored client-side using cookies without any personal information."
+      h4(class="note"):
+        text "Preferences are stored client-side using cookies without any personal information."
 
-        button(`type`="submit", class="pref-submit"):
-          text "Save preferences"
+      button(`type`="submit", class="pref-submit"):
+        text "Save preferences"
 
-      buttonReferer "/resetprefs", "Reset preferences", path, class="pref-reset"
+    buttonReferer "/resetprefs", "Reset preferences", path, class="pref-reset"
