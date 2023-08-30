@@ -40,8 +40,6 @@ type
     id*: string
     oauthToken*: string
     oauthSecret*: string
-    # init*: Time
-    lastUse*: Time
     pending*: int
     apis*: Table[Api, RateLimit]
 

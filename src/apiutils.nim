@@ -103,6 +103,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
           setLimited(account, api)
           raise rateLimitError()
       elif result.startsWith("429 Too Many Requests"):
+        echo "[accounts] 429 error, API: ", api, ", account: ", account.id
         account.apis[api].remaining = 0
         # rate limit hit, resets after the 15 minute window
         raise rateLimitError()

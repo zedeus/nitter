@@ -109,7 +109,7 @@ proc invalidate*(account: var GuestAccount) =
   if idx > -1: accountPool.delete(idx)
   account = nil
 
-proc release*(account: GuestAccount; invalid=false) =
+proc release*(account: GuestAccount) =
   if account.isNil: return
   dec account.pending
 
