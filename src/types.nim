@@ -56,7 +56,7 @@ type
     userNotFound = 50
     suspended = 63
     rateLimited = 88
-    invalidToken = 89
+    expiredToken = 89
     listIdOrSlug = 112
     tweetNotFound = 144
     tweetNotAuthorized = 179

@@ -11,7 +11,7 @@ var
   accountPool: seq[GuestAccount]
   enableLogging = false
 
-template log(str) =
+template log(str: varargs[string, `$`]) =
   if enableLogging: echo "[accounts] ", str
 
 proc getPoolJson*(): JsonNode =
@@ -91,7 +91,7 @@ proc isLimited(account: GuestAccount; api: Api): bool =
 
     if limit.limited and (epochTime().int - limit.limitedAt) > dayInSeconds:
       account.apis[api].limited = false
-      log "resetting limit, api: " & $api & ", id: " & $account.id
+      log "resetting limit, api: ", api, ", id: ", account.id
 
     return limit.limited or (limit.remaining <= 10 and limit.reset > epochTime().int)
   else:
@@ -100,15 +100,18 @@ proc isLimited(account: GuestAccount; api: Api): bool =
 proc isReady(account: GuestAccount; api: Api): bool =
   not (account.isNil or account.pending > maxConcurrentReqs or account.isLimited(api))
 
-proc release*(account: GuestAccount; used=false; invalid=false) =
+proc invalidate*(account: var GuestAccount) =
   if account.isNil: return
-  if invalid:
-    log "discarding invalid account: " & account.id
+  log "invalidating expired account: ", account.id
 
-    let idx = accountPool.find(account)
-    if idx > -1: accountPool.delete(idx)
-  elif used:
-    dec account.pending
+  # TODO: This isn't sufficient, but it works for now
+  let idx = accountPool.find(account)
+  if idx > -1: accountPool.delete(idx)
+  account = nil
+
+proc release*(account: GuestAccount; invalid=false) =
+  if account.isNil: return
+  dec account.pending
 
 proc getGuestAccount*(api: Api): Future[GuestAccount] {.async.} =
   for i in 0 ..< accountPool.len:
@@ -119,8 +122,13 @@ proc getGuestAccount*(api: Api): Future[GuestAccount] {.async.} =
   if not result.isNil and result.isReady(api):
     inc result.pending
   else:
-    log "no accounts available for API: " & $api
+    log "no accounts available for API: ", api
     raise rateLimitError()
+
+proc setLimited*(account: GuestAccount; api: Api) =
+  account.apis[api].limited = true
+  account.apis[api].limitedAt = epochTime().int
+  log "rate limited, api: ", api, ", reqs left: ", account.apis[api].remaining, ", id: ", account.id
 
 proc setRateLimit*(account: GuestAccount; api: Api; remaining, reset: int) =
   # avoid undefined behavior in race conditions
