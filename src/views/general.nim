@@ -42,7 +42,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   var theme = prefs.theme.toTheme
   if "theme" in req.params:
     theme = req.params["theme"].toTheme
-    
+
   let ogType =
     if video.len > 0: "video"
     elif rss.len > 0: "object"
@@ -134,7 +134,7 @@ proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
     body:
       renderNavbar(cfg, req, rss, canonical)
 
-      tdiv(class="container"):
+      main(class="container"):
         body
 
   result = doctype & $node
