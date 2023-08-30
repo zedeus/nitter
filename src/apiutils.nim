@@ -67,6 +67,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
   var account = await getGuestAccount(api)
   if account.oauthToken.len == 0:
+    echo "[accounts] Empty oauth token, account: ", account.id
     raise rateLimitError()
 
   try:
