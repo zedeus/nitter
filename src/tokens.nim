@@ -12,7 +12,7 @@ var
   enableLogging = false
 
 template log(str: varargs[string, `$`]) =
-  if enableLogging: echo "[accounts] ", str
+  if enableLogging: echo "[accounts] ", str.join("")
 
 proc getPoolJson*(): JsonNode =
   var
