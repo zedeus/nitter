@@ -116,7 +116,6 @@ proc release*(account: GuestAccount) =
 proc getGuestAccount*(api: Api): Future[GuestAccount] {.async.} =
   for i in 0 ..< accountPool.len:
     if result.isReady(api): break
-    release(result)
     result = accountPool.sample()
 
   if not result.isNil and result.isReady(api):
