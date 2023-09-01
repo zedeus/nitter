@@ -37,6 +37,7 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   try:
     let res = await client.get(url)
     if res.status != "200 OK":
+      echo "[media] Proxying media failed, status: $1, url: $2, body: $3" % [res.status, url, await res.body]
       return Http404
 
     let hashed = $hash(url)
@@ -65,6 +66,7 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
         await request.client.send(data)
     data.setLen 0
   except HttpRequestError, ProtocolError, OSError:
+    echo "[media] Proxying media exception, error: $1, url: $2" % [getCurrentExceptionMsg(), url]
     result = Http404
   finally:
     client.close()
