@@ -120,28 +120,38 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   except OSError as e:
     raise e
   except Exception as e:
-    echo "error: ", e.name, ", msg: ", e.msg, ", accountId: ", account.id, ", url: ", url
+    let id = if account.isNil: "null" else: account.id
+    echo "error: ", e.name, ", msg: ", e.msg, ", accountId: ", id, ", url: ", url
     raise rateLimitError()
   finally:
     release(account)
 
-proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
-  var body: string
-  fetchImpl body:
-    if body.startsWith('{') or body.startsWith('['):
-      result = parseJson(body)
-    else:
-      echo resp.status, ": ", body, " --- url: ", url
-      result = newJNull()
+template retry(bod) =
+  try:
+    bod
+  except RateLimitError:
+    echo "[accounts] Rate limited, retrying ", api, " request..."
+    bod
 
-    let error = result.getError
-    if error in {expiredToken, badToken}:
-      echo "fetchBody error: ", error
-      invalidate(account)
-      raise rateLimitError()
+proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
+  retry:
+    var body: string
+    fetchImpl body:
+      if body.startsWith('{') or body.startsWith('['):
+        result = parseJson(body)
+      else:
+        echo resp.status, ": ", body, " --- url: ", url
+        result = newJNull()
+
+      let error = result.getError
+      if error in {expiredToken, badToken}:
+        echo "fetchBody error: ", error
+        invalidate(account)
+        raise rateLimitError()
 
 proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
-  fetchImpl result:
-    if not (result.startsWith('{') or result.startsWith('[')):
-      echo resp.status, ": ", result, " --- url: ", url
-      result.setLen(0)
+  retry:
+    fetchImpl result:
+      if not (result.startsWith('{') or result.startsWith('[')):
+        echo resp.status, ": ", result, " --- url: ", url
+        result.setLen(0)
