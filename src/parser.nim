@@ -324,6 +324,9 @@ proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet =
   of "TweetWithVisibilityResults":
     return parseGraphTweet(js{"tweet"}, isLegacy)
 
+  if not js.hasKey("legacy"):
+    return Tweet()
+
   var jsCard = copy(js{if isLegacy: "card" else: "tweet_card", "legacy"})
   if jsCard.kind != JNull:
     var values = newJObject()
