@@ -31,7 +31,7 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
                    of TimelineKind.replies: (graphUserTweetsAndReplies, Api.userTweetsAndReplies)
                    of TimelineKind.media: (graphUserMedia, Api.userMedia)
     js = await fetch(url ? params, apiId)
-  result = parseGraphTimeline(js, "user", after)
+  result = await parseGraphTimeline(js, "user", after)
 
 proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
@@ -40,7 +40,7 @@ proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
     variables = listTweetsVariables % [id, cursor]
     params = {"variables": variables, "features": gqlFeatures}
     js = await fetch(graphListTweets ? params, Api.listTweets)
-  result = parseGraphTimeline(js, "list", after).tweets
+  result = (await parseGraphTimeline(js, "list", after)).tweets
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let
@@ -59,7 +59,7 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
   var
     variables = %*{
       "listId": list.id,
-      "withBirdwatchPivots": false,
+      "withBirdwatchPivots": true,
       "withDownvotePerspective": false,
       "withReactionsMetadata": false,
       "withReactionsPerspective": false
@@ -75,16 +75,17 @@ proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
     variables = """{"rest_id": "$1"}""" % id
     params = {"variables": variables, "features": gqlFeatures}
     js = await fetch(graphTweetResult ? params, Api.tweetResult)
-  result = parseGraphTweetResult(js)
+  result = await parseGraphTweetResult(js)
+
 
 proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
   if id.len == 0: return
   let
-    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    cursor = if after.len > 0: "\"cursorp\":\"$1\"," % after else: ""
     variables = tweetVariables % [id, cursor]
     params = {"variables": variables, "features": gqlFeatures}
     js = await fetch(graphTweet ? params, Api.tweetDetail)
-  result = parseGraphConversation(js, id)
+  result = await parseGraphConversation(js, id)
 
 proc getReplies*(id, after: string): Future[Result[Chain]] {.async.} =
   result = (await getGraphTweet(id, after)).replies
@@ -112,7 +113,7 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
   if after.len > 0:
     variables["cursor"] = % after
   let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
-  result = parseGraphSearch(await fetch(url, Api.search), after)
+  result = await parseGraphSearch(await fetch(url, Api.search), after)
   result.query = query
 
 proc getUserSearch*(query: Query; page="1"): Future[Result[User]] {.async.} =
@@ -138,10 +139,10 @@ proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
     ps = genParams({"screen_name": name, "trim_user": "true"},
                     count="18", ext=false)
     url = photoRail ? ps
-  result = parsePhotoRail(await fetch(url, Api.photoRail))
+  result = await parsePhotoRail(await fetch(url, Api.photoRail))
 
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
-  let client = newAsyncHttpClient(maxRedirects=0)
+  let client = newAsyncHttpClient(maxRedirects=5)
   try:
     let resp = await client.request(url, HttpHead)
     result = resp.headers["location"].replaceUrls(prefs)

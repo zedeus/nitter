@@ -46,12 +46,16 @@ proc getOauthHeader(url, oauthToken, oauthTokenSecret: string): string =
 
   return getOauth1RequestHeader(params)["authorization"]
 
-proc genHeaders*(url, oauthToken, oauthTokenSecret: string): HttpHeaders =
-  let header = getOauthHeader(url, oauthToken, oauthTokenSecret)
+proc genHeaders*(url: string, account: GuestAccount, browserapi: bool): HttpHeaders =
+  let authorization = if browserapi:
+    "Bearer " & bearerToken
+  else:
+    getOauthHeader(url, account.oauthToken, account.oauthSecret)
+  
 
   result = newHttpHeaders({
     "connection": "keep-alive",
-    "authorization": header,
+    "authorization": authorization,
     "content-type": "application/json",
     "x-twitter-active-user": "yes",
     "authority": "api.twitter.com",
@@ -60,6 +64,9 @@ proc genHeaders*(url, oauthToken, oauthTokenSecret: string): HttpHeaders =
     "accept": "*/*",
     "DNT": "1"
   })
+
+  if browserapi:
+    result["x-guest-token"] = account.guestToken
 
 template fetchImpl(result, fetchBody) {.dirty.} =
   once:
@@ -72,7 +79,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
   try:
     var resp: AsyncResponse
-    pool.use(genHeaders($url, account.oauthToken, account.oauthSecret)):
+    pool.use(genHeaders($url, account, browserApi)):
       template getContent =
         resp = await c.get($url)
         result = await resp.body
@@ -133,7 +140,16 @@ template retry(bod) =
     echo "[accounts] Rate limited, retrying ", api, " request..."
     bod
 
-proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
+# `fetch` and `fetchRaw` operate in two modes:
+# 1. `browserApi` is false (the normal mode). We call 'https://api.twitter.com' endpoints,
+#    using the oauth token for a particular GuestAccount. This is used for everything
+#    except Community Notes.
+# 2. `browserApi` is true. We call 'https://twitter.com/i/api' endpoints,
+#    using a hardcoded Bearer token, and an 'x-guest-token' header for a particular GuestAccount.
+#    This is currently only used for retrieving Community Notes, which do not seem to be available
+#    through any of the 'https://api.twitter.com' endpoints.
+#    
+proc fetch*(url: Uri; api: Api, browserApi = false): Future[JsonNode] {.async.} =
   retry:
     var body: string
     fetchImpl body:
@@ -149,9 +165,31 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
         invalidate(account)
         raise rateLimitError()
 
-proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
+proc fetchRaw*(url: Uri; api: Api, browserApi = false): Future[string] {.async.} =
   retry:
     fetchImpl result:
       if not (result.startsWith('{') or result.startsWith('[')):
         echo resp.status, ": ", result, " --- url: ", url
         result.setLen(0)
+
+
+proc parseCommunityNote(js: JsonNode): Option[CommunityNote] = 
+  if js.isNull: return
+  var pivot = js{"data", "tweetResult", "result", "birdwatch_pivot"}
+  if pivot.isNull: return
+
+  result = some CommunityNote(
+    title: pivot{"title"}.getStr,
+    subtitle: expandCommunityNoteEntities(pivot{"subtitle"}),
+    footer: expandCommunityNoteEntities(pivot{"footer"}),
+    url: pivot{"destinationUrl"}.getStr
+  )
+
+
+proc getCommunityNote*(id: string): Future[Option[CommunityNote]] {.async.} =
+  if id.len == 0: return
+  let
+    variables = browserApiTweetVariables % [id]
+    params = {"variables": variables, "features": gqlFeatures}
+    js = await fetch(browserGraphTweetResultByRestId ? params, Api.tweetResultByRestId, true)
+  result = parseCommunityNote(js)

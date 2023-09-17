@@ -308,3 +308,36 @@ proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
     textSlice = 0..text.runeLen
 
   tweet.expandTextEntities(entities, text, textSlice)
+
+
+proc expandCommunityNoteEntities*(js: JsonNode): string =
+  var replacements = newSeq[ReplaceSlice]()
+
+  let
+    text = js{"text"}.getStr
+    entities = ? js{"entities"}
+
+  let runes = text.toRunes
+
+  for entity in entities:
+    # These are the only types that I've seen so far
+    if entity{"ref", "type"}.getStr != "TimelineUrl":
+      echo "Unknown community note entity type: " & entity{"ref", "type"}.getStr
+      continue
+
+    if entity{"ref", "urlType"}.getStr != "ExternalUrl":
+      echo "Unknown community note entity urlType: " & entity{"ref", "urlType"}.getStr
+      continue
+
+    let fromIndex = entity{"fromIndex"}.getInt
+    # Nim slices include the endpoint, while 'toIndex' excludes it
+    let toIndex = entity{"toIndex"}.getInt - 1
+    var slice = fromIndex .. toIndex
+
+    replacements.add ReplaceSlice(kind: rkUrl, url: entity{"ref", "url"}.getStr,
+      display: $runes[slice], slice: slice)
+
+  replacements.deduplicate
+  replacements.sort(cmp)
+
+  result = runes.replacedWith(replacements,  0 .. runes.len-1).strip(leading=false)

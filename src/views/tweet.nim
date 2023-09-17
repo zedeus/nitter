@@ -203,6 +203,16 @@ proc renderAttribution(user: User; prefs: Prefs): VNode =
     if user.verified:
       icon "ok", class="verified-icon", title="Verified account"
 
+proc renderCommunityNote*(note: CommunityNote): VNode =
+  buildHtml(tdiv(class=("community-note large"))):
+    tdiv(class="community-note-container"):
+      tdiv(class="community-note-content-container"):
+        buildHtml(tdiv(class="community-note-content")):
+          a(href=note.url, rel="noreferrer"): h2(class="community-note-title"):verbatim note.title
+          br()
+          verbatim note.subtitle.replace("\n", "<br>")
+          span(class="community-note-destination"): verbatim note.footer
+
 proc renderMediaTags(tags: seq[User]): VNode =
   buildHtml(tdiv(class="media-tag-block")):
     icon "user"
@@ -320,6 +330,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
 
       if tweet.attribution.isSome:
         renderAttribution(tweet.attribution.get(), prefs)
+
+      if tweet.communityNote.isSome:
+        renderCommunityNote(tweet.communityNote.get())
 
       if tweet.card.isSome and tweet.card.get().kind != hidden:
         renderCard(tweet.card.get(), prefs, path)

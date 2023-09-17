@@ -4,8 +4,11 @@ import uri, sequtils, strutils
 const
   consumerKey* = "3nVuSoBZnx6U4vzUxf5w"
   consumerSecret* = "Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys"
+  bearerToken* = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
   api = parseUri("https://api.twitter.com")
+  # This is the API accessed by the browser, which is different from the developer API
+  browserApi = parseUri("https://twitter.com/i/api")
   activate* = $(api / "1.1/guest/activate.json")
 
   photoRail* = api / "1.1/statuses/media_timeline.json"
@@ -24,6 +27,8 @@ const
   graphListBySlug* = graphql / "-kmqNvm5Y-cVrfvBy6docg/ListBySlug"
   graphListMembers* = graphql / "P4NpVZDqUD_7MEM84L-8nw/ListMembers"
   graphListTweets* = graphql / "BbGLL1ZfMibdFNWlk7a0Pw/ListTimeline"
+
+  browserGraphTweetResultByRestId* = browserApi / "/graphql/DJS3BdhUhcaEpZ7B7irJDg/TweetResultByRestId"
 
   timelineParams* = {
     "include_can_media_tag": "1",
@@ -91,9 +96,16 @@ const
   $2
   "includeHasBirdwatchNotes": false,
   "includePromotedContent": false,
-  "withBirdwatchNotes": false,
+  "withBirdwatchNotes": true,
   "withVoice": false,
   "withV2Timeline": true
+}""".replace(" ", "").replace("\n", "")
+
+  browserApiTweetVariables* = """{
+  "tweetId": "$1",
+  "includePromotedContent": false,
+  "withCommunity": false,
+  "withVoice": false
 }""".replace(" ", "").replace("\n", "")
 
 #   oldUserTweetsVariables* = """{

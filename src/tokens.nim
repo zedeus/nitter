@@ -55,7 +55,7 @@ proc getPoolJson*(): JsonNode =
         maxReqs =
           case api
           of Api.search: 50
-          of Api.tweetDetail: 150
+          of Api.tweetDetail, Api.tweetResultByRestId: 150
           of Api.photoRail: 180
           of Api.userTweets, Api.userTweetsAndReplies, Api.userMedia,
              Api.userRestId, Api.userScreenName,
@@ -149,4 +149,5 @@ proc initAccountPool*(cfg: Config; accounts: JsonNode) =
       id: account{"user", "id_str"}.getStr,
       oauthToken: account{"oauth_token"}.getStr,
       oauthSecret: account{"oauth_token_secret"}.getStr,
+      guestToken: account{"guest_token"}.getStr,
     )

@@ -1,0 +1,59 @@
+@import '_variables';
+@import '_mixins';
+
+.community-note {
+    margin: 5px 0;
+    pointer-events: all;
+    max-height: unset;
+}
+
+.community-note-container {
+    border-radius: 10px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--dark_grey);
+    background-color: var(--bg_elements);
+    overflow: hidden;
+    color: inherit;
+    display: flex;
+    flex-direction: row;
+    text-decoration: none !important;
+
+    &:hover {
+        border-color: var(--grey);
+    }
+
+    .attachments {
+        margin: 0;
+        border-radius: 0;
+    }
+}
+
+.community-note-content {
+    padding: 0.5em;
+}
+
+.community-note-title {
+    white-space: unset;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.community-note-destination {
+    color: var(--grey);
+    display: block;
+}
+
+.community-note-content-container {
+    color: unset;
+    overflow: auto;
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.large {
+    .community-note-container {
+        display: block;
+    }
+}

@@ -17,6 +17,7 @@ type
   Api* {.pure.} = enum
     tweetDetail
     tweetResult
+    tweetResultByRestId
     photoRail
     search
     userSearch
@@ -40,6 +41,7 @@ type
     id*: string
     oauthToken*: string
     oauthSecret*: string
+    guestToken*: string
     pending*: int
     apis*: Table[Api, RateLimit]
 
@@ -206,8 +208,15 @@ type
     gif*: Option[Gif]
     video*: Option[Video]
     photos*: seq[string]
+    communityNote*: Option[CommunityNote]
 
   Tweets* = seq[Tweet]
+
+  CommunityNote* = object
+    title*: string
+    subtitle*: string
+    footer*: string
+    url*: string
 
   Result*[T] = object
     content*: seq[T]

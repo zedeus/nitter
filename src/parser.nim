@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, options, times, math
+import asyncdispatch, strutils, options, times, math
 import packedjson, packedjson/deserialiser
 import types, parserutils, utils
 import experimental/parser/unifiedcard
+import apiutils
 
-proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet
+proc parseGraphTweet(js: JsonNode; isLegacy=false): Future[Tweet] {.async.}
 
 proc parseUser(js: JsonNode; id=""): User =
   if js.isNull: return
@@ -200,7 +201,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
      result.url.len == 0 or result.url.startsWith("card://"):
     result.url = getPicUrl(result.image)
 
-proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
+proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull(), hasBirdwatchNotes = false): Future[Tweet] {.async.} =
   if js.isNull: return
   result = Tweet(
     id: js{"id_str"}.getId,
@@ -216,10 +217,13 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
       retweets: js{"retweet_count"}.getInt,
       likes: js{"favorite_count"}.getInt,
       quotes: js{"quote_count"}.getInt
-    )
+    ),
   )
 
   result.expandTweetEntities(js)
+
+  if hasBirdwatchNotes:
+    result.communityNote = await getCommunityNote(js{"id_str"}.getStr)
 
   # fix for pinned threads
   if result.hasThread and result.threadId == 0:
@@ -239,7 +243,7 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
   with rt, js{"retweeted_status_result", "result"}:
     # needed due to weird edgecase where the actual tweet data isn't included
     if "legacy" in rt:
-      result.retweet = some parseGraphTweet(rt)
+      result.retweet = some await parseGraphTweet(rt)
       return
 
   if jsCard.kind != JNull:
@@ -289,14 +293,15 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
       result.text.removeSuffix(" Learn more.")
       result.available = false
 
-proc parsePhotoRail*(js: JsonNode): PhotoRail =
+proc parsePhotoRail*(js: JsonNode): Future[PhotoRail] {.async.} =
   with error, js{"error"}:
     if error.getStr == "Not authorized.":
       return
 
   for tweet in js:
     let
-      t = parseTweet(tweet, js{"tweet_card"})
+      # We don't support community notes here (TODO: see if this is possible)
+      t = await parseTweet(tweet, js{"tweet_card"}, false)
       url = if t.photos.len > 0: t.photos[0]
             elif t.video.isSome: get(t.video).thumb
             elif t.gif.isSome: get(t.gif).thumb
@@ -306,7 +311,7 @@ proc parsePhotoRail*(js: JsonNode): PhotoRail =
     if url.len == 0: continue
     result.add GalleryPhoto(url: url, tweetId: $t.id)
 
-proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet =
+proc parseGraphTweet(js: JsonNode; isLegacy=false): Future[Tweet] {.async.} =
   if js.kind == JNull:
     return Tweet()
 
@@ -322,7 +327,7 @@ proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet =
   of "TweetPreviewDisplay":
     return Tweet(text: "You're unable to view this Tweet because it's only available to the Subscribers of the account owner.")
   of "TweetWithVisibilityResults":
-    return parseGraphTweet(js{"tweet"}, isLegacy)
+    return await parseGraphTweet(js{"tweet"}, isLegacy)
 
   if not js.hasKey("legacy"):
     return Tweet()
@@ -334,7 +339,7 @@ proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet =
       values[val["key"].getStr] = val["value"]
     jsCard["binding_values"] = values
 
-  result = parseTweet(js{"legacy"}, jsCard)
+  result = await parseTweet(js{"legacy"}, jsCard, js{"has_birdwatch_notes"}.getBool)
   result.id = js{"rest_id"}.getId
   result.user = parseGraphUser(js{"core"})
 
@@ -342,9 +347,9 @@ proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet =
     result.expandNoteTweetEntities(noteTweet)
 
   if result.quote.isSome:
-    result.quote = some(parseGraphTweet(js{"quoted_status_result", "result"}, isLegacy))
+    result.quote = some(await parseGraphTweet(js{"quoted_status_result", "result"}, isLegacy))
 
-proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
+proc parseGraphThread(js: JsonNode): Future[tuple[thread: Chain; self: bool]] {.async.} =
   for t in js{"content", "items"}:
     let entryId = t{"entryId"}.getStr
     if "cursor-showmore" in entryId:
@@ -358,16 +363,16 @@ proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
                                   else: ("content", "tweetResult")
 
       with content, t{"item", contentKey}:
-        result.thread.content.add parseGraphTweet(content{resultKey, "result"}, isLegacy)
+        result.thread.content.add (await parseGraphTweet(content{resultKey, "result"}, isLegacy))
 
         if content{"tweetDisplayType"}.getStr == "SelfThread":
           result.self = true
 
-proc parseGraphTweetResult*(js: JsonNode): Tweet =
+proc parseGraphTweetResult*(js: JsonNode): Future[Tweet] {.async.} =
   with tweet, js{"data", "tweet_result", "result"}:
-    result = parseGraphTweet(tweet, false)
+    result = await parseGraphTweet(tweet, false)
 
-proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
+proc parseGraphConversation*(js: JsonNode; tweetId: string): Future[Conversation] {.async.} =
   result = Conversation(replies: Result[Chain](beginning: true))
 
   let instructions = ? js{"data", "threaded_conversation_with_injections_v2", "instructions"}
@@ -378,7 +383,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
     let entryId = e{"entryId"}.getStr
     if entryId.startsWith("tweet"):
       with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
-        let tweet = parseGraphTweet(tweetResult, true)
+        let tweet = await parseGraphTweet(tweetResult, true)
 
         if not tweet.available:
           tweet.id = parseBiggestInt(entryId.getId())
@@ -400,7 +405,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
       else:
         result.before.content.add tweet
     elif entryId.startsWith("conversationthread"):
-      let (thread, self) = parseGraphThread(e)
+      let (thread, self) = await parseGraphThread(e)
       if self:
         result.after = thread
       else:
@@ -408,7 +413,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
     elif entryId.startsWith("cursor-bottom"):
       result.replies.bottom = e{"content", "itemContent", "value"}.getStr
 
-proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
+proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Future[Profile] {.async.}  =
   result = Profile(tweets: Timeline(beginning: after.len == 0))
 
   let instructions =
@@ -424,18 +429,18 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
         let entryId = e{"entryId"}.getStr
         if entryId.startsWith("tweet"):
           with tweetResult, e{"content", "content", "tweetResult", "result"}:
-            let tweet = parseGraphTweet(tweetResult, false)
+            let tweet = await parseGraphTweet(tweetResult, false)
             if not tweet.available:
               tweet.id = parseBiggestInt(entryId.getId())
             result.tweets.content.add tweet
         elif "-conversation-" in entryId or entryId.startsWith("homeConversation"):
-          let (thread, self) = parseGraphThread(e)
+          let (thread, self) = await parseGraphThread(e)
           result.tweets.content.add thread.content
         elif entryId.startsWith("cursor-bottom"):
           result.tweets.bottom = e{"content", "value"}.getStr
     if after.len == 0 and i{"__typename"}.getStr == "TimelinePinEntry":
       with tweetResult, i{"entry", "content", "content", "tweetResult", "result"}:
-        let tweet = parseGraphTweet(tweetResult, false)
+        let tweet = await parseGraphTweet(tweetResult, false)
         tweet.pinned = true
         if not tweet.available and tweet.tombstone.len == 0:
           let entryId = i{"entry", "entryId"}.getEntryId
@@ -443,7 +448,7 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
             tweet.id = parseBiggestInt(entryId)
         result.pinned = some tweet
 
-proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
+proc parseGraphSearch*(js: JsonNode; after=""): Future[Timeline] {.async.} =
   result = Timeline(beginning: after.len == 0)
 
   let instructions = js{"data", "search_by_raw_query", "search_timeline", "timeline", "instructions"}
@@ -457,7 +462,7 @@ proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
         let entryId = e{"entryId"}.getStr
         if entryId.startsWith("tweet"):
           with tweetRes, e{"content", "itemContent", "tweet_results", "result"}:
-            let tweet = parseGraphTweet(tweetRes, true)
+            let tweet = await parseGraphTweet(tweetRes, true)
             if not tweet.available:
               tweet.id = parseBiggestInt(entryId.getId())
             result.content.add tweet
