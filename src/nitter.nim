@@ -3,7 +3,6 @@ import asyncdispatch, strformat, logging
 from net import Port
 from htmlgen import a
 from os import getEnv
-from json import parseJson
 
 import jester
 
@@ -21,9 +20,8 @@ let
   (cfg, fullCfg) = getConfig(configPath)
 
   accountsPath = getEnv("NITTER_ACCOUNTS_FILE", "./guest_accounts.json")
-  accounts = parseJson(readFile(accountsPath))
 
-initAccountPool(cfg, parseJson(readFile(accountsPath)))
+initAccountPool(cfg, accountsPath)
 
 if not cfg.enableDebug:
   # Silence Jester's query warning
