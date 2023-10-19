@@ -17,11 +17,8 @@ type
   Api* {.pure.} = enum
     tweetDetail
     tweetResult
-    timeline
-    userTimeline
     photoRail
     search
-    userSearch
     list
     listBySlug
     listMembers
@@ -35,11 +32,13 @@ type
   RateLimit* = object
     remaining*: int
     reset*: int
+    limited*: bool
+    limitedAt*: int
 
-  Token* = ref object
-    tok*: string
-    init*: Time
-    lastUse*: Time
+  GuestAccount* = ref object
+    id*: string
+    oauthToken*: string
+    oauthSecret*: string
     pending*: int
     apis*: Table[Api, RateLimit]
 
@@ -54,7 +53,7 @@ type
     userNotFound = 50
     suspended = 63
     rateLimited = 88
-    invalidToken = 89
+    expiredToken = 89
     listIdOrSlug = 112
     tweetNotFound = 144
     tweetNotAuthorized = 179

@@ -23,7 +23,7 @@ requires "https://github.com/zedeus/redis#d0a0e6f"
 requires "zippy#ca5989a"
 requires "flatty#e668085"
 requires "jsony#ea811be"
-
+requires "oauth#b8c163b"
 
 # Tasks
 

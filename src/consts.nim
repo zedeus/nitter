@@ -2,17 +2,13 @@
 import uri, sequtils, strutils
 
 const
-  auth* = "Bearer AAAAAAAAAAAAAAAAAAAAAFQODgEAAAAAVHTp76lzh3rFzcHbmHVvQxYYpTw%3DckAlMINMjmCwxUcaXbAN4XqJVdgMJaHqNOFgPMK0zN1qLqLQCF"
+  consumerKey* = "3nVuSoBZnx6U4vzUxf5w"
+  consumerSecret* = "Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys"
 
   api = parseUri("https://api.twitter.com")
   activate* = $(api / "1.1/guest/activate.json")
 
-  legacyUserTweets* = api / "1.1/timeline/user.json"
   photoRail* = api / "1.1/statuses/media_timeline.json"
-  userSearch* = api / "1.1/users/search.json"
-  tweetSearch* = api / "1.1/search/universal.json"
-
-  # oldUserTweets* = api / "2/timeline/profile"
 
   graphql = api / "graphql"
   graphUser* = graphql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
@@ -20,7 +16,7 @@ const
   graphUserTweets* = graphql / "3JNH4e9dq1BifLxAa3UMWg/UserWithProfileTweetsQueryV2"
   graphUserTweetsAndReplies* = graphql / "8IS8MaO-2EN6GZZZb8jF0g/UserWithProfileTweetsAndRepliesQueryV2"
   graphUserMedia* = graphql / "PDfFf8hGeJvUCiTyWtw4wQ/MediaTimelineV2"
-  graphTweet* = graphql / "83h5UyHZ9wEKBVzALX8R_g/ConversationTimelineV2"
+  graphTweet* = graphql / "q94uRCEn65LZThakYcPT6g/TweetDetail"
   graphTweetResult* = graphql / "sITyJdhRPpvpEjg4waUmTA/TweetResultByIdQuery"
   graphSearchTimeline* = graphql / "gkjsKepM6gl_HmFWoWKfgg/SearchTimeline"
   graphListById* = graphql / "iTpgCtbdxrsJfyx0cFjHqg/ListByRestId"
@@ -38,6 +34,7 @@ const
     "include_user_entities": "1",
     "include_ext_reply_count": "1",
     "include_ext_is_blue_verified": "1",
+    "include_ext_verified_type": "1",
     "include_ext_media_color": "0",
     "cards_platform": "Web-13",
     "tweet_mode": "extended",
@@ -91,8 +88,12 @@ const
   tweetVariables* = """{
   "focalTweetId": "$1",
   $2
-  "includeHasBirdwatchNotes": false
-}"""
+  "includeHasBirdwatchNotes": false,
+  "includePromotedContent": false,
+  "withBirdwatchNotes": false,
+  "withVoice": false,
+  "withV2Timeline": true
+}""".replace(" ", "").replace("\n", "")
 
 #   oldUserTweetsVariables* = """{
 #   "userId": "$1", $2

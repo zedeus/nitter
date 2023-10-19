@@ -147,15 +147,15 @@ proc getCachedUsername*(userId: string): Future[string] {.async.} =
     if result.len > 0 and user.id.len > 0:
       await all(cacheUserId(result, user.id), cache(user))
 
-proc getCachedTweet*(id: int64): Future[Tweet] {.async.} =
-  if id == 0: return
-  let tweet = await get(id.tweetKey)
-  if tweet != redisNil:
-    tweet.deserialize(Tweet)
-  else:
-    result = await getGraphTweetResult($id)
-    if not result.isNil:
-      await cache(result)
+# proc getCachedTweet*(id: int64): Future[Tweet] {.async.} =
+#   if id == 0: return
+#   let tweet = await get(id.tweetKey)
+#   if tweet != redisNil:
+#     tweet.deserialize(Tweet)
+#   else:
+#     result = await getGraphTweetResult($id)
+#     if not result.isNil:
+#       await cache(result)
 
 proc getCachedPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return

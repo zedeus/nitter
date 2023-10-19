@@ -4,7 +4,7 @@ import packedjson, packedjson/deserialiser
 import types, parserutils, utils
 import experimental/parser/unifiedcard
 
-proc parseGraphTweet(js: JsonNode): Tweet
+proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet
 
 proc parseUser(js: JsonNode; id=""): User =
   if js.isNull: return
@@ -29,7 +29,9 @@ proc parseUser(js: JsonNode; id=""): User =
   result.expandUserEntities(js)
 
 proc parseGraphUser(js: JsonNode): User =
-  let user = ? js{"user_result", "result"}
+  var user = js{"user_result", "result"}
+  if user.isNull:
+    user = ? js{"user_results", "result"}
   result = parseUser(user{"legacy"})
 
   if "is_blue_verified" in user:
@@ -287,169 +289,6 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
       result.text.removeSuffix(" Learn more.")
       result.available = false
 
-proc parseLegacyTweet(js: JsonNode): Tweet =
-  result = parseTweet(js, js{"card"})
-  if not result.isNil and result.available:
-    result.user = parseUser(js{"user"})
-
-    if result.quote.isSome:
-      result.quote = some parseLegacyTweet(js{"quoted_status"})
-
-proc parseTweetSearch*(js: JsonNode; after=""): Timeline =
-  result.beginning = after.len == 0
-
-  if js.kind == JNull or "modules" notin js or js{"modules"}.len == 0:
-    return
-
-  for item in js{"modules"}:
-    with tweet, item{"status", "data"}:
-      let parsed = parseLegacyTweet(tweet)
-
-      if parsed.retweet.isSome:
-        parsed.retweet = some parseLegacyTweet(tweet{"retweeted_status"})
-
-      result.content.add @[parsed]
-
-  if result.content.len > 0:
-    result.bottom = $(result.content[^1][0].id - 1)
-
-proc parseUserTimelineTweet(tweet: JsonNode; users: TableRef[string, User]): Tweet =
-  result = parseTweet(tweet, tweet{"card"})
-
-  if result.isNil or not result.available:
-    return
-
-  with user, tweet{"user"}:
-    let userId = user{"id_str"}.getStr
-    if user{"ext_is_blue_verified"}.getBool(false):
-      users[userId].verified = users[userId].verified or true
-    result.user = users[userId]
-
-proc parseUserTimeline*(js: JsonNode; after=""): Profile =
-  result = Profile(tweets: Timeline(beginning: after.len == 0))
-
-  if js.kind == JNull or "response" notin js or "twitter_objects" notin js:
-    return
-
-  var users = newTable[string, User]()
-  for userId, user in js{"twitter_objects", "users"}:
-    users[userId] = parseUser(user)
-
-  for entity in js{"response", "timeline"}:
-    let
-      tweetId = entity{"tweet", "id"}.getId
-      isPinned = entity{"tweet", "is_pinned"}.getBool(false)
-
-    with tweet, js{"twitter_objects", "tweets", $tweetId}:
-      var parsed = parseUserTimelineTweet(tweet, users)
-
-      if not parsed.isNil and parsed.available:
-        if parsed.quote.isSome:
-          parsed.quote = some parseUserTimelineTweet(tweet{"quoted_status"}, users)
-
-        if parsed.retweet.isSome:
-          let retweet = parseUserTimelineTweet(tweet{"retweeted_status"}, users)
-          if retweet.quote.isSome:
-            retweet.quote = some parseUserTimelineTweet(tweet{"retweeted_status", "quoted_status"}, users)
-          parsed.retweet = some retweet
-
-      if isPinned:
-        parsed.pinned = true
-        result.pinned = some parsed
-      else:
-        result.tweets.content.add parsed
-
-  result.tweets.bottom = js{"response", "cursor", "bottom"}.getStr
-
-# proc finalizeTweet(global: GlobalObjects; id: string): Tweet =
-#   let intId = if id.len > 0: parseBiggestInt(id) else: 0
-#   result = global.tweets.getOrDefault(id, Tweet(id: intId))
-
-#   if result.quote.isSome:
-#     let quote = get(result.quote).id
-#     if $quote in global.tweets:
-#       result.quote = some global.tweets[$quote]
-#     else:
-#       result.quote = some Tweet()
-
-#   if result.retweet.isSome:
-#     let rt = get(result.retweet).id
-#     if $rt in global.tweets:
-#       result.retweet = some finalizeTweet(global, $rt)
-#     else:
-#       result.retweet = some Tweet()
-
-# proc parsePin(js: JsonNode; global: GlobalObjects): Tweet =
-#   let pin = js{"pinEntry", "entry", "entryId"}.getStr
-#   if pin.len == 0: return
-
-#   let id = pin.getId
-#   if id notin global.tweets: return
-
-#   global.tweets[id].pinned = true
-#   return finalizeTweet(global, id)
-
-# proc parseGlobalObjects(js: JsonNode): GlobalObjects =
-#   result = GlobalObjects()
-#   let
-#     tweets = ? js{"globalObjects", "tweets"}
-#     users = ? js{"globalObjects", "users"}
-
-#   for k, v in users:
-#     result.users[k] = parseUser(v, k)
-
-#   for k, v in tweets:
-#     var tweet = parseTweet(v, v{"card"})
-#     if tweet.user.id in result.users:
-#       tweet.user = result.users[tweet.user.id]
-#     result.tweets[k] = tweet
-
-# proc parseInstructions(res: var Profile; global: GlobalObjects; js: JsonNode) =
-#   if js.kind != JArray or js.len == 0:
-#     return
-
-#   for i in js:
-#     if res.tweets.beginning and i{"pinEntry"}.notNull:
-#       with pin, parsePin(i, global):
-#         res.pinned = some pin
-
-#     with r, i{"replaceEntry", "entry"}:
-#       if "top" in r{"entryId"}.getStr:
-#         res.tweets.top = r.getCursor
-#       elif "bottom" in r{"entryId"}.getStr:
-#         res.tweets.bottom = r.getCursor
-
-# proc parseTimeline*(js: JsonNode; after=""): Profile =
-#   result = Profile(tweets: Timeline(beginning: after.len == 0))
-#   let global = parseGlobalObjects(? js)
-
-#   let instructions = ? js{"timeline", "instructions"}
-#   if instructions.len == 0: return
-
-#   result.parseInstructions(global, instructions)
-
-#   var entries: JsonNode
-#   for i in instructions:
-#     if "addEntries" in i:
-#       entries = i{"addEntries", "entries"}
-
-#   for e in ? entries:
-#     let entry = e{"entryId"}.getStr
-#     if "tweet" in entry or entry.startsWith("sq-I-t") or "tombstone" in entry:
-#       let tweet = finalizeTweet(global, e.getEntryId)
-#       if not tweet.available: continue
-#       result.tweets.content.add tweet
-#     elif "cursor-top" in entry:
-#       result.tweets.top = e.getCursor
-#     elif "cursor-bottom" in entry:
-#       result.tweets.bottom = e.getCursor
-#     elif entry.startsWith("sq-cursor"):
-#       with cursor, e{"content", "operation", "cursor"}:
-#         if cursor{"cursorType"}.getStr == "Bottom":
-#           result.tweets.bottom = cursor{"value"}.getStr
-#         else:
-#           result.tweets.top = cursor{"value"}.getStr
-
 proc parsePhotoRail*(js: JsonNode): PhotoRail =
   with error, js{"error"}:
     if error.getStr == "Not authorized.":
@@ -467,7 +306,7 @@ proc parsePhotoRail*(js: JsonNode): PhotoRail =
     if url.len == 0: continue
     result.add GalleryPhoto(url: url, tweetId: $t.id)
 
-proc parseGraphTweet(js: JsonNode): Tweet =
+proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet =
   if js.kind == JNull:
     return Tweet()
 
@@ -483,9 +322,12 @@ proc parseGraphTweet(js: JsonNode): Tweet =
   of "TweetPreviewDisplay":
     return Tweet(text: "You're unable to view this Tweet because it's only available to the Subscribers of the account owner.")
   of "TweetWithVisibilityResults":
-    return parseGraphTweet(js{"tweet"})
+    return parseGraphTweet(js{"tweet"}, isLegacy)
 
-  var jsCard = copy(js{"tweet_card", "legacy"})
+  if not js.hasKey("legacy"):
+    return Tweet()
+
+  var jsCard = copy(js{if isLegacy: "card" else: "tweet_card", "legacy"})
   if jsCard.kind != JNull:
     var values = newJObject()
     for val in jsCard["binding_values"]:
@@ -500,10 +342,9 @@ proc parseGraphTweet(js: JsonNode): Tweet =
     result.expandNoteTweetEntities(noteTweet)
 
   if result.quote.isSome:
-    result.quote = some(parseGraphTweet(js{"quoted_status_result", "result"}))
+    result.quote = some(parseGraphTweet(js{"quoted_status_result", "result"}, isLegacy))
 
 proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
-  let thread = js{"content", "items"}
   for t in js{"content", "items"}:
     let entryId = t{"entryId"}.getStr
     if "cursor-showmore" in entryId:
@@ -511,28 +352,33 @@ proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
       result.thread.cursor = cursor.getStr
       result.thread.hasMore = true
     elif "tweet" in entryId:
-      let tweet = parseGraphTweet(t{"item", "content", "tweetResult", "result"})
-      result.thread.content.add tweet
+      let
+        isLegacy = t{"item"}.hasKey("itemContent")
+        (contentKey, resultKey) = if isLegacy: ("itemContent", "tweet_results")
+                                  else: ("content", "tweetResult")
 
-      if t{"item", "content", "tweetDisplayType"}.getStr == "SelfThread":
-        result.self = true
+      with content, t{"item", contentKey}:
+        result.thread.content.add parseGraphTweet(content{resultKey, "result"}, isLegacy)
+
+        if content{"tweetDisplayType"}.getStr == "SelfThread":
+          result.self = true
 
 proc parseGraphTweetResult*(js: JsonNode): Tweet =
   with tweet, js{"data", "tweet_result", "result"}:
-    result = parseGraphTweet(tweet)
+    result = parseGraphTweet(tweet, false)
 
 proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
   result = Conversation(replies: Result[Chain](beginning: true))
 
-  let instructions = ? js{"data", "timeline_response", "instructions"}
+  let instructions = ? js{"data", "threaded_conversation_with_injections_v2", "instructions"}
   if instructions.len == 0:
     return
 
   for e in instructions[0]{"entries"}:
     let entryId = e{"entryId"}.getStr
     if entryId.startsWith("tweet"):
-      with tweetResult, e{"content", "content", "tweetResult", "result"}:
-        let tweet = parseGraphTweet(tweetResult)
+      with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
+        let tweet = parseGraphTweet(tweetResult, true)
 
         if not tweet.available:
           tweet.id = parseBiggestInt(entryId.getId())
@@ -546,7 +392,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
       let tweet = Tweet(
         id: parseBiggestInt(id),
         available: false,
-        text: e{"content", "content", "tombstoneInfo", "richText"}.getTombstone
+        text: e{"content", "itemContent", "tombstoneInfo", "richText"}.getTombstone
       )
 
       if id == tweetId:
@@ -560,7 +406,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
       else:
         result.replies.content.add thread
     elif entryId.startsWith("cursor-bottom"):
-      result.replies.bottom = e{"content", "content", "value"}.getStr
+      result.replies.bottom = e{"content", "itemContent", "value"}.getStr
 
 proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
   result = Profile(tweets: Timeline(beginning: after.len == 0))
@@ -578,7 +424,7 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
         let entryId = e{"entryId"}.getStr
         if entryId.startsWith("tweet"):
           with tweetResult, e{"content", "content", "tweetResult", "result"}:
-            let tweet = parseGraphTweet(tweetResult)
+            let tweet = parseGraphTweet(tweetResult, false)
             if not tweet.available:
               tweet.id = parseBiggestInt(entryId.getId())
             result.tweets.content.add tweet
@@ -589,7 +435,7 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
           result.tweets.bottom = e{"content", "value"}.getStr
     if after.len == 0 and i{"__typename"}.getStr == "TimelinePinEntry":
       with tweetResult, i{"entry", "content", "content", "tweetResult", "result"}:
-        let tweet = parseGraphTweet(tweetResult)
+        let tweet = parseGraphTweet(tweetResult, false)
         tweet.pinned = true
         if not tweet.available and tweet.tombstone.len == 0:
           let entryId = i{"entry", "entryId"}.getEntryId
@@ -597,8 +443,8 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
             tweet.id = parseBiggestInt(entryId)
         result.pinned = some tweet
 
-proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
-  result = Timeline(beginning: after.len == 0)
+proc parseGraphSearch*[T: User | Tweets](js: JsonNode; after=""): Result[T] =
+  result = Result[T](beginning: after.len == 0)
 
   let instructions = js{"data", "search_by_raw_query", "search_timeline", "timeline", "instructions"}
   if instructions.len == 0:
@@ -607,15 +453,21 @@ proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
   for instruction in instructions:
     let typ = instruction{"type"}.getStr
     if typ == "TimelineAddEntries":
-      for e in instructions[0]{"entries"}:
+      for e in instruction{"entries"}:
         let entryId = e{"entryId"}.getStr
-        if entryId.startsWith("tweet"):
-          with tweetResult, e{"content", "itemContent", "tweet_results", "result"}:
-            let tweet = parseGraphTweet(tweetResult)
-            if not tweet.available:
-              tweet.id = parseBiggestInt(entryId.getId())
-            result.content.add tweet
-        elif entryId.startsWith("cursor-bottom"):
+        when T is Tweets:
+          if entryId.startsWith("tweet"):
+            with tweetRes, e{"content", "itemContent", "tweet_results", "result"}:
+              let tweet = parseGraphTweet(tweetRes)
+              if not tweet.available:
+                tweet.id = parseBiggestInt(entryId.getId())
+              result.content.add tweet
+        elif T is User:
+          if entryId.startsWith("user"):
+            with userRes, e{"content", "itemContent"}:
+              result.content.add parseGraphUser(userRes)
+
+        if entryId.startsWith("cursor-bottom"):
           result.bottom = e{"content", "value"}.getStr
     elif typ == "TimelineReplaceEntry":
       if instruction{"entry_id_to_replace"}.getStr.startsWith("cursor-bottom"):

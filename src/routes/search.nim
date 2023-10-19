@@ -11,6 +11,12 @@ include "../views/opensearch.nimf"
 
 export search
 
+import jsony, times
+export jsony
+
+proc dumpHook*(s: var string, v: DateTime) =
+  s.add $v.toTime().toUnix()
+
 proc createSearchRouter*(cfg: Config) =
   router search:
     get "/search/?":
@@ -29,13 +35,13 @@ proc createSearchRouter*(cfg: Config) =
           redirect("/" & q)
         var users: Result[User]
         try:
-          users = await getUserSearch(query, getCursor())
+          users = await getGraphUserSearch(query, getCursor())
         except InternalError:
           users = Result[User](beginning: true, query: query)
         resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs, title)
       of tweets:
         let
-          tweets = await getTweetSearch(query, getCursor())
+          tweets = await getGraphTweetSearch(query, getCursor())
           rss = "/search/rss?" & genQueryUrl(query)
         resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
                         request, cfg, prefs, title, rss=rss)

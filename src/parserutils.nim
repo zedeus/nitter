@@ -36,7 +36,8 @@ template with*(ident, value, body): untyped =
 template with*(ident; value: JsonNode; body): untyped =
   if true:
     let ident {.inject.} = value
-    if value.notNull: body
+    # value.notNull causes a compilation error for versions < 1.6.14
+    if notNull(value): body
 
 template getCursor*(js: JsonNode): string =
   js{"content", "operation", "cursor", "value"}.getStr

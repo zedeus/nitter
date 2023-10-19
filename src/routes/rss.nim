@@ -27,7 +27,7 @@ proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.
   else:
     var q = query
     q.fromUser = names
-    profile.tweets = await getTweetSearch(q, after)
+    profile.tweets = await getGraphTweetSearch(q, after)
     # this is kinda dumb
     profile.user = User(
       username: name,
@@ -76,7 +76,7 @@ proc createRssRouter*(cfg: Config) =
       if rss.cursor.len > 0:
         respRss(rss, "Search")
 
-      let tweets = await getTweetSearch(query, cursor)
+      let tweets = await getGraphTweetSearch(query, cursor)
       rss.cursor = tweets.bottom
       rss.feed = renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg)
 

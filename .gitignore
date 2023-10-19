@@ -11,3 +11,5 @@ nitter
 /public/md/*.html
 nitter.conf
 dump.rdb
+
+guest_accounts.json
