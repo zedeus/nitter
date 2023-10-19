@@ -18,12 +18,11 @@ const issuesUrl = "https://github.com/zedeus/nitter/issues"
 
 let
   configPath = getEnv("NITTER_CONF_FILE", "./nitter.conf")
-  (cfg*, fullCfg) = getConfig(configPath)
+  (cfg, fullCfg) = getConfig(configPath)
 
   accountsPath = getEnv("NITTER_ACCOUNTS_FILE", "./guest_accounts.json")
-  accounts = parseJson(readFile(accountsPath))
 
-initAccountPool(cfg, parseJson(readFile(accountsPath)))
+initAccountPool(cfg, accountsPath)
 
 if not cfg.enableDebug:
   # Silence Jester's query warning

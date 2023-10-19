@@ -1,6 +1,7 @@
 #SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, times, json, random, strutils, tables, sets
+import asyncdispatch, times, json, random, strutils, tables, sets, os
 import types
+import experimental/parser/guestaccount
 
 # max requests at a time per account to avoid race conditions
 const
@@ -140,12 +141,18 @@ proc setRateLimit*(account: GuestAccount; api: Api; remaining, reset: int) =
 
   account.apis[api] = RateLimit(remaining: remaining, reset: reset)
 
-proc initAccountPool*(cfg: Config; accounts: JsonNode) =
+proc initAccountPool*(cfg: Config; path: string) =
   enableLogging = cfg.enableDebug
 
-  for account in accounts:
-    accountPool.add GuestAccount(
-      id: account{"user", "id_str"}.getStr,
-      oauthToken: account{"oauth_token"}.getStr,
-      oauthSecret: account{"oauth_token_secret"}.getStr,
-    )
+  let jsonlPath = if path.endsWith(".json"): (path & 'l') else: path
+
+  if fileExists(jsonlPath):
+    log "Parsing JSONL guest accounts file: ", jsonlPath
+    for line in jsonlPath.lines:
+      accountPool.add parseGuestAccount(line)
+  elif fileExists(path):
+    log "Parsing JSON guest accounts file: ", path
+    accountPool = parseGuestAccounts(path)
+  else:
+    echo "[accounts] ERROR: ", path, " not found. This file is required to authenticate API requests."
+    quit 1

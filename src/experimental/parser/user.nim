@@ -56,7 +56,7 @@ proc toUser*(raw: RawUser): User =
     tweets: raw.statusesCount,
     likes: raw.favouritesCount,
     media: raw.mediaCount,
-    verified: raw.verified,
+    verified: raw.verified or raw.extIsBlueVerified,
     protected: raw.protected,
     joinDate: parseTwitterDate(raw.createdAt),
     banner: getBanner(raw),
