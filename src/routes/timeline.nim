@@ -12,12 +12,6 @@ export router_utils
 export redis_cache, formatters, query, api
 export profile, timeline, status
 
-import jsony, times
-export jsony
-
-proc dumpHook*(s: var string, v: DateTime) =
-  s.add $v.toTime().toUnix()
-
 proc getQuery*(request: Request; tab, name: string): Query =
   case tab
   of "with_replies": getReplyQuery(name)

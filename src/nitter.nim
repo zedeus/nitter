@@ -3,7 +3,6 @@ import asyncdispatch, strformat, logging
 from net import Port
 from htmlgen import a
 from os import getEnv
-from json import parseJson
 
 import jester
 

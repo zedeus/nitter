@@ -11,12 +11,6 @@ include "../views/opensearch.nimf"
 
 export search
 
-import jsony, times
-export jsony
-
-proc dumpHook*(s: var string, v: DateTime) =
-  s.add $v.toTime().toUnix()
-
 proc createSearchRouter*(cfg: Config) =
   router search:
     get "/search/?":

@@ -34,7 +34,7 @@ const
     "include_user_entities": "1",
     "include_ext_reply_count": "1",
     "include_ext_is_blue_verified": "1",
-    "include_ext_verified_type": "1",
+    # "include_ext_verified_type": "1",
     "include_ext_media_color": "0",
     "cards_platform": "Web-13",
     "tweet_mode": "extended",

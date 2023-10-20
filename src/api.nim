@@ -134,6 +134,7 @@ proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.}
 
   let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
   result = parseGraphSearch[User](await fetch(url, Api.search), after)
+  result.query = query
 
 proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return
