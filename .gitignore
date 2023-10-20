@@ -12,4 +12,3 @@ nitter
 nitter.conf
 guest_accounts.json*
 dump.rdb
-./
