@@ -443,8 +443,8 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
             tweet.id = parseBiggestInt(entryId)
         result.pinned = some tweet
 
-proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
-  result = Timeline(beginning: after.len == 0)
+proc parseGraphSearch*[T: User | Tweets](js: JsonNode; after=""): Result[T] =
+  result = Result[T](beginning: after.len == 0)
 
   let instructions = js{"data", "search_by_raw_query", "search_timeline", "timeline", "instructions"}
   if instructions.len == 0:
@@ -455,13 +455,19 @@ proc parseGraphSearch*(js: JsonNode; after=""): Timeline =
     if typ == "TimelineAddEntries":
       for e in instruction{"entries"}:
         let entryId = e{"entryId"}.getStr
-        if entryId.startsWith("tweet"):
-          with tweetRes, e{"content", "itemContent", "tweet_results", "result"}:
-            let tweet = parseGraphTweet(tweetRes, true)
-            if not tweet.available:
-              tweet.id = parseBiggestInt(entryId.getId())
-            result.content.add tweet
-        elif entryId.startsWith("cursor-bottom"):
+        when T is Tweets:
+          if entryId.startsWith("tweet"):
+            with tweetRes, e{"content", "itemContent", "tweet_results", "result"}:
+              let tweet = parseGraphTweet(tweetRes)
+              if not tweet.available:
+                tweet.id = parseBiggestInt(entryId.getId())
+              result.content.add tweet
+        elif T is User:
+          if entryId.startsWith("user"):
+            with userRes, e{"content", "itemContent"}:
+              result.content.add parseGraphUser(userRes)
+
+        if entryId.startsWith("cursor-bottom"):
           result.bottom = e{"content", "value"}.getStr
     elif typ == "TimelineReplaceEntry":
       if instruction{"entry_id_to_replace"}.getStr.startsWith("cursor-bottom"):

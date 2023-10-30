@@ -62,7 +62,6 @@ proc getPoolJson*(): JsonNode =
              Api.userRestId, Api.userScreenName,
              Api.tweetResult,
              Api.list, Api.listTweets, Api.listMembers, Api.listBySlug: 500
-          of Api.userSearch: 900
         reqs = maxReqs - apiStatus.remaining
 
       reqsPerApi[$api] = reqsPerApi.getOrDefault($api, 0) + reqs
