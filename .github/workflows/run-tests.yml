@@ -50,6 +50,6 @@ jobs:
         env:
           GUEST_ACCOUNTS: ${{ secrets.GUEST_ACCOUNTS }}
         run: |
-          echo $GUEST_ACCOUNTS > ./guest_accounts.json
+          echo $GUEST_ACCOUNTS > ./guest_accounts.jsonl
           ./nitter &
           pytest -n4 tests
