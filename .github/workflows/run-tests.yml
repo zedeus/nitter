@@ -11,6 +11,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        nim:
+          - "1.6.10"
+          - "1.6.x"
+          - "2.0.x"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -28,7 +34,8 @@ jobs:
           cache: "pip"
       - uses: jiro4989/setup-nim-action@v1
         with:
-          nim-version: "1.x"
+          nim-version: ${{ matrix.nim }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - run: nimble build -d:release -Y
       - run: pip install seleniumbase
       - run: seleniumbase install chromedriver
