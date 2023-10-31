@@ -1,5 +1,5 @@
 #SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, times, json, random, strutils, tables, intsets, os
+import std/[asyncdispatch, times, json, random, strutils, tables, packedsets, os]
 import types
 import experimental/parser/guestaccount
 
@@ -35,21 +35,21 @@ proc getAccountPoolHealth*(): JsonNode =
 
   var
     totalReqs = 0
-    limited: IntSet
+    limited: PackedSet[BiggestInt]
     reqsPerApi: Table[string, int]
-    oldest = now
-    newest = 0
-    average = 0
+    oldest = now.int64
+    newest = 0'i64
+    average = 0'i64
 
   for account in accountPool:
     # Twitter snowflake conversion
-    let created = ((account.id shr 22) + 1288834974657) div 1000
+    let created = int64(((account.id shr 22) + 1288834974657) div 1000)
 
     if created > newest:
       newest = created
     if created < oldest:
       oldest = created
-    average.inc created
+    average += created
 
     for api in account.apis.keys:
       let
