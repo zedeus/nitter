@@ -3,7 +3,7 @@ version: "3"
 services:
 
   nitter:
-    image: zedeus/nitter:latest
+    image: zedeus/nitter:guest-accounts
     container_name: nitter
     ports:
       - "127.0.0.1:8080:8080" # Replace with "8080:8080" if you don't use a reverse proxy
