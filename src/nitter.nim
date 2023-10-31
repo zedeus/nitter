@@ -6,7 +6,7 @@ from os import getEnv
 
 import jester
 
-import types, config, prefs, formatters, redis_cache, http_pool, tokens
+import types, config, prefs, formatters, redis_cache, http_pool, auth
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, debug,

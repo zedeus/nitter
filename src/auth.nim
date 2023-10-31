@@ -1,5 +1,5 @@
 #SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, times, json, random, strutils, tables, sets, os
+import asyncdispatch, times, json, random, strutils, tables, intsets, os
 import types
 import experimental/parser/guestaccount
 
@@ -7,6 +7,21 @@ import experimental/parser/guestaccount
 const
   maxConcurrentReqs = 2
   dayInSeconds = 24 * 60 * 60
+  apiMaxReqs: Table[Api, int] = {
+    Api.search: 50,
+    Api.tweetDetail: 150,
+    Api.photoRail: 180,
+    Api.userTweets: 500,
+    Api.userTweetsAndReplies: 500,
+    Api.userMedia: 500,
+    Api.userRestId: 500,
+    Api.userScreenName: 500,
+    Api.tweetResult: 500,
+    Api.list: 500,
+    Api.listTweets: 500,
+    Api.listMembers: 500,
+    Api.listBySlug: 500
+  }.toTable
 
 var
   accountPool: seq[GuestAccount]
@@ -15,20 +30,64 @@ var
 template log(str: varargs[string, `$`]) =
   if enableLogging: echo "[accounts] ", str.join("")
 
-proc getPoolJson*(): JsonNode =
-  var
-    list = newJObject()
-    totalReqs = 0
-    totalPending = 0
-    limited: HashSet[string]
-    reqsPerApi: Table[string, int]
-
+proc getAccountPoolHealth*(): JsonNode =
   let now = epochTime().int
 
-  for account in accountPool:
-    totalPending.inc(account.pending)
+  var
+    totalReqs = 0
+    limited: IntSet
+    reqsPerApi: Table[string, int]
+    oldest = now
+    newest = 0
+    average = 0
 
-    var includeAccount = false
+  for account in accountPool:
+    # Twitter snowflake conversion
+    let created = ((account.id shr 22) + 1288834974657) div 1000
+
+    if created > newest:
+      newest = created
+    if created < oldest:
+      oldest = created
+    average.inc created
+
+    for api in account.apis.keys:
+      let
+        apiStatus = account.apis[api]
+        reqs = apiMaxReqs[api] - apiStatus.remaining
+
+      reqsPerApi.mgetOrPut($api, 0).inc reqs
+      totalReqs.inc reqs
+
+      if apiStatus.limited:
+        limited.incl account.id
+
+  if accountPool.len > 0:
+    average = average div accountPool.len
+  else:
+    oldest = 0
+    average = 0
+
+  return %*{
+    "accounts": %*{
+      "total": accountPool.len,
+      "active": accountPool.len - limited.card,
+      "limited": limited.card,
+      "oldest": $fromUnix(oldest),
+      "newest": $fromUnix(newest),
+      "average": $fromUnix(average)
+    },
+    "requests": %*{
+      "total": totalReqs,
+      "apis": reqsPerApi
+    }
+  }
+
+proc getAccountPoolDebug*(): JsonNode =
+  let now = epochTime().int
+  var list = newJObject()
+
+  for account in accountPool:
     let accountJson = %*{
       "apis": newJObject(),
       "pending": account.pending,
@@ -47,37 +106,11 @@ proc getPoolJson*(): JsonNode =
 
       if apiStatus.limited:
         obj["limited"] = %true
-        limited.incl account.id
 
       accountJson{"apis", $api} = obj
-      includeAccount = true
+      list[$account.id] = accountJson
 
-      let
-        maxReqs =
-          case api
-          of Api.search: 50
-          of Api.tweetDetail: 150
-          of Api.photoRail: 180
-          of Api.userTweets, Api.userTweetsAndReplies, Api.userMedia,
-             Api.userRestId, Api.userScreenName,
-             Api.tweetResult,
-             Api.list, Api.listTweets, Api.listMembers, Api.listBySlug: 500
-        reqs = maxReqs - apiStatus.remaining
-
-      reqsPerApi[$api] = reqsPerApi.getOrDefault($api, 0) + reqs
-      totalReqs.inc(reqs)
-
-    if includeAccount:
-      list[account.id] = accountJson
-
-  return %*{
-    "amount": accountPool.len,
-    "limited": limited.card,
-    "requests": totalReqs,
-    "pending": totalPending,
-    "apis": reqsPerApi,
-    "accounts": list
-  }
+  return %list
 
 proc rateLimitError*(): ref RateLimitError =
   newException(RateLimitError, "rate limited")

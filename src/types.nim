@@ -36,7 +36,7 @@ type
     limitedAt*: int
 
   GuestAccount* = ref object
-    id*: string
+    id*: BiggestInt
     oauthToken*: string
     oauthSecret*: string
     pending*: int

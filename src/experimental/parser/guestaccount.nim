@@ -1,3 +1,4 @@
+import std/strutils
 import jsony
 import ../types/guestaccount
 from ../../types import GuestAccount
@@ -5,7 +6,7 @@ from ../../types import GuestAccount
 proc toGuestAccount(account: RawAccount): GuestAccount =
   let id = account.oauthToken[0 ..< account.oauthToken.find('-')]
   result = GuestAccount(
-    id: id,
+    id: parseBiggestInt(id),
     oauthToken: account.oauthToken,
     oauthSecret: account.oauthTokenSecret
   )

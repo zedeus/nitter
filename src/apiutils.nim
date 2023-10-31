@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import httpclient, asyncdispatch, options, strutils, uri, times, math, tables
 import jsony, packedjson, zippy, oauth1
-import types, tokens, consts, parserutils, http_pool
+import types, auth, consts, parserutils, http_pool
 import experimental/types/common
 
 const
@@ -120,7 +120,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   except OSError as e:
     raise e
   except Exception as e:
-    let id = if account.isNil: "null" else: account.id
+    let id = if account.isNil: "null" else: $account.id
     echo "error: ", e.name, ", msg: ", e.msg, ", accountId: ", id, ", url: ", url
     raise rateLimitError()
   finally:
