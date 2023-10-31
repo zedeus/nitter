@@ -1,7 +1,7 @@
-FROM alpine:3.17 as nim
+FROM alpine:3.18 as nim
 LABEL maintainer="setenforce@protonmail.com"
 
-RUN apk --no-cache add gcc git libc-dev libsass-dev "nim=1.6.8-r0" nimble pcre
+RUN apk --no-cache add gcc git libc-dev libsass-dev "nim=1.6.14-r0" nimble pcre
 
 WORKDIR /src/nitter
 
@@ -13,7 +13,7 @@ RUN nimble build -d:danger -d:lto -d:strip \
     && nimble scss \
     && nimble md
 
-FROM alpine:3.17
+FROM alpine:3.18
 WORKDIR /src/
 RUN apk --no-cache add ca-certificates pcre openssl1.1-compat
 COPY --from=nim /src/nitter/nitter ./
