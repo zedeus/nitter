@@ -60,7 +60,7 @@ proc genQueryParam*(query: Query): string =
       param &= "OR "
 
   if query.fromUser.len > 0 and query.kind in {posts, media}:
-    param &= "filter:self_threads OR-filter:replies "
+    param &= "filter:self_threads OR -filter:replies "
 
   if "nativeretweets" notin query.excludes:
     param &= "include:nativeretweets "
