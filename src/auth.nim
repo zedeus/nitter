@@ -71,7 +71,6 @@ proc getAccountPoolHealth*(): JsonNode =
   return %*{
     "accounts": %*{
       "total": accountPool.len,
-      "active": accountPool.len - limited.card,
       "limited": limited.card,
       "oldest": $fromUnix(oldest),
       "newest": $fromUnix(newest),
