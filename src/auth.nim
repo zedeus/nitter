@@ -64,11 +64,15 @@ proc getAccountPoolHealth*(): JsonNode =
         apiStatus = account.apis[api]
         reqs = apiMaxReqs[api] - apiStatus.remaining
 
-      reqsPerApi.mgetOrPut($api, 0).inc reqs
-      totalReqs.inc reqs
-
       if apiStatus.limited:
         limited.incl account.id
+
+      # no requests made with this account and endpoint since the limit reset
+      if apiStatus.reset < now:
+        continue
+
+      reqsPerApi.mgetOrPut($api, 0).inc reqs
+      totalReqs.inc reqs
 
   if accountPool.len > 0:
     average = average div accountPool.len
