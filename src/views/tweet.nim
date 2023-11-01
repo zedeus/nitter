@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, sequtils, strformat, options, algorithm
+import strutils, sequtils, strformat, options
 import karax/[karaxdsl, vdom, vstyles]
 from jester import Request
 
@@ -12,7 +12,7 @@ const doctype = "<!DOCTYPE html>\n"
 proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
   let url = getPicUrl(user.getUserPic("_mini"))
   buildHtml():
-    img(class=(prefs.getAvatarClass & " mini"), src=url)
+    img(class=(prefs.getAvatarClass & " mini"), src=url, loading="lazy")
 
 proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VNode =
   buildHtml(tdiv):
@@ -84,34 +84,35 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
   let
     container = if video.description.len == 0 and video.title.len == 0: ""
                 else: " card-container"
-    playbackType = if not prefs.proxyVideos and video.hasMp4Url: mp4
+    playbackType = if prefs.proxyVideos and video.hasMp4Url: mp4
                    else: video.playbackType
 
   buildHtml(tdiv(class="attachments card")):
     tdiv(class="gallery-video" & container):
       tdiv(class="attachment video-container"):
         let thumb = getSmallPic(video.thumb)
-        if not video.available:
-          img(src=thumb)
-          renderVideoUnavailable(video)
-        elif not prefs.isPlaybackEnabled(playbackType):
-          img(src=thumb)
-          renderVideoDisabled(playbackType, path)
-        else:
+        let canPlay = prefs.isPlaybackEnabled(playbackType)
+
+        if video.available and canPlay:
           let
-            vars = video.variants.filterIt(it.contentType == playbackType)
-            vidUrl = vars.sortedByIt(it.resolution)[^1].url
+            vidUrl = video.getVidVariant(playbackType).url
             source = if prefs.proxyVideos: getVidUrl(vidUrl)
                      else: vidUrl
           case playbackType
           of mp4:
-            video(poster=thumb, controls="", muted=prefs.muteVideos):
-              source(src=source, `type`="video/mp4")
+            video(src=source, poster=thumb, controls="", muted=prefs.muteVideos, preload="metadata")
           of m3u8, vmap:
             video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
             tdiv(class="overlay-circle"): span(class="overlay-triangle")
             verbatim "</div>"
+        else:
+          img(src=thumb, loading="lazy", decoding="async")
+          if not canPlay:
+            renderVideoDisabled(playbackType, path)
+          else:
+            renderVideoUnavailable(video)
+
       if container.len > 0:
         tdiv(class="card-content"):
           h2(class="card-title"): text video.title
@@ -144,7 +145,7 @@ proc renderPoll(poll: Poll): VNode =
 proc renderCardImage(card: Card): VNode =
   buildHtml(tdiv(class="card-image-container")):
     tdiv(class="card-image"):
-      img(src=getPicUrl(card.image), alt="")
+      img(src=getPicUrl(card.image), alt="", loading="lazy")
       if card.kind == player:
         tdiv(class="card-overlay"):
           tdiv(class="overlay-circle"):

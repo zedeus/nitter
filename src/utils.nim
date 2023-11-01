@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, strformat, uri, tables, base64
 import nimcrypto
+import types
 
 var
   hmacKey: string
@@ -27,6 +28,20 @@ proc setProxyEncoding*(state: bool) =
 
 proc getHmac*(data: string): string =
   ($hmac(sha256, hmacKey, data))[0 .. 12]
+
+proc getBestMp4VidVariant(video: Video): VideoVariant =
+  for v in video.variants:
+    if v.bitrate >= result.bitrate:
+      result = v
+
+proc getVidVariant*(video: Video; playbackType: VideoType): VideoVariant =
+  case playbackType
+  of mp4:
+    return video.getBestMp4VidVariant
+  of m3u8, vmap:
+    for variant in video.variants:
+      if variant.contentType == playbackType:
+        return variant
 
 proc getVidUrl*(link: string): string =
   if link.len == 0: return
