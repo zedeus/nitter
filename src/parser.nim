@@ -323,6 +323,8 @@ proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet =
     return Tweet(text: "You're unable to view this Tweet because it's only available to the Subscribers of the account owner.")
   of "TweetWithVisibilityResults":
     return parseGraphTweet(js{"tweet"}, isLegacy)
+  else:
+    discard
 
   if not js.hasKey("legacy"):
     return Tweet()
