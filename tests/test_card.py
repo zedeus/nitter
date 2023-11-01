@@ -21,9 +21,9 @@ card = [
 
 no_thumb = [
     ['FluentAI/status/1116417904831029248',
-     'Amazon’s Alexa isn’t just AI — thousands of humans are listening',
-     'One of the only ways to improve Alexa is to have human beings check it for errors',
-     'theverge.com'],
+     'LinkedIn',
+     'This link will take you to a page that’s not on LinkedIn',
+     'lnkd.in'],
 
     ['Thom_Wolf/status/1122466524860702729',
      'facebookresearch/fairseq',
