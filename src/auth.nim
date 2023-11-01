@@ -1,5 +1,5 @@
 #SPDX-License-Identifier: AGPL-3.0-only
-import std/[asyncdispatch, times, json, random, strutils, tables, packedsets, os]
+import std/[asyncdispatch, times, json, random, sequtils, strutils, tables, packedsets, os]
 import types
 import experimental/parser/guestaccount
 
@@ -30,6 +30,16 @@ var
 template log(str: varargs[string, `$`]) =
   if enableLogging: echo "[accounts] ", str.join("")
 
+proc snowflakeToEpoch(flake: int64): int64 =
+  int64(((flake shr 22) + 1288834974657) div 1000)
+
+proc hasExpired(account: GuestAccount): bool =
+  let
+    created = snowflakeToEpoch(account.id)
+    now = epochTime().int64
+    daysOld = int(now - created) div (24 * 60 * 60)
+  return daysOld > 30
+
 proc getAccountPoolHealth*(): JsonNode =
   let now = epochTime().int
 
@@ -42,9 +52,7 @@ proc getAccountPoolHealth*(): JsonNode =
     average = 0'i64
 
   for account in accountPool:
-    # Twitter snowflake conversion
-    let created = int64(((account.id shr 22) + 1288834974657) div 1000)
-
+    let created = snowflakeToEpoch(account.id)
     if created > newest:
       newest = created
     if created < oldest:
@@ -188,3 +196,10 @@ proc initAccountPool*(cfg: Config; path: string) =
   else:
     echo "[accounts] ERROR: ", path, " not found. This file is required to authenticate API requests."
     quit 1
+
+  let accountsPrePurge = accountPool.len
+  accountPool.keepItIf(not it.hasExpired)
+
+  log "Successfully added ", accountPool.len, " valid accounts."
+  if accountsPrePurge > accountPool.len:
+    log "Purged ", accountsPrePurge - accountPool.len, " expired accounts."
