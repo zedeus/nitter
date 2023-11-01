@@ -54,10 +54,10 @@
     }
 }
 
-@media(max-width: 700px) {
+@media(max-width: 800px) {
     .profile-tabs {
         width: 100vw;
-        max-width: 600px;
+        max-width: 95%;
 
         .timeline-container {
             width: 100% !important;
