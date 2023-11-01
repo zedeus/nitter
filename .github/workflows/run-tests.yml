@@ -44,12 +44,11 @@ jobs:
         run: |
           sudo apt install libsass-dev -y
           cp nitter.example.conf nitter.conf
+          sed -i 's/enableDebug = false/enableDebug = true/g'
           nimble md
           nimble scss
+          echo "${{ env.GUEST_ACCOUNTS }}" > ./guest_accounts.jsonl
       - name: Run tests
-        env:
-          GUEST_ACCOUNTS: ${{ secrets.GUEST_ACCOUNTS }}
         run: |
-          echo $GUEST_ACCOUNTS > ./guest_accounts.jsonl
           ./nitter &
           pytest -n4 tests
