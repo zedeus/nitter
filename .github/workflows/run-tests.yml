@@ -44,7 +44,7 @@ jobs:
         run: |
           sudo apt install libsass-dev -y
           cp nitter.example.conf nitter.conf
-          sed -i 's/enableDebug = false/enableDebug = true/g'
+          sed -i 's/enableDebug = false/enableDebug = true/g' nitter.conf
           nimble md
           nimble scss
           echo "${{ env.GUEST_ACCOUNTS }}" > ./guest_accounts.jsonl
