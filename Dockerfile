@@ -15,11 +15,11 @@ RUN nimble build -d:danger -d:lto -d:strip \
 
 FROM alpine:latest
 WORKDIR /src/
-RUN apk --no-cache add pcre ca-certificates
+RUN apk --no-cache add pcre ca-certificates && \
+    adduser -h /src/ -D -s /bin/sh nitter
 COPY --from=nim /src/nitter/nitter ./
-COPY --from=nim /src/nitter/nitter.example.conf ./nitter.conf
+COPY --from=nim --chown=nitter:nitter /src/nitter/nitter.example.conf ./nitter.conf
 COPY --from=nim /src/nitter/public ./public
 EXPOSE 8080
-RUN adduser -h /src/ -D -s /bin/sh nitter
 USER nitter
 CMD ./nitter
