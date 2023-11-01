@@ -47,7 +47,7 @@ jobs:
           sed -i 's/enableDebug = false/enableDebug = true/g' nitter.conf
           nimble md
           nimble scss
-          echo "${{ env.GUEST_ACCOUNTS }}" > ./guest_accounts.jsonl
+          echo "${{ vars.GUEST_ACCOUNTS }}" > ./guest_accounts.jsonl
       - name: Run tests
         run: |
           ./nitter &
