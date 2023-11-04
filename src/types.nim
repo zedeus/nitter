@@ -36,7 +36,7 @@ type
     limitedAt*: int
 
   GuestAccount* = ref object
-    id*: BiggestInt
+    id*: int64
     oauthToken*: string
     oauthSecret*: string
     pending*: int
@@ -164,7 +164,7 @@ type
     newsletterPublication = "newsletter_publication"
     hidden
     unknown
-    
+
   Card* = object
     kind*: CardKind
     url*: string
