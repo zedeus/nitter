@@ -1,7 +1,7 @@
 FROM alpine:3.18 as nim
 LABEL maintainer="setenforce@protonmail.com"
 
-RUN apk --no-cache add libsass-dev pcre gcc git libc-dev "nim=1.6.16-r0" "nimble=0.13.1-r3"
+RUN apk --no-cache add libsass-dev pcre gcc git libc-dev "nim=1.6.14-r0" "nimble=0.13.1-r2"
 
 WORKDIR /src/nitter
 
