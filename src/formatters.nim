@@ -68,6 +68,9 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
     result = result.replace(rdRegex, prefs.replaceReddit)
     if prefs.replaceReddit in result and "/gallery/" in result:
       result = result.replace("/gallery/", "/comments/")
+      
+  if prefs.replaceImgur.len > 0 and "https://imgur.com" in result:
+    result = result.replace("imgur.com", prefs.replaceImgur)
 
   if absolute.len > 0 and "href" in result:
     result = result.replace("href=\"/", &"href=\"{absolute}/")

@@ -106,6 +106,26 @@ genPrefs:
     replaceReddit(input, ""):
       "Reddit -> Teddit/Libreddit"
       placeholder: "Teddit hostname"
+        
+    replaceImgur(input, ""):
+      "Imgur -> Rimgo"
+      placeholder: "Rimgo hostname"
+        
+    #replaceMedium(input, ""):
+    #  "Medium -> Scribe"
+    #  placeholder: "Scribe hostname"
+        
+    #replaceFandom(input, ""):
+    #  "Fandom -> BreezeWiki"
+    #  placeholder: "BreezeWiki hostname"
+        
+    #replaceQuora(input, ""):
+    #  "Quora -> Quetre"
+    #  placeholder: "Quetre hostname"
+        
+    #replaceIMDb(input, ""):
+    #  "IMDb -> libremdb"
+    #  placeholder: "libremdb hostname"
 
 iterator allPrefs*(): Pref =
   for k, v in prefList:
