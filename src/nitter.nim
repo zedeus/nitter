@@ -10,7 +10,7 @@ import types, config, prefs, formatters, redis_cache, http_pool, auth
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, debug,
-  unsupported, embed, resolver, router_utils]
+  unsupported, embed, resolver, router_utils, auth]
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 const issuesUrl = "https://github.com/zedeus/nitter/issues"
@@ -54,6 +54,7 @@ createMediaRouter(cfg)
 createEmbedRouter(cfg)
 createRssRouter(cfg)
 createDebugRouter(cfg)
+createAuthRouter(cfg)
 
 settings:
   port = Port(cfg.port)
@@ -108,3 +109,4 @@ routes:
   extend embed, ""
   extend debug, ""
   extend unsupported, ""
+  extend auth, ""

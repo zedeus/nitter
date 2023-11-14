@@ -254,6 +254,9 @@ type
     title*: string
     hostname*: string
     staticDir*: string
+    guestAccountsUrl*: string
+    guestAccountsKey*: string
+    guestAccountsHost*: string
 
     hmacKey*: string
     base64Media*: bool

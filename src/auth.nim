@@ -1,6 +1,7 @@
 #SPDX-License-Identifier: AGPL-3.0-only
-import std/[asyncdispatch, times, json, random, sequtils, strutils, tables, packedsets, os]
-import types
+import std/[httpclient, asyncdispatch, times, json, random, sequtils, strutils, tables, packedsets, os]
+import nimcrypto
+import types, http_pool
 import experimental/parser/guestaccount
 
 # max requests at a time per account to avoid race conditions
@@ -24,6 +25,11 @@ const
   }.toTable
 
 var
+  pool: HttpPool
+  guestAccountsUrl = ""
+  guestAccountsHost = ""
+  guestAccountsKey = ""
+  guestAccountsUrlLastFetched = 0
   accountPool: seq[GuestAccount]
   enableLogging = false
 
@@ -158,6 +164,27 @@ proc release*(account: GuestAccount) =
   dec account.pending
 
 proc getGuestAccount*(api: Api): Future[GuestAccount] {.async.} =
+  let now = epochTime().int
+
+  if accountPool.len == 0 and guestAccountsUrl != "" and guestAccountsUrlLastFetched < now - 3600:
+    once:
+      pool = HttpPool()
+
+    guestAccountsUrlLastFetched = now
+
+    log "fetching more accounts from service"
+    pool.use(newHttpHeaders()):
+      let resp = await c.get("$1?host=$2&key=$3" % [guestAccountsUrl, guestAccountsHost, guestAccountsKey])
+      let guestAccounts = await resp.body
+
+      log "status code from service: ", resp.status
+
+      for line in guestAccounts.splitLines:
+        if line != "":
+          accountPool.add parseGuestAccount(line)
+
+      accountPool.keepItIf(not it.hasExpired)
+
   for i in 0 ..< accountPool.len:
     if result.isReady(api): break
     result = accountPool.sample()
@@ -187,6 +214,9 @@ proc setRateLimit*(account: GuestAccount; api: Api; remaining, reset: int) =
 
 proc initAccountPool*(cfg: Config; path: string) =
   enableLogging = cfg.enableDebug
+  guestAccountsUrl = cfg.guestAccountsUrl
+  guestAccountsHost = cfg.guestAccountsHost
+  guestAccountsKey = cfg.guestAccountsKey
 
   let jsonlPath = if path.endsWith(".json"): (path & 'l') else: path
 
@@ -197,7 +227,7 @@ proc initAccountPool*(cfg: Config; path: string) =
   elif fileExists(path):
     log "Parsing JSON guest accounts file: ", path
     accountPool = parseGuestAccounts(path)
-  else:
+  elif guestAccountsUrl == "":
     echo "[accounts] ERROR: ", path, " not found. This file is required to authenticate API requests."
     quit 1
 
@@ -205,5 +235,12 @@ proc initAccountPool*(cfg: Config; path: string) =
   accountPool.keepItIf(not it.hasExpired)
 
   log "Successfully added ", accountPool.len, " valid accounts."
-  if accountsPrePurge > accountPool.len:
-    log "Purged ", accountsPrePurge - accountPool.len, " expired accounts."
+
+proc getAuthHash*(cfg: Config): string =
+  if cfg.guestAccountsKey == "":
+    log "guestAccountsKey is set to bogus value, responding with empty string"
+    return ""
+
+  let hashStr = $sha_256.digest(cfg.guestAccountsKey)
+
+  return hashStr.toLowerAscii
