@@ -111,9 +111,9 @@ genPrefs:
       "Imgur -> Rimgo"
       placeholder: "Rimgo hostname"
         
-    #replaceMedium(input, ""):
-    #  "Medium -> Scribe"
-    #  placeholder: "Scribe hostname"
+    replaceMedium(input, ""):
+      "Medium -> Scribe"
+      placeholder: "Scribe hostname"
         
     #replaceFandom(input, ""):
     #  "Fandom -> BreezeWiki"
