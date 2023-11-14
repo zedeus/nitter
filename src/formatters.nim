@@ -21,7 +21,7 @@ let
   # Images aren't supported due to errors from Teddit when the image
   # wasn't first displayed via a post on the Teddit instance.
   
-  imgurRegex = re"(i|i.stack)\.)?imgur.com"
+  imgurRegex = re"((i|i.stack)\.)?imgur.com"
 
   wwwRegex = re"https?://(www[0-9]?\.)?"
   m3u8Regex = re"""url="(.+.m3u8)""""
