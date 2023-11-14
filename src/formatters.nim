@@ -20,6 +20,8 @@ let
   # so v.redd.it links will not be replaced.
   # Images aren't supported due to errors from Teddit when the image
   # wasn't first displayed via a post on the Teddit instance.
+  
+  imgurRegex = re"(i|i.stack)\.)?imgur.com"
 
   wwwRegex = re"https?://(www[0-9]?\.)?"
   m3u8Regex = re"""url="(.+.m3u8)""""
@@ -69,8 +71,8 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
     if prefs.replaceReddit in result and "/gallery/" in result:
       result = result.replace("/gallery/", "/comments/")
       
-  if prefs.replaceImgur.len > 0 and "https://imgur.com" in result:
-    result = result.replace("imgur.com", prefs.replaceImgur)
+  if prefs.replaceImgur.len > 0 and "imgur.com" in result:
+    result = result.replace(imgurRegex, prefs.replaceImgur)
 
   if absolute.len > 0 and "href" in result:
     result = result.replace("href=\"/", &"href=\"{absolute}/")
