@@ -10,25 +10,34 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: buildjet-2vcpu-ubuntu-2204
+    strategy:
+      matrix:
+        nim:
+          - "1.6.10"
+          - "1.6.x"
+          - "2.0.x"
+          - "devel"
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Cache nimble
         id: cache-nimble
-        uses: actions/cache@v3
+        uses: buildjet/cache@v3
         with:
           path: ~/.nimble
-          key: nimble-${{ hashFiles('*.nimble') }}
-          restore-keys: "nimble-"
+          key: ${{ matrix.nim }}-nimble-${{ hashFiles('*.nimble') }}
+          restore-keys: |
+            ${{ matrix.nim }}-nimble-
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
           cache: "pip"
       - uses: jiro4989/setup-nim-action@v1
         with:
-          nim-version: "1.x"
+          nim-version: ${{ matrix.nim }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - run: nimble build -d:release -Y
       - run: pip install seleniumbase
       - run: seleniumbase install chromedriver
@@ -37,12 +46,11 @@ jobs:
         run: |
           sudo apt install libsass-dev -y
           cp nitter.example.conf nitter.conf
+          sed -i 's/enableDebug = false/enableDebug = true/g' nitter.conf
           nimble md
           nimble scss
+          echo '${{ secrets.GUEST_ACCOUNTS }}' > ./guest_accounts.jsonl
       - name: Run tests
-        env:
-          GUEST_ACCOUNTS: ${{ secrets.GUEST_ACCOUNTS }}
         run: |
-          echo $GUEST_ACCOUNTS > ./guest_accounts.json
           ./nitter &
-          pytest -n4 tests
+          pytest -n8 tests
