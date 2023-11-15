@@ -1,4 +1,4 @@
-from base import BaseTestCase, Tweet, get_timeline_tweet
+from base import BaseTestCase, Tweet, Conversation, get_timeline_tweet
 from parameterized import parameterized
 
 # image = tweet + 'div.attachments.media-body > div > div > a > div > img'
@@ -83,22 +83,18 @@ retweet = [
     [3, 'mobile_test_8', 'mobile test 8', 'jack', '@jack', 'twttr']
 ]
 
-# reply = [
-#     ['mobile_test/with_replies', 15]
-# ]
-
 
 class TweetTest(BaseTestCase):
-    # @parameterized.expand(timeline)
-    # def test_timeline(self, index, fullname, username, date, tid, text):
-    #     self.open_nitter(username)
-    #     tweet = get_timeline_tweet(index)
-    #     self.assert_exact_text(fullname, tweet.fullname)
-    #     self.assert_exact_text('@' + username, tweet.username)
-    #     self.assert_exact_text(date, tweet.date)
-    #     self.assert_text(text, tweet.text)
-    #     permalink = self.find_element(tweet.date + ' a')
-    #     self.assertIn(tid, permalink.get_attribute('href'))
+    @parameterized.expand(timeline)
+    def test_timeline(self, index, fullname, username, date, tid, text):
+        self.open_nitter(username)
+        tweet = get_timeline_tweet(index)
+        self.assert_exact_text(fullname, tweet.fullname)
+        self.assert_exact_text('@' + username, tweet.username)
+        self.assert_exact_text(date, tweet.date)
+        self.assert_text(text, tweet.text)
+        permalink = self.find_element(tweet.date + ' a')
+        self.assertIn(tid, permalink.get_attribute('href'))
 
     @parameterized.expand(status)
     def test_status(self, tid, fullname, username, date, text):
@@ -112,18 +108,18 @@ class TweetTest(BaseTestCase):
     @parameterized.expand(multiline)
     def test_multiline_formatting(self, tid, username, text):
         self.open_nitter(f'{username}/status/{tid}')
-        self.assert_text(text.strip('\n'), '.main-tweet')
+        self.assert_text(text.strip('\n'), Conversation.main)
 
     @parameterized.expand(emoji)
     def test_emoji(self, tweet, text):
         self.open_nitter(tweet)
-        self.assert_text(text, '.main-tweet')
+        self.assert_text(text, Conversation.main)
 
     @parameterized.expand(link)
     def test_link(self, tweet, links):
         self.open_nitter(tweet)
         for link in links:
-            self.assert_text(link, '.main-tweet')
+            self.assert_text(link, Conversation.main)
 
     @parameterized.expand(username)
     def test_username(self, tweet, usernames):
@@ -132,22 +128,22 @@ class TweetTest(BaseTestCase):
             link = self.find_link_text(f'@{un}')
             self.assertIn(f'/{un}', link.get_property('href'))
 
-    # @parameterized.expand(retweet)
-    # def test_retweet(self, index, url, retweet_by, fullname, username, text):
-    #     self.open_nitter(url)
-    #     tweet = get_timeline_tweet(index)
-    #     self.assert_text(f'{retweet_by} retweeted', tweet.retweet)
-    #     self.assert_text(text, tweet.text)
-    #     self.assert_exact_text(fullname, tweet.fullname)
-    #     self.assert_exact_text(username, tweet.username)
+    @parameterized.expand(retweet)
+    def test_retweet(self, index, url, retweet_by, fullname, username, text):
+        self.open_nitter(url)
+        tweet = get_timeline_tweet(index)
+        self.assert_text(f'{retweet_by} retweeted', tweet.retweet)
+        self.assert_text(text, tweet.text)
+        self.assert_exact_text(fullname, tweet.fullname)
+        self.assert_exact_text(username, tweet.username)
 
     @parameterized.expand(invalid)
     def test_invalid_id(self, tweet):
         self.open_nitter(tweet)
         self.assert_text('Tweet not found', '.error-panel')
 
-    # @parameterized.expand(reply)
-    # def test_thread(self, tweet, num):
-    #     self.open_nitter(tweet)
-    #     thread = self.find_element(f'.timeline > div:nth-child({num})')
-    #     self.assertIn(thread.get_attribute('class'), 'thread-line')
+    #@parameterized.expand(reply)
+    #def test_thread(self, tweet, num):
+        #self.open_nitter(tweet)
+        #thread = self.find_element(f'.timeline > div:nth-child({num})')
+        #self.assertIn(thread.get_attribute('class'), 'thread-line')
