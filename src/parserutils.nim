@@ -1,8 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import std/[strutils, times, macros, htmlgen, options, algorithm, re]
+import std/[times, macros, htmlgen, options, algorithm, re]
+import std/strutils except escape
 import std/unicode except strip
+from xmltree import escape
 import packedjson
 import types, utils, formatters
+
+const
+  unicodeOpen = "\uFFFA"
+  unicodeClose = "\uFFFB"
+  xmlOpen = escape("<")
+  xmlClose = escape(">")
 
 let
   unRegex = re"(^|[^A-z0-9-_./?])@([A-z0-9_]{1,15})"
@@ -304,7 +312,9 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
 proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
     entities = ? js{"entity_set"}
-    text = js{"text"}.getStr
+    text = js{"text"}.getStr.multiReplace(("<", unicodeOpen), (">", unicodeClose))
     textSlice = 0..text.runeLen
 
   tweet.expandTextEntities(entities, text, textSlice)
+
+  tweet.text = tweet.text.multiReplace((unicodeOpen, xmlOpen), (unicodeClose, xmlClose))
