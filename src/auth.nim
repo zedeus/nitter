@@ -210,24 +210,33 @@ proc updateAccountPool*(cfg: Config) {.async.} =
   if not cfg.guestAccountsUsePool:
     return
 
+  # wait for a few seconds before fetching guest accounts, so that
+  # /.well-known/... is served correctly
+  await sleepAsync(10 * 1000)
+
   while true:
     if accountPool.len == 0:
       let pool = HttpPool()
 
       log "fetching more accounts from service"
-      pool.use(newHttpHeaders()):
-        let resp = await c.get("$1?id=$2&auth=$3" % [cfg.guestAccountsPoolUrl, cfg.guestAccountsPoolId, cfg.guestAccountsPoolAuth])
-        let guestAccounts = await resp.body
 
-        log "status code from service: ", resp.status
+      try:
+        pool.use(newHttpHeaders()):
+          let resp = await c.get("$1?id=$2&auth=$3" % [cfg.guestAccountsPoolUrl, cfg.guestAccountsPoolId, cfg.guestAccountsPoolAuth])
+          let guestAccounts = await resp.body
 
-        for line in guestAccounts.splitLines:
-          if line != "":
-            accountPool.add parseGuestAccount(line)
+          log "status code from service: ", resp.status
 
-        accountPool.keepItIf(not it.hasExpired)
+          for line in guestAccounts.splitLines:
+            if line != "":
+              accountPool.add parseGuestAccount(line)
 
-    await sleepAsync(3600)
+      except Exception as e:
+        log "failed to fetch from accounts service: ", e.msg
+
+      accountPool.keepItIf(not it.hasExpired)
+
+    await sleepAsync(3600 * 1000)
 
 proc getAuthHash*(cfg: Config): string =
   if cfg.guestAccountsPoolAuth == "":
