@@ -1,7 +1,7 @@
 #SPDX-License-Identifier: AGPL-3.0-only
 import std/[httpclient, asyncdispatch, times, json, random, sequtils, strutils, tables, packedsets, os, uri]
 import nimcrypto
-import types, http_pool
+import types
 import experimental/parser/guestaccount
 
 # max requests at a time per account to avoid race conditions
@@ -216,13 +216,12 @@ proc updateAccountPool*(cfg: Config) {.async.} =
 
   while true:
     if accountPool.len == 0:
-      let pool = HttpPool()
-
       log "fetching more accounts from service"
 
+      let client = newAsyncHttpClient()
+
       try:
-        pool.use(newHttpHeaders()):
-          let resp = await c.get($(cfg.guestAccountsPoolUrl ? {"id": cfg.guestAccountsPoolId, "auth": cfg.guestAccountsPoolAuth}))
+          let resp = await client.get($(cfg.guestAccountsPoolUrl ? {"id": cfg.guestAccountsPoolId, "auth": cfg.guestAccountsPoolAuth}))
           let guestAccounts = await resp.body
 
           log "status code from service: ", resp.status
@@ -233,6 +232,8 @@ proc updateAccountPool*(cfg: Config) {.async.} =
 
       except Exception as e:
         log "failed to fetch from accounts service: ", e.msg
+      finally:
+        client.close()
 
       accountPool.keepItIf(not it.hasExpired)
 
