@@ -218,7 +218,7 @@ proc updateAccountPool*(cfg: Config) {.async.} =
     if accountPool.len == 0:
       log "fetching more accounts from service"
 
-      let client = newAsyncHttpClient()
+      let client = newAsyncHttpClient("nitter-accounts")
 
       try:
         let resp = await client.get($(cfg.guestAccountsPoolUrl ? {"id": cfg.guestAccountsPoolId, "auth": cfg.guestAccountsPoolAuth}))
