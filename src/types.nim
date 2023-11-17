@@ -254,17 +254,18 @@ type
     title*: string
     hostname*: string
     staticDir*: string
-    guestAccountsUrl*: string
-    guestAccountsKey*: string
-    guestAccountsHost*: string
 
     hmacKey*: string
     base64Media*: bool
-    minTokens*: int
     enableRss*: bool
     enableDebug*: bool
     proxy*: string
     proxyAuth*: string
+
+    guestAccountsUsePool*: bool
+    guestAccountsPoolUrl*: string
+    guestAccountsPoolId*: string
+    guestAccountsPoolAuth*: string
 
     rssCacheTime*: int
     listCacheTime*: int

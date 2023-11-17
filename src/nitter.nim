@@ -22,6 +22,7 @@ let
   accountsPath = getEnv("NITTER_ACCOUNTS_FILE", "./guest_accounts.json")
 
 initAccountPool(cfg, accountsPath)
+asyncCheck updateAccountPool(cfg)
 
 if not cfg.enableDebug:
   # Silence Jester's query warning

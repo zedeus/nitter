@@ -7,6 +7,6 @@ import ".."/[types, auth]
 
 proc createAuthRouter*(cfg: Config) =
   router auth:
-    get "/.well-known/nitter-auth-sha256":
-      cond cfg.guestAccountsUrl != ""
+    get "/.well-known/nitter-request-auth":
+      cond cfg.guestAccountsUsePool
       resp Http200, {"content-type": "text/plain"}, getAuthHash(cfg)

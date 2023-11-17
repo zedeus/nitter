@@ -36,14 +36,16 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     # Config
     hmacKey: cfg.get("Config", "hmacKey", "secretkey"),
     base64Media: cfg.get("Config", "base64Media", false),
-    minTokens: cfg.get("Config", "tokenCount", 10),
     enableRss: cfg.get("Config", "enableRSS", true),
     enableDebug: cfg.get("Config", "enableDebug", false),
     proxy: cfg.get("Config", "proxy", ""),
     proxyAuth: cfg.get("Config", "proxyAuth", ""),
-    guestAccountsUrl: cfg.get("Config", "guestAccountsUrl", ""),
-    guestAccountsKey: cfg.get("Config", "guestAccountsKey", ""),
-    guestAccountsHost: cfg.get("Config", "guestAccountsHost", cfg.get("Server", "hostname", ""))
+
+    # GuestAccounts
+    guestAccountsUsePool: cfg.get("GuestAccounts", "usePool", false),
+    guestAccountsPoolUrl: cfg.get("GuestAccounts", "poolUrl", ""),
+    guestAccountsPoolAuth: cfg.get("GuestAccounts", "poolAuth", ""),
+    guestAccountsPoolId: cfg.get("GuestAccounts", "poolId", cfg.get("Server", "hostname", ""))
   )
 
   return (conf, cfg)

@@ -25,11 +25,6 @@ const
   }.toTable
 
 var
-  pool: HttpPool
-  guestAccountsUrl = ""
-  guestAccountsHost = ""
-  guestAccountsKey = ""
-  guestAccountsUrlLastFetched = 0
   accountPool: seq[GuestAccount]
   enableLogging = false
 
@@ -164,27 +159,6 @@ proc release*(account: GuestAccount) =
   dec account.pending
 
 proc getGuestAccount*(api: Api): Future[GuestAccount] {.async.} =
-  let now = epochTime().int
-
-  if accountPool.len == 0 and guestAccountsUrl != "" and guestAccountsUrlLastFetched < now - 3600:
-    once:
-      pool = HttpPool()
-
-    guestAccountsUrlLastFetched = now
-
-    log "fetching more accounts from service"
-    pool.use(newHttpHeaders()):
-      let resp = await c.get("$1?host=$2&key=$3" % [guestAccountsUrl, guestAccountsHost, guestAccountsKey])
-      let guestAccounts = await resp.body
-
-      log "status code from service: ", resp.status
-
-      for line in guestAccounts.splitLines:
-        if line != "":
-          accountPool.add parseGuestAccount(line)
-
-      accountPool.keepItIf(not it.hasExpired)
-
   for i in 0 ..< accountPool.len:
     if result.isReady(api): break
     result = accountPool.sample()
@@ -214,9 +188,6 @@ proc setRateLimit*(account: GuestAccount; api: Api; remaining, reset: int) =
 
 proc initAccountPool*(cfg: Config; path: string) =
   enableLogging = cfg.enableDebug
-  guestAccountsUrl = cfg.guestAccountsUrl
-  guestAccountsHost = cfg.guestAccountsHost
-  guestAccountsKey = cfg.guestAccountsKey
 
   let jsonlPath = if path.endsWith(".json"): (path & 'l') else: path
 
@@ -227,20 +198,45 @@ proc initAccountPool*(cfg: Config; path: string) =
   elif fileExists(path):
     log "Parsing JSON guest accounts file: ", path
     accountPool = parseGuestAccounts(path)
-  elif guestAccountsUrl == "":
-    echo "[accounts] ERROR: ", path, " not found. This file is required to authenticate API requests."
+  elif not cfg.guestAccountsUsePool:
+    echo "[accounts] ERROR: ", path, " not found. This file is required to authenticate API requests. Alternatively, configure the guest account pool in nitter.conf"
     quit 1
 
-  let accountsPrePurge = accountPool.len
   accountPool.keepItIf(not it.hasExpired)
 
   log "Successfully added ", accountPool.len, " valid accounts."
 
+proc updateAccountPool*(cfg: Config) {.async.} =
+  if not cfg.guestAccountsUsePool:
+    return
+
+  while true:
+    if accountPool.len == 0:
+      let pool = HttpPool()
+
+      log "fetching more accounts from service"
+      pool.use(newHttpHeaders()):
+        let resp = await c.get("$1?host=$2&key=$3" % [cfg.guestAccountsPoolUrl, cfg.guestAccountsPoolId, cfg.guestAccountsPoolAuth])
+        let guestAccounts = await resp.body
+
+        log "status code from service: ", resp.status
+
+        for line in guestAccounts.splitLines:
+          if line != "":
+            accountPool.add parseGuestAccount(line)
+
+        accountPool.keepItIf(not it.hasExpired)
+
+    await sleepAsync(3600)
+
 proc getAuthHash*(cfg: Config): string =
-  if cfg.guestAccountsKey == "":
-    log "guestAccountsKey is set to bogus value, responding with empty string"
+  if cfg.guestAccountsPoolAuth == "":
+    # If somebody turns on pool auth and provides a dummy key, we should
+    # prevent third parties from using that mis-configured auth and impersonate
+    # this instance
+    log "poolAuth is set to bogus value, responding with empty string"
     return ""
 
-  let hashStr = $sha_256.digest(cfg.guestAccountsKey)
+  let hashStr = $sha_256.digest(cfg.guestAccountsPoolAuth)
 
   return hashStr.toLowerAscii
