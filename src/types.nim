@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import times, sequtils, options, tables
 import prefs_impl
+import std/uri
 
 genPrefsType()
 
@@ -263,7 +264,7 @@ type
     proxyAuth*: string
 
     guestAccountsUsePool*: bool
-    guestAccountsPoolUrl*: string
+    guestAccountsPoolUrl*: Uri
     guestAccountsPoolId*: string
     guestAccountsPoolAuth*: string
 

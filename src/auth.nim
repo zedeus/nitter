@@ -1,5 +1,5 @@
 #SPDX-License-Identifier: AGPL-3.0-only
-import std/[httpclient, asyncdispatch, times, json, random, sequtils, strutils, tables, packedsets, os]
+import std/[httpclient, asyncdispatch, times, json, random, sequtils, strutils, tables, packedsets, os, uri]
 import nimcrypto
 import types, http_pool
 import experimental/parser/guestaccount
@@ -222,7 +222,7 @@ proc updateAccountPool*(cfg: Config) {.async.} =
 
       try:
         pool.use(newHttpHeaders()):
-          let resp = await c.get("$1?id=$2&auth=$3" % [cfg.guestAccountsPoolUrl, cfg.guestAccountsPoolId, cfg.guestAccountsPoolAuth])
+          let resp = await c.get($(cfg.guestAccountsPoolUrl ? {"id": cfg.guestAccountsPoolId, "auth": cfg.guestAccountsPoolAuth}))
           let guestAccounts = await resp.body
 
           log "status code from service: ", resp.status
@@ -239,11 +239,11 @@ proc updateAccountPool*(cfg: Config) {.async.} =
     await sleepAsync(3600 * 1000)
 
 proc getAuthHash*(cfg: Config): string =
-  if cfg.guestAccountsPoolAuth == "":
+  if cfg.guestAccountsPoolAuth.len == 0:
     # If somebody turns on pool auth and provides a dummy key, we should
     # prevent third parties from using that mis-configured auth and impersonate
     # this instance
-    log "poolAuth is set to bogus value, responding with empty string"
+    log "poolAuth is empty, authentication with accounts service will fail"
     return ""
 
   let hashStr = $sha_256.digest(cfg.guestAccountsPoolAuth)

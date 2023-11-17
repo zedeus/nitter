@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import parsecfg except Config
 import types, strutils
+import std/uri
 
 proc get*[T](config: parseCfg.Config; section, key: string; default: T): T =
   let val = config.getSectionValue(section, key)
@@ -43,7 +44,7 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
 
     # GuestAccounts
     guestAccountsUsePool: cfg.get("GuestAccounts", "usePool", false),
-    guestAccountsPoolUrl: cfg.get("GuestAccounts", "poolUrl", ""),
+    guestAccountsPoolUrl: parseUri(cfg.get("GuestAccounts", "poolUrl", "")),
     guestAccountsPoolAuth: cfg.get("GuestAccounts", "poolAuth", ""),
     guestAccountsPoolId: cfg.get("GuestAccounts", "poolId", cfg.get("Server", "hostname", ""))
   )
