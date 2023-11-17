@@ -216,7 +216,7 @@ proc updateAccountPool*(cfg: Config) {.async.} =
 
       log "fetching more accounts from service"
       pool.use(newHttpHeaders()):
-        let resp = await c.get("$1?host=$2&key=$3" % [cfg.guestAccountsPoolUrl, cfg.guestAccountsPoolId, cfg.guestAccountsPoolAuth])
+        let resp = await c.get("$1?id=$2&auth=$3" % [cfg.guestAccountsPoolUrl, cfg.guestAccountsPoolId, cfg.guestAccountsPoolAuth])
         let guestAccounts = await resp.body
 
         log "status code from service: ", resp.status
