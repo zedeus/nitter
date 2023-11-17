@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import times, sequtils, options, tables
+import std/[times, sequtils, options, tables, uri]
 import prefs_impl
-import std/uri
 
 genPrefsType()
 
