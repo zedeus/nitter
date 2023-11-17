@@ -221,14 +221,14 @@ proc updateAccountPool*(cfg: Config) {.async.} =
       let client = newAsyncHttpClient()
 
       try:
-          let resp = await client.get($(cfg.guestAccountsPoolUrl ? {"id": cfg.guestAccountsPoolId, "auth": cfg.guestAccountsPoolAuth}))
-          let guestAccounts = await resp.body
+        let resp = await client.get($(cfg.guestAccountsPoolUrl ? {"id": cfg.guestAccountsPoolId, "auth": cfg.guestAccountsPoolAuth}))
+        let guestAccounts = await resp.body
 
-          log "status code from service: ", resp.status
+        log "status code from service: ", resp.status
 
-          for line in guestAccounts.splitLines:
-            if line != "":
-              accountPool.add parseGuestAccount(line)
+        for line in guestAccounts.splitLines:
+          if line != "":
+            accountPool.add parseGuestAccount(line)
 
       except Exception as e:
         log "failed to fetch from accounts service: ", e.msg
