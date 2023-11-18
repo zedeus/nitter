@@ -1,9 +1,9 @@
 // @license http://www.gnu.org/licenses/agpl-3.0.html AGPL-3.0
 // SPDX-License-Identifier: AGPL-3.0-only
 function playVideo() {
-        const video_overlay = document.getElementsByClassName("video-overlay");
+    const video_overlay = document.getElementsByClassName("video-overlay");
     
-        for (var i = 0 ; i < video_overlay.length; i++) {
+    for (var i = 0 ; i < video_overlay.length; i++) {
         video_overlay[i].addEventListener('click', function () {
 
             const video = this.parentElement.querySelector('video');
