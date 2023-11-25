@@ -68,6 +68,11 @@ proc toUser*(raw: RawUser): User =
 
   result.expandUserEntities(raw)
 
+proc parseHook*(s: string; i: var int; v: var User) =
+  var u: RawUser
+  parseHook(s, i, u)
+  v = toUser u
+
 proc parseUser*(json: string; username=""): User =
   handleErrors:
     case error.code
@@ -75,7 +80,7 @@ proc parseUser*(json: string; username=""): User =
     of userNotFound: return
     else: echo "[error - parseUser]: ", error
 
-  result = toUser json.fromJson(RawUser)
+  result = json.fromJson(User)
 
 proc parseUsers*(json: string; after=""): Result[User] =
   result = Result[User](beginning: after.len == 0)

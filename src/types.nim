@@ -162,6 +162,7 @@ type
     imageDirectMessage = "image_direct_message"
     audiospace = "audiospace"
     newsletterPublication = "newsletter_publication"
+    jobDetails = "job_details"
     hidden
     unknown
 

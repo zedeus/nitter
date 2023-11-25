@@ -1,5 +1,6 @@
 import std/[options, tables, strutils, strformat, sugar]
 import jsony
+import user
 import ../types/unifiedcard
 from ../../types import Card, CardKind, Video
 from ../../utils import twimg, https
@@ -26,6 +27,14 @@ proc parseMediaDetails(data: ComponentData; card: UnifiedCard; result: var Card)
   result.image = card.mediaEntities[data.mediaId].getImageUrl
   result.text = data.topicDetail.title
   result.dest = "Topic"
+
+proc parseJobDetails(data: ComponentData; card: UnifiedCard; result: var Card) =
+  data.destination.parseDestination(card, result)
+
+  result.kind = jobDetails
+  result.title = data.title
+  result.text = data.shortDescriptionText
+  result.dest = &"@{data.profileUser.username} · {data.location}"
 
 proc parseAppDetails(data: ComponentData; card: UnifiedCard; result: var Card) =
   let app = card.appStoreData[data.appId][0]
@@ -84,6 +93,8 @@ proc parseUnifiedCard*(json: string): Card =
       component.parseMedia(card, result)
     of buttonGroup:
       discard
+    of jobDetails:
+      component.data.parseJobDetails(card, result)
     of ComponentType.hidden:
       result.kind = CardKind.hidden
     of ComponentType.unknown:

@@ -246,7 +246,7 @@ proc expandUserEntities*(user: var User; js: JsonNode) =
                      .replacef(htRegex, htReplace)
 
 proc expandTextEntities(tweet: Tweet; entities: JsonNode; text: string; textSlice: Slice[int];
-                        replyTo=""; hasQuote=false) =
+                        replyTo=""; hasRedundantLink=false) =
   let hasCard = tweet.card.isSome
 
   var replacements = newSeq[ReplaceSlice]()
@@ -257,7 +257,7 @@ proc expandTextEntities(tweet: Tweet; entities: JsonNode; text: string; textSlic
       if urlStr.len == 0 or urlStr notin text:
         continue
 
-      replacements.extractUrls(u, textSlice.b, hideTwitter = hasQuote)
+      replacements.extractUrls(u, textSlice.b, hideTwitter = hasRedundantLink)
 
       if hasCard and u{"url"}.getStr == get(tweet.card).url:
         get(tweet.card).url = u{"expanded_url"}.getStr
@@ -297,9 +297,10 @@ proc expandTextEntities(tweet: Tweet; entities: JsonNode; text: string; textSlic
 proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
     entities = ? js{"entities"}
-    hasQuote = js{"is_quote_status"}.getBool
     textRange = js{"display_text_range"}
     textSlice = textRange{0}.getInt .. textRange{1}.getInt
+    hasQuote = js{"is_quote_status"}.getBool
+    hasJobCard = tweet.card.isSome and get(tweet.card).kind == jobDetails
 
   var replyTo = ""
   if tweet.replyId != 0:
@@ -307,7 +308,7 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
       replyTo = reply.getStr
       tweet.reply.add replyTo
 
-  tweet.expandTextEntities(entities, tweet.text, textSlice, replyTo, hasQuote)
+  tweet.expandTextEntities(entities, tweet.text, textSlice, replyTo, hasQuote or hasJobCard)
 
 proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
   let

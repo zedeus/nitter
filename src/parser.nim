@@ -219,8 +219,6 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
     )
   )
 
-  result.expandTweetEntities(js)
-
   # fix for pinned threads
   if result.hasThread and result.threadId == 0:
     result.threadId = js{"self_thread", "id_str"}.getId
@@ -253,6 +251,8 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
       result.video = some(parsePromoVideo(jsCard{"binding_values"}))
     else:
       result.card = some parseCard(jsCard, js{"entities", "urls"})
+
+  result.expandTweetEntities(js)
 
   with jsMedia, js{"extended_entities", "media"}:
     for m in jsMedia:

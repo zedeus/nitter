@@ -12,7 +12,7 @@ proc parseGraphUser*(json: string): User =
   if raw.data.userResult.result.unavailableReason.get("") == "Suspended":
     return User(suspended: true)
 
-  result = toUser raw.data.userResult.result.legacy
+  result = raw.data.userResult.result.legacy
   result.id = raw.data.userResult.result.restId
   result.verified = result.verified or raw.data.userResult.result.isBlueVerified
 
@@ -30,7 +30,7 @@ proc parseGraphListMembers*(json, cursor: string): Result[User] =
         of TimelineTimelineItem:
           let userResult = entry.content.itemContent.userResults.result
           if userResult.restId.len > 0:
-            result.content.add toUser userResult.legacy
+            result.content.add userResult.legacy
         of TimelineTimelineCursor:
           if entry.content.cursorType == "Bottom":
             result.bottom = entry.content.value
