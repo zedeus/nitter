@@ -24,7 +24,7 @@ proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
       text " " & text
 
 template verifiedIcon*(user: User): untyped {.dirty.} =
-  if user.verifiedType != none:
+  if user.verifiedType != VerifiedType.none:
     let lower = ($user.verifiedType).toLowerAscii()
     icon "ok", class=(&"verified-icon {lower}"), title=(&"Verified {lower} account")
   else:

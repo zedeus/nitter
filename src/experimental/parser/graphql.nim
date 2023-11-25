@@ -14,7 +14,7 @@ proc parseGraphUser*(json: string): User =
 
   result = raw.data.userResult.result.legacy
   result.id = raw.data.userResult.result.restId
-  if result.verifiedType == none and raw.data.userResult.result.isBlueVerified:
+  if result.verifiedType == VerifiedType.none and raw.data.userResult.result.isBlueVerified:
     result.verifiedType = blue
 
 proc parseGraphListMembers*(json, cursor: string): Result[User] =

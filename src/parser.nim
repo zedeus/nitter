@@ -34,7 +34,7 @@ proc parseGraphUser(js: JsonNode): User =
     user = ? js{"user_results", "result"}
   result = parseUser(user{"legacy"})
 
-  if result.verifiedType == none and user{"is_blue_verified"}.getBool(false):
+  if result.verifiedType == VerifiedType.none and user{"is_blue_verified"}.getBool(false):
     result.verifiedType = blue
 
 proc parseGraphList*(js: JsonNode): List =
