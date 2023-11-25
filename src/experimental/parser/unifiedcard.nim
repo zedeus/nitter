@@ -31,7 +31,7 @@ proc parseMediaDetails(data: ComponentData; card: UnifiedCard; result: var Card)
 proc parseJobDetails(data: ComponentData; card: UnifiedCard; result: var Card) =
   data.destination.parseDestination(card, result)
 
-  result.kind = jobDetails
+  result.kind = CardKind.jobDetails
   result.title = data.title
   result.text = data.shortDescriptionText
   result.dest = &"@{data.profileUser.username} · {data.location}"
@@ -93,7 +93,7 @@ proc parseUnifiedCard*(json: string): Card =
       component.parseMedia(card, result)
     of buttonGroup:
       discard
-    of jobDetails:
+    of ComponentType.jobDetails:
       component.data.parseJobDetails(card, result)
     of ComponentType.hidden:
       result.kind = CardKind.hidden
