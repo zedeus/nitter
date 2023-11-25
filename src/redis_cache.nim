@@ -52,6 +52,7 @@ proc initRedisPool*(cfg: Config) {.async.} =
     await migrate("profileDates", "p:*")
     await migrate("profileStats", "p:*")
     await migrate("userType", "p:*")
+    await migrate("verifiedType", "p:*")
 
     pool.withAcquire(r):
       # optimize memory usage for user ID buckets

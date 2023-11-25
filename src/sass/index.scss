@@ -39,6 +39,8 @@ body {
     --error_red: #{$error_red};
 
     --verified_blue: #{$verified_blue};
+    --verified_business: #{$verified_business};
+    --verified_government: #{$verified_government};
     --icon_text: #{$icon_text};
 
     --tab: #{$fg_color};
@@ -141,17 +143,30 @@ ul {
 
 .verified-icon {
     color: var(--icon_text);
-    background-color: var(--verified_blue);
     border-radius: 50%;
     flex-shrink: 0;
     margin: 2px 0 3px 3px;
-    padding-top: 2px;
-    height: 12px;
+    padding-top: 3px;
+    height: 11px;
     width: 14px;
     font-size: 8px;
     display: inline-block;
     text-align: center;
     vertical-align: middle;
+
+    &.blue {
+        background-color: var(--verified_blue);
+    }
+
+    &.business {
+        color: var(--bg_panel);
+        background-color: var(--verified_business);
+    }
+
+    &.government {
+        color: var(--bg_panel);
+        background-color: var(--verified_government);
+    }
 }
 
 @media(max-width: 600px) {

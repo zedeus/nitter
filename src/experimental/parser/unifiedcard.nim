@@ -1,7 +1,6 @@
 import std/[options, tables, strutils, strformat, sugar]
 import jsony
-import user
-import ../types/unifiedcard
+import user, ../types/unifiedcard
 from ../../types import Card, CardKind, Video
 from ../../utils import twimg, https
 

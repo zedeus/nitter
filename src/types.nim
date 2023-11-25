@@ -10,9 +10,7 @@ type
   BadClientError* = object of CatchableError
 
   TimelineKind* {.pure.} = enum
-    tweets
-    replies
-    media
+    tweets, replies, media
 
   Api* {.pure.} = enum
     tweetDetail
@@ -63,6 +61,12 @@ type
     tweetUnavailable = 421
     tweetCensored = 422
 
+  VerifiedType* = enum
+    none = "None"
+    blue = "Blue"
+    business = "Business"
+    government = "Government"
+
   User* = object
     id*: string
     username*: string
@@ -78,7 +82,7 @@ type
     tweets*: int
     likes*: int
     media*: int
-    verified*: bool
+    verifiedType*: VerifiedType
     protected*: bool
     suspended*: bool
     joinDate*: DateTime

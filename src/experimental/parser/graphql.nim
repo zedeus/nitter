@@ -1,7 +1,7 @@
 import options
 import jsony
 import user, ../types/[graphuser, graphlistmembers]
-from ../../types import User, Result, Query, QueryKind
+from ../../types import User, VerifiedType, Result, Query, QueryKind
 
 proc parseGraphUser*(json: string): User =
   if json.len == 0 or json[0] != '{':
@@ -14,7 +14,8 @@ proc parseGraphUser*(json: string): User =
 
   result = raw.data.userResult.result.legacy
   result.id = raw.data.userResult.result.restId
-  result.verified = result.verified or raw.data.userResult.result.isBlueVerified
+  if result.verifiedType == none and raw.data.userResult.result.isBlueVerified:
+    result.verifiedType = blue
 
 proc parseGraphListMembers*(json, cursor: string): Result[User] =
   result = Result[User](

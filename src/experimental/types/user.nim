@@ -1,5 +1,6 @@
 import options
 import common
+from ../../types import VerifiedType
 
 type
   RawUser* = object
@@ -15,8 +16,7 @@ type
     favouritesCount*: int
     statusesCount*: int
     mediaCount*: int
-    verified*: bool
-    extIsBlueVerified*: bool
+    verifiedType*: VerifiedType
     protected*: bool
     profileLinkColor*: string
     profileBannerUrl*: string
