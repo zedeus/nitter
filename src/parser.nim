@@ -32,7 +32,7 @@ proc parseGraphUser(js: JsonNode): User =
   var user = js{"user_result", "result"}
   if user.isNull:
     user = ? js{"user_results", "result"}
-  result = parseUser(user{"legacy"})
+  result = parseUser(user{"legacy"}, user{"rest_id"}.getStr)
 
   if result.verifiedType == VerifiedType.none and user{"is_blue_verified"}.getBool(false):
     result.verifiedType = blue
