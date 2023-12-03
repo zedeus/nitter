@@ -110,7 +110,7 @@ proc createRssRouter*(cfg: Config) =
           case tab
           of "with_replies": getReplyQuery(name)
           of "media": getMediaQuery(name)
-          # of "search": initQuery(params(request), name=name)
+          of "search": initQuery(params(request), name=name)
           else: Query(fromUser: @[name])
 
       let searchKey = if tab != "search": ""
