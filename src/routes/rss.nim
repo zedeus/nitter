@@ -15,7 +15,7 @@ proc redisKey*(page, name, cursor: string): string =
   if cursor.len > 0:
     result &= ":" & cursor
 
-proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.} =
+proc timelineRss*(req: Request; cfg: Config; query: Query; tab, param: string): Future[Rss] {.async.} =
   var profile: Profile
   let
     name = req.params.getOrDefault("name")
@@ -39,7 +39,7 @@ proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.
     return Rss(feed: profile.user.username, cursor: "suspended")
 
   if profile.user.fullname.len > 0:
-    let rss = renderTimelineRss(profile, cfg, multi=(names.len > 1))
+    let rss = renderTimelineRss(profile, cfg, tab, param, multi=(names.len > 1))
     return Rss(feed: rss, cursor: profile.tweets.bottom)
 
 template respRss*(rss, page) =
@@ -94,7 +94,7 @@ proc createRssRouter*(cfg: Config) =
       if rss.cursor.len > 0:
         respRss(rss, "User")
 
-      rss = await timelineRss(request, cfg, Query(fromUser: @[name]))
+      rss = await timelineRss(request, cfg, Query(fromUser: @[name]), "", "")
 
       await cacheRss(key, rss)
       respRss(rss, "User")
@@ -113,8 +113,10 @@ proc createRssRouter*(cfg: Config) =
           of "search": initQuery(params(request), name=name)
           else: Query(fromUser: @[name])
 
+      let param = if tab != "search": ""
+                  else: genQueryUrl(query)
       let searchKey = if tab != "search": ""
-                      else: ":" & $hash(genQueryUrl(query))
+                      else: ":" & $hash(param)
 
       let key = redisKey(tab, name & searchKey, getCursor())
 
@@ -122,7 +124,7 @@ proc createRssRouter*(cfg: Config) =
       if rss.cursor.len > 0:
         respRss(rss, "User")
 
-      rss = await timelineRss(request, cfg, query)
+      rss = await timelineRss(request, cfg, query, tab, param)
 
       await cacheRss(key, rss)
       respRss(rss, "User")
