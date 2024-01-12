@@ -35,6 +35,7 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
 
     # Config
     hmacKey: cfg.get("Config", "hmacKey", "secretkey"),
+    nonceString: cfg.get("Config", "nonceString", "secretstring"),
     base64Media: cfg.get("Config", "base64Media", false),
     minTokens: cfg.get("Config", "tokenCount", 10),
     enableRss: cfg.get("Config", "enableRSS", true),

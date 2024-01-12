@@ -109,7 +109,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
               source(src=source, `type`="video/mp4")
           of m3u8, vmap:
             video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
-            verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
+            verbatim "<div class=\"video-overlay\">"
             tdiv(class="overlay-circle"): span(class="overlay-triangle")
             verbatim "</div>"
       if container.len > 0:
