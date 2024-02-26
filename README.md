@@ -1,4 +1,4 @@
-# Nitter
+# [Nitter is dead](https://github.com/zedeus/nitter/issues/1155#issuecomment-1913361757)
 
 [![Test Matrix](https://github.com/zedeus/nitter/workflows/Tests/badge.svg)](https://github.com/zedeus/nitter/actions/workflows/run-tests.yml)
 [![Test Matrix](https://github.com/zedeus/nitter/workflows/Docker/badge.svg)](https://github.com/zedeus/nitter/actions/workflows/build-docker.yml)
