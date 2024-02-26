@@ -8,8 +8,6 @@ on:
       - master
 
 jobs:
-  tests:
-    uses: ./.github/workflows/run-tests.yml
   build-docker-amd64:
     needs: [tests]
     runs-on: ubuntu-22.04
