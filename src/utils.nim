@@ -16,7 +16,8 @@ const
     "twimg.com",
     "abs.twimg.com",
     "pbs.twimg.com",
-    "video.twimg.com"
+    "video.twimg.com",
+    "x.com"
   ]
 
 proc setHmacKey*(key: string) =
@@ -57,4 +58,4 @@ proc isTwitterUrl*(uri: Uri): bool =
   uri.hostname in twitterDomains
 
 proc isTwitterUrl*(url: string): bool =
-  parseUri(url).hostname in twitterDomains
+  isTwitterUrl(parseUri(url))

@@ -1,5 +1,5 @@
 import std/tables
-import user
+from ../../types import User
 
 type
   Search* = object
@@ -7,7 +7,7 @@ type
     timeline*: Timeline
 
   GlobalObjects = object
-    users*: Table[string, RawUser]
+    users*: Table[string, User]
 
   Timeline = object
     instructions*: seq[Instructions]

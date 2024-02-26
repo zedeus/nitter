@@ -52,7 +52,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   let opensearchUrl = getUrlPrefix(cfg) & "/opensearch"
 
   buildHtml(head):
-    link(rel="stylesheet", type="text/css", href="/css/style.css?v=18")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=19")
     link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=2")
 
     if theme.len > 0:
@@ -73,7 +73,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
       link(rel="alternate", type="application/rss+xml", href=rss, title="RSS feed")
 
     if prefs.hlsPlayback:
-      script(src="/js/hls.light.min.js", `defer`="")
+      script(src="/js/hls.min.js", `defer`="")
       script(src="/js/hlsPlayback.js", `defer`="")
 
     if prefs.infiniteScroll:

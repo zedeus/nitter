@@ -14,7 +14,7 @@ poll = [
 
 image = [
     ['mobile_test/status/519364660823207936', 'BzUnaDFCUAAmrjs'],
-    ['mobile_test_2/status/324619691039543297', 'BIFH45vCUAAQecj']
+    #['mobile_test_2/status/324619691039543297', 'BIFH45vCUAAQecj']
 ]
 
 gif = [

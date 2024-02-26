@@ -1,8 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import std/[strutils, times, macros, htmlgen, options, algorithm, re]
+import std/[times, macros, htmlgen, options, algorithm, re]
+import std/strutils except escape
 import std/unicode except strip
+from xmltree import escape
 import packedjson
 import types, utils, formatters
+
+const
+  unicodeOpen = "\uFFFA"
+  unicodeClose = "\uFFFB"
+  xmlOpen = escape("<")
+  xmlClose = escape(">")
 
 let
   unRegex = re"(^|[^A-z0-9-_./?])@([A-z0-9_]{1,15})"
@@ -36,7 +44,8 @@ template with*(ident, value, body): untyped =
 template with*(ident; value: JsonNode; body): untyped =
   if true:
     let ident {.inject.} = value
-    if value.notNull: body
+    # value.notNull causes a compilation error for versions < 1.6.14
+    if notNull(value): body
 
 template getCursor*(js: JsonNode): string =
   js{"content", "operation", "cursor", "value"}.getStr
@@ -237,7 +246,7 @@ proc expandUserEntities*(user: var User; js: JsonNode) =
                      .replacef(htRegex, htReplace)
 
 proc expandTextEntities(tweet: Tweet; entities: JsonNode; text: string; textSlice: Slice[int];
-                        replyTo=""; hasQuote=false) =
+                        replyTo=""; hasRedundantLink=false) =
   let hasCard = tweet.card.isSome
 
   var replacements = newSeq[ReplaceSlice]()
@@ -248,7 +257,7 @@ proc expandTextEntities(tweet: Tweet; entities: JsonNode; text: string; textSlic
       if urlStr.len == 0 or urlStr notin text:
         continue
 
-      replacements.extractUrls(u, textSlice.b, hideTwitter = hasQuote)
+      replacements.extractUrls(u, textSlice.b, hideTwitter = hasRedundantLink)
 
       if hasCard and u{"url"}.getStr == get(tweet.card).url:
         get(tweet.card).url = u{"expanded_url"}.getStr
@@ -288,9 +297,10 @@ proc expandTextEntities(tweet: Tweet; entities: JsonNode; text: string; textSlic
 proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
     entities = ? js{"entities"}
-    hasQuote = js{"is_quote_status"}.getBool
     textRange = js{"display_text_range"}
     textSlice = textRange{0}.getInt .. textRange{1}.getInt
+    hasQuote = js{"is_quote_status"}.getBool
+    hasJobCard = tweet.card.isSome and get(tweet.card).kind == jobDetails
 
   var replyTo = ""
   if tweet.replyId != 0:
@@ -298,12 +308,14 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
       replyTo = reply.getStr
       tweet.reply.add replyTo
 
-  tweet.expandTextEntities(entities, tweet.text, textSlice, replyTo, hasQuote)
+  tweet.expandTextEntities(entities, tweet.text, textSlice, replyTo, hasQuote or hasJobCard)
 
 proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
     entities = ? js{"entity_set"}
-    text = js{"text"}.getStr
+    text = js{"text"}.getStr.multiReplace(("<", unicodeOpen), (">", unicodeClose))
     textSlice = 0..text.runeLen
 
   tweet.expandTextEntities(entities, text, textSlice)
+
+  tweet.text = tweet.text.multiReplace((unicodeOpen, xmlOpen), (unicodeClose, xmlClose))

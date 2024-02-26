@@ -33,23 +33,6 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
     js = await fetch(url ? params, apiId)
   result = parseGraphTimeline(js, "user", after)
 
-# proc getTimeline*(id: string; after=""; replies=false): Future[Profile] {.async.} =
-#   if id.len == 0: return
-#   let
-#     ps = genParams({"userId": id, "include_tweet_replies": $replies}, after)
-#     url = oldUserTweets / (id & ".json") ? ps
-#   result = parseTimeline(await fetch(url, Api.timeline), after)
-
-proc getUserTimeline*(id: string; after=""): Future[Profile] {.async.} =
-  var ps = genParams({"id": id})
-  if after.len > 0:
-    ps.add ("down_cursor", after)
-
-  let
-    url = legacyUserTweets ? ps
-    js = await fetch(url, Api.userTimeline)
-  result = parseUserTimeline(js, after)
-
 proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
@@ -112,10 +95,10 @@ proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
   if after.len > 0:
     result.replies = await getReplies(id, after)
 
-proc getGraphSearch*(query: Query; after=""): Future[Profile] {.async.} =
+proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
   let q = genQueryParam(query)
   if q.len == 0 or q == emptyQuery:
-    return Profile(tweets: Timeline(query: query, beginning: true))
+    return Timeline(query: query, beginning: true)
 
   var
     variables = %*{
@@ -129,44 +112,29 @@ proc getGraphSearch*(query: Query; after=""): Future[Profile] {.async.} =
   if after.len > 0:
     variables["cursor"] = % after
   let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
-  result = Profile(tweets: parseGraphSearch(await fetch(url, Api.search), after))
-  result.tweets.query = query
-
-proc getTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
-  var q = genQueryParam(query)
-
-  if q.len == 0 or q == emptyQuery:
-    return Timeline(query: query, beginning: true)
-
-  if after.len > 0:
-    q &= " max_id:" & after
-
-  let url = tweetSearch ? genParams({
-    "q": q ,
-    "modules": "status",
-    "result_type": "recent",
-  })
-
-  result = parseTweetSearch(await fetch(url, Api.search), after)
+  result = parseGraphSearch[Tweets](await fetch(url, Api.search), after)
   result.query = query
 
-proc getUserSearch*(query: Query; page="1"): Future[Result[User]] {.async.} =
+proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.} =
   if query.text.len == 0:
     return Result[User](query: query, beginning: true)
 
-  var url = userSearch ? {
-    "q": query.text,
-    "skip_status": "1",
-    "count": "20",
-    "page": page
-  }
+  var
+    variables = %*{
+      "rawQuery": query.text,
+      "count": 20,
+      "product": "People",
+      "withDownvotePerspective": false,
+      "withReactionsMetadata": false,
+      "withReactionsPerspective": false
+    }
+  if after.len > 0:
+    variables["cursor"] = % after
+    result.beginning = false
 
-  result = parseUsers(await fetchRaw(url, Api.userSearch))
+  let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
+  result = parseGraphSearch[User](await fetch(url, Api.search), after)
   result.query = query
-  if page.len == 0:
-    result.bottom = "2"
-  elif page.allCharsInSet(Digits):
-    result.bottom = $(parseInt(page) + 1)
 
 proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
   if name.len == 0: return

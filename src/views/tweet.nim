@@ -200,8 +200,7 @@ proc renderAttribution(user: User; prefs: Prefs): VNode =
   buildHtml(a(class="attribution", href=("/" & user.username))):
     renderMiniAvatar(user, prefs)
     strong: text user.fullname
-    if user.verified:
-      icon "ok", class="verified-icon", title="Verified account"
+    verifiedIcon(user)
 
 proc renderMediaTags(tags: seq[User]): VNode =
   buildHtml(tdiv(class="media-tag-block")):

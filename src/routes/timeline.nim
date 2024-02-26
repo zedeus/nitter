@@ -53,10 +53,10 @@ proc fetchProfile*(after: string; query: Query; skipRail=false;
 
   result =
     case query.kind
-    of posts: await getUserTimeline(userId, after)
+    of posts: await getGraphUserTweets(userId, TimelineKind.tweets, after)
     of replies: await getGraphUserTweets(userId, TimelineKind.replies, after)
     of media: await getGraphUserTweets(userId, TimelineKind.media, after)
-    else: Profile(tweets: await getTweetSearch(query, after))
+    else: Profile(tweets: await getGraphTweetSearch(query, after))
 
   result.user = await user
   result.photoRail = await rail
@@ -67,7 +67,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
                    rss, after: string): Future[string] {.async.} =
   if query.fromUser.len != 1:
     let
-      timeline = await getTweetSearch(query, after)
+      timeline = await getGraphTweetSearch(query, after)
       html = renderTweetSearch(timeline, prefs, getPath())
     return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
@@ -122,7 +122,7 @@ proc createTimelineRouter*(cfg: Config) =
       # used for the infinite scroll feature
       if @"scroll".len > 0:
         if query.fromUser.len != 1:
-          var timeline = await getTweetSearch(query, after)
+          var timeline = await getGraphTweetSearch(query, after)
           if timeline.content.len == 0: resp Http404
           timeline.beginning = true
           resp $renderTweetSearch(timeline, prefs, getPath())

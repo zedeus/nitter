@@ -6,7 +6,7 @@ from os import getEnv
 
 import jester
 
-import types, config, prefs, formatters, redis_cache, http_pool, tokens
+import types, config, prefs, formatters, redis_cache, http_pool, auth
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, debug,
@@ -15,8 +15,13 @@ import routes/[
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 const issuesUrl = "https://github.com/zedeus/nitter/issues"
 
-let configPath = getEnv("NITTER_CONF_FILE", "./nitter.conf")
-let (cfg, fullCfg) = getConfig(configPath)
+let
+  configPath = getEnv("NITTER_CONF_FILE", "./nitter.conf")
+  (cfg, fullCfg) = getConfig(configPath)
+
+  accountsPath = getEnv("NITTER_ACCOUNTS_FILE", "./guest_accounts.json")
+
+initAccountPool(cfg, accountsPath)
 
 if not cfg.enableDebug:
   # Silence Jester's query warning
@@ -37,8 +42,6 @@ initAboutPage(cfg.staticDir)
 waitFor initRedisPool(cfg)
 stdout.write &"Connected to Redis at {cfg.redisHost}:{cfg.redisPort}\n"
 stdout.flushFile
-
-asyncCheck initTokenPool(cfg)
 
 createUnsupportedRouter(cfg)
 createResolverRouter(cfg)

@@ -115,7 +115,7 @@
     }
 
     .profile-card-tabs-name {
-        @include breakable;
+        flex-shrink: 100;
     }
 
     .profile-card-avatar {

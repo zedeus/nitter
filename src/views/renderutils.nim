@@ -23,6 +23,13 @@ proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
     if text.len > 0:
       text " " & text
 
+template verifiedIcon*(user: User): untyped {.dirty.} =
+  if user.verifiedType != VerifiedType.none:
+    let lower = ($user.verifiedType).toLowerAscii()
+    icon "ok", class=(&"verified-icon {lower}"), title=(&"Verified {lower} account")
+  else:
+    text ""
+
 proc linkUser*(user: User, class=""): VNode =
   let
     isName = "username" notin class
@@ -32,11 +39,11 @@ proc linkUser*(user: User, class=""): VNode =
 
   buildHtml(a(href=href, class=class, title=nameText)):
     text nameText
-    if isName and user.verified:
-      icon "ok", class="verified-icon", title="Verified account"
-    if isName and user.protected:
-      text " "
-      icon "lock", title="Protected account"
+    if isName:
+      verifiedIcon(user)
+      if user.protected:
+        text " "
+        icon "lock", title="Protected account"
 
 proc linkText*(text: string; class=""): VNode =
   let url = if "http" notin text: https & text else: text

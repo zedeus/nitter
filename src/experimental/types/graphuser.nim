@@ -1,5 +1,5 @@
 import options
-import user
+from ../../types import User
 
 type
   GraphUser* = object
@@ -9,7 +9,7 @@ type
     result*: UserResult
 
   UserResult = object
-    legacy*: RawUser
+    legacy*: User
     restId*: string
     isBlueVerified*: bool
     unavailableReason*: Option[string]

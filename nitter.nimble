@@ -14,7 +14,7 @@ requires "nim >= 1.6.10"
 requires "jester#baca3f"
 requires "karax#5cf360c"
 requires "sass#7dfdd03"
-requires "nimcrypto#4014ef9"
+requires "nimcrypto#a079df9"
 requires "markdown#158efe3"
 requires "packedjson#9e6fbb6"
 requires "supersnappy#6c94198"
@@ -22,8 +22,8 @@ requires "redpool#8b7c1db"
 requires "https://github.com/zedeus/redis#d0a0e6f"
 requires "zippy#ca5989a"
 requires "flatty#e668085"
-requires "jsony#ea811be"
-
+requires "jsony#1de1f08"
+requires "oauth#b8c163b"
 
 # Tasks
 

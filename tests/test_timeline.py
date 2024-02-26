@@ -6,7 +6,7 @@ normal = [['jack'], ['elonmusk']]
 after = [['jack', '1681686036294803456'],
          ['elonmusk', '1681686036294803456']]
 
-no_more = [['mobile_test_8?cursor=1000']]
+no_more = [['mobile_test_8?cursor=DAABCgABF4YVAqN___kKAAICNn_4msIQAAgAAwAAAAIAAA']]
 
 empty = [['emptyuser'], ['mobile_test_10']]
 
