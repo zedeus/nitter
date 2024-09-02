@@ -4,16 +4,16 @@
 [![Test Matrix](https://github.com/zedeus/nitter/workflows/Docker/badge.svg)](https://github.com/zedeus/nitter/actions/workflows/build-docker.yml)
 [![License](https://img.shields.io/github/license/zedeus/nitter?style=flat)](#license)
 
-A free and open source alternative Twitter front-end focused on privacy and
+A free and open source alternative X (Twitter) front-end focused on privacy and
 performance. \
 Inspired by the [Invidious](https://github.com/iv-org/invidious)
 project.
 
 - No JavaScript or ads
-- All requests go through the backend, client never talks to Twitter
-- Prevents Twitter from tracking your IP or JavaScript fingerprint
-- Uses Twitter's unofficial API (no rate limits or developer account required)
-- Lightweight (for [@nim_lang](https://nitter.net/nim_lang), 60KB vs 784KB from twitter.com)
+- All requests go through the backend, client never talks to X (Twitter)
+- Prevents X (Twitter) from tracking your IP or JavaScript fingerprint
+- Uses X (Twitter's) unofficial API (no rate limits or developer account required)
+- Lightweight (for [@nim_lang](https://nitter.net/nim_lang), 60KB vs 784KB from x.com)
 - RSS feeds
 - Themes
 - Mobile support (responsive design)
@@ -42,24 +42,24 @@ maintained by the community.
 
 ## Why?
 
-It's impossible to use Twitter without JavaScript enabled. For privacy-minded
+It's impossible to use X (Twitter) without JavaScript enabled. For privacy-minded
 folks, preventing JavaScript analytics and IP-based tracking is important, but
 apart from using a VPN and uBlock/uMatrix, it's impossible. Despite being behind
 a VPN and using heavy-duty adblockers, you can get accurately tracked with your
 [browser's fingerprint](https://restoreprivacy.com/browser-fingerprinting/),
 [no JavaScript required](https://noscriptfingerprint.com/). This all became
-particularly important after Twitter [removed the
+particularly important after X (Twitter) [removed the
 ability](https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws)
 for users to control whether their data gets sent to advertisers.
 
 Using an instance of Nitter (hosted on a VPS for example), you can browse
 Twitter without JavaScript while retaining your privacy. In addition to
 respecting your privacy, Nitter is on average around 15 times lighter than
-Twitter, and in most cases serves pages faster (eg. timelines load 2-4x faster).
+X (Twitter), and in most cases serves pages faster (eg. timelines load 2-4x faster).
 
-In the future a simple account system will be added that lets you follow Twitter
+In the future a simple account system will be added that lets you follow X (Twitter)
 users, allowing you to have a clean chronological timeline without needing a
-Twitter account.
+X (Twitter) account.
 
 ## Screenshot
 
@@ -149,7 +149,7 @@ To run Nitter via systemd you can use this service file:
 
 ```ini
 [Unit]
-Description=Nitter (An alternative Twitter front-end)
+Description=Nitter (An alternative X (Twitter) front-end)
 After=syslog.target
 After=network.target
 
