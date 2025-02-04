@@ -136,13 +136,13 @@ proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.}
   result = parseGraphSearch[User](await fetch(url, Api.search), after)
   result.query = query
 
-proc getPhotoRail*(name: string): Future[PhotoRail] {.async.} =
-  if name.len == 0: return
+proc getPhotoRail*(id: string): Future[PhotoRail] {.async.} =
+  if id.len == 0: return
   let
-    ps = genParams({"screen_name": name, "trim_user": "true"},
-                    count="18", ext=false)
-    url = photoRail ? ps
-  result = parsePhotoRail(await fetch(url, Api.photoRail))
+    variables = userTweetsVariables % [id, ""]
+    params = {"variables": variables, "features": gqlFeatures}
+    url = graphUserMedia ? params
+  result = parseGraphPhotoRail(await fetch(url, Api.userMedia))
 
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
   let client = newAsyncHttpClient(maxRedirects=0)

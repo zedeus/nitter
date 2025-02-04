@@ -15,7 +15,6 @@ type
   Api* {.pure.} = enum
     tweetDetail
     tweetResult
-    photoRail
     search
     list
     listBySlug

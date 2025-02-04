@@ -10,7 +10,6 @@ const
   apiMaxReqs: Table[Api, int] = {
     Api.search: 50,
     Api.tweetDetail: 150,
-    Api.photoRail: 180,
     Api.userTweets: 500,
     Api.userTweetsAndReplies: 500,
     Api.userMedia: 500,

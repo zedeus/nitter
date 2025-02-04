@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import uri, sequtils, strutils
+import uri, strutils
 
 const
   consumerKey* = "3nVuSoBZnx6U4vzUxf5w"
@@ -7,8 +7,6 @@ const
 
   api = parseUri("https://api.twitter.com")
   activate* = $(api / "1.1/guest/activate.json")
-
-  photoRail* = api / "1.1/statuses/media_timeline.json"
 
   graphql = api / "graphql"
   graphUser* = graphql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
@@ -23,22 +21,6 @@ const
   graphListBySlug* = graphql / "-kmqNvm5Y-cVrfvBy6docg/ListBySlug"
   graphListMembers* = graphql / "P4NpVZDqUD_7MEM84L-8nw/ListMembers"
   graphListTweets* = graphql / "BbGLL1ZfMibdFNWlk7a0Pw/ListTimeline"
-
-  timelineParams* = {
-    "include_can_media_tag": "1",
-    "include_cards": "1",
-    "include_entities": "1",
-    "include_profile_interstitial_type": "0",
-    "include_quote_count": "0",
-    "include_reply_count": "0",
-    "include_user_entities": "0",
-    "include_ext_reply_count": "0",
-    "include_ext_media_color": "0",
-    "cards_platform": "Web-13",
-    "tweet_mode": "extended",
-    "send_error_codes": "1",
-    "simple_quoted_tweet": "1"
-  }.toSeq
 
   gqlFeatures* = """{
   "android_graphql_skip_api_media_color_palette": false,

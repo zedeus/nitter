@@ -289,23 +289,6 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
       result.text.removeSuffix(" Learn more.")
       result.available = false
 
-proc parsePhotoRail*(js: JsonNode): PhotoRail =
-  with error, js{"error"}:
-    if error.getStr == "Not authorized.":
-      return
-
-  for tweet in js:
-    let
-      t = parseTweet(tweet, js{"tweet_card"})
-      url = if t.photos.len > 0: t.photos[0]
-            elif t.video.isSome: get(t.video).thumb
-            elif t.gif.isSome: get(t.gif).thumb
-            elif t.card.isSome: get(t.card).image
-            else: ""
-
-    if url.len == 0: continue
-    result.add GalleryPhoto(url: url, tweetId: $t.id)
-
 proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet =
   if js.kind == JNull:
     return Tweet()
@@ -444,6 +427,34 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
           if entryId.len > 0:
             tweet.id = parseBiggestInt(entryId)
         result.pinned = some tweet
+
+proc parseGraphPhotoRail*(js: JsonNode): PhotoRail =
+  result = @[]
+
+  let instructions =
+    ? js{"data", "user_result", "result", "timeline_response", "timeline", "instructions"}
+
+  for i in instructions:
+    if i{"__typename"}.getStr == "TimelineAddEntries":
+      for e in i{"entries"}:
+        let entryId = e{"entryId"}.getStr
+        if entryId.startsWith("tweet"):
+          with tweetResult, e{"content", "content", "tweetResult", "result"}:
+            let t = parseGraphTweet(tweetResult, false)
+            if not t.available:
+              t.id = parseBiggestInt(entryId.getId())
+
+            let url = 
+              if t.photos.len > 0: t.photos[0]
+              elif t.video.isSome: get(t.video).thumb
+              elif t.gif.isSome: get(t.gif).thumb
+              elif t.card.isSome: get(t.card).image
+              else: ""
+
+            result.add GalleryPhoto(url: url, tweetId: $t.id)
+
+            if result.len == 16:
+              break
 
 proc parseGraphSearch*[T: User | Tweets](js: JsonNode; after=""): Result[T] =
   result = Result[T](beginning: after.len == 0)
