@@ -30,14 +30,14 @@ type
   RateLimit* = object
     remaining*: int
     reset*: int
-    limited*: bool
-    limitedAt*: int
 
   GuestAccount* = ref object
     id*: int64
     oauthToken*: string
     oauthSecret*: string
     pending*: int
+    limited*: bool
+    limitedAt*: int
     apis*: Table[Api, RateLimit]
 
   Error* = enum

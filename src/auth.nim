@@ -32,13 +32,6 @@ template log(str: varargs[string, `$`]) =
 proc snowflakeToEpoch(flake: int64): int64 =
   int64(((flake shr 22) + 1288834974657) div 1000)
 
-proc hasExpired(account: GuestAccount): bool =
-  let
-    created = snowflakeToEpoch(account.id)
-    now = epochTime().int64
-    daysOld = int(now - created) div dayInSeconds
-  return daysOld > 30
-
 proc getAccountPoolHealth*(): JsonNode =
   let now = epochTime().int
 
@@ -58,13 +51,13 @@ proc getAccountPoolHealth*(): JsonNode =
       oldest = created
     average += created
 
+    if account.limited:
+      limited.incl account.id
+
     for api in account.apis.keys:
       let
         apiStatus = account.apis[api]
         reqs = apiMaxReqs[api] - apiStatus.remaining
-
-      if apiStatus.limited:
-        limited.incl account.id
 
       # no requests made with this account and endpoint since the limit reset
       if apiStatus.reset < now:
@@ -103,6 +96,9 @@ proc getAccountPoolDebug*(): JsonNode =
       "pending": account.pending,
     }
 
+    if account.limited:
+      accountJson["limited"] = %true
+
     for api in account.apis.keys:
       let
         apiStatus = account.apis[api]
@@ -110,12 +106,10 @@ proc getAccountPoolDebug*(): JsonNode =
 
       if apiStatus.reset > now.int:
         obj["remaining"] = %apiStatus.remaining
+        obj["reset"] = %apiStatus.reset
 
-      if "remaining" notin obj and not apiStatus.limited:
+      if "remaining" notin obj:
         continue
-
-      if apiStatus.limited:
-        obj["limited"] = %true
 
       accountJson{"apis", $api} = obj
       list[$account.id] = accountJson
@@ -132,14 +126,16 @@ proc isLimited(account: GuestAccount; api: Api): bool =
   if account.isNil:
     return true
 
+  if account.limited and api != Api.userTweets:
+    if (epochTime().int - account.limitedAt) > dayInSeconds:
+      account.limited = false
+      log "resetting limit: ", account.id
+    else:
+      return false
+
   if api in account.apis:
     let limit = account.apis[api]
-
-    if limit.limited and (epochTime().int - limit.limitedAt) > dayInSeconds:
-      account.apis[api].limited = false
-      log "resetting limit, api: ", api, ", id: ", account.id
-
-    return limit.limited or (limit.remaining <= 10 and limit.reset > epochTime().int)
+    return limit.remaining <= 10 and limit.reset > epochTime().int
   else:
     return false
 
@@ -148,7 +144,7 @@ proc isReady(account: GuestAccount; api: Api): bool =
 
 proc invalidate*(account: var GuestAccount) =
   if account.isNil: return
-  log "invalidating expired account: ", account.id
+  log "invalidating: ", account.id
 
   # TODO: This isn't sufficient, but it works for now
   let idx = accountPool.find(account)
@@ -171,9 +167,9 @@ proc getGuestAccount*(api: Api): Future[GuestAccount] {.async.} =
     raise noAccountsError()
 
 proc setLimited*(account: GuestAccount; api: Api) =
-  account.apis[api].limited = true
-  account.apis[api].limitedAt = epochTime().int
-  log "rate limited, api: ", api, ", reqs left: ", account.apis[api].remaining, ", id: ", account.id
+  account.limited = true
+  account.limitedAt = epochTime().int
+  log "rate limited by api: ", api, ", reqs left: ", account.apis[api].remaining, ", id: ", account.id
 
 proc setRateLimit*(account: GuestAccount; api: Api; remaining, reset: int) =
   # avoid undefined behavior in race conditions
@@ -203,9 +199,4 @@ proc initAccountPool*(cfg: Config; path: string) =
     echo "[accounts] ERROR: ", path, " not found. This file is required to authenticate API requests."
     quit 1
 
-  let accountsPrePurge = accountPool.len
-  #accountPool.keepItIf(not it.hasExpired)
-
   log "Successfully added ", accountPool.len, " valid accounts."
-  if accountsPrePurge > accountPool.len:
-    log "Purged ", accountsPrePurge - accountPool.len, " expired accounts."
