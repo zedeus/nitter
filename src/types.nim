@@ -57,6 +57,7 @@ type
     tweetNotAuthorized = 179
     forbidden = 200
     badToken = 239
+    locked = 326
     noCsrf = 353
     tweetUnavailable = 421
     tweetCensored = 422

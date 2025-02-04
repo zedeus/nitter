@@ -76,8 +76,8 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
       if result.startsWith("{\"errors"):
         let errors = result.fromJson(Errors)
-        if errors in {expiredToken, badToken}:
-          echo "fetch error: ", errors
+        echo "Fetch error, API: ", api, ", errors: ", errors
+        if errors in {expiredToken, badToken, locked}:
           invalidate(account)
           raise rateLimitError()
         elif errors in {rateLimited}:
@@ -93,6 +93,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     fetchBody
 
     if resp.status == $Http400:
+      echo "ERROR 400, ", api, ": ", result
       raise newException(InternalError, $url)
   except InternalError as e:
     raise e
@@ -125,8 +126,8 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
         result = newJNull()
 
       let error = result.getError
-      if error in {expiredToken, badToken}:
-        echo "fetchBody error: ", error
+      echo "Fetch error, API: ", api, ", error: ", error
+      if error in {expiredToken, badToken, locked}:
         invalidate(account)
         raise rateLimitError()
 
