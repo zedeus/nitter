@@ -6,6 +6,7 @@ genPrefsType()
 
 type
   RateLimitError* = object of CatchableError
+  NoAccountsError* = object of CatchableError
   InternalError* = object of CatchableError
   BadClientError* = object of CatchableError
 

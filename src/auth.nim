@@ -125,6 +125,9 @@ proc getAccountPoolDebug*(): JsonNode =
 proc rateLimitError*(): ref RateLimitError =
   newException(RateLimitError, "rate limited")
 
+proc noAccountsError*(): ref NoAccountsError =
+  newException(NoAccountsError, "no accounts available")
+
 proc isLimited(account: GuestAccount; api: Api): bool =
   if account.isNil:
     return true
@@ -165,7 +168,7 @@ proc getGuestAccount*(api: Api): Future[GuestAccount] {.async.} =
     inc result.pending
   else:
     log "no accounts available for API: ", api
-    raise rateLimitError()
+    raise noAccountsError()
 
 proc setLimited*(account: GuestAccount; api: Api) =
   account.apis[api].limited = true

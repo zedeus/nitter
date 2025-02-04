@@ -97,6 +97,11 @@ routes:
     resp Http429, showError(
       &"Instance has been rate limited.<br>Use {link} or try again later.", cfg)
 
+  error NoAccountsError:
+    const link = a("another instance", href = instancesUrl)
+    resp Http429, showError(
+      &"Instance has no available accounts.<br>Use {link} or try again later.", cfg)
+
   extend rss, ""
   extend status, ""
   extend search, ""
