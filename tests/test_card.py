@@ -26,8 +26,8 @@ no_thumb = [
      'lnkd.in'],
 
     ['Thom_Wolf/status/1122466524860702729',
-     'facebookresearch/fairseq',
-     'Facebook AI Research Sequence-to-Sequence Toolkit written in Python. - GitHub - facebookresearch/fairseq: Facebook AI Research Sequence-to-Sequence Toolkit written in Python.',
+     'GitHub - NVIDIA/Megatron-LM: Ongoing research training transformer models at scale',
+     'Ongoing research training transformer models at scale - NVIDIA/Megatron-LM',
      'github.com'],
 
     ['brent_p/status/1088857328680488961',

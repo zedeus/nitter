@@ -53,4 +53,4 @@ jobs:
       - name: Run tests
         run: |
           ./nitter &
-          pytest -n8 tests
+          pytest -n3 tests
