@@ -4,27 +4,35 @@
 [![Test Matrix](https://github.com/zedeus/nitter/workflows/Docker/badge.svg)](https://github.com/zedeus/nitter/actions/workflows/build-docker.yml)
 [![License](https://img.shields.io/github/license/zedeus/nitter?style=flat)](#license)
 
+> [!NOTE]
+> Running a Nitter instance now requires real accounts, since Twitter removed the previous methods. \
+> This does not affect users. \
+> For instructions on how to obtain session tokens, see [Creating session tokens](https://github.com/zedeus/nitter/wiki/Creating-session-tokens).
+
 A free and open source alternative Twitter front-end focused on privacy and
 performance. \
-Inspired by the [Invidious](https://github.com/iv-org/invidious)
-project.
+Inspired by the [Invidious](https://github.com/iv-org/invidious) project.
 
 - No JavaScript or ads
 - All requests go through the backend, client never talks to Twitter
 - Prevents Twitter from tracking your IP or JavaScript fingerprint
-- Uses Twitter's unofficial API (no rate limits or developer account required)
+- Uses Twitter's unofficial API (no developer account required)
 - Lightweight (for [@nim_lang](https://nitter.net/nim_lang), 60KB vs 784KB from twitter.com)
 - RSS feeds
 - Themes
 - Mobile support (responsive design)
 - AGPLv3 licensed, no proprietary instances permitted
 
-Liberapay: https://liberapay.com/zedeus \
-Patreon: https://patreon.com/nitter \
-BTC: bc1qp7q4qz0fgfvftm5hwz3vy284nue6jedt44kxya \
-ETH: 0x66d84bc3fd031b62857ad18c62f1ba072b011925 \
-LTC: ltc1qhsz5nxw6jw9rdtw9qssjeq2h8hqk2f85rdgpkr \
-XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscWGWJCczFLe9RFhM3d1zpL
+<details>
+<summary>Donations</summary>
+Liberapay: https://liberapay.com/zedeus<br>
+Patreon: https://patreon.com/nitter<br>
+BTC: bc1qpqpzjkcpgluhzf7x9yqe7jfe8gpfm5v08mdr55<br>
+ETH: 0x24a0DB59A923B588c7A5EBd0dBDFDD1bCe9c4460<br>
+XMR: 42hKayRoEAw4D6G6t8mQHPJHQcXqofjFuVfavqKeNMNUZfeJLJAcNU19i1bGdDvcdN6romiSscWGWJCczFLe9RFhM3d1zpL<br>
+SOL: ANsyGNXFo6osuFwr1YnUqif2RdoYRhc27WdyQNmmETSW<br>
+ZEC: u1vndfqtzyy6qkzhkapxelel7ams38wmfeccu3fdpy2wkuc4erxyjm8ncjhnyg747x6t0kf0faqhh2hxyplgaum08d2wnj4n7cyu9s6zhxkqw2aef4hgd4s6vh5hpqvfken98rg80kgtgn64ff70djy7s8f839z00hwhuzlcggvefhdlyszkvwy3c7yw623vw3rvar6q6evd3xcvveypt
+</details>
 
 ## Roadmap
 
@@ -42,12 +50,13 @@ maintained by the community.
 
 ## Why?
 
-It's impossible to use Twitter without JavaScript enabled. For privacy-minded
-folks, preventing JavaScript analytics and IP-based tracking is important, but
-apart from using a VPN and uBlock/uMatrix, it's impossible. Despite being behind
-a VPN and using heavy-duty adblockers, you can get accurately tracked with your
-[browser's fingerprint](https://restoreprivacy.com/browser-fingerprinting/),
-[no JavaScript required](https://noscriptfingerprint.com/). This all became
+It's impossible to use Twitter without JavaScript enabled, and as of 2024 you
+need to sign up. For privacy-minded folks, preventing JavaScript analytics and
+IP-based tracking is important, but apart from using a VPN and uBlock/uMatrix,
+it's impossible. Despite being behind a VPN and using heavy-duty adblockers,
+you can get accurately tracked with your [browser's
+fingerprint](https://restoreprivacy.com/browser-fingerprinting/), [no
+JavaScript required](https://noscriptfingerprint.com/). This all became
 particularly important after Twitter [removed the
 ability](https://www.eff.org/deeplinks/2020/04/twitter-removes-privacy-option-and-shows-why-we-need-strong-privacy-laws)
 for users to control whether their data gets sent to advertisers.
@@ -71,19 +80,21 @@ Twitter account.
 
 - libpcre
 - libsass
-- redis
+- redis/valkey
 
 To compile Nitter you need a Nim installation, see
-[nim-lang.org](https://nim-lang.org/install.html) for details. It is possible to
-install it system-wide or in the user directory you create below.
+[nim-lang.org](https://nim-lang.org/install.html) for details. It is possible
+to install it system-wide or in the user directory you create below.
 
 To compile the scss files, you need to install `libsass`. On Ubuntu and Debian,
 you can use `libsass-dev`.
 
-Redis is required for caching and in the future for account info. It should be
-available on most distros as `redis` or `redis-server` (Ubuntu/Debian).
-Running it with the default config is fine, Nitter's default config is set to
-use the default Redis port and localhost.
+Redis is required for caching and in the future for account info. As of 2024
+Redis is no longer open source, so using the fork Valkey is recommended. It
+should be available on most distros as `redis` or `redis-server`
+(Ubuntu/Debian), or `valkey`/`valkey-server`. Running it with the default
+config is fine, Nitter's default config is set to use the default port and
+localhost.
 
 Here's how to create a `nitter` user, clone the repo, and build the project
 along with the scss and md files.
@@ -93,7 +104,7 @@ along with the scss and md files.
 # su nitter
 $ git clone https://github.com/zedeus/nitter
 $ cd nitter
-$ nimble build -d:release
+$ nimble build -d:danger --mm:refc
 $ nimble scss
 $ nimble md
 $ cp nitter.example.conf nitter.conf
