@@ -5,7 +5,7 @@ import experimental/parser/guestaccount
 
 # max requests at a time per account to avoid race conditions
 const
-  maxConcurrentReqs = 2
+  maxConcurrentReqs = 3
   dayInSeconds = 24 * 60 * 60
   apiMaxReqs: Table[Api, int] = {
     Api.search: 50,
