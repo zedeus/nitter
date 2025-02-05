@@ -14,9 +14,9 @@ jobs:
     strategy:
       matrix:
         nim:
-          - "1.6.10"
           - "1.6.x"
           - "2.0.x"
+          - "2.2.x"
           - "devel"
     steps:
       - uses: actions/checkout@v3
@@ -49,7 +49,7 @@ jobs:
           sed -i 's/enableDebug = false/enableDebug = true/g' nitter.conf
           nimble md
           nimble scss
-          echo '${{ secrets.GUEST_ACCOUNTS }}' > ./guest_accounts.jsonl
+          echo '${{ secrets.SESSIONS }}' > ./sessions.jsonl
       - name: Run tests
         run: |
           ./nitter &
