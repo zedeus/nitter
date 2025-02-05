@@ -126,10 +126,11 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
         result = newJNull()
 
       let error = result.getError
-      echo "Fetch error, API: ", api, ", error: ", error
-      if error in {expiredToken, badToken, locked}:
-        invalidate(account)
-        raise rateLimitError()
+      if error != null:
+        echo "Fetch error, API: ", api, ", error: ", error
+        if error in {expiredToken, badToken, locked}:
+          invalidate(account)
+          raise rateLimitError()
 
 proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
   retry:
