@@ -456,7 +456,8 @@ proc parseGraphPhotoRail*(js: JsonNode): PhotoRail =
               elif t.card.isSome: get(t.card).image
               else: ""
 
-            result.add GalleryPhoto(url: url, tweetId: $t.id)
+            if url.len > 0:
+              result.add GalleryPhoto(url: url, tweetId: $t.id)
 
             if result.len == 16:
               break
