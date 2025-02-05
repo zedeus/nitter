@@ -16,6 +16,8 @@ video {
 }
 
 .video-container {
+    min-height: 80px;
+    min-width: 200px;
     max-height: 530px;
     margin: 0;
     display: flex;
