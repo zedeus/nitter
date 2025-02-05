@@ -19,9 +19,9 @@ let
   configPath = getEnv("NITTER_CONF_FILE", "./nitter.conf")
   (cfg, fullCfg) = getConfig(configPath)
 
-  accountsPath = getEnv("NITTER_ACCOUNTS_FILE", "./guest_accounts.json")
+  sessionsPath = getEnv("NITTER_SESSIONS_FILE", "./sessions.jsonl")
 
-initAccountPool(cfg, accountsPath)
+initSessionPool(cfg, sessionsPath)
 
 if not cfg.enableDebug:
   # Silence Jester's query warning
@@ -97,10 +97,10 @@ routes:
     resp Http429, showError(
       &"Instance has been rate limited.<br>Use {link} or try again later.", cfg)
 
-  error NoAccountsError:
+  error NoSessionsError:
     const link = a("another instance", href = instancesUrl)
     resp Http429, showError(
-      &"Instance has no available accounts.<br>Use {link} or try again later.", cfg)
+      &"Instance has no auth tokens, or is fully rate limited.<br>Use {link} or try again later.", cfg)
 
   extend rss, ""
   extend status, ""

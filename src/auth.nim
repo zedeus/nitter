@@ -1,9 +1,9 @@
 #SPDX-License-Identifier: AGPL-3.0-only
 import std/[asyncdispatch, times, json, random, sequtils, strutils, tables, packedsets, os]
 import types
-import experimental/parser/guestaccount
+import experimental/parser/session
 
-# max requests at a time per account to avoid race conditions
+# max requests at a time per session to avoid race conditions
 const
   maxConcurrentReqs = 3
   dayInSeconds = 24 * 60 * 60
@@ -23,16 +23,16 @@ const
   }.toTable
 
 var
-  accountPool: seq[GuestAccount]
+  sessionPool: seq[Session]
   enableLogging = false
 
 template log(str: varargs[string, `$`]) =
-  if enableLogging: echo "[accounts] ", str.join("")
+  if enableLogging: echo "[sessions] ", str.join("")
 
 proc snowflakeToEpoch(flake: int64): int64 =
   int64(((flake shr 22) + 1288834974657) div 1000)
 
-proc getAccountPoolHealth*(): JsonNode =
+proc getSessionPoolHealth*(): JsonNode =
   let now = epochTime().int
 
   var
@@ -43,38 +43,38 @@ proc getAccountPoolHealth*(): JsonNode =
     newest = 0'i64
     average = 0'i64
 
-  for account in accountPool:
-    let created = snowflakeToEpoch(account.id)
+  for session in sessionPool:
+    let created = snowflakeToEpoch(session.id)
     if created > newest:
       newest = created
     if created < oldest:
       oldest = created
     average += created
 
-    if account.limited:
-      limited.incl account.id
+    if session.limited:
+      limited.incl session.id
 
-    for api in account.apis.keys:
+    for api in session.apis.keys:
       let
-        apiStatus = account.apis[api]
+        apiStatus = session.apis[api]
         reqs = apiMaxReqs[api] - apiStatus.remaining
 
-      # no requests made with this account and endpoint since the limit reset
+      # no requests made with this session and endpoint since the limit reset
       if apiStatus.reset < now:
         continue
 
       reqsPerApi.mgetOrPut($api, 0).inc reqs
       totalReqs.inc reqs
 
-  if accountPool.len > 0:
-    average = average div accountPool.len
+  if sessionPool.len > 0:
+    average = average div sessionPool.len
   else:
     oldest = 0
     average = 0
 
   return %*{
-    "accounts": %*{
-      "total": accountPool.len,
+    "sessions": %*{
+      "total": sessionPool.len,
       "limited": limited.card,
       "oldest": $fromUnix(oldest),
       "newest": $fromUnix(newest),
@@ -86,22 +86,22 @@ proc getAccountPoolHealth*(): JsonNode =
     }
   }
 
-proc getAccountPoolDebug*(): JsonNode =
+proc getSessionPoolDebug*(): JsonNode =
   let now = epochTime().int
   var list = newJObject()
 
-  for account in accountPool:
-    let accountJson = %*{
+  for session in sessionPool:
+    let sessionJson = %*{
       "apis": newJObject(),
-      "pending": account.pending,
+      "pending": session.pending,
     }
 
-    if account.limited:
-      accountJson["limited"] = %true
+    if session.limited:
+      sessionJson["limited"] = %true
 
-    for api in account.apis.keys:
+    for api in session.apis.keys:
       let
-        apiStatus = account.apis[api]
+        apiStatus = session.apis[api]
         obj = %*{}
 
       if apiStatus.reset > now.int:
@@ -111,92 +111,91 @@ proc getAccountPoolDebug*(): JsonNode =
       if "remaining" notin obj:
         continue
 
-      accountJson{"apis", $api} = obj
-      list[$account.id] = accountJson
+      sessionJson{"apis", $api} = obj
+      list[$session.id] = sessionJson
 
   return %list
 
 proc rateLimitError*(): ref RateLimitError =
   newException(RateLimitError, "rate limited")
 
-proc noAccountsError*(): ref NoAccountsError =
-  newException(NoAccountsError, "no accounts available")
+proc noSessionsError*(): ref NoSessionsError =
+  newException(NoSessionsError, "no sessions available")
 
-proc isLimited(account: GuestAccount; api: Api): bool =
-  if account.isNil:
+proc isLimited(session: Session; api: Api): bool =
+  if session.isNil:
     return true
 
-  if account.limited and api != Api.userTweets:
-    if (epochTime().int - account.limitedAt) > dayInSeconds:
-      account.limited = false
-      log "resetting limit: ", account.id
+  if session.limited and api != Api.userTweets:
+    if (epochTime().int - session.limitedAt) > dayInSeconds:
+      session.limited = false
+      log "resetting limit: ", session.id
     else:
       return false
 
-  if api in account.apis:
-    let limit = account.apis[api]
+  if api in session.apis:
+    let limit = session.apis[api]
     return limit.remaining <= 10 and limit.reset > epochTime().int
   else:
     return false
 
-proc isReady(account: GuestAccount; api: Api): bool =
-  not (account.isNil or account.pending > maxConcurrentReqs or account.isLimited(api))
+proc isReady(session: Session; api: Api): bool =
+  not (session.isNil or session.pending > maxConcurrentReqs or session.isLimited(api))
 
-proc invalidate*(account: var GuestAccount) =
-  if account.isNil: return
-  log "invalidating: ", account.id
+proc invalidate*(session: var Session) =
+  if session.isNil: return
+  log "invalidating: ", session.id
 
   # TODO: This isn't sufficient, but it works for now
-  let idx = accountPool.find(account)
-  if idx > -1: accountPool.delete(idx)
-  account = nil
+  let idx = sessionPool.find(session)
+  if idx > -1: sessionPool.delete(idx)
+  session = nil
 
-proc release*(account: GuestAccount) =
-  if account.isNil: return
-  dec account.pending
+proc release*(session: Session) =
+  if session.isNil: return
+  dec session.pending
 
-proc getGuestAccount*(api: Api): Future[GuestAccount] {.async.} =
-  for i in 0 ..< accountPool.len:
+proc getSession*(api: Api): Future[Session] {.async.} =
+  for i in 0 ..< sessionPool.len:
     if result.isReady(api): break
-    result = accountPool.sample()
+    result = sessionPool.sample()
 
   if not result.isNil and result.isReady(api):
     inc result.pending
   else:
-    log "no accounts available for API: ", api
-    raise noAccountsError()
+    log "no sessions available for API: ", api
+    raise noSessionsError()
 
-proc setLimited*(account: GuestAccount; api: Api) =
-  account.limited = true
-  account.limitedAt = epochTime().int
-  log "rate limited by api: ", api, ", reqs left: ", account.apis[api].remaining, ", id: ", account.id
+proc setLimited*(session: Session; api: Api) =
+  session.limited = true
+  session.limitedAt = epochTime().int
+  log "rate limited by api: ", api, ", reqs left: ", session.apis[api].remaining, ", id: ", session.id
 
-proc setRateLimit*(account: GuestAccount; api: Api; remaining, reset: int) =
+proc setRateLimit*(session: Session; api: Api; remaining, reset: int) =
   # avoid undefined behavior in race conditions
-  if api in account.apis:
-    let limit = account.apis[api]
+  if api in session.apis:
+    let limit = session.apis[api]
     if limit.reset >= reset and limit.remaining < remaining:
       return
     if limit.reset == reset and limit.remaining >= remaining:
-      account.apis[api].remaining = remaining
+      session.apis[api].remaining = remaining
       return
 
-  account.apis[api] = RateLimit(remaining: remaining, reset: reset)
+  session.apis[api] = RateLimit(remaining: remaining, reset: reset)
 
-proc initAccountPool*(cfg: Config; path: string) =
+proc initSessionPool*(cfg: Config; path: string) =
   enableLogging = cfg.enableDebug
 
-  let jsonlPath = if path.endsWith(".json"): (path & 'l') else: path
-
-  if fileExists(jsonlPath):
-    log "Parsing JSONL guest accounts file: ", jsonlPath
-    for line in jsonlPath.lines:
-      accountPool.add parseGuestAccount(line)
-  elif fileExists(path):
-    log "Parsing JSON guest accounts file: ", path
-    accountPool = parseGuestAccounts(path)
-  else:
-    echo "[accounts] ERROR: ", path, " not found. This file is required to authenticate API requests."
+  if path.endsWith(".json"):
+    echo "[sessions] ERROR: .json is not supported, the file must be a valid JSONL file ending in .jsonl"
     quit 1
 
-  log "Successfully added ", accountPool.len, " valid accounts."
+  if not fileExists(path):
+    echo "[sessions] ERROR: ", path, " not found. This file is required to authenticate API requests."
+    quit 1
+
+  log "Parsing JSONL account sessions file: ", path
+  for line in path.lines:
+    sessionPool.add parseSession(line)
+
+  log "Successfully added ", sessionPool.len, " valid account sessions."

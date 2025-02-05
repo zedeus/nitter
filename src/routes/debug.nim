@@ -6,8 +6,8 @@ import ".."/[auth, types]
 proc createDebugRouter*(cfg: Config) =
   router debug:
     get "/.health":
-      respJson getAccountPoolHealth()
+      respJson getSessionPoolHealth()
 
-    get "/.accounts":
+    get "/.sessions":
       cond cfg.enableDebug
-      respJson getAccountPoolDebug()
+      respJson getSessionPoolDebug()

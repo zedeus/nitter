@@ -1,4 +1,4 @@
 type
-  RawAccount* = object
+  RawSession* = object
     oauthToken*: string
     oauthTokenSecret*: string

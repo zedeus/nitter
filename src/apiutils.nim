@@ -46,14 +46,14 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   once:
     pool = HttpPool()
 
-  var account = await getGuestAccount(api)
-  if account.oauthToken.len == 0:
-    echo "[accounts] Empty oauth token, account: ", account.id
+  var session = await getSession(api)
+  if session.oauthToken.len == 0:
+    echo "[sessions] Empty oauth token, session: ", session.id
     raise rateLimitError()
 
   try:
     var resp: AsyncResponse
-    pool.use(genHeaders($url, account.oauthToken, account.oauthSecret)):
+    pool.use(genHeaders($url, session.oauthToken, session.oauthSecret)):
       template getContent =
         resp = await c.get($url)
         result = await resp.body
@@ -68,7 +68,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
       let
         remaining = parseInt(resp.headers[rlRemaining])
         reset = parseInt(resp.headers[rlReset])
-      account.setRateLimit(api, remaining, reset)
+      session.setRateLimit(api, remaining, reset)
 
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
@@ -78,15 +78,15 @@ template fetchImpl(result, fetchBody) {.dirty.} =
         let errors = result.fromJson(Errors)
         echo "Fetch error, API: ", api, ", errors: ", errors
         if errors in {expiredToken, badToken, locked}:
-          invalidate(account)
+          invalidate(session)
           raise rateLimitError()
         elif errors in {rateLimited}:
           # rate limit hit, resets after 24 hours
-          setLimited(account, api)
+          setLimited(session, api)
           raise rateLimitError()
       elif result.startsWith("429 Too Many Requests"):
-        echo "[accounts] 429 error, API: ", api, ", account: ", account.id
-        account.apis[api].remaining = 0
+        echo "[sessions] 429 error, API: ", api, ", session: ", session.id
+        session.apis[api].remaining = 0
         # rate limit hit, resets after the 15 minute window
         raise rateLimitError()
 
@@ -102,17 +102,17 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   except OSError as e:
     raise e
   except Exception as e:
-    let id = if account.isNil: "null" else: $account.id
-    echo "error: ", e.name, ", msg: ", e.msg, ", accountId: ", id, ", url: ", url
+    let id = if session.isNil: "null" else: $session.id
+    echo "error: ", e.name, ", msg: ", e.msg, ", sessionId: ", id, ", url: ", url
     raise rateLimitError()
   finally:
-    release(account)
+    release(session)
 
 template retry(bod) =
   try:
     bod
   except RateLimitError:
-    echo "[accounts] Rate limited, retrying ", api, " request..."
+    echo "[sessions] Rate limited, retrying ", api, " request..."
     bod
 
 proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
@@ -129,7 +129,7 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
       if error != null:
         echo "Fetch error, API: ", api, ", error: ", error
         if error in {expiredToken, badToken, locked}:
-          invalidate(account)
+          invalidate(session)
           raise rateLimitError()
 
 proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =

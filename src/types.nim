@@ -6,7 +6,7 @@ genPrefsType()
 
 type
   RateLimitError* = object of CatchableError
-  NoAccountsError* = object of CatchableError
+  NoSessionsError* = object of CatchableError
   InternalError* = object of CatchableError
   BadClientError* = object of CatchableError
 
@@ -31,7 +31,7 @@ type
     remaining*: int
     reset*: int
 
-  GuestAccount* = ref object
+  Session* = ref object
     id*: int64
     oauthToken*: string
     oauthSecret*: string
