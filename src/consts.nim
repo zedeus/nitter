@@ -5,22 +5,20 @@ const
   consumerKey* = "3nVuSoBZnx6U4vzUxf5w"
   consumerSecret* = "Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys"
 
-  api = parseUri("https://api.twitter.com")
-  activate* = $(api / "1.1/guest/activate.json")
+  gql = parseUri("https://api.x.com") / "graphql"
 
-  graphql = api / "graphql"
-  graphUser* = graphql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
-  graphUserById* = graphql / "oPppcargziU1uDQHAUmH-A/UserResultByIdQuery"
-  graphUserTweets* = graphql / "3JNH4e9dq1BifLxAa3UMWg/UserWithProfileTweetsQueryV2"
-  graphUserTweetsAndReplies* = graphql / "8IS8MaO-2EN6GZZZb8jF0g/UserWithProfileTweetsAndRepliesQueryV2"
-  graphUserMedia* = graphql / "PDfFf8hGeJvUCiTyWtw4wQ/MediaTimelineV2"
-  graphTweet* = graphql / "q94uRCEn65LZThakYcPT6g/TweetDetail"
-  graphTweetResult* = graphql / "sITyJdhRPpvpEjg4waUmTA/TweetResultByIdQuery"
-  graphSearchTimeline* = graphql / "gkjsKepM6gl_HmFWoWKfgg/SearchTimeline"
-  graphListById* = graphql / "iTpgCtbdxrsJfyx0cFjHqg/ListByRestId"
-  graphListBySlug* = graphql / "-kmqNvm5Y-cVrfvBy6docg/ListBySlug"
-  graphListMembers* = graphql / "P4NpVZDqUD_7MEM84L-8nw/ListMembers"
-  graphListTweets* = graphql / "BbGLL1ZfMibdFNWlk7a0Pw/ListTimeline"
+  graphUser* = gql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
+  graphUserById* = gql / "oPppcargziU1uDQHAUmH-A/UserResultByIdQuery"
+  graphUserTweets* = gql / "JLApJKFY0MxGTzCoK6ps8Q/UserWithProfileTweetsQueryV2"
+  graphUserTweetsAndReplies* = gql / "Y86LQY7KMvxn5tu3hFTyPg/UserWithProfileTweetsAndRepliesQueryV2"
+  graphUserMedia* = gql / "PDfFf8hGeJvUCiTyWtw4wQ/MediaTimelineV2"
+  graphTweet* = gql / "Vorskcd2tZ-tc4Gx3zbk4Q/ConversationTimelineV2"
+  graphTweetResult* = gql / "sITyJdhRPpvpEjg4waUmTA/TweetResultByIdQuery"
+  graphSearchTimeline* = gql / "KI9jCXUx3Ymt-hDKLOZb9Q/SearchTimeline"
+  graphListById* = gql / "oygmAig8kjn0pKsx_bUadQ/ListByRestId"
+  graphListBySlug* = gql / "88GTz-IPPWLn1EiU8XoNVg/ListBySlug"
+  graphListMembers* = gql / "kSmxeqEeelqdHSR7jMnb_w/ListMembers"
+  graphListTweets* = gql / "BbGLL1ZfMibdFNWlk7a0Pw/ListTimeline"
 
   gqlFeatures* = """{
   "android_graphql_skip_api_media_color_palette": false,
@@ -62,7 +60,23 @@ const
   "unified_cards_ad_metadata_container_dynamic_card_content_query_enabled": false,
   "verified_phone_label_enabled": false,
   "vibe_api_enabled": false,
-  "view_counts_everywhere_api_enabled": false
+  "view_counts_everywhere_api_enabled": false,
+  "premium_content_api_read_enabled": false,
+  "communities_web_enable_tweet_community_results_fetch": false,
+  "responsive_web_jetfuel_frame": false,
+  "responsive_web_grok_analyze_button_fetch_trends_enabled": false,
+  "responsive_web_grok_image_annotation_enabled": false,
+  "rweb_tipjar_consumption_enabled": false,
+  "profile_label_improvements_pcf_label_in_post_enabled": false,
+  "creator_subscriptions_quote_tweet_preview_enabled": false,
+  "c9s_tweet_anatomy_moderator_badge_enabled": false,
+  "responsive_web_grok_analyze_post_followups_enabled": false,
+  "rweb_video_timestamps_enabled": false,
+  "responsive_web_grok_share_attachment_enabled": false,
+  "articles_preview_enabled": false,
+  "immersive_video_status_linkable_timestamps": false,
+  "articles_api_enabled": false,
+  "responsive_web_grok_analysis_button_from_backend": false
 }""".replace(" ", "").replace("\n", "")
 
   tweetVariables* = """{
