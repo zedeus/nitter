@@ -5,7 +5,7 @@ import experimental/parser/session
 
 # max requests at a time per session to avoid race conditions
 const
-  maxConcurrentReqs = 3
+  maxConcurrentReqs = 2
   dayInSeconds = 24 * 60 * 60
   apiMaxReqs: Table[Api, int] = {
     Api.search: 50,
@@ -130,8 +130,9 @@ proc isLimited(session: Session; api: Api): bool =
     if (epochTime().int - session.limitedAt) > dayInSeconds:
       session.limited = false
       log "resetting limit: ", session.id
-    else:
       return false
+    else:
+      return true
 
   if api in session.apis:
     let limit = session.apis[api]
