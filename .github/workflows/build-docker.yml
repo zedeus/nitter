@@ -10,6 +10,7 @@ on:
 jobs:
   tests:
     uses: ./.github/workflows/run-tests.yml
+    secrets: inherit
   build-docker-amd64:
     needs: [tests]
     runs-on: buildjet-2vcpu-ubuntu-2204
