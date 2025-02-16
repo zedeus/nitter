@@ -45,8 +45,10 @@ type
     noUserMatches = 17
     protectedUser = 22
     missingParams = 25
+    timeout = 29
     couldntAuth = 32
     doesntExist = 34
+    unauthorized = 37
     invalidParam = 47
     userNotFound = 50
     suspended = 63
@@ -56,6 +58,7 @@ type
     tweetNotFound = 144
     tweetNotAuthorized = 179
     forbidden = 200
+    badRequest = 214
     badToken = 239
     locked = 326
     noCsrf = 353

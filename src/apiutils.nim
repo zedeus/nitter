@@ -7,6 +7,7 @@ import experimental/types/common
 const
   rlRemaining = "x-rate-limit-remaining"
   rlReset = "x-rate-limit-reset"
+  errorsToSkip = {doesntExist, tweetNotFound, timeout, unauthorized, badRequest}
 
 var pool: HttpPool
 
@@ -76,14 +77,15 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
       if result.startsWith("{\"errors"):
         let errors = result.fromJson(Errors)
-        echo "Fetch error, API: ", api, ", errors: ", errors
-        if errors in {expiredToken, badToken, locked}:
-          invalidate(session)
-          raise rateLimitError()
-        elif errors in {rateLimited}:
-          # rate limit hit, resets after 24 hours
-          setLimited(session, api)
-          raise rateLimitError()
+        if errors notin errorsToSkip:
+          echo "Fetch error, API: ", api, ", errors: ", errors
+          if errors in {expiredToken, badToken, locked}:
+            invalidate(session)
+            raise rateLimitError()
+          elif errors in {rateLimited}:
+            # rate limit hit, resets after 24 hours
+            setLimited(session, api)
+            raise rateLimitError()
       elif result.startsWith("429 Too Many Requests"):
         echo "[sessions] 429 error, API: ", api, ", session: ", session.id
         session.apis[api].remaining = 0
@@ -126,7 +128,7 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
         result = newJNull()
 
       let error = result.getError
-      if error != null:
+      if error != null and error notin errorsToSkip:
         echo "Fetch error, API: ", api, ", error: ", error
         if error in {expiredToken, badToken, locked}:
           invalidate(session)
