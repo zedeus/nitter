@@ -61,6 +61,9 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
       getContent()
 
+    if resp.status == $Http429:
+      raise rateLimitError()
+
       if resp.status == $Http503:
         badClient = true
         raise newException(BadClientError, "Bad client")
