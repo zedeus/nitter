@@ -147,3 +147,20 @@ ${renderRssTweets(tweets, cfg)}
   </channel>
 </rss>
 #end proc
+#
+#proc renderThreadRss*(tweets: seq[Tweet]; username, tweetId: string; cfg: Config): string =
+#let urlPrefix = getUrlPrefix(cfg)
+#result = ""
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+  <channel>
+    <atom:link href="${urlPrefix}/${username}/status/${tweetId}/rss" rel="self" type="application/rss+xml" />
+    <title>Thread for ${urlPrefix}/${username}/status/${tweetId}</title>
+    <link>${urlPrefix}/${username}/status/${tweetId}</link>
+    <description>${getDescription("Thread for " & urlPrefix & "/" & username & "/status/" & tweetId, cfg)}</description>
+    <language>en-us</language>
+    <ttl>40</ttl>
+${renderRssTweets(tweets, cfg)}
+  </channel>
+</rss>
+#end proc
