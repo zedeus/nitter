@@ -32,7 +32,7 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
         if cfg.enableRss and rss.len > 0:
           icon "rss-feed", title="RSS Feed", href=rss
         icon "bird", title="Open in Twitter", href=canonical
-        a(href="https://liberapay.com/zedeus"): verbatim lp
+        a(href="https://liberapay.com/zedeus", title="Liberapay — zedeus"): verbatim lp
         icon "info", title="About", href="/about"
         icon "cog", title="Preferences", href=("/settings?referer=" & encodeUrl(path))
 
@@ -42,7 +42,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   var theme = prefs.theme.toTheme
   if "theme" in req.params:
     theme = req.params["theme"].toTheme
-    
+
   let ogType =
     if video.len > 0: "video"
     elif rss.len > 0: "object"
@@ -134,7 +134,7 @@ proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
     body:
       renderNavbar(cfg, req, rss, canonical)
 
-      tdiv(class="container"):
+      main(class="container"):
         body
 
   result = doctype & $node

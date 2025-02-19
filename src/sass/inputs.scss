@@ -88,22 +88,6 @@ input::-webkit-datetime-edit-year-field:focus {
     }
 }
 
-.checkbox {
-    position: absolute;
-    top: 1px;
-    right: 0;
-    height: 17px;
-    width: 17px;
-    background-color: var(--bg_elements);
-    border: 1px solid var(--accent_border);
-
-    &:after {
-        content: "";
-        position: absolute;
-        display: none;
-    }
-}
-
 .checkbox-container {
     display: block;
     position: relative;
@@ -114,30 +98,37 @@ input::-webkit-datetime-edit-year-field:focus {
 
     input {
         position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        height: 0;
-        width: 0;
+        right: 0;
+        height: 19px;
+        width: 19px;
+        background-color: var(--bg_elements);
+        border: 1px solid var(--accent_border);
+        appearance: none;
+        box-sizing: border-box;
+        cursor: inherit;
 
-        &:checked ~ .checkbox:after {
+        &:after {
+            left: 2px;
+            bottom: 0;
+            font-size: 13px;
+            font-family: $font_4;
+            content: '\e803';
+            position: absolute;
+            display: none;
+            bottom: 2px;
+        }
+
+        &:checked:after {
             display: block;
         }
     }
 
-    &:hover input ~ .checkbox {
+    &:hover input {
         border-color: var(--accent);
     }
 
-    &:active input ~ .checkbox {
+    &:active input {
         border-color: var(--accent_light);
-    }
-
-    .checkbox:after {
-        left: 2px;
-        bottom: 0;
-        font-size: 13px;
-        font-family: $font_4;
-        content: '\e803';
     }
 }
 
