@@ -9,6 +9,7 @@ services:
       - "127.0.0.1:8080:8080" # Replace with "8080:8080" if you don't use a reverse proxy
     volumes:
       - ./nitter.conf:/src/nitter.conf:Z,ro
+      - ./sessions.jsonl:/src/sessions.jsonl:Z,ro # Run get_sessions.py to get the credentials
     depends_on:
       - nitter-redis
     restart: unless-stopped
