@@ -31,20 +31,10 @@ type
     remaining*: int
     reset*: int
 
-  SessionKind* = enum
-    oauth
-    cookie
-
   Session* = ref object
-    case kind*: SessionKind
-    of oauth:
-      oauthToken*: string
-      oauthSecret*: string
-    of cookie:
-      ct0*: string
-      authToken*: string
-
     id*: int64
+    oauthToken*: string
+    oauthSecret*: string
     pending*: int
     limited*: bool
     limitedAt*: int

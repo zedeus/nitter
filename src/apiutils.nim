@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import httpclient, asyncdispatch, options, strformat, strutils, uri, times, math, tables
+import httpclient, asyncdispatch, options, strutils, uri, times, math, tables
 import jsony, packedjson, zippy, oauth1
 import types, auth, consts, parserutils, http_pool
 import experimental/types/common
@@ -28,26 +28,20 @@ proc getOauthHeader(url, oauthToken, oauthTokenSecret: string): string =
 
   return getOauth1RequestHeader(params)["authorization"]
 
-proc genHeaders*(url: string; session: Session): HttpHeaders =
+proc genHeaders*(url, oauthToken, oauthTokenSecret: string): HttpHeaders =
+  let header = getOauthHeader(url, oauthToken, oauthTokenSecret)
+
   result = newHttpHeaders({
     "connection": "keep-alive",
+    "authorization": header,
     "content-type": "application/json",
     "x-twitter-active-user": "yes",
     "authority": "api.x.com",
     "accept-encoding": "gzip",
     "accept-language": "en-US,en;q=0.9",
     "accept": "*/*",
-    "DNT": "1",
+    "DNT": "1"
   })
-
-  case session.kind
-  of oauth:
-    result["authorization"] = getOauthHeader(url, session.oauthToken, session.oauthSecret)
-  of cookie:
-    result["authorization"] = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
-    result["x-twitter-auth-type"] = "OAuth2Session"
-    result["x-csrf-token"] = session.ct0
-    result["cookie"] = &"ct0={session.ct0}; auth_token={session.authToken}"
 
 template fetchImpl(result, fetchBody) {.dirty.} =
   once:
@@ -60,7 +54,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
   try:
     var resp: AsyncResponse
-    pool.use(genHeaders($url, session)):
+    pool.use(genHeaders($url, session.oauthToken, session.oauthSecret)):
       template getContent =
         resp = await c.get($url)
         result = await resp.body
