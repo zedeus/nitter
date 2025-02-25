@@ -163,3 +163,34 @@ proc createRssRouter*(cfg: Config) =
 
       await cacheRss(key, rss)
       respRss(rss, "List")
+
+    get "/@name/status/@id/rss":
+      cond '.' notin @"name"
+      let name = @"name"
+      let id = @"id"
+
+      var key = name & "/" & id
+
+      var rss = await getCachedRss(key)
+      if rss.cursor.len > 0:
+        respRss(rss, "Tweet")
+
+      var conv = await getTweet(id)
+      if conv == nil or conv.tweet == nil or conv.tweet.id == 0:
+        var error = "Tweet not found"
+        if conv != nil and conv.tweet != nil and conv.tweet.tombstone.len > 0:
+          error = conv.tweet.tombstone
+        resp Http404, showError(error, cfg)
+
+      while conv.after.hasMore:
+        let newer_conv = await getTweet($conv.after.content[^1].id)
+        if newer_conv == nil or newer_conv.tweet == nil or newer_conv.tweet.id == 0:
+          break
+        conv = newer_conv
+
+      let lastThreadTweets = conv.before.content & @[conv.tweet] & conv.after.content
+      let feed = compress renderThreadRss(lastThreadTweets, name, id, cfg)
+      rss = Rss(feed: feed, cursor: $lastThreadTweets[0].id)
+
+      await cacheRss(key, rss)
+      respRss(rss, "Tweet")
