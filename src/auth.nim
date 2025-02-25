@@ -27,7 +27,7 @@ var
   enableLogging = false
 
 template log(str: varargs[string, `$`]) =
-  if enableLogging: echo "[sessions] ", str.join("")
+  echo "[sessions] ", str.join("")
 
 proc snowflakeToEpoch(flake: int64): int64 =
   int64(((flake shr 22) + 1288834974657) div 1000)
@@ -188,15 +188,15 @@ proc initSessionPool*(cfg: Config; path: string) =
   enableLogging = cfg.enableDebug
 
   if path.endsWith(".json"):
-    echo "[sessions] ERROR: .json is not supported, the file must be a valid JSONL file ending in .jsonl"
+    log "ERROR: .json is not supported, the file must be a valid JSONL file ending in .jsonl"
     quit 1
 
   if not fileExists(path):
-    echo "[sessions] ERROR: ", path, " not found. This file is required to authenticate API requests."
+    log "ERROR: ", path, " not found. This file is required to authenticate API requests."
     quit 1
 
-  log "Parsing JSONL account sessions file: ", path
+  log "parsing JSONL account sessions file: ", path
   for line in path.lines:
     sessionPool.add parseSession(line)
 
-  log "Successfully added ", sessionPool.len, " valid account sessions."
+  log "successfully added ", sessionPool.len, " valid account sessions"
