@@ -9,7 +9,7 @@ import jester
 import types, config, prefs, formatters, redis_cache, http_pool, auth
 import views/[general, about]
 import routes/[
-  preferences, timeline, status, media, search, rss, list, debug,
+  preferences, timeline, status, media, search, jsonapi, rss, list, debug,
   unsupported, embed, resolver, router_utils]
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
@@ -52,6 +52,7 @@ createStatusRouter(cfg)
 createSearchRouter(cfg)
 createMediaRouter(cfg)
 createEmbedRouter(cfg)
+createJsonApiRouter(cfg)
 createRssRouter(cfg)
 createDebugRouter(cfg)
 
@@ -102,6 +103,7 @@ routes:
     resp Http429, showError(
       &"Instance has no auth tokens, or is fully rate limited.<br>Use {link} or try again later.", cfg)
 
+  extend jsonapi, ""
   extend rss, ""
   extend status, ""
   extend search, ""

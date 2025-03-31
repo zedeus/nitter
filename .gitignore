@@ -9,6 +9,7 @@ nitter
 /tools/rendermd
 /public/css/style.css
 /public/md/*.html
+/tools/venv
 nitter.conf
 guest_accounts.json*
 sessions.json*
