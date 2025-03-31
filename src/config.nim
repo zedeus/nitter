@@ -38,7 +38,7 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     base64Media: cfg.get("Config", "base64Media", false),
     minTokens: cfg.get("Config", "tokenCount", 10),
     enableRss: cfg.get("Config", "enableRSS", true),
-    enableJson: cfg.get("Config", "enableJson", true),
+    enableJsonApi: cfg.get("Config", "enableJsonApi", true),
     enableDebug: cfg.get("Config", "enableDebug", false),
     proxy: cfg.get("Config", "proxy", ""),
     proxyAuth: cfg.get("Config", "proxyAuth", "")
