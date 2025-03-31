@@ -268,7 +268,7 @@ type
     base64Media*: bool
     minTokens*: int
     enableRss*: bool
-    enableApi*: bool
+    enableJson*: bool
     enableDebug*: bool
     proxy*: string
     proxyAuth*: string

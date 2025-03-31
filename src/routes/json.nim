@@ -1,8 +1,8 @@
 import router_utils, timeline
 
-proc createApiRouter*(cfg: Config) =
+proc createJsonRouter*(cfg: Config) =
     router api:
         get "/hello":
-            cond cfg.enableApi
+            cond cfg.enableJson
             let headers = ["Content-Type": "application/json; charset=utf-8"]
             resp Http200, headers, """{"message": "Hello, world"}"""
