@@ -12,7 +12,6 @@ jobs:
     uses: ./.github/workflows/run-tests.yml
     secrets: inherit
   build-docker-amd64:
-    needs: [tests]
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
       - uses: actions/checkout@v3
@@ -37,7 +36,6 @@ jobs:
           push: true
           tags: zedeus/nitter:latest,zedeus/nitter:${{ github.sha }}
   build-docker-arm64:
-    needs: [tests]
     runs-on: buildjet-2vcpu-ubuntu-2204-arm
     steps:
       - uses: actions/checkout@v3
