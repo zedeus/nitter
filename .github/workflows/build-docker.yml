@@ -31,4 +31,4 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           push: true
-          tags: dimensiondev/nitter:latest,dimensiondev/nitter:${{ github.sha }}
+          tags: differui/nitter:latest,differui/nitter:${{ github.sha }}
