@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
+import std/json
 import asyncdispatch
-import packedjson
 
 import jester
 
@@ -21,39 +21,34 @@ proc formatListAsJson*(list: List): JsonNode =
 
 proc createJsonApiListRouter*(cfg: Config) =
   router jsonapi_list:
-    # get "/api/@name/lists/@slug/?":
-    #   cond cfg.enableJsonApi
-    #   cond '.' notin @"name"
-    #   cond @"name" != "i"
-    #   cond @"slug" != "memberships"
-    #   let
-    #     slug = decodeUrl(@"slug")
-    #     list = await getCachedList(@"name", slug)
-    #   if list.id.len == 0:
-    #     let json = %*{ "error": "List not found" }
-    #     resp Http200, $json
-    #   redirect(&"/api/i/lists/{list.id}")
+    get "/api/@name/lists/@slug/?":
+      cond cfg.enableJsonApi
+      cond '.' notin @"name"
+      cond @"name" != "i"
+      cond @"slug" != "memberships"
+      let
+        slug = decodeUrl(@"slug")
+        list = await getCachedList(@"name", slug)
+      respJson formatListAsJson(list)
 
     get "/api/i/lists/@id/?":
+      cond cfg.enableJsonApi
+      cond '.' notin @"id"
+      let list = await getCachedList(id=(@"id"))
+      respJson formatListAsJson(list)
+
+    get "/api/i/lists/@id/timeline/?":
       cond cfg.enableJsonApi
       cond '.' notin @"id"
       let
           list = await getCachedList(id=(@"id"))
           timeline = await getGraphListTweets(list.id, getCursor())
-          json = %*{
-            "list": $formatListAsJson(list),
-            "timeline": $formatTimelineAsJson(timeline)
-          }
-      resp Http200, $json
+      respJson formatTimelineAsJson(timeline)
 
-    get "/api/i/lists/@id/members":
+    get "/api/i/lists/@id/members/?":
       cond cfg.enableJsonApi
       cond '.' notin @"id"
       let
           list = await getCachedList(id=(@"id"))
           members = await getGraphListMembers(list, getCursor())
-          json = %*{
-            "list": $formatListAsJson(list),
-            "members": $formatUsersAsJson(members)
-          }
-      resp Http200, $json
+      respJson formatUsersAsJson(members) 

@@ -11,7 +11,7 @@ import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, debug,
   unsupported, embed, resolver, router_utils]
-import jsons/[timeline, list, health]
+import jsons/[health, timeline, list]
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 const issuesUrl = "https://github.com/zedeus/nitter/issues"
@@ -58,6 +58,7 @@ createDebugRouter(cfg)
 
 createJsonApiHealthRouter(cfg)
 createJsonApiListRouter(cfg)
+createJsonApiTimelineRouter(cfg)
 
 settings:
   port = Port(cfg.port)
@@ -106,8 +107,9 @@ routes:
     resp Http429, showError(
       &"Instance has no auth tokens, or is fully rate limited.<br>Use {link} or try again later.", cfg)
 
-  extend jsonapi_list, ""
   extend jsonapi_health, ""
+  extend jsonapi_list, ""
+  extend jsonapi_timeline, ""
   extend rss, ""
   extend status, ""
   extend search, ""
