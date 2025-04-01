@@ -10,6 +10,7 @@ nitter
 /public/css/style.css
 /public/md/*.html
 /tools/venv
+/nimbledeps
 nitter.conf
 guest_accounts.json*
 sessions.json*
