@@ -9,8 +9,9 @@ import jester
 import types, config, prefs, formatters, redis_cache, http_pool, auth
 import views/[general, about]
 import routes/[
-  preferences, timeline, status, media, search, jsonapi, rss, list, debug,
+  preferences, timeline, status, media, search, rss, list, debug,
   unsupported, embed, resolver, router_utils]
+import jsons/[timeline, list, health]
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 const issuesUrl = "https://github.com/zedeus/nitter/issues"
@@ -52,10 +53,11 @@ createStatusRouter(cfg)
 createSearchRouter(cfg)
 createMediaRouter(cfg)
 createEmbedRouter(cfg)
-createJsonApiRouter(cfg)
-createJsonApiListRouter(cfg)
 createRssRouter(cfg)
 createDebugRouter(cfg)
+
+createJsonApiHealthRouter(cfg)
+createJsonApiListRouter(cfg)
 
 settings:
   port = Port(cfg.port)

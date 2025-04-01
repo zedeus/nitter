@@ -69,10 +69,12 @@ proc formatTweetAsJson*(tweet: Tweet): JsonNode =
 
 proc formatTimelineAsJson*(results: Timeline): JsonNode =
   result = %*{
-    "beginning": results.beginning,
-    "top": results.top,
-    "bottom": results.bottom,
-    "content": newJArray()
+    "list": %*{
+      "beginning": results.beginning,
+      "top": results.top,
+      "bottom": results.bottom
+    },
+    "timeline": newJArray()
   }
 
   var retweets: seq[int64]
@@ -87,12 +89,12 @@ proc formatTimelineAsJson*(results: Timeline): JsonNode =
       if retweetId != 0 and tweet.retweet.isSome:
         retweets &= retweetId
 
-      result["content"].add(formatTweetAsJson(tweet))
+      result["timeline"].add(formatTweetAsJson(tweet))
     else:
       var threadJson = newJArray()
       for tweet in thread:
         threadJson.add(formatTweetAsJson(tweet))
-      result["content"].add(threadJson)
+      result["timeline"].add(threadJson)
 
 proc formatUsersAsJson*(results: Result[User]): JsonNode =
   result = %*{
