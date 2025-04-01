@@ -53,6 +53,7 @@ createSearchRouter(cfg)
 createMediaRouter(cfg)
 createEmbedRouter(cfg)
 createJsonApiRouter(cfg)
+createJsonApiListRouter(cfg)
 createRssRouter(cfg)
 createDebugRouter(cfg)
 
