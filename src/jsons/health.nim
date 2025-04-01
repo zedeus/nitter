@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch
-import json
+import packedjson
 
 import jester
 
-import router_utils, timeline
+import ".."/routes/[router_utils]
 import "../jsons/timeline"
 
 proc createJsonApiHealthRouter*(cfg: Config) =
-  router jsonapi:
-    get "/hello":
+  router jsonapi_health:
+    get "/api/health":
       cond cfg.enableJsonApi
       let headers = {"Content-Type": "application/json; charset=utf-8"}
-      resp Http200, headers, """{"message": "Hello, world"}"""
+      resp Http200, headers, """{"message": "OK"}"""

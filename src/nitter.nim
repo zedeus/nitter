@@ -106,7 +106,8 @@ routes:
     resp Http429, showError(
       &"Instance has no auth tokens, or is fully rate limited.<br>Use {link} or try again later.", cfg)
 
-  extend jsonapi, ""
+  extend jsonapi_list, ""
+  extend jsonapi_health, ""
   extend rss, ""
   extend status, ""
   extend search, ""

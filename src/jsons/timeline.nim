@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import options
-import json
+import packedjson
 import times
 
 import ".."/[types]
@@ -8,7 +8,7 @@ import ".."/[types]
 
 # JSON formatting functions
 proc formatUserAsJson*(user: User): JsonNode =
-  result = %*{
+  return %*{
     "id": user.id,
     "username": user.username,
     "fullname": user.fullname,
@@ -30,7 +30,7 @@ proc formatUserAsJson*(user: User): JsonNode =
   }
 
 proc formatTweetAsJson*(tweet: Tweet): JsonNode =
-  result = %*{
+  let result = %*{
     "id": tweet.id,
     "threadId": tweet.threadId,
     "replyId": tweet.replyId,
@@ -49,35 +49,21 @@ proc formatTweetAsJson*(tweet: Tweet): JsonNode =
       "retweets": tweet.stats.retweets,
       "likes": tweet.stats.likes,
       "quotes": tweet.stats.quotes
-    }
+    },
+    "retweet": if tweet.retweet.isSome: formatTweetAsJson(get(tweet.retweet)) else: JsonTree(newJNull()),
+    "attribution": if tweet.attribution.isSome: formatUserAsJson(get(tweet.attribution)) else: JsonTree(newJNull()),
+    "quote": if tweet.quote.isSome: formatTweetAsJson(get(tweet.quote)) else: JsonTree(newJNull()),
+    "poll": if tweet.poll.isSome: %*get(tweet.poll) else: JsonTree(newJNull()),
+    "gif": if tweet.gif.isSome: %*get(tweet.gif) else: JsonTree(newJNull()),
+    "video": if tweet.video.isSome: %*get(tweet.video) else: JsonTree(newJNull()),
+    "photos": if tweet.photos.len > 0: %tweet.photos else: JsonTree(newJNull())
   }
-
-  if tweet.retweet.isSome:
-    result["retweet"] = formatTweetAsJson(get(tweet.retweet))
-  if tweet.attribution.isSome:
-    result["attribution"] = formatUserAsJson(get(tweet.attribution))
-  if tweet.quote.isSome:
-    result["quote"] = formatTweetAsJson(get(tweet.quote))
-  if tweet.poll.isSome:
-    result["poll"] = %*get(tweet.poll)
-  if tweet.gif.isSome:
-    result["gif"] = %*get(tweet.gif)
-  if tweet.video.isSome:
-    result["video"] = %*get(tweet.video)
-  if tweet.photos.len > 0:
-    result["photos"] = %tweet.photos
+  return result
 
 proc formatTimelineAsJson*(results: Timeline): JsonNode =
-  result = %*{
-    "list": %*{
-      "beginning": results.beginning,
-      "top": results.top,
-      "bottom": results.bottom
-    },
-    "timeline": newJArray()
-  }
-
   var retweets: seq[int64]
+  var timeline = newJArray()
+
   for thread in results.content:
     if thread.len == 1:
       let tweet = thread[0]
@@ -89,20 +75,33 @@ proc formatTimelineAsJson*(results: Timeline): JsonNode =
       if retweetId != 0 and tweet.retweet.isSome:
         retweets &= retweetId
 
-      result["timeline"].add(formatTweetAsJson(tweet))
+      timeline.add(formatTweetAsJson(tweet))
     else:
-      var threadJson = newJArray()
       for tweet in thread:
-        threadJson.add(formatTweetAsJson(tweet))
-      result["timeline"].add(threadJson)
+        timeline.add(formatTweetAsJson(tweet))
+      timeline.add(timeline)
 
-proc formatUsersAsJson*(results: Result[User]): JsonNode =
-  result = %*{
-    "beginning": results.beginning,
-    "top": results.top,
-    "bottom": results.bottom,
-    "content": newJArray()
+  return %*{
+    "list": %*{
+      "beginning": results.beginning,
+      "top": results.top,
+      "bottom": results.bottom
+    },
+    "timeline": timeline
   }
 
+proc formatUsersAsJson*(results: Result[User]): JsonNode =
+  var users = newJArray()
+
   for user in results.content:
-    result["content"].add(formatUserAsJson(user))
+    users.add(formatUserAsJson(user))
+
+  return %*{
+    "list": %*{
+      "beginning": results.beginning,
+      "top": results.top,
+      "bottom": results.bottom,
+    },
+    "users": users
+  }
+

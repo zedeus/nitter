@@ -1,11 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import json
+import asyncdispatch
+import packedjson
 
-import renderutils
-import ".."/[types]
+import jester
+
+import timeline
+import ".."/routes/[router_utils]
+import ".."/[types, redis_cache, api]
 
 proc formatListAsJson*(list: List): JsonNode =
-  result = %*{
+  return %*{
     "id": list.id,
     "name": list.name,
     "userId": list.userId,
@@ -17,17 +21,18 @@ proc formatListAsJson*(list: List): JsonNode =
 
 proc createJsonApiListRouter*(cfg: Config) =
   router jsonapi_list:
-    get "/api/@name/lists/@slug/?":
-      cond cfg.enableJsonApi
-      cond '.' notin @"name"
-      cond @"name" != "i"
-      cond @"slug" != "memberships"
-      let
-        slug = decodeUrl(@"slug")
-        list = await getCachedList(@"name", slug)
-      if list.id.len == 0:
-        resp Http404, showError(&"""List "{@"slug"}" not found""", cfg)
-      redirect(&"/api/i/lists/{list.id}")
+    # get "/api/@name/lists/@slug/?":
+    #   cond cfg.enableJsonApi
+    #   cond '.' notin @"name"
+    #   cond @"name" != "i"
+    #   cond @"slug" != "memberships"
+    #   let
+    #     slug = decodeUrl(@"slug")
+    #     list = await getCachedList(@"name", slug)
+    #   if list.id.len == 0:
+    #     let json = %*{ "error": "List not found" }
+    #     resp Http200, $json
+    #   redirect(&"/api/i/lists/{list.id}")
 
     get "/api/i/lists/@id/?":
       cond cfg.enableJsonApi
@@ -39,7 +44,7 @@ proc createJsonApiListRouter*(cfg: Config) =
             "list": $formatListAsJson(list),
             "timeline": $formatTimelineAsJson(timeline)
           }
-      resp Http200, headers, $json
+      resp Http200, $json
 
     get "/api/i/lists/@id/members":
       cond cfg.enableJsonApi
@@ -51,4 +56,4 @@ proc createJsonApiListRouter*(cfg: Config) =
             "list": $formatListAsJson(list),
             "members": $formatUsersAsJson(members)
           }
-      resp Http200, headers, $json
+      resp Http200, $json
