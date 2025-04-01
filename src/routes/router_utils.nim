@@ -45,3 +45,21 @@ proc getNames*(name: string): seq[string] =
 
 template respJson*(node: JsonNode) =
   resp $node, "application/json"
+
+template respJsonSuccess*(data: JsonNode) =
+  let successResponse = %*{
+    "code": 0,
+    "data": data
+  }
+  resp $successResponse, "application/json"
+
+template respJsonError*(message: string) =
+  let errorResponse = %*{
+    "code": -1,
+    "error": message
+  }
+  resp $errorResponse, "application/json"
+
+template respJsonNull*() =
+  let nullResponse = newJNull()
+  resp $nullResponse, "application/json"
