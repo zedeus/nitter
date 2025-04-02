@@ -94,21 +94,6 @@ proc formatTimelineAsJson*(results: Timeline): JsonNode =
     "timeline": timeline
   }
 
-proc formatUsersAsJson*(results: Result[User]): JsonNode =
-  var users = newJArray()
-
-  for user in results.content:
-    users.add(formatUserAsJson(user))
-
-  return %*{
-    "pagination": %*{
-      "beginning": results.beginning,
-      "top": results.top,
-      "bottom": results.bottom,
-    },
-    "users": users
-  }
-
 proc formatUserName*(username: string): JsonNode =
   return %*{
     "username": username

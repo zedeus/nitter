@@ -19,6 +19,21 @@ proc formatListAsJson*(list: List): JsonNode =
     "banner": list.banner
   }
 
+proc formatUsersAsJson*(results: Result[User]): JsonNode =
+  var users = newJArray()
+
+  for user in results.content:
+    users.add(formatUserAsJson(user))
+
+  return %*{
+    "pagination": %*{
+      "beginning": results.beginning,
+      "top": results.top,
+      "bottom": results.bottom,
+    },
+    "users": users
+  }
+
 proc createJsonApiListRouter*(cfg: Config) =
   router jsonapi_list:
     get "/api/@name/lists/@slug/?":
