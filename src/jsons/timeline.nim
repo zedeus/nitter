@@ -58,8 +58,10 @@ proc formatTweetAsJson*(tweet: Tweet): JsonNode =
         tweet.retweet)) else: newJNull(),
     "attribution": if tweet.attribution.isSome: formatUserAsJson(get(
         tweet.attribution)) else: newJNull(),
+    "mediaTags": if tweet.mediaTags.len > 0: %tweet.mediaTags.map(formatUserAsJson) else: newJNull(),
     "quote": if tweet.quote.isSome: formatTweetAsJson(get(
         tweet.quote)) else: newJNull(),
+    "card": if tweet.card.isSome: %*get(tweet.card) else: newJNull(),
     "poll": if tweet.poll.isSome: %*get(tweet.poll) else: newJNull(),
     "gif": if tweet.gif.isSome: %*get(tweet.gif) else: newJNull(),
     "video": if tweet.video.isSome: %*get(tweet.video) else: newJNull(),
