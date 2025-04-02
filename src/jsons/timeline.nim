@@ -35,9 +35,9 @@ proc formatUserAsJson*(user: User): JsonNode =
 
 proc formatTweetAsJson*(tweet: Tweet): JsonNode =
   return %*{
-    "id": tweet.id,
-    "threadId": tweet.threadId,
-    "replyId": tweet.replyId,
+    "id": $tweet.id,
+    "threadId": $tweet.threadId,
+    "replyId": $tweet.replyId,
     "user": formatUserAsJson(tweet.user),
     "text": tweet.text,
     "time": tweet.time.toTime.toUnix(),
