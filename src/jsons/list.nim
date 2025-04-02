@@ -19,6 +19,21 @@ proc formatListAsJson*(list: List): JsonNode =
     "banner": list.banner
   }
 
+proc formatUsersAsJson*(results: Result[User]): JsonNode =
+  var users = newJArray()
+
+  for user in results.content:
+    users.add(formatUserAsJson(user))
+
+  return %*{
+    "pagination": %*{
+      "beginning": results.beginning,
+      "top": results.top,
+      "bottom": results.bottom,
+    },
+    "users": users
+  }
+
 proc createJsonApiListRouter*(cfg: Config) =
   router jsonapi_list:
     get "/api/@name/lists/@slug/?":
@@ -34,21 +49,21 @@ proc createJsonApiListRouter*(cfg: Config) =
     get "/api/i/lists/@id/?":
       cond cfg.enableJsonApi
       cond '.' notin @"id"
-      let list = await getCachedList(id=(@"id"))
+      let list = await getCachedList(id = (@"id"))
       respJson formatListAsJson(list)
 
     get "/api/i/lists/@id/timeline/?":
       cond cfg.enableJsonApi
       cond '.' notin @"id"
       let
-          list = await getCachedList(id=(@"id"))
-          timeline = await getGraphListTweets(list.id, getCursor())
+        list = await getCachedList(id = (@"id"))
+        timeline = await getGraphListTweets(list.id, getCursor())
       respJson formatTimelineAsJson(timeline)
 
     get "/api/i/lists/@id/members/?":
       cond cfg.enableJsonApi
       cond '.' notin @"id"
       let
-          list = await getCachedList(id=(@"id"))
-          members = await getGraphListMembers(list, getCursor())
-      respJson formatUsersAsJson(members) 
+        list = await getCachedList(id = (@"id"))
+        members = await getGraphListMembers(list, getCursor())
+      respJson formatUsersAsJson(members)
