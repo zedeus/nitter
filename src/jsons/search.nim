@@ -35,5 +35,6 @@ proc createJsonApiSearchRouter*(cfg: Config) =
         respJsonSuccess formatTweetsAsJson(tweets)
       else:
         respJsonError "Invalid search"
+
     get "/api/hashtag/@hash":
       redirect("/search?q=" & encodeUrl("#" & @"hash"))
