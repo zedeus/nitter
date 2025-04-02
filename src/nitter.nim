@@ -11,7 +11,7 @@ import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, debug,
   unsupported, embed, resolver, router_utils]
-import jsons/[health, timeline, list]
+import jsons/[health, timeline, list, search]
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 const issuesUrl = "https://github.com/zedeus/nitter/issues"

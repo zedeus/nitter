@@ -3,6 +3,8 @@ import strutils, uri
 
 import jester
 
+import timeline
+
 import ".."/routes/[router_utils, timeline]
 import ".."/[query, types, api, formatters]
 import ../views/[general, search]
