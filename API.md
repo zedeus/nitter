@@ -1,4 +1,4 @@
- # Nitter JSON API Documentation
+# Nitter JSON API Documentation
 
 This document describes all available JSON API endpoints in the Nitter application.
 
@@ -76,6 +76,42 @@ Get members of a specific list.
 |------------|--------|--------------------------------|
 | pagination | object | Pagination information         |
 | users      | array  | Array of user objects          |
+
+## Search
+
+### GET /api/search
+
+Search for tweets or users based on a query.
+
+**Parameters:**
+| Parameter | Type   | Description                    |
+|-----------|--------|--------------------------------|
+| q         | string | Search query (max 500 chars)   |
+
+**Response:**
+| Field      | Type   | Description                    |
+|------------|--------|--------------------------------|
+| pagination | object | Pagination information         |
+| timeline   | array  | Array of tweets (for tweet search) |
+| users      | array  | Array of users (for user search) |
+
+**Notes:**
+- The search type is determined by the query format
+- For user search, if the query contains a comma, it will redirect to the user profile page
+- Returns error if search input is too long (>500 characters)
+- Returns error for invalid search types
+
+### GET /api/hashtag/@hash
+
+Redirect to search results for a specific hashtag.
+
+**Parameters:**
+| Parameter | Type   | Description                    |
+|-----------|--------|--------------------------------|
+| hash      | string | Hashtag to search for          |
+
+**Response:**
+Redirects to `/search?q=#hashtag`
 
 ## User Profile
 
