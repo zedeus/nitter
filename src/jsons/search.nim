@@ -3,6 +3,8 @@ import strutils, uri
 
 import jester
 
+import timeline, list
+
 import ".."/routes/[router_utils, timeline]
 import ".."/[query, types, api, formatters]
 import ../views/[general, search]
@@ -17,12 +19,11 @@ proc createJsonApiSearchRouter*(cfg: Config) =
       let
         prefs = cookiePrefs()
         query = initQuery(params(request))
-        title = "Search" & (if q.len > 0: " (" & q & ")" else: "")
 
       case query.kind
       of users:
         if "," in q:
-          redirect("/" & q)
+          respJsonError "Invalid search input"
         var users: Result[User]
         try:
           users = await getGraphUserSearch(query, getCursor())
@@ -30,9 +31,9 @@ proc createJsonApiSearchRouter*(cfg: Config) =
           users = Result[User](beginning: true, query: query)
         respJsonSuccess formatUsersAsJson(users)
       of tweets:
-        let
-          tweets = await getGraphTweetSearch(query, getCursor())
-        respJsonSuccess formatTweetsAsJson(tweets)
+        let timeline = await getGraphTweetSearch(query, getCursor())
+        if timeline.content.len == 0: respJsonError "No results found"
+        respJsonSuccess formatTimelineAsJson(timeline)
       else:
         respJsonError "Invalid search"
 

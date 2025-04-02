@@ -11,7 +11,7 @@ import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, debug,
   unsupported, embed, resolver, router_utils]
-import jsons/[health, timeline, list]
+import jsons/[health, timeline, list, search]
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 const issuesUrl = "https://github.com/zedeus/nitter/issues"
@@ -110,6 +110,7 @@ routes:
   extend jsonapi_health, ""
   extend jsonapi_list, ""
   extend jsonapi_timeline, ""
+  extend jsonapi_search, ""
   extend rss, ""
   extend status, ""
   extend search, ""
