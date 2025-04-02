@@ -49,21 +49,21 @@ proc createJsonApiListRouter*(cfg: Config) =
     get "/api/i/lists/@id/?":
       cond cfg.enableJsonApi
       cond '.' notin @"id"
-      let list = await getCachedList(id=(@"id"))
+      let list = await getCachedList(id = (@"id"))
       respJson formatListAsJson(list)
 
     get "/api/i/lists/@id/timeline/?":
       cond cfg.enableJsonApi
       cond '.' notin @"id"
       let
-          list = await getCachedList(id=(@"id"))
-          timeline = await getGraphListTweets(list.id, getCursor())
+        list = await getCachedList(id = (@"id"))
+        timeline = await getGraphListTweets(list.id, getCursor())
       respJson formatTimelineAsJson(timeline)
 
     get "/api/i/lists/@id/members/?":
       cond cfg.enableJsonApi
       cond '.' notin @"id"
       let
-          list = await getCachedList(id=(@"id"))
-          members = await getGraphListMembers(list, getCursor())
-      respJson formatUsersAsJson(members) 
+        list = await getCachedList(id = (@"id"))
+        members = await getGraphListMembers(list, getCursor())
+      respJson formatUsersAsJson(members)

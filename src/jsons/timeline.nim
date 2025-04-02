@@ -54,9 +54,12 @@ proc formatTweetAsJson*(tweet: Tweet): JsonNode =
       "likes": tweet.stats.likes,
       "quotes": tweet.stats.quotes
     },
-    "retweet": if tweet.retweet.isSome: formatTweetAsJson(get(tweet.retweet)) else: newJNull(),
-    "attribution": if tweet.attribution.isSome: formatUserAsJson(get(tweet.attribution)) else: newJNull(),
-    "quote": if tweet.quote.isSome: formatTweetAsJson(get(tweet.quote)) else: newJNull(),
+    "retweet": if tweet.retweet.isSome: formatTweetAsJson(get(
+        tweet.retweet)) else: newJNull(),
+    "attribution": if tweet.attribution.isSome: formatUserAsJson(get(
+        tweet.attribution)) else: newJNull(),
+    "quote": if tweet.quote.isSome: formatTweetAsJson(get(
+        tweet.quote)) else: newJNull(),
     "poll": if tweet.poll.isSome: %*get(tweet.poll) else: newJNull(),
     "gif": if tweet.gif.isSome: %*get(tweet.gif) else: newJNull(),
     "video": if tweet.video.isSome: %*get(tweet.video) else: newJNull(),
@@ -103,7 +106,8 @@ proc formatProfileAsJson*(profile: Profile): JsonNode =
   return %*{
     "user": formatUserAsJson(profile.user),
     "photoRail": %profile.photoRail,
-    "pinned": if profile.pinned.isSome: formatTweetAsJson(get(profile.pinned)) else: newJNull()
+    "pinned": if profile.pinned.isSome: formatTweetAsJson(get(
+        profile.pinned)) else: newJNull()
   }
 
 proc createJsonApiTimelineRouter*(cfg: Config) =
@@ -117,7 +121,8 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
         respJsonError "User not found"
 
     get "/api/@name/profile":
-      cond @"name" notin ["pic", "gif", "video", "search", "settings", "login", "intent", "i"]
+      cond @"name" notin ["pic", "gif", "video", "search", "settings", "login",
+          "intent", "i"]
       let
         prefs = cookiePrefs()
         names = getNames(@"name")
@@ -126,14 +131,15 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
       if names.len != 1:
         query.fromUser = names
 
-      var profile = await fetchProfile("", query, skipRail=false)
+      var profile = await fetchProfile("", query, skipRail = false)
       if profile.user.username.len == 0: respJsonError "User not found"
 
       respJsonSuccess formatProfileAsJson(profile)
 
     get "/api/@name/?@tab?/?":
       cond '.' notin @"name"
-      cond @"name" notin ["pic", "gif", "video", "search", "settings", "login", "intent", "i"]
+      cond @"name" notin ["pic", "gif", "video", "search", "settings", "login",
+          "intent", "i"]
       cond @"tab" in ["with_replies", "media", "search", ""]
       let
         prefs = cookiePrefs()
@@ -150,7 +156,7 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
         timeline.beginning = true
         respJsonSuccess formatTimelineAsJson(timeline)
       else:
-        var profile = await fetchProfile(after, query, skipRail=true)
+        var profile = await fetchProfile(after, query, skipRail = true)
         if profile.tweets.content.len == 0: respJsonError "User not found"
         profile.tweets.beginning = true
         respJsonSuccess formatTimelineAsJson(profile.tweets)
