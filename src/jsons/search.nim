@@ -17,12 +17,11 @@ proc createJsonApiSearchRouter*(cfg: Config) =
       let
         prefs = cookiePrefs()
         query = initQuery(params(request))
-        title = "Search" & (if q.len > 0: " (" & q & ")" else: "")
 
       case query.kind
       of users:
         if "," in q:
-          redirect("/" & q)
+          respJsonError "Invalid search input"
         var users: Result[User]
         try:
           users = await getGraphUserSearch(query, getCursor())

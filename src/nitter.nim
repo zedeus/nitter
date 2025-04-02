@@ -110,6 +110,7 @@ routes:
   extend jsonapi_health, ""
   extend jsonapi_list, ""
   extend jsonapi_timeline, ""
+  extend jsonapi_search, ""
   extend rss, ""
   extend status, ""
   extend search, ""
