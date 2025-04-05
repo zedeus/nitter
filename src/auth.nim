@@ -6,7 +6,7 @@ import experimental/parser/session
 # max requests at a time per session to avoid race conditions
 const
   maxConcurrentReqs = 2
-  dayInSeconds = 24 * 60 * 60
+  hourInSeconds = 60 * 60
   apiMaxReqs: Table[Api, int] = {
     Api.search: 50,
     Api.tweetDetail: 500,
@@ -127,7 +127,7 @@ proc isLimited(session: Session; api: Api): bool =
     return true
 
   if session.limited and api != Api.userTweets:
-    if (epochTime().int - session.limitedAt) > dayInSeconds:
+    if (epochTime().int - session.limitedAt) > hourInSeconds:
       session.limited = false
       log "resetting limit: ", session.id
       return false
