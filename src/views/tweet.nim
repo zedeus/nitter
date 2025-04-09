@@ -274,6 +274,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
     divClass = "thread-last " & class
 
   if not tweet.available:
+    divClass &= " author-" & tweet.user.username
     return buildHtml(tdiv(class=divClass & "unavailable timeline-item")):
       tdiv(class="unavailable-box"):
         if tweet.tombstone.len > 0:
@@ -295,6 +296,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
   if tweet.retweet.isSome:
     tweet = tweet.retweet.get
     retweet = fullTweet.user.fullname
+    divClass &= " retweet-" & retweet
+
+  divClass &= " author-" & tweet.user.fullname
 
   buildHtml(tdiv(class=("timeline-item " & divClass))):
     if not mainTweet:
