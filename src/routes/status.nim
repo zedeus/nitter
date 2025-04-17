@@ -62,9 +62,11 @@ proc createStatusRouter*(cfg: Config) =
         elif card.video.isSome():
           images = @[card.video.get().thumb]
 
+
+      let rss = "/$1/status/$2/rss" % [@"name", @"id"]
       let html = renderConversation(conv, prefs, getPath() & "#m")
       resp renderMain(html, request, cfg, prefs, title, desc, ogTitle,
-                      images=images, video=video)
+                      images=images, video=video, rss=rss)
 
     get "/@name/@s/@id/@m/?@i?":
       cond @"s" in ["status", "statuses"]
