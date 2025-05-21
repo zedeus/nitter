@@ -270,6 +270,7 @@ type
     enableRss*: bool
     twitterLinkInRss*: bool
     enableDebug*: bool
+    enableApi*: bool
     proxy*: string
     proxyAuth*: string
 
