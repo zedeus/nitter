@@ -10,7 +10,7 @@ import pyotp
 TW_CONSUMER_KEY = '3nVuSoBZnx6U4vzUxf5w'
 TW_CONSUMER_SECRET = 'Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys'
 
-def auth(username, password, otp_secret):
+def auth(username, password, email,otp_secret):
     bearer_token_req = requests.post("https://api.twitter.com/oauth2/token",
         auth=(TW_CONSUMER_KEY, TW_CONSUMER_SECRET),
         headers={"Content-Type": "application/x-www-form-urlencoded"},
@@ -88,6 +88,24 @@ def auth(username, password, otp_secret):
         }
     )
 
+    if task2.json().get('subtasks')[0].get('subtask_id') == "LoginEnterAlternateIdentifierSubtask":
+
+        task2 = session.post(
+            'https://api.twitter.com/1.1/onboarding/task.json',
+            json={
+                "flow_token": task2.json().get('flow_token'),
+                "subtask_inputs": [{
+                    "enter_text": {
+                        "suggestion_id": None,
+                        "text": email,
+                        "link": "next_link"
+                    },
+                    "subtask_id": "LoginEnterAlternateIdentifierSubtask"
+                }]
+            }
+        )
+
+
     task3 = session.post(
         'https://api.twitter.com/1.1/onboarding/task.json',
         json={
@@ -133,16 +151,17 @@ def auth(username, password, otp_secret):
     return None
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
-        print("Usage: python3 get_session.py <username> <password> <2fa secret> <path>")
+    if len(sys.argv) != 6:
+        print("Usage: python3 get_session.py <username> <password> <email> <2fa secret> <path>")
         sys.exit(1)
 
     username = sys.argv[1]
     password = sys.argv[2]
-    otp_secret = sys.argv[3]
-    path = sys.argv[4]
+    email = sys.argv[3]
+    otp_secret = sys.argv[4]
+    path = sys.argv[5]
 
-    result = auth(username, password, otp_secret)
+    result = auth(username, password, email, otp_secret)
     if result is None:
         print("Authentication failed.")
         sys.exit(1)
