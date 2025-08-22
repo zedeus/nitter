@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, sequtils, strformat, options, algorithm
+import strutils, sequtils, strformat, options, algorithm, uri
 import karax/[karaxdsl, vdom, vstyles]
 from jester import Request
 
@@ -178,11 +178,11 @@ func formatStat(stat: int): string =
   if stat > 0: insertSep($stat, ',')
   else: ""
 
-proc renderStats(stats: TweetStats; views: string): VNode =
+proc renderStats(tweet_id: int64; stats: TweetStats; views: string): VNode =
   buildHtml(tdiv(class="tweet-stats")):
     span(class="tweet-stat"): icon "comment", formatStat(stats.replies)
     span(class="tweet-stat"): icon "retweet", formatStat(stats.retweets)
-    span(class="tweet-stat"): icon "quote", formatStat(stats.quotes)
+    a(class="tweet-stat", href=("/search?q=" & encodeUrl(&"-from:quotedreplies url:{tweet_id}") & "&e-nativeretweets=on")): icon "quote", formatStat(stats.quotes)
     span(class="tweet-stat"): icon "heart", formatStat(stats.likes)
     if views.len > 0:
       span(class="tweet-stat"): icon "play", insertSep(views, ',')
@@ -343,7 +343,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         renderMediaTags(tweet.mediaTags)
 
       if not prefs.hideTweetStats:
-        renderStats(tweet.stats, views)
+        renderStats(tweet.id, tweet.stats, views)
 
       if showThread:
         a(class="show-thread", href=("/i/status/" & $tweet.threadId)):

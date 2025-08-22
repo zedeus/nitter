@@ -201,6 +201,10 @@
 .tweet-stats {
     margin-bottom: -3px;
     -webkit-user-select: none;
+
+    a {
+        pointer-events: all;
+    }
 }
 
 .tweet-stat {
