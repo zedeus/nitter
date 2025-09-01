@@ -3,47 +3,68 @@ import requests
 import json
 import sys
 import pyotp
+from loguru import logger
+from tools.env import OTP_SECRET, PASSWORD, PROXY_IP, PROXY_PASSWORD, PROXY_PORT, PROXY_USERNAME, USERNAME
 
-# NOTE: pyotp and requests are dependencies
-# > pip install pyotp requests
-
+# pip install pyotp loguru requests
 TW_CONSUMER_KEY = '3nVuSoBZnx6U4vzUxf5w'
 TW_CONSUMER_SECRET = 'Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys'
 
-def auth(username, password, otp_secret):
-    bearer_token_req = requests.post("https://api.twitter.com/oauth2/token",
+PROXIES = {
+"http": "",
+"https": ""
+}
+
+def auth(username, password, otp_secret=None):
+    logger.info("🔑 Getting bearer token")
+    resp = requests.post(
+        "https://api.twitter.com/oauth2/token",
         auth=(TW_CONSUMER_KEY, TW_CONSUMER_SECRET),
         headers={"Content-Type": "application/x-www-form-urlencoded"},
-        data='grant_type=client_credentials'
-    ).json()
-    bearer_token = ' '.join(str(x) for x in bearer_token_req.values())
+        data="grant_type=client_credentials",
+        proxies=PROXIES,
+        timeout=15
+    )
+    logger.debug(resp.text)
+    if resp.status_code != 200:
+        logger.error("❌ Failed to get bearer token.")
+        return None
 
-    guest_token = requests.post(
+    bearer_token = ' '.join(str(x) for x in resp.json().values())
+
+    logger.info("🎫 Getting guest token")
+    guest_resp = requests.post(
         "https://api.twitter.com/1.1/guest/activate.json",
-        headers={'Authorization': bearer_token}
-    ).json().get('guest_token')
+        headers={"Authorization": bearer_token},
+        proxies=PROXIES,
+        timeout=15
+    )
+    logger.debug(guest_resp.text)
 
+    guest_token = guest_resp.json().get('guest_token')
     if not guest_token:
-        print("Failed to obtain guest token.")
-        sys.exit(1)
+        logger.error("❌ Failed to obtain guest token.")
+        return None
 
-    twitter_header = {
+    twitter_headers = {
         'Authorization': bearer_token,
         "Content-Type": "application/json",
-        "User-Agent": "TwitterAndroid/10.21.0-release.0 (310210000-r-0) ONEPLUS+A3010/9 (OnePlus;ONEPLUS+A3010;OnePlus;OnePlus3;0;;1;2016)",
+        "User-Agent": "TwitterAndroid/10.21.0-release.0 (310210000-r-0) ONEPLUS+A3010/9",
         "X-Twitter-API-Version": '5',
         "X-Twitter-Client": "TwitterAndroid",
         "X-Twitter-Client-Version": "10.21.0-release.0",
         "OS-Version": "28",
-        "System-User-Agent": "Dalvik/2.1.0 (Linux; U; Android 9; ONEPLUS A3010 Build/PKQ1.181203.001)",
+        "System-User-Agent": "Dalvik/2.1.0 (Linux; Android 9; ONEPLUS A3010)",
         "X-Twitter-Active-User": "yes",
         "X-Guest-Token": guest_token,
         "X-Twitter-Client-DeviceID": ""
     }
 
     session = requests.Session()
-    session.headers = twitter_header
+    session.headers = twitter_headers
+    session.proxies.update(PROXIES)
 
+    logger.info("🚀 Starting login flow")
     task1 = session.post(
         'https://api.twitter.com/1.1/onboarding/task.json',
         params={
@@ -68,26 +89,52 @@ def auth(username, password, otp_secret):
                 "requested_variant": None,
                 "target_user_id": 0
             }
-        }
+        },
+        timeout=15
     )
+    logger.debug(task1.text)
 
     session.headers['att'] = task1.headers.get('att')
 
+    # STEP: Enter user identifier (email / phone / username)
     task2 = session.post(
         'https://api.twitter.com/1.1/onboarding/task.json',
         json={
             "flow_token": task1.json().get('flow_token'),
             "subtask_inputs": [{
                 "enter_text": {
-                    "suggestion_id": None,
                     "text": username,
                     "link": "next_link"
                 },
                 "subtask_id": "LoginEnterUserIdentifier"
             }]
-        }
+        },
+        timeout=15
     )
+    logger.debug(task2.text)
 
+    # STEP: Enter alternate identifier if required
+    for subtask in task2.json().get("subtasks", []):
+        if subtask.get("subtask_id") == "LoginEnterAlternateIdentifierSubtask":
+            logger.warning("⚠️ Twitter requested alternate identifier")
+            task2b = session.post(
+                'https://api.twitter.com/1.1/onboarding/task.json',
+                json={
+                    "flow_token": task2.json().get('flow_token'),
+                    "subtask_inputs": [{
+                        "enter_text": {
+                            "text": username,
+                            "link": "next_link"
+                        },
+                        "subtask_id": "LoginEnterAlternateIdentifierSubtask"
+                    }]
+                },
+                timeout=15
+            )
+            logger.debug(task2b.text)
+            task2 = task2b
+
+    # STEP: Enter password
     task3 = session.post(
         'https://api.twitter.com/1.1/onboarding/task.json',
         json={
@@ -98,64 +145,103 @@ def auth(username, password, otp_secret):
                     "link": "next_link"
                 },
                 "subtask_id": "LoginEnterPassword"
-            }],
-        }
+            }]
+        },
+        timeout=15
     )
+    logger.debug(task3.text)
 
-    for t3_subtask in task3.json().get('subtasks', []):
-        if "open_account" in t3_subtask:
-            return t3_subtask["open_account"]
-        elif "enter_text" in t3_subtask:
-            response_text = t3_subtask["enter_text"]["hint_text"]
-            totp = pyotp.TOTP(otp_secret)
-            generated_code = totp.now()
-            task4resp = session.post(
+    # STEP: Handle possible 2FA
+    for subtask in task3.json().get('subtasks', []):
+        if "open_account" in subtask:
+            logger.success("✅ Login successful without 2FA")
+            return subtask["open_account"]
+        elif "enter_text" in subtask and subtask["subtask_id"] == "LoginTwoFactorAuthChallenge":
+            if not otp_secret:
+                logger.error("2FA required, but no otp_secret provided.")
+                return None
+            try:
+                totp = pyotp.TOTP(otp_secret)
+                generated_code = totp.now()
+                logger.info(f"🔐 Generated 2FA code: {generated_code}")
+            except Exception as e:
+                logger.exception("TOTP generation failed")
+                return None
+
+            task4 = session.post(
                 "https://api.twitter.com/1.1/onboarding/task.json",
                 json={
                     "flow_token": task3.json().get("flow_token"),
-                    "subtask_inputs": [
-                        {
-                            "enter_text": {
-                                "suggestion_id": None,
-                                "text": generated_code,
-                                "link": "next_link",
-                            },
-                            "subtask_id": "LoginTwoFactorAuthChallenge",
-                        }
-                    ],
-                }
+                    "subtask_inputs": [{
+                        "enter_text": {
+                            "text": generated_code,
+                            "link": "next_link"
+                        },
+                        "subtask_id": "LoginTwoFactorAuthChallenge"
+                    }]
+                },
+                timeout=15
             )
-            task4 = task4resp.json()
-            for t4_subtask in task4.get("subtasks", []):
-                if "open_account" in t4_subtask:
-                    return t4_subtask["open_account"]
+            logger.debug(task4.text)
 
+            for sub in task4.json().get("subtasks", []):
+                if "open_account" in sub:
+                    logger.success("✅ Login successful with 2FA")
+                    return sub["open_account"]
+
+    logger.error("❌ Login failed: No open_account received")
     return None
 
+def process_accounts():
+    data = f"""
+    {USERNAME}:{PASSWORD}:{OTP_SECRET}
+    """
+    results = []
+
+    for line in data.strip().splitlines():
+        parts = line.strip().split(":")
+        
+        login = parts[0]
+        password = parts[1]
+        code = parts[2] # secretcode (aka cant scan qr code)
+        results.append({
+            "login": login,
+            "password": password,
+            "code": code
+        })
+
+    return results
+
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
-        print("Usage: python3 get_session.py <username> <password> <2fa secret> <path>")
-        sys.exit(1)
+    accounts = process_accounts()
+    proxy = [
+    f"{PROXY_USERNAME}:{PROXY_PASSWORD}@{PROXY_IP}:{PROXY_PORT}",
+    ]
 
-    username = sys.argv[1]
-    password = sys.argv[2]
-    otp_secret = sys.argv[3]
-    path = sys.argv[4]
+    for account, proxy_addr in zip(accounts, proxy):
+        username = account['login']
+        password = account['password']
+        otp_secret = account['code']
+        PROXIES = {
+            "http": f"http://{proxy_addr}",
+            "https": f"http://{proxy_addr}"
+        }
 
-    result = auth(username, password, otp_secret)
-    if result is None:
-        print("Authentication failed.")
-        sys.exit(1)
+        
+        result = auth(username, password, otp_secret)
+        if result is None:
+            print("Authentication failed.")
+            sys.exit(1)
 
-    session_entry = {
-        "oauth_token": result.get("oauth_token"),
-        "oauth_token_secret": result.get("oauth_token_secret")
-    }
+        session_entry = {
+            "oauth_token": result.get("oauth_token"),
+            "oauth_token_secret": result.get("oauth_token_secret")
+        }
 
-    try:
-        with open(path, "a") as f:
-            f.write(json.dumps(session_entry) + "\n")
-        print("Authentication successful. Session appended to", path)
-    except Exception as e:
-        print(f"Failed to write session information: {e}")
-        sys.exit(1)
+        try:
+            with open("sessions.jsonl", "a") as f:
+                f.write(json.dumps(session_entry) + "\n")
+            print("Authentication successful. Session saved to sessions.jsonl")
+        except Exception as e:
+            print(f"Failed to save session: {e}")
+            sys.exit(1)

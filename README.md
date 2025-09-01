@@ -76,6 +76,14 @@ Twitter account.
 
 ## Installation
 
+### Get session tokens
+
+```bash
+python3 tools/get_session.py
+```
+
+This will create a `sessions.jsonl` file with the session tokens.
+
 ### Dependencies
 
 - libpcre

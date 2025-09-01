@@ -13,3 +13,5 @@ nitter.conf
 guest_accounts.json*
 sessions.json*
 dump.rdb
+*.env
+*.pyc
