@@ -24,6 +24,8 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    networks:
+      - appnet
 
   nitter-redis:
     image: redis:6-alpine
@@ -43,6 +45,12 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    networks:
+      - appnet
 
 volumes:
   nitter-redis:
+
+networks:
+  appnet:
+    external: true
