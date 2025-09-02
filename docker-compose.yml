@@ -1,5 +1,3 @@
-version: "3"
-
 services:
 
   nitter:
@@ -25,7 +23,7 @@ services:
     cap_drop:
       - ALL
     networks:
-      - appnet
+      - nitter_net
 
   nitter-redis:
     image: redis:6-alpine
@@ -46,11 +44,11 @@ services:
     cap_drop:
       - ALL
     networks:
-      - appnet
+      - nitter_net
 
 volumes:
   nitter-redis:
 
 networks:
-  appnet:
+  nitter_net:
     external: true

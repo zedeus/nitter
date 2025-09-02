@@ -2,7 +2,7 @@
 set -euo pipefail
 
 COMPOSE_FILE="${COMPOSE_FILE:-./docker-compose.yml}"
-NETWORK_NAME="${NETWORK_NAME:-appnet}"
+NETWORK_NAME="${NETWORK_NAME:-nitter_net}"
 PORT="${PORT:-8080}"
 
 # docker compose wrapper
@@ -17,11 +17,13 @@ compose() {
 case "${1:-}" in
   up)
     docker network inspect "$NETWORK_NAME" >/dev/null 2>&1 || docker network create "$NETWORK_NAME" || true
+    compose build
     compose up -d
     echo "Nitter Running → http://localhost:${PORT}"
     ;;
   down)
-    compose down
+    compose down --remove-orphans
+    docker system prune -f
     echo "Nitter Stopped"
     ;;
   *)
