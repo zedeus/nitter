@@ -1,7 +1,9 @@
 services:
 
   nitter:
-    image: zedeus/nitter:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: nitter
     ports:
       - "8080:8080" # Replace with "8080:8080" if you don't use a reverse proxy
