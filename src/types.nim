@@ -271,6 +271,7 @@ type
     enableDebug*: bool
     proxy*: string
     proxyAuth*: string
+    searchMode*: string
 
     rssCacheTime*: int
     listCacheTime*: int

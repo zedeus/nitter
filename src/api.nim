@@ -1,8 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch, httpclient, uri, strutils, sequtils, sugar
 import packedjson
-import types, query, formatters, consts, apiutils, parser
+import types, query, formatters, consts, apiutils, parser, config
 import experimental/parser as newParser
+
+var globalConfig: Config
+
+proc setApiConfig*(cfg: Config) =
+  globalConfig = cfg
 
 proc getGraphUser*(username: string): Future[User] {.async.} =
   if username.len == 0: return
@@ -104,7 +109,7 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
     variables = %*{
       "rawQuery": q,
       "count": 20,
-      "product": "Latest",
+      "product": if globalConfig != nil: globalConfig.searchMode else: "Latest",
       "withDownvotePerspective": false,
       "withReactionsMetadata": false,
       "withReactionsPerspective": false

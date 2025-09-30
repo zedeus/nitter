@@ -14,12 +14,22 @@ compose() {
   fi
 }
 
-case "${1:-}" in
-  up)
+MODE="${1:-}"
+CMD="${2:-}"
+
+case "$MODE" in
+  Latest|Top)
+    if [ "$CMD" != "up" ]; then
+      echo "Usage: $0 {Latest|Top} up"
+      exit 1
+    fi
+    # Update nitter.conf with the selected mode
+    sed -i "s/^searchMode = \".*\"/searchMode = \"$MODE\"/" nitter.conf
+
     docker network inspect "$NETWORK_NAME" >/dev/null 2>&1 || docker network create "$NETWORK_NAME" || true
     compose build
     compose up -d
-    echo "Nitter Running → http://localhost:${PORT}"
+    echo "Nitter Running → http://localhost:${PORT} (Mode: $MODE)"
     ;;
   down)
     compose down --remove-orphans
@@ -27,7 +37,8 @@ case "${1:-}" in
     echo "Nitter Stopped"
     ;;
   *)
-    echo "Usage: $0 {up|down}"
+    echo "Usage: $0 {Latest|Top} up"
+    echo "       $0 down"
     exit 1
     ;;
 esac
