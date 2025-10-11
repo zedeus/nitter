@@ -5,8 +5,8 @@ import sys
 import pyotp
 import cloudscraper
 
-# NOTE: pyotp and requests are dependencies
-# > pip install pyotp requests
+# NOTE: pyotp, requests and cloudscraper are dependencies
+# > pip install pyotp requests cloudscraper
 
 TW_CONSUMER_KEY = '3nVuSoBZnx6U4vzUxf5w'
 TW_CONSUMER_SECRET = 'Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys'
