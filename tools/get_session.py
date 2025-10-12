@@ -3,9 +3,10 @@ import requests
 import json
 import sys
 import pyotp
+import cloudscraper
 
-# NOTE: pyotp and requests are dependencies
-# > pip install pyotp requests
+# NOTE: pyotp, requests and cloudscraper are dependencies
+# > pip install pyotp requests cloudscraper
 
 TW_CONSUMER_KEY = '3nVuSoBZnx6U4vzUxf5w'
 TW_CONSUMER_SECRET = 'Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys'
@@ -41,10 +42,10 @@ def auth(username, password, otp_secret):
         "X-Twitter-Client-DeviceID": ""
     }
 
-    session = requests.Session()
-    session.headers = twitter_header
+    scraper = cloudscraper.create_scraper()
+    scraper.headers = twitter_header
 
-    task1 = session.post(
+    task1 = scraper.post(
         'https://api.twitter.com/1.1/onboarding/task.json',
         params={
             'flow_name': 'login',
@@ -71,9 +72,9 @@ def auth(username, password, otp_secret):
         }
     )
 
-    session.headers['att'] = task1.headers.get('att')
+    scraper.headers['att'] = task1.headers.get('att')
 
-    task2 = session.post(
+    task2 = scraper.post(
         'https://api.twitter.com/1.1/onboarding/task.json',
         json={
             "flow_token": task1.json().get('flow_token'),
@@ -88,7 +89,7 @@ def auth(username, password, otp_secret):
         }
     )
 
-    task3 = session.post(
+    task3 = scraper.post(
         'https://api.twitter.com/1.1/onboarding/task.json',
         json={
             "flow_token": task2.json().get('flow_token'),
@@ -109,7 +110,7 @@ def auth(username, password, otp_secret):
             response_text = t3_subtask["enter_text"]["hint_text"]
             totp = pyotp.TOTP(otp_secret)
             generated_code = totp.now()
-            task4resp = session.post(
+            task4resp = scraper.post(
                 "https://api.twitter.com/1.1/onboarding/task.json",
                 json={
                     "flow_token": task3.json().get("flow_token"),
