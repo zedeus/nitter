@@ -14,8 +14,17 @@ const
   m3u8Mime* = "application/vnd.apple.mpegurl"
   maxAge* = "max-age=604800"
 
+var
+  proxy: Proxy
+
+proc setHttpProxy*(url: string; auth: string) =
+  if url.len > 0:
+    proxy = newProxy(url, auth)
+  else:
+    proxy = nil
+
 proc safeFetch*(url: string): Future[string] {.async.} =
-  let client = newAsyncHttpClient()
+  let client = newAsyncHttpClient(proxy=proxy)
   try: result = await client.getContent(url)
   except: discard
   finally: client.close()
@@ -32,7 +41,7 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   result = Http200
   let
     request = req.getNativeReq()
-    client = newAsyncHttpClient()
+    client = newAsyncHttpClient(proxy=proxy)
 
   try:
     let res = await client.get(url)
