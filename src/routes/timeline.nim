@@ -27,8 +27,7 @@ template skipIf[T](cond: bool; default; body: Future[T]): Future[T] =
   else:
     body
 
-proc fetchProfile*(after: string; query: Query; skipRail=false;
-                   skipPinned=false): Future[Profile] {.async.} =
+proc fetchProfile*(after: string; query: Query; skipRail=false): Future[Profile] {.async.} =
   let
     name = query.fromUser[0]
     userId = await getUserId(name)
@@ -71,7 +70,7 @@ proc showTimeline*(request: Request; query: Query; cfg: Config; prefs: Prefs;
       html = renderTweetSearch(timeline, prefs, getPath())
     return renderMain(html, request, cfg, prefs, "Multi", rss=rss)
 
-  var profile = await fetchProfile(after, query, skipPinned=prefs.hidePins)
+  var profile = await fetchProfile(after, query)
   template u: untyped = profile.user
 
   if u.suspended:
