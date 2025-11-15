@@ -31,14 +31,23 @@ type
     remaining*: int
     reset*: int
 
+  SessionKind* = enum
+    oauth
+    cookie
+
   Session* = ref object
     id*: int64
-    oauthToken*: string
-    oauthSecret*: string
     pending*: int
     limited*: bool
     limitedAt*: int
     apis*: Table[Api, RateLimit]
+    case kind*: SessionKind
+    of oauth:
+      oauthToken*: string
+      oauthSecret*: string
+    of cookie:
+      authToken*: string
+      ct0*: string
 
   Error* = enum
     null = 0

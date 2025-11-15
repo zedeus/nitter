@@ -28,12 +28,12 @@ proc getOauthHeader(url, oauthToken, oauthTokenSecret: string): string =
 
   return getOauth1RequestHeader(params)["authorization"]
 
-proc genHeaders*(url, oauthToken, oauthTokenSecret: string): HttpHeaders =
-  let header = getOauthHeader(url, oauthToken, oauthTokenSecret)
+proc getCookieHeader(authToken, ct0: string): string =
+  "auth_token=" & authToken & "; ct0=" & ct0
 
+proc genHeaders*(session: Session, url: string): HttpHeaders =
   result = newHttpHeaders({
     "connection": "keep-alive",
-    "authorization": header,
     "content-type": "application/json",
     "x-twitter-active-user": "yes",
     "authority": "api.x.com",
@@ -43,18 +43,32 @@ proc genHeaders*(url, oauthToken, oauthTokenSecret: string): HttpHeaders =
     "DNT": "1"
   })
 
+  case session.kind
+  of SessionKind.oauth:
+    result["authorization"] = getOauthHeader(url, session.oauthToken, session.oauthSecret)
+  of SessionKind.cookie:
+    result["cookie"] = getCookieHeader(session.authToken, session.ct0)
+    result["x-csrf-token"] = session.ct0
+    result["x-twitter-auth-type"] = "OAuth2Session"
+
 template fetchImpl(result, fetchBody) {.dirty.} =
   once:
     pool = HttpPool()
 
   var session = await getSession(api)
-  if session.oauthToken.len == 0:
-    echo "[sessions] Empty oauth token, session: ", session.id
-    raise rateLimitError()
+  case session.kind
+  of SessionKind.oauth:
+    if session.oauthToken.len == 0:
+      echo "[sessions] Empty oauth token, session: ", session.id
+      raise rateLimitError()
+  of SessionKind.cookie:
+    if session.authToken.len == 0 or session.ct0.len == 0:
+      echo "[sessions] Empty cookie credentials, session: ", session.id
+      raise rateLimitError()
 
   try:
     var resp: AsyncResponse
-    pool.use(genHeaders($url, session.oauthToken, session.oauthSecret)):
+    pool.use(genHeaders(session, $url)):
       template getContent =
         resp = await c.get($url)
         result = await resp.body
