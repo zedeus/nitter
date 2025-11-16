@@ -17,9 +17,10 @@ proc parseSession*(raw: string): Session =
       oauthSecret: session.oauthTokenSecret
     )
   of "cookie":
+    let id = if session.id.len > 0: parseBiggestInt(session.id) else: 0
     result = Session(
       kind: SessionKind.cookie,
-      id: 999,
+      id: id,
       authToken: session.authToken,
       ct0: session.ct0
     )
