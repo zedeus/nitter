@@ -28,6 +28,7 @@ import json
 import asyncio
 import pyotp
 import nodriver as uc
+import os
 
 
 async def login_and_get_cookies(username, password, totp_seed=None, headless=False):
@@ -76,9 +77,9 @@ async def login_and_get_cookies(username, password, totp_seed=None, headless=Fal
                     twid = cookies_dict['twid']
                     # Try to extract the ID from twid (format: u%3D<id> or u=<id>)
                     if 'u%3D' in twid:
-                        user_id = twid.split('u%3D')[1].split('&')[0]
+                        user_id = twid.split('u%3D')[1].split('&')[0].strip('"')
                     elif 'u=' in twid:
-                        user_id = twid.split('u=')[1].split('&')[0]
+                        user_id = twid.split('u=')[1].split('&')[0].strip('"')
 
                 cookies_dict['username'] = username
                 if user_id:
@@ -106,13 +107,27 @@ async def main():
     headless = False
 
     # Parse optional arguments
-    for i, arg in enumerate(sys.argv[3:], 3):
-        if arg == '--append' and i + 1 < len(sys.argv):
-            append_file = sys.argv[i + 1]
+    i = 3
+    while i < len(sys.argv):
+        arg = sys.argv[i]
+        if arg == '--append':
+            if i + 1 < len(sys.argv):
+                append_file = sys.argv[i + 1]
+                i += 2  # Skip '--append' and filename
+            else:
+                print('[!] Error: --append requires a filename', file=sys.stderr)
+                sys.exit(1)
         elif arg == '--headless':
             headless = True
+            i += 1
         elif not arg.startswith('--'):
-            totp_seed = arg
+            if totp_seed is None: 
+                totp_seed = arg
+            i += 1
+        else:
+            # Unkown args
+            print(f'[!] Warning: Unknown argument: {arg}', file=sys.stderr)
+            i += 1
 
     try:
         cookies = await login_and_get_cookies(username, password, totp_seed, headless)
