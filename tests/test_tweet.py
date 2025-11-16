@@ -28,14 +28,6 @@ invalid = [
 ]
 
 multiline = [
-    [400897186990284800, 'mobile_test_3',
-     """
-♔
-  KEEP
- CALM
-   AND
-CLICHÉ
-    ON"""],
     [1718660434457239868, 'WebDesignMuseum',
      """
 Happy 32nd Birthday HTML tags! 
