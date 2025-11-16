@@ -57,7 +57,8 @@ proc getSessionPoolHealth*(): JsonNode =
     for api in session.apis.keys:
       let
         apiStatus = session.apis[api]
-        reqs = apiMaxReqs[api] - apiStatus.remaining
+        limit = if apiStatus.limit > 0: apiStatus.limit else: apiMaxReqs.getOrDefault(api, 0)
+        reqs = limit - apiStatus.remaining
 
       # no requests made with this session and endpoint since the limit reset
       if apiStatus.reset < now:
@@ -172,17 +173,17 @@ proc setLimited*(session: Session; api: Api) =
   session.limitedAt = epochTime().int
   log "rate limited by api: ", api, ", reqs left: ", session.apis[api].remaining, ", id: ", session.id
 
-proc setRateLimit*(session: Session; api: Api; remaining, reset: int) =
+proc setRateLimit*(session: Session; api: Api; remaining, reset, limit: int) =
   # avoid undefined behavior in race conditions
   if api in session.apis:
-    let limit = session.apis[api]
-    if limit.reset >= reset and limit.remaining < remaining:
+    let rateLimit = session.apis[api]
+    if rateLimit.reset >= reset and rateLimit.remaining < remaining:
       return
-    if limit.reset == reset and limit.remaining >= remaining:
+    if rateLimit.reset == reset and rateLimit.remaining >= remaining:
       session.apis[api].remaining = remaining
       return
 
-  session.apis[api] = RateLimit(remaining: remaining, reset: reset)
+  session.apis[api] = RateLimit(limit: limit, remaining: remaining, reset: reset)
 
 proc initSessionPool*(cfg: Config; path: string) =
   enableLogging = cfg.enableDebug

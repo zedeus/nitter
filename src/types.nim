@@ -28,6 +28,7 @@ type
     userMedia
 
   RateLimit* = object
+    limit*: int
     remaining*: int
     reset*: int
 

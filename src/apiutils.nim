@@ -7,6 +7,7 @@ import experimental/types/common
 const
   rlRemaining = "x-rate-limit-remaining"
   rlReset = "x-rate-limit-reset"
+  rlLimit = "x-rate-limit-limit"
   errorsToSkip = {doesntExist, tweetNotFound, timeout, unauthorized, badRequest}
 
 var pool: HttpPool
@@ -83,7 +84,8 @@ template fetchImpl(result, fetchBody) {.dirty.} =
       let
         remaining = parseInt(resp.headers[rlRemaining])
         reset = parseInt(resp.headers[rlReset])
-      session.setRateLimit(api, remaining, reset)
+        limit = parseInt(resp.headers[rlLimit])
+      session.setRateLimit(api, remaining, reset, limit)
 
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
