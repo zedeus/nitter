@@ -37,20 +37,23 @@ proc genHeaders*(session: Session, url: string): HttpHeaders =
     "connection": "keep-alive",
     "content-type": "application/json",
     "x-twitter-active-user": "yes",
+    "x-twitter-client-language": "en",
     "authority": "api.x.com",
     "accept-encoding": "gzip",
     "accept-language": "en-US,en;q=0.9",
     "accept": "*/*",
-    "DNT": "1"
+    "DNT": "1",
+    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
   })
 
   case session.kind
   of SessionKind.oauth:
     result["authorization"] = getOauthHeader(url, session.oauthToken, session.oauthSecret)
   of SessionKind.cookie:
-    result["cookie"] = getCookieHeader(session.authToken, session.ct0)
-    result["x-csrf-token"] = session.ct0
+    result["authorization"] = "Bearer AAAAAAAAAAAAAAAAAAAAAFQODgEAAAAAVHTp76lzh3rFzcHbmHVvQxYYpTw%3DckAlMINMjmCwxUcaXbAN4XqJVdgMJaHqNOFgPMK0zN1qLqLQCF"
     result["x-twitter-auth-type"] = "OAuth2Session"
+    result["x-csrf-token"] = session.ct0
+    result["cookie"] = getCookieHeader(session.authToken, session.ct0)
 
 template fetchImpl(result, fetchBody) {.dirty.} =
   once:
