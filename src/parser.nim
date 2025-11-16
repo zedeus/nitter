@@ -6,22 +6,6 @@ import experimental/parser/unifiedcard
 
 proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet
 
-proc extractTweetsFromEntry(e: JsonNode; entryId: string): seq[Tweet] =
-  if e{"content", "items"}.notNull:
-    for item in e{"content", "items"}:
-      with tweetResult, item{"item", "itemContent", "tweet_results", "result"}:
-        var tweet = parseGraphTweet(tweetResult, false)
-        if not tweet.available:
-          tweet.id = parseBiggestInt(item{"entryId"}.getStr.getId())
-        result.add tweet
-    return
-
-  with tweetResult, e{"content", "content", "tweetResult", "result"}:
-    var tweet = parseGraphTweet(tweetResult, false)
-    if not tweet.available:
-      tweet.id = parseBiggestInt(entryId.getId())
-    result.add tweet
-
 proc parseUser(js: JsonNode; id=""): User =
   if js.isNull: return
   result = User(
@@ -432,6 +416,22 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string; v2=true): Conversati
         elif entryId.startsWith("cursor-bottom"):
           result.replies.bottom = e{"content", contentKey, "value"}.getStr
 
+proc extractTweetsFromEntry*(e: JsonNode; entryId: string): seq[Tweet] =
+  if e{"content", "items"}.notNull:
+    for item in e{"content", "items"}:
+      with tweetResult, item{"item", "itemContent", "tweet_results", "result"}:
+        var tweet = parseGraphTweet(tweetResult, false)
+        if not tweet.available:
+          tweet.id = parseBiggestInt(item{"entryId"}.getStr.getId())
+        result.add tweet
+    return
+
+  with tweetResult, e{"content", "content", "tweetResult", "result"}:
+    var tweet = parseGraphTweet(tweetResult, false)
+    if not tweet.available:
+      tweet.id = parseBiggestInt(entryId.getId())
+    result.add tweet
+
 proc parseGraphTimeline*(js: JsonNode; after=""): Profile =
   result = Profile(tweets: Timeline(beginning: after.len == 0))
 
@@ -482,31 +482,43 @@ proc parseGraphTimeline*(js: JsonNode; after=""): Profile =
 proc parseGraphPhotoRail*(js: JsonNode): PhotoRail =
   result = @[]
 
-  var instructions = ? js{"data", "user", "result", "timeline", "timeline", "instructions"}
+  let instructions =
+    if js{"data", "user"}.notNull:
+      ? js{"data", "user", "result", "timeline", "timeline", "instructions"}
+    else:
+      ? js{"data", "user_result", "result", "timeline_response", "timeline", "instructions"}
+
   if instructions.len == 0:
-    instructions = ? js{"data", "user_result", "result", "timeline_response", "timeline", "instructions"}
+    return
 
   for i in instructions:
-    let instrType = i{"type"}.getStr
-    if instrType.len == 0:
-      if i{"__typename"}.getStr != "TimelineAddEntries":
-        continue
-    elif instrType != "TimelineAddEntries":
+    # TimelineAddToModule instruction is used by MediaTimelineV2
+    if i{"moduleItems"}.notNull:
+      for item in i{"moduleItems"}:
+        with tweetResult, item{"item", "itemContent", "tweet_results", "result"}:
+          let t = parseGraphTweet(tweetResult, false)
+          if not t.available:
+            t.id = parseBiggestInt(item{"entryId"}.getStr.getId())
+
+          let photo = extractGalleryPhoto(t)
+          if photo.url.len > 0:
+            result.add photo
+
+          if result.len == 16:
+            return
+      continue
+
+    let instrType = i{"type"}.getStr(i{"__typename"}.getStr)
+    if instrType != "TimelineAddEntries":
       continue
 
     for e in i{"entries"}:
       let entryId = e{"entryId"}.getStr
       if entryId.startsWith("tweet") or entryId.startsWith("profile-grid"):
         for t in extractTweetsFromEntry(e, entryId):
-          let url =
-            if t.photos.len > 0: t.photos[0]
-            elif t.video.isSome: get(t.video).thumb
-            elif t.gif.isSome: get(t.gif).thumb
-            elif t.card.isSome: get(t.card).image
-            else: ""
-
-          if url.len > 0:
-            result.add GalleryPhoto(url: url, tweetId: $t.id)
+          let photo = extractGalleryPhoto(t)
+          if photo.url.len > 0:
+            result.add photo
 
           if result.len == 16:
             return

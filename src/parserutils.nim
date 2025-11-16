@@ -319,3 +319,13 @@ proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
   tweet.expandTextEntities(entities, text, textSlice)
 
   tweet.text = tweet.text.multiReplace((unicodeOpen, xmlOpen), (unicodeClose, xmlClose))
+
+proc extractGalleryPhoto*(t: Tweet): GalleryPhoto =
+  let url =
+    if t.photos.len > 0: t.photos[0]
+    elif t.video.isSome: get(t.video).thumb
+    elif t.gif.isSome: get(t.gif).thumb
+    elif t.card.isSome: get(t.card).image
+    else: ""
+
+  result = GalleryPhoto(url: url, tweetId: $t.id)
