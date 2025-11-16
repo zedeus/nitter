@@ -55,20 +55,21 @@ proc genHeaders*(session: Session, url: string): HttpHeaders =
     result["x-csrf-token"] = session.ct0
     result["cookie"] = getCookieHeader(session.authToken, session.ct0)
 
+proc getAndValidateSession*(api: Api): Future[Session] {.async.} =
+  result = await getSession(api)
+  case result.kind
+  of SessionKind.oauth:
+    if result.oauthToken.len == 0:
+      echo "[sessions] Empty oauth token, session: ", result.id
+      raise rateLimitError()
+  of SessionKind.cookie:
+    if result.authToken.len == 0 or result.ct0.len == 0:
+      echo "[sessions] Empty cookie credentials, session: ", result.id
+      raise rateLimitError()
+
 template fetchImpl(result, fetchBody) {.dirty.} =
   once:
     pool = HttpPool()
-
-  var session = await getSession(api)
-  case session.kind
-  of SessionKind.oauth:
-    if session.oauthToken.len == 0:
-      echo "[sessions] Empty oauth token, session: ", session.id
-      raise rateLimitError()
-  of SessionKind.cookie:
-    if session.authToken.len == 0 or session.ct0.len == 0:
-      echo "[sessions] Empty cookie credentials, session: ", session.id
-      raise rateLimitError()
 
   try:
     var resp: AsyncResponse
@@ -136,9 +137,17 @@ template retry(bod) =
     echo "[sessions] Rate limited, retrying ", api, " request..."
     bod
 
-proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
+proc fetch*(url: Uri | SessionAwareUrl; api: Api): Future[JsonNode] {.async.} =
   retry:
-    var body: string
+    var 
+      body: string
+      session = await getAndValidateSession(api)
+
+    when url is SessionAwareUrl:
+      let url = case session.kind
+        of SessionKind.oauth: url.oauthUrl
+        of SessionKind.cookie: url.cookieUrl
+
     fetchImpl body:
       if body.startsWith('{') or body.startsWith('['):
         result = parseJson(body)
@@ -153,8 +162,15 @@ proc fetch*(url: Uri; api: Api): Future[JsonNode] {.async.} =
           invalidate(session)
           raise rateLimitError()
 
-proc fetchRaw*(url: Uri; api: Api): Future[string] {.async.} =
+proc fetchRaw*(url: Uri | SessionAwareUrl; api: Api): Future[string] {.async.} =
   retry:
+    var session = await getAndValidateSession(api)
+
+    when url is SessionAwareUrl:
+      let url = case session.kind
+        of SessionKind.oauth: url.oauthUrl
+        of SessionKind.cookie: url.cookieUrl
+
     fetchImpl result:
       if not (result.startsWith('{') or result.startsWith('[')):
         echo resp.status, ": ", result, " --- url: ", url

@@ -6,6 +6,22 @@ import experimental/parser/unifiedcard
 
 proc parseGraphTweet(js: JsonNode; isLegacy=false): Tweet
 
+proc extractTweetsFromEntry(e: JsonNode; entryId: string): seq[Tweet] =
+  if e{"content", "items"}.notNull:
+    for item in e{"content", "items"}:
+      with tweetResult, item{"item", "itemContent", "tweet_results", "result"}:
+        var tweet = parseGraphTweet(tweetResult, false)
+        if not tweet.available:
+          tweet.id = parseBiggestInt(item{"entryId"}.getStr.getId())
+        result.add tweet
+    return
+
+  with tweetResult, e{"content", "content", "tweetResult", "result"}:
+    var tweet = parseGraphTweet(tweetResult, false)
+    if not tweet.available:
+      tweet.id = parseBiggestInt(entryId.getId())
+    result.add tweet
+
 proc parseUser(js: JsonNode; id=""): User =
   if js.isNull: return
   result = User(
@@ -32,10 +48,26 @@ proc parseGraphUser(js: JsonNode): User =
   var user = js{"user_result", "result"}
   if user.isNull:
     user = ? js{"user_results", "result"}
+
+  if user.isNull:
+    if js{"core"}.notNull and js{"legacy"}.notNull:
+      user = js
+    else:
+      return
+
   result = parseUser(user{"legacy"}, user{"rest_id"}.getStr)
 
-  if result.verifiedType == VerifiedType.none and user{"is_blue_verified"}.getBool(false):
-    result.verifiedType = blue
+  # fallback to support UserMedia/recent GraphQL updates
+  if result.username.len == 0 and user{"core", "screen_name"}.notNull:
+    result.username = user{"core", "screen_name"}.getStr
+    result.fullname = user{"core", "name"}.getStr
+    result.userPic = user{"avatar", "image_url"}.getImageStr.replace("_normal", "")
+
+    if user{"is_blue_verified"}.getBool(false):
+      result.verifiedType = blue
+    elif user{"verification", "verified_type"}.notNull:
+      let verifiedType = user{"verification", "verified_type"}.getStr("None")
+      result.verifiedType = parseEnum[VerifiedType](verifiedType)
 
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
@@ -400,31 +432,43 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string; v2=true): Conversati
         elif entryId.startsWith("cursor-bottom"):
           result.replies.bottom = e{"content", contentKey, "value"}.getStr
 
-proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
+proc parseGraphTimeline*(js: JsonNode; after=""): Profile =
   result = Profile(tweets: Timeline(beginning: after.len == 0))
 
   let instructions =
-    if root == "list": ? js{"data", "list", "timeline_response", "timeline", "instructions"}
-    else: ? js{"data", "user_result", "result", "timeline_response", "timeline", "instructions"}
+    if js{"data", "list"}.notNull:
+      ? js{"data", "list", "timeline_response", "timeline", "instructions"}
+    elif js{"data", "user"}.notNull:
+      ? js{"data", "user", "result", "timeline", "timeline", "instructions"}
+    else:
+      ? js{"data", "user_result", "result", "timeline_response", "timeline", "instructions"}
 
   if instructions.len == 0:
     return
 
   for i in instructions:
-    if i{"__typename"}.getStr == "TimelineAddEntries":
+    # TimelineAddToModule instruction is used by UserMedia
+    if i{"moduleItems"}.notNull:
+      for item in i{"moduleItems"}:
+        with tweetResult, item{"item", "itemContent", "tweet_results", "result"}:
+          let tweet = parseGraphTweet(tweetResult, false)
+          if not tweet.available:
+            tweet.id = parseBiggestInt(item{"entryId"}.getStr.getId())
+          result.tweets.content.add tweet
+      continue
+
+    if i{"entries"}.notNull:
       for e in i{"entries"}:
         let entryId = e{"entryId"}.getStr
-        if entryId.startsWith("tweet"):
-          with tweetResult, e{"content", "content", "tweetResult", "result"}:
-            let tweet = parseGraphTweet(tweetResult, false)
-            if not tweet.available:
-              tweet.id = parseBiggestInt(entryId.getId())
+        if entryId.startsWith("tweet") or entryId.startsWith("profile-grid"):
+          for tweet in extractTweetsFromEntry(e, entryId):
             result.tweets.content.add tweet
         elif "-conversation-" in entryId or entryId.startsWith("homeConversation"):
           let (thread, self) = parseGraphThread(e)
           result.tweets.content.add thread.content
         elif entryId.startsWith("cursor-bottom"):
           result.tweets.bottom = e{"content", "value"}.getStr
+
     if after.len == 0 and i{"__typename"}.getStr == "TimelinePinEntry":
       with tweetResult, i{"entry", "content", "content", "tweetResult", "result"}:
         let tweet = parseGraphTweet(tweetResult, false)
@@ -438,31 +482,34 @@ proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
 proc parseGraphPhotoRail*(js: JsonNode): PhotoRail =
   result = @[]
 
-  let instructions =
-    ? js{"data", "user_result", "result", "timeline_response", "timeline", "instructions"}
+  var instructions = ? js{"data", "user", "result", "timeline", "timeline", "instructions"}
+  if instructions.len == 0:
+    instructions = ? js{"data", "user_result", "result", "timeline_response", "timeline", "instructions"}
 
   for i in instructions:
-    if i{"__typename"}.getStr == "TimelineAddEntries":
-      for e in i{"entries"}:
-        let entryId = e{"entryId"}.getStr
-        if entryId.startsWith("tweet"):
-          with tweetResult, e{"content", "content", "tweetResult", "result"}:
-            let t = parseGraphTweet(tweetResult, false)
-            if not t.available:
-              t.id = parseBiggestInt(entryId.getId())
+    let instrType = i{"type"}.getStr
+    if instrType.len == 0:
+      if i{"__typename"}.getStr != "TimelineAddEntries":
+        continue
+    elif instrType != "TimelineAddEntries":
+      continue
 
-            let url = 
-              if t.photos.len > 0: t.photos[0]
-              elif t.video.isSome: get(t.video).thumb
-              elif t.gif.isSome: get(t.gif).thumb
-              elif t.card.isSome: get(t.card).image
-              else: ""
+    for e in i{"entries"}:
+      let entryId = e{"entryId"}.getStr
+      if entryId.startsWith("tweet") or entryId.startsWith("profile-grid"):
+        for t in extractTweetsFromEntry(e, entryId):
+          let url =
+            if t.photos.len > 0: t.photos[0]
+            elif t.video.isSome: get(t.video).thumb
+            elif t.gif.isSome: get(t.gif).thumb
+            elif t.card.isSome: get(t.card).image
+            else: ""
 
-            if url.len > 0:
-              result.add GalleryPhoto(url: url, tweetId: $t.id)
+          if url.len > 0:
+            result.add GalleryPhoto(url: url, tweetId: $t.id)
 
-            if result.len == 16:
-              break
+          if result.len == 16:
+            return
 
 proc parseGraphSearch*[T: User | Tweets](js: JsonNode; after=""): Result[T] =
   result = Result[T](beginning: after.len == 0)

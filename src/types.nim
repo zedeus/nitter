@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import times, sequtils, options, tables
+import times, sequtils, options, tables, uri
 import prefs_impl
 
 genPrefsType()
@@ -49,6 +49,10 @@ type
     of cookie:
       authToken*: string
       ct0*: string
+
+  SessionAwareUrl* = object
+    oauthUrl*: Uri
+    cookieUrl*: Uri
 
   Error* = enum
     null = 0
