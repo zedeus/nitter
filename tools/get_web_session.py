@@ -77,9 +77,9 @@ async def login_and_get_cookies(username, password, totp_seed=None, headless=Fal
                     twid = cookies_dict['twid']
                     # Try to extract the ID from twid (format: u%3D<id> or u=<id>)
                     if 'u%3D' in twid:
-                        user_id = twid.split('u%3D')[1].split('&')[0]
+                        user_id = twid.split('u%3D')[1].split('&')[0].strip('"')
                     elif 'u=' in twid:
-                        user_id = twid.split('u=')[1].split('&')[0]
+                        user_id = twid.split('u=')[1].split('&')[0].strip('"')
 
                 cookies_dict['username'] = username
                 if user_id:
