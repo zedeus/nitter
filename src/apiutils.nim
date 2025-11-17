@@ -60,11 +60,11 @@ proc getAndValidateSession*(api: Api): Future[Session] {.async.} =
   case result.kind
   of SessionKind.oauth:
     if result.oauthToken.len == 0:
-      echo "[sessions] Empty oauth token, session: ", result.id
+      echo "[sessions] Empty oauth token, session: ", result.pretty
       raise rateLimitError()
   of SessionKind.cookie:
     if result.authToken.len == 0 or result.ct0.len == 0:
-      echo "[sessions] Empty cookie credentials, session: ", result.id
+      echo "[sessions] Empty cookie credentials, session: ", result.pretty
       raise rateLimitError()
 
 template fetchImpl(result, fetchBody) {.dirty.} =
@@ -107,7 +107,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
             setLimited(session, api)
             raise rateLimitError()
       elif result.startsWith("429 Too Many Requests"):
-        echo "[sessions] 429 error, API: ", api, ", session: ", session.id
+        echo "[sessions] 429 error, API: ", api, ", session: ", session.pretty
         session.apis[api].remaining = 0
         # rate limit hit, resets after the 15 minute window
         raise rateLimitError()
@@ -124,8 +124,8 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   except OSError as e:
     raise e
   except Exception as e:
-    let id = if session.isNil: "null" else: $session.id
-    echo "error: ", e.name, ", msg: ", e.msg, ", sessionId: ", id, ", url: ", url
+    let s = session.pretty
+    echo "error: ", e.name, ", msg: ", e.msg, ", session: ", s, ", url: ", url
     raise rateLimitError()
   finally:
     release(session)

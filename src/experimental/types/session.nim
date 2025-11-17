@@ -1,8 +1,8 @@
 type
   RawSession* = object
     kind*: string
-    username*: string
     id*: string
+    username*: string
     oauthToken*: string
     oauthTokenSecret*: string
     authToken*: string

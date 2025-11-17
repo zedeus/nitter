@@ -13,6 +13,7 @@ proc parseSession*(raw: string): Session =
     result = Session(
       kind: SessionKind.oauth,
       id: parseBiggestInt(id),
+      username: session.username,
       oauthToken: session.oauthToken,
       oauthSecret: session.oauthTokenSecret
     )
@@ -21,6 +22,7 @@ proc parseSession*(raw: string): Session =
     result = Session(
       kind: SessionKind.cookie,
       id: id,
+      username: session.username,
       authToken: session.authToken,
       ct0: session.ct0
     )

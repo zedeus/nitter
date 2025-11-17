@@ -29,6 +29,20 @@ var
 template log(str: varargs[string, `$`]) =
   echo "[sessions] ", str.join("")
 
+proc pretty*(session: Session): string =
+  if session.isNil:
+    return "<null>"
+
+  if session.id > 0 and session.username.len > 0:
+    result = $session.id & " (" & session.username & ")"
+  elif session.username.len > 0:
+    result = session.username
+  elif session.id > 0:
+    result = $session.id
+  else:
+    result = "<unknown>"
+  result = $session.kind & " " & result
+
 proc snowflakeToEpoch(flake: int64): int64 =
   int64(((flake shr 22) + 1288834974657) div 1000)
 
@@ -130,7 +144,7 @@ proc isLimited(session: Session; api: Api): bool =
   if session.limited and api != Api.userTweets:
     if (epochTime().int - session.limitedAt) > hourInSeconds:
       session.limited = false
-      log "resetting limit: ", session.id
+      log "resetting limit: ", session.pretty
       return false
     else:
       return true
@@ -146,7 +160,7 @@ proc isReady(session: Session; api: Api): bool =
 
 proc invalidate*(session: var Session) =
   if session.isNil: return
-  log "invalidating: ", session.id
+  log "invalidating: ", session.pretty
 
   # TODO: This isn't sufficient, but it works for now
   let idx = sessionPool.find(session)
@@ -171,7 +185,7 @@ proc getSession*(api: Api): Future[Session] {.async.} =
 proc setLimited*(session: Session; api: Api) =
   session.limited = true
   session.limitedAt = epochTime().int
-  log "rate limited by api: ", api, ", reqs left: ", session.apis[api].remaining, ", id: ", session.id
+  log "rate limited by api: ", api, ", reqs left: ", session.apis[api].remaining, ", ", session.pretty
 
 proc setRateLimit*(session: Session; api: Api; remaining, reset, limit: int) =
   # avoid undefined behavior in race conditions

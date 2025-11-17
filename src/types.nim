@@ -38,6 +38,7 @@ type
 
   Session* = ref object
     id*: int64
+    username*: string
     pending*: int
     limited*: bool
     limitedAt*: int
