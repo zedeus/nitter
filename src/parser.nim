@@ -385,7 +385,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
     return
 
   for i in instructions:
-    let instrType = i{"__typename"}.getStr(i{"type"}.getStr)
+    let instrType = i{"type"}.getStr(i{"__typename"}.getStr)
     if instrType == "TimelineAddEntries":
       for e in i{"entries"}:
         let entryId = e{"entryId"}.getStr
@@ -421,7 +421,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
         elif entryId.startsWith("cursor-bottom"):
           result.replies.bottom = e{"content", contentKey, "value"}.getStr
 
-proc extractTweetsFromEntry*(e: JsonNode; entryId: string): seq[Tweet] =
+proc extractTweetsFromEntry*(e: JsonNode): seq[Tweet] =
   var tweetResult = e{"content", "itemContent", "tweet_results", "result"}
   if tweetResult.isNull:
     tweetResult = e{"content", "content", "tweetResult", "result"}
@@ -429,7 +429,7 @@ proc extractTweetsFromEntry*(e: JsonNode; entryId: string): seq[Tweet] =
   if tweetResult.notNull:
     var tweet = parseGraphTweet(tweetResult, false)
     if not tweet.available:
-      tweet.id = parseBiggestInt(entryId.getId())
+      tweet.id = parseBiggestInt(e.getEntryId())
     result.add tweet
     return
 
@@ -469,7 +469,7 @@ proc parseGraphTimeline*(js: JsonNode; after=""): Profile =
       for e in i{"entries"}:
         let entryId = e{"entryId"}.getStr
         if entryId.startsWith("tweet") or entryId.startsWith("profile-grid"):
-          for tweet in extractTweetsFromEntry(e, entryId):
+          for tweet in extractTweetsFromEntry(e):
             result.tweets.content.add tweet
         elif "-conversation-" in entryId or entryId.startsWith("homeConversation"):
           let (thread, self) = parseGraphThread(e)
@@ -477,15 +477,14 @@ proc parseGraphTimeline*(js: JsonNode; after=""): Profile =
         elif entryId.startsWith("cursor-bottom"):
           result.tweets.bottom = e{"content", "value"}.getStr
 
-    if after.len == 0 and i{"__typename"}.getStr == "TimelinePinEntry":
-      with tweetResult, i{"entry", "content", "content", "tweetResult", "result"}:
-        let tweet = parseGraphTweet(tweetResult, false)
-        tweet.pinned = true
-        if not tweet.available and tweet.tombstone.len == 0:
-          let entryId = i{"entry", "entryId"}.getEntryId
-          if entryId.len > 0:
-            tweet.id = parseBiggestInt(entryId)
-        result.pinned = some tweet
+    if after.len == 0:
+      let instrType = i{"type"}.getStr(i{"__typename"}.getStr)
+      if instrType == "TimelinePinEntry":
+        let tweets = extractTweetsFromEntry(i{"entry"})
+        if tweets.len > 0:
+          var tweet = tweets[0]
+          tweet.pinned = true
+          result.pinned = some tweet
 
 proc parseGraphPhotoRail*(js: JsonNode): PhotoRail =
   result = @[]
@@ -523,7 +522,7 @@ proc parseGraphPhotoRail*(js: JsonNode): PhotoRail =
     for e in i{"entries"}:
       let entryId = e{"entryId"}.getStr
       if entryId.startsWith("tweet") or entryId.startsWith("profile-grid"):
-        for t in extractTweetsFromEntry(e, entryId):
+        for t in extractTweetsFromEntry(e):
           let photo = extractGalleryPhoto(t)
           if photo.url.len > 0:
             result.add photo
