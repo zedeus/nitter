@@ -72,21 +72,3 @@ proc parseHook*(s: string; i: var int; v: var User) =
   var u: RawUser
   parseHook(s, i, u)
   v = toUser u
-
-proc parseUser*(json: string; username=""): User =
-  handleErrors:
-    case error.code
-    of suspended: return User(username: username, suspended: true)
-    of userNotFound: return
-    else: echo "[error - parseUser]: ", error
-
-  result = json.fromJson(User)
-
-proc parseUsers*(json: string; after=""): Result[User] =
-  result = Result[User](beginning: after.len == 0)
-
-  # starting with '{' means it's an error
-  if json[0] == '[':
-    let raw = json.fromJson(seq[RawUser])
-    for user in raw:
-      result.content.add user.toUser

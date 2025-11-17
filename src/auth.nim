@@ -7,20 +7,6 @@ import experimental/parser/session
 const
   maxConcurrentReqs = 2
   hourInSeconds = 60 * 60
-  apiMaxReqs: Table[Api, int] = {
-    Api.search: 50,
-    Api.tweetDetail: 500,
-    Api.userTweets: 500,
-    Api.userTweetsAndReplies: 500,
-    Api.userMedia: 500,
-    Api.userRestId: 500,
-    Api.userScreenName: 500,
-    Api.tweetResult: 500,
-    Api.list: 500,
-    Api.listTweets: 500,
-    Api.listMembers: 500,
-    Api.listBySlug: 500
-  }.toTable
 
 var
   sessionPool: seq[Session]
@@ -71,8 +57,7 @@ proc getSessionPoolHealth*(): JsonNode =
     for api in session.apis.keys:
       let
         apiStatus = session.apis[api]
-        limit = if apiStatus.limit > 0: apiStatus.limit else: apiMaxReqs.getOrDefault(api, 0)
-        reqs = limit - apiStatus.remaining
+        reqs = apiStatus.limit - apiStatus.remaining
 
       # no requests made with this session and endpoint since the limit reset
       if apiStatus.reset < now:
