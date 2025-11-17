@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 """
-Authenticates with X.com/Twitter and extracts session cookies for use with Nitter.
-Handles 2FA, extracts user info, and outputs clean JSON for sessions.jsonl.
-
 Requirements:
   pip install -r tools/requirements.txt
 
 Usage:
-  python3 tools/get_web_session.py <username> <password> [totp_seed] [--append sessions.jsonl] [--headless]
+  python3 tools/create_session_browser.py <username> <password> [totp_seed] [--append sessions.jsonl] [--headless]
 
 Examples:
   # Output to terminal
-  python3 tools/get_web_session.py myusername mypassword TOTP_BASE32_SECRET
+  python3 tools/create_session_browser.py myusername mypassword TOTP_SECRET
 
   # Append to sessions.jsonl
-  python3 tools/get_web_session.py myusername mypassword TOTP_SECRET --append sessions.jsonl
+  python3 tools/create_session_browser.py myusername mypassword TOTP_SECRET --append sessions.jsonl
 
   # Headless mode (may increase detection risk)
-  python3 tools/get_web_session.py myusername mypassword TOTP_SECRET --headless
+  python3 tools/create_session_browser.py myusername mypassword TOTP_SECRET --headless
 
 Output:
   {"kind": "cookie", "username": "...", "id": "...", "auth_token": "...", "ct0": "..."}
