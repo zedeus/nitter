@@ -33,10 +33,13 @@ proc getUrlPrefix*(cfg: Config): string =
   if cfg.useHttps: https & cfg.hostname
   else: "http://" & cfg.hostname
 
-proc shortLink*(text: string; length=28): string =
-  result = text.replace(wwwRegex, "")
+proc shorten*(text: string; length=28): string =
+  result = text
   if result.len > length:
     result = result[0 ..< length] & "…"
+
+proc shortLink*(text: string; length=28): string =
+  result = text.replace(wwwRegex, "").shorten(length)
     
 proc stripHtml*(text: string; shorten=false): string =
   var html = parseHtml(text)

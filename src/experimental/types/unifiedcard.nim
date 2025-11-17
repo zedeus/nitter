@@ -22,6 +22,7 @@ type
     communityDetails
     mediaWithDetailsHorizontal
     hidden
+    grokShare
     unknown
 
   Component* = object
@@ -42,6 +43,7 @@ type
     topicDetail*: tuple[title: Text]
     profileUser*: User
     shortDescriptionText*: string
+    conversationPreview*: seq[GrokConversation]
 
   MediaItem* = object
     id*: string
@@ -76,6 +78,10 @@ type
     title*: Text
     category*: Text
 
+  GrokConversation* = object
+    message*: string
+    sender*: string
+
   TypeField = Component | Destination | MediaEntity | AppStoreData
 
 converter fromText*(text: Text): string = string(text)
@@ -96,6 +102,7 @@ proc enumHook*(s: string; v: var ComponentType) =
       of "community_details": communityDetails
       of "media_with_details_horizontal": mediaWithDetailsHorizontal
       of "commerce_drop_details": hidden
+      of "grok_share": grokShare
       else: echo "ERROR: Unknown enum value (ComponentType): ", s; unknown
 
 proc enumHook*(s: string; v: var AppType) =
