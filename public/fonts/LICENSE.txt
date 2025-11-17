@@ -1,6 +1,15 @@
 Font license info
 
 
+## Modern Pictograms
+
+   Copyright (c) 2012 by John Caserta. All rights reserved.
+
+   Author:    John Caserta
+   License:   SIL (http://scripts.sil.org/OFL)
+   Homepage:  http://thedesignoffice.org/project/modern-pictograms/
+
+
 ## Entypo
 
    Copyright (C) 2012 by Daniel Bruce
@@ -35,14 +44,5 @@ Font license info
    Author:    Aristeides Stathopoulos
    License:   SIL (http://scripts.sil.org/OFL)
    Homepage:  http://aristeides.com/
-
-
-## Modern Pictograms
-
-   Copyright (c) 2012 by John Caserta. All rights reserved.
-
-   Author:    John Caserta
-   License:   SIL (http://scripts.sil.org/OFL)
-   Homepage:  http://thedesignoffice.org/project/modern-pictograms/
 
 

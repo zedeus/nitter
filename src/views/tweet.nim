@@ -184,6 +184,8 @@ proc renderStats(stats: TweetStats; views: string): VNode =
     span(class="tweet-stat"): icon "retweet", formatStat(stats.retweets)
     span(class="tweet-stat"): icon "quote", formatStat(stats.quotes)
     span(class="tweet-stat"): icon "heart", formatStat(stats.likes)
+    if stats.views > 0:
+      span(class="tweet-stat"): icon "views", formatStat(stats.views)
     if views.len > 0:
       span(class="tweet-stat"): icon "play", insertSep(views, ',')
 

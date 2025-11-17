@@ -203,6 +203,7 @@ type
     retweets*: int
     likes*: int
     quotes*: int
+    views*: int
 
   Tweet* = ref object
     id*: int64
