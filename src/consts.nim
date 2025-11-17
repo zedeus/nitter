@@ -9,16 +9,19 @@ const
 
   graphUser* = gql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
   graphUserById* = gql / "oPppcargziU1uDQHAUmH-A/UserResultByIdQuery"
-  graphUserTweets* = gql / "JLApJKFY0MxGTzCoK6ps8Q/UserWithProfileTweetsQueryV2"
-  graphUserTweetsAndReplies* = gql / "Y86LQY7KMvxn5tu3hFTyPg/UserWithProfileTweetsAndRepliesQueryV2"
+  graphUserTweetsV2* = gql / "JLApJKFY0MxGTzCoK6ps8Q/UserWithProfileTweetsQueryV2"
+  graphUserTweetsAndRepliesV2* = gql / "Y86LQY7KMvxn5tu3hFTyPg/UserWithProfileTweetsAndRepliesQueryV2"
+  graphUserTweets* = gql / "oRJs8SLCRNRbQzuZG93_oA/UserTweets"
+  graphUserTweetsAndReplies* = gql / "kkaJ0Mf34PZVarrxzLihjg/UserTweetsAndReplies"
   graphUserMedia* = gql / "36oKqyQ7E_9CmtONGjJRsA/UserMedia"
   graphUserMediaV2* = gql / "PDfFf8hGeJvUCiTyWtw4wQ/MediaTimelineV2"
   graphTweet* = gql / "Vorskcd2tZ-tc4Gx3zbk4Q/ConversationTimelineV2"
+  graphTweetDetail* = gql / "YVyS4SfwYW7Uw5qwy0mQCA/TweetDetail"
   graphTweetResult* = gql / "sITyJdhRPpvpEjg4waUmTA/TweetResultByIdQuery"
-  graphSearchTimeline* = gql / "KI9jCXUx3Ymt-hDKLOZb9Q/SearchTimeline"
-  graphListById* = gql / "oygmAig8kjn0pKsx_bUadQ/ListByRestId"
-  graphListBySlug* = gql / "88GTz-IPPWLn1EiU8XoNVg/ListBySlug"
-  graphListMembers* = gql / "kSmxeqEeelqdHSR7jMnb_w/ListMembers"
+  graphSearchTimeline* = gql / "7r8ibjHuK3MWUyzkzHNMYQ/SearchTimeline"
+  graphListById* = gql / "cIUpT1UjuGgl_oWiY7Snhg/ListByRestId"
+  graphListBySlug* = gql / "K6wihoTiTrzNzSF8y1aeKQ/ListBySlug"
+  graphListMembers* = gql / "fuVHh5-gFn8zDBBxb8wOMA/ListMembers"
   graphListTweets* = gql / "BbGLL1ZfMibdFNWlk7a0Pw/ListTimeline"
 
   gqlFeatures* = """{
@@ -96,24 +99,20 @@ const
   "withV2Timeline": true
 }""".replace(" ", "").replace("\n", "")
 
-#   oldUserTweetsVariables* = """{
-#   "userId": "$1", $2
-#   "count": 20,
-#   "includePromotedContent": false,
-#   "withDownvotePerspective": false,
-#   "withReactionsMetadata": false,
-#   "withReactionsPerspective": false,
-#   "withVoice": false,
-#   "withV2Timeline": true
-# }
-# """
+  tweetDetailVariables* = """{
+  "focalTweetId": "$1",
+  $2
+  "referrer": "profile",
+  "with_rux_injections": false,
+  "rankingMode": "Relevance",
+  "includePromotedContent": true,
+  "withCommunity": true,
+  "withQuickPromoteEligibilityTweetFields": true,
+  "withBirdwatchNotes": true,
+  "withVoice": true
+}""".replace(" ", "").replace("\n", "")
 
-  userTweetsVariables* = """{
-  "rest_id": "$1", $2
-  "count": 20
-}"""
-
-  listTweetsVariables* = """{
+  restIdVariables* = """{
   "rest_id": "$1", $2
   "count": 20
 }"""
@@ -126,3 +125,22 @@ const
   "withBirdwatchNotes": false,
   "withVoice": true
 }""".replace(" ", "").replace("\n", "")
+
+  userTweetsVariables* = """{
+  "userId": "$1", $2
+  "count": 20,
+  "includePromotedContent": false,
+  "withQuickPromoteEligibilityTweetFields": true,
+  "withVoice": true
+}""".replace(" ", "").replace("\n", "")
+
+  userTweetsAndRepliesVariables* = """{
+  "userId": "$1", $2
+  "count": 20,
+  "includePromotedContent": false,
+  "withCommunity": true,
+  "withVoice": true
+}""".replace(" ", "").replace("\n", "")
+
+  fieldToggles* = """{"withArticlePlainText":false}"""
+  tweetDetailFieldToggles* = """{"withArticleRichContentState":true,"withArticlePlainText":false,"withGrokAnalyze":false,"withDisallowedReplyControls":false}"""

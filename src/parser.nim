@@ -42,16 +42,16 @@ proc parseGraphUser(js: JsonNode): User =
   result = parseUser(user{"legacy"}, user{"rest_id"}.getStr)
 
   # fallback to support UserMedia/recent GraphQL updates
-  if result.username.len == 0 and user{"core", "screen_name"}.notNull:
+  if result.username.len == 0:
     result.username = user{"core", "screen_name"}.getStr
     result.fullname = user{"core", "name"}.getStr
     result.userPic = user{"avatar", "image_url"}.getImageStr.replace("_normal", "")
 
     if user{"is_blue_verified"}.getBool(false):
       result.verifiedType = blue
-    elif user{"verification", "verified_type"}.notNull:
-      let verifiedType = user{"verification", "verified_type"}.getStr("None")
-      result.verifiedType = parseEnum[VerifiedType](verifiedType)
+
+    with verifiedType, user{"verification", "verified_type"}:
+      result.verifiedType = parseEnum[VerifiedType](verifiedType.getStr)
 
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
@@ -372,10 +372,10 @@ proc parseGraphTweetResult*(js: JsonNode): Tweet =
   with tweet, js{"data", "tweet_result", "result"}:
     result = parseGraphTweet(tweet, false)
 
-proc parseGraphConversation*(js: JsonNode; tweetId: string; v2=true): Conversation =
+proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
   result = Conversation(replies: Result[Chain](beginning: true))
-
   let
+    v2 = js{"data", "timeline_response"}.notNull
     rootKey = if v2: "timeline_response" else: "threaded_conversation_with_injections_v2"
     contentKey = if v2: "content" else: "itemContent"
     resultKey = if v2: "tweetResult" else: "tweet_results"
@@ -385,7 +385,8 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string; v2=true): Conversati
     return
 
   for i in instructions:
-    if i{"__typename"}.getStr == "TimelineAddEntries":
+    let instrType = i{"__typename"}.getStr(i{"type"}.getStr)
+    if instrType == "TimelineAddEntries":
       for e in i{"entries"}:
         let entryId = e{"entryId"}.getStr
         if entryId.startsWith("tweet"):
@@ -421,20 +422,23 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string; v2=true): Conversati
           result.replies.bottom = e{"content", contentKey, "value"}.getStr
 
 proc extractTweetsFromEntry*(e: JsonNode; entryId: string): seq[Tweet] =
-  if e{"content", "items"}.notNull:
-    for item in e{"content", "items"}:
-      with tweetResult, item{"item", "itemContent", "tweet_results", "result"}:
-        var tweet = parseGraphTweet(tweetResult, false)
-        if not tweet.available:
-          tweet.id = parseBiggestInt(item{"entryId"}.getStr.getId())
-        result.add tweet
-    return
+  var tweetResult = e{"content", "itemContent", "tweet_results", "result"}
+  if tweetResult.isNull:
+    tweetResult = e{"content", "content", "tweetResult", "result"}
 
-  with tweetResult, e{"content", "content", "tweetResult", "result"}:
+  if tweetResult.notNull:
     var tweet = parseGraphTweet(tweetResult, false)
     if not tweet.available:
       tweet.id = parseBiggestInt(entryId.getId())
     result.add tweet
+    return
+
+  for item in e{"content", "items"}:
+    with tweetResult, item{"item", "itemContent", "tweet_results", "result"}:
+      var tweet = parseGraphTweet(tweetResult, false)
+      if not tweet.available:
+        tweet.id = parseBiggestInt(item{"entryId"}.getStr.getId())
+      result.add tweet
 
 proc parseGraphTimeline*(js: JsonNode; after=""): Profile =
   result = Profile(tweets: Timeline(beginning: after.len == 0))
