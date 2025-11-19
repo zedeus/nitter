@@ -21,10 +21,15 @@ proc parseUser(js: JsonNode; id=""): User =
     tweets: js{"statuses_count"}.getInt,
     likes: js{"favourites_count"}.getInt,
     media: js{"media_count"}.getInt,
-    verifiedType: parseEnum[VerifiedType](js{"verified_type"}.getStr("None")),
     protected: js{"protected"}.getBool,
     joinDate: js{"created_at"}.getTime
   )
+
+  if js{"is_blue_verified"}.getBool(false):
+    result.verifiedType = blue
+
+  with verifiedType, js{"verified_type"}:
+    result.verifiedType = parseEnum[VerifiedType](verifiedType.getStr)
 
   result.expandUserEntities(js)
 
