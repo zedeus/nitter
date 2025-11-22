@@ -66,7 +66,7 @@ routes:
     resp renderMain(renderSearch(), request, cfg, themePrefs())
 
   get "/about":
-    resp renderMain(renderAbout(), request, cfg, themePrefs())
+    resp renderMain(renderAbout(), request, cfg, themePrefs(), "About")
 
   get "/explore":
     redirect("/about")
