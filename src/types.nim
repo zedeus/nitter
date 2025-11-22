@@ -121,7 +121,6 @@ type
     durationMs*: int
     url*: string
     thumb*: string
-    views*: string
     available*: bool
     reason*: string
     title*: string
@@ -202,7 +201,6 @@ type
     replies*: int
     retweets*: int
     likes*: int
-    quotes*: int
     views*: int
 
   Tweet* = ref object

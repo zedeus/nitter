@@ -1,16 +1,23 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, httpclient, uri, strutils, sequtils, sugar
+import asyncdispatch, httpclient, uri, strutils, sequtils, sugar, tables
 import packedjson
 import types, query, formatters, consts, apiutils, parser
 import experimental/parser as newParser
+
+# Helper to generate params object for GraphQL requests
+proc genParams(variables: string; fieldToggles = ""): seq[(string, string)] =
+  result.add ("variables", variables)
+  result.add ("features", gqlFeatures)
+  if fieldToggles.len > 0:
+    result.add ("fieldToggles", fieldToggles)
 
 proc mediaUrl(id: string; cursor: string): SessionAwareUrl =
   let
     cookieVariables = userMediaVariables % [id, cursor]
     oauthVariables = restIdVariables % [id, cursor]
   result = SessionAwareUrl(
-    cookieUrl: graphUserMedia ? {"variables": cookieVariables, "features": gqlFeatures},
-    oauthUrl: graphUserMediaV2 ? {"variables": oauthVariables, "features": gqlFeatures}
+    cookieUrl: graphUserMedia ? genParams(cookieVariables),
+    oauthUrl: graphUserMediaV2 ? genParams(oauthVariables)
   )
 
 proc userTweetsUrl(id: string; cursor: string): SessionAwareUrl =
@@ -18,17 +25,19 @@ proc userTweetsUrl(id: string; cursor: string): SessionAwareUrl =
     cookieVariables = userTweetsVariables % [id, cursor]
     oauthVariables = restIdVariables % [id, cursor]
   result = SessionAwareUrl(
-    cookieUrl: graphUserTweets ? {"variables": cookieVariables, "features": gqlFeatures, "fieldToggles": fieldToggles},
-    oauthUrl: graphUserTweetsV2 ? {"variables": oauthVariables, "features": gqlFeatures}
+    # cookieUrl: graphUserTweets ? genParams(cookieVariables, fieldToggles),
+    oauthUrl: graphUserTweetsV2 ? genParams(oauthVariables)
   )
+  # might change this in the future pending testing
+  result.cookieUrl = result.oauthUrl
 
 proc userTweetsAndRepliesUrl(id: string; cursor: string): SessionAwareUrl =
   let
     cookieVariables = userTweetsAndRepliesVariables % [id, cursor]
     oauthVariables = restIdVariables % [id, cursor]
   result = SessionAwareUrl(
-    cookieUrl: graphUserTweetsAndReplies ? {"variables": cookieVariables, "features": gqlFeatures, "fieldToggles": fieldToggles},
-    oauthUrl: graphUserTweetsAndRepliesV2 ? {"variables": oauthVariables, "features": gqlFeatures}
+    cookieUrl: graphUserTweetsAndReplies ? genParams(cookieVariables, fieldToggles),
+    oauthUrl: graphUserTweetsAndRepliesV2 ? genParams(oauthVariables)
   )
 
 proc tweetDetailUrl(id: string; cursor: string): SessionAwareUrl =
@@ -36,24 +45,22 @@ proc tweetDetailUrl(id: string; cursor: string): SessionAwareUrl =
     cookieVariables = tweetDetailVariables % [id, cursor]
     oauthVariables = tweetVariables % [id, cursor]
   result = SessionAwareUrl(
-    cookieUrl: graphTweetDetail ? {"variables": cookieVariables, "features": gqlFeatures, "fieldToggles": tweetDetailFieldToggles},
-    oauthUrl: graphTweet ? {"variables": oauthVariables, "features": gqlFeatures}
+    cookieUrl: graphTweetDetail ? genParams(cookieVariables, tweetDetailFieldToggles),
+    oauthUrl: graphTweet ? genParams(oauthVariables)
   )
 
 proc getGraphUser*(username: string): Future[User] {.async.} =
   if username.len == 0: return
   let
-    variables = """{"screen_name": "$1"}""" % username
-    params = {"variables": variables, "features": gqlFeatures}
-    js = await fetchRaw(graphUser ? params, Api.userScreenName)
+    url = graphUser ? genParams("""{"screen_name": "$1"}""" % username)
+    js = await fetchRaw(url, Api.userScreenName)
   result = parseGraphUser(js)
 
 proc getGraphUserById*(id: string): Future[User] {.async.} =
   if id.len == 0 or id.any(c => not c.isDigit): return
   let
-    variables = """{"rest_id": "$1"}""" % id
-    params = {"variables": variables, "features": gqlFeatures}
-    js = await fetchRaw(graphUserById ? params, Api.userRestId)
+    url = graphUserById ? genParams("""{"rest_id": "$1"}""" % id)
+    js = await fetchRaw(url, Api.userRestId)
   result = parseGraphUser(js)
 
 proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profile] {.async.} =
@@ -73,23 +80,18 @@ proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
     cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
-    variables = restIdVariables % [id, cursor]
-    params = {"variables": variables, "features": gqlFeatures}
-    js = await fetch(graphListTweets ? params, Api.listTweets)
-  result = parseGraphTimeline(js, after).tweets
+    url = graphListTweets ? genParams(restIdVariables % [id, cursor])
+  result = parseGraphTimeline(await fetch(url, Api.listTweets), after).tweets
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
   let
     variables = %*{"screenName": name, "listSlug": list}
-    params = {"variables": $variables, "features": gqlFeatures}
-    url = graphListBySlug ? params
+    url = graphListBySlug ? genParams($variables)
   result = parseGraphList(await fetch(url, Api.listBySlug))
 
 proc getGraphList*(id: string): Future[List] {.async.} =
   let
-    variables = """{"listId": "$1"}""" % id
-    params = {"variables": variables, "features": gqlFeatures}
-    url = graphListById ? params
+    url = graphListById ? genParams("""{"listId": "$1"}""" % id)
   result = parseGraphList(await fetch(url, Api.list))
 
 proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} =
@@ -104,7 +106,7 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
     }
   if after.len > 0:
     variables["cursor"] = % after
-  let url = graphListMembers ? {"variables": $variables, "features": gqlFeatures}
+  let url = graphListMembers ? genParams($variables)
   result = parseGraphListMembers(await fetchRaw(url, Api.listMembers), after)
 
 proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
@@ -139,6 +141,7 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
   var
     variables = %*{
       "rawQuery": q,
+      "query_source": "typedQuery",
       "count": 20,
       "product": "Latest",
       "withDownvotePerspective": false,
@@ -147,7 +150,7 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
     }
   if after.len > 0:
     variables["cursor"] = % after
-  let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
+  let url = graphSearchTimeline ? genParams($variables)
   result = parseGraphSearch[Tweets](await fetch(url, Api.search), after)
   result.query = query
 
@@ -158,6 +161,7 @@ proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.}
   var
     variables = %*{
       "rawQuery": query.text,
+      "query_source": "typedQuery",
       "count": 20,
       "product": "People",
       "withDownvotePerspective": false,
@@ -168,7 +172,7 @@ proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.}
     variables["cursor"] = % after
     result.beginning = false
 
-  let url = graphSearchTimeline ? {"variables": $variables, "features": gqlFeatures}
+  let url = graphSearchTimeline ? genParams($variables)
   result = parseGraphSearch[User](await fetch(url, Api.search), after)
   result.query = query
 

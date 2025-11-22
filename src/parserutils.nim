@@ -36,6 +36,12 @@ template `?`*(js: JsonNode): untyped =
   if j.isNull: return
   j
 
+template select*(a, b: JsonNode): untyped =
+  if a.notNull: a else: b
+
+template select*(a, b, c: JsonNode): untyped =
+  if a.notNull: a elif b.notNull: b else: c
+
 template with*(ident, value, body): untyped =
   if true:
     let ident {.inject.} = value
@@ -54,6 +60,20 @@ template getError*(js: JsonNode): Error =
   if js.kind != JArray or js.len == 0: null
   else: Error(js[0]{"code"}.getInt)
 
+proc getTweetResult*(js: JsonNode; root="content"): JsonNode =
+  select(
+    js{root, "content", "tweet_results", "result"},
+    js{root, "itemContent", "tweet_results", "result"},
+    js{root, "content", "tweetResult", "result"}
+  )
+
+template getTypeName*(js: JsonNode): string =
+  js{"__typename"}.getStr(js{"type"}.getStr)
+
+template getEntryId*(e: JsonNode): string =
+  e{"entryId"}.getStr(e{"entry_id"}.getStr)
+
+
 template parseTime(time: string; f: static string; flen: int): DateTime =
   if time.len != flen: return
   parse(time, f, utc())
@@ -64,28 +84,23 @@ proc getDateTime*(js: JsonNode): DateTime =
 proc getTime*(js: JsonNode): DateTime =
   parseTime(js.getStr, "ddd MMM dd hh:mm:ss \'+0000\' yyyy", 30)
 
-proc getId*(id: string): string {.inline.} =
+proc getTimeFromMs*(js: JsonNode): DateTime =
+  let ms = js.getInt(0)
+  if ms == 0: return
+  let seconds = ms div 1000
+  return fromUnix(seconds).utc()
+
+proc getId*(id: string): int64 {.inline.} =
   let start = id.rfind("-")
-  if start < 0: return id
-  id[start + 1 ..< id.len]
+  if start < 0:
+    return parseBiggestInt(id)
+  return parseBiggestInt(id[start + 1 ..< id.len])
 
 proc getId*(js: JsonNode): int64 {.inline.} =
   case js.kind
-  of JString: return parseBiggestInt(js.getStr("0"))
+  of JString: return js.getStr("0").getId
   of JInt: return js.getBiggestInt()
   else: return 0
-
-proc getEntryId*(js: JsonNode): string {.inline.} =
-  let entry = js{"entryId"}.getStr
-  if entry.len == 0: return
-
-  if "tweet" in entry or "sq-I-t" in entry:
-    return entry.getId
-  elif "tombstone" in entry:
-    return js{"content", "item", "content", "tombstone", "tweet", "id"}.getStr
-  else:
-    echo "unknown entry: ", entry
-    return
 
 template getStrVal*(js: JsonNode; default=""): string =
   js{"string_value"}.getStr(default)
@@ -156,12 +171,6 @@ proc getMp4Resolution*(url: string): int =
   except ValueError:
     # cannot determine resolution (e.g. m3u8/non-mp4 video)
     return 0
-
-proc getVideoViewCount*(js: JsonNode): string =
-  with stats, js{"ext_media_stats"}:
-    return stats{"view_count"}.getStr($stats{"viewCount"}.getInt)
-
-  return $js{"mediaStats", "viewCount"}.getInt(0)
 
 proc extractSlice(js: JsonNode): Slice[int] =
   result = js["indices"][0].getInt ..< js["indices"][1].getInt

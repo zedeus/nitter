@@ -7,26 +7,29 @@ const
 
   gql = parseUri("https://api.x.com") / "graphql"
 
-  graphUser* = gql / "u7wQyGi6oExe8_TRWGMq4Q/UserResultByScreenNameQuery"
-  graphUserById* = gql / "oPppcargziU1uDQHAUmH-A/UserResultByIdQuery"
-  graphUserTweetsV2* = gql / "JLApJKFY0MxGTzCoK6ps8Q/UserWithProfileTweetsQueryV2"
-  graphUserTweetsAndRepliesV2* = gql / "Y86LQY7KMvxn5tu3hFTyPg/UserWithProfileTweetsAndRepliesQueryV2"
+  graphUser* = gql / "WEoGnYB0EG1yGwamDCF6zg/UserResultByScreenNameQuery"
+  graphUserById* = gql / "VN33vKXrPT7p35DgNR27aw/UserResultByIdQuery"
+  graphUserTweetsV2* = gql / "6QdSuZ5feXxOadEdXa4XZg/UserWithProfileTweetsQueryV2"
+  graphUserTweetsAndRepliesV2* = gql / "BDX77Xzqypdt11-mDfgdpQ/UserWithProfileTweetsAndRepliesQueryV2"
   graphUserTweets* = gql / "oRJs8SLCRNRbQzuZG93_oA/UserTweets"
   graphUserTweetsAndReplies* = gql / "kkaJ0Mf34PZVarrxzLihjg/UserTweetsAndReplies"
   graphUserMedia* = gql / "36oKqyQ7E_9CmtONGjJRsA/UserMedia"
-  graphUserMediaV2* = gql / "PDfFf8hGeJvUCiTyWtw4wQ/MediaTimelineV2"
-  graphTweet* = gql / "Vorskcd2tZ-tc4Gx3zbk4Q/ConversationTimelineV2"
+  graphUserMediaV2* = gql / "bp0e_WdXqgNBIwlLukzyYA/MediaTimelineV2"
+  graphTweet* = gql / "Y4Erk_-0hObvLpz0Iw3bzA/ConversationTimeline"
   graphTweetDetail* = gql / "YVyS4SfwYW7Uw5qwy0mQCA/TweetDetail"
-  graphTweetResult* = gql / "sITyJdhRPpvpEjg4waUmTA/TweetResultByIdQuery"
-  graphSearchTimeline* = gql / "7r8ibjHuK3MWUyzkzHNMYQ/SearchTimeline"
+  graphTweetResult* = gql / "nzme9KiYhfIOrrLrPP_XeQ/TweetResultByIdQuery"
+  graphSearchTimeline* = gql / "bshMIjqDk8LTXTq4w91WKw/SearchTimeline"
   graphListById* = gql / "cIUpT1UjuGgl_oWiY7Snhg/ListByRestId"
   graphListBySlug* = gql / "K6wihoTiTrzNzSF8y1aeKQ/ListBySlug"
   graphListMembers* = gql / "fuVHh5-gFn8zDBBxb8wOMA/ListMembers"
-  graphListTweets* = gql / "BbGLL1ZfMibdFNWlk7a0Pw/ListTimeline"
+  graphListTweets* = gql / "VQf8_XQynI3WzH6xopOMMQ/ListTimeline"
 
   gqlFeatures* = """{
+  "android_ad_formats_media_component_render_overlay_enabled": false,
   "android_graphql_skip_api_media_color_palette": false,
+  "android_professional_link_spotlight_display_enabled": false,
   "blue_business_profile_image_shape_enabled": false,
+  "commerce_android_shop_module_enabled": false,
   "creator_subscriptions_subscription_count_enabled": false,
   "creator_subscriptions_tweet_preview_api_enabled": true,
   "freedom_of_speech_not_reach_fetch_enabled": true,
@@ -36,8 +39,9 @@ const
   "interactive_text_enabled": false,
   "longform_notetweets_consumption_enabled": true,
   "longform_notetweets_inline_media_enabled": true,
-  "longform_notetweets_richtext_consumption_enabled": true,
   "longform_notetweets_rich_text_read_enabled": true,
+  "longform_notetweets_richtext_consumption_enabled": true,
+  "mobile_app_spotlight_module_enabled": false,
   "responsive_web_edit_tweet_api_enabled": true,
   "responsive_web_enhance_cards_enabled": false,
   "responsive_web_graphql_exclude_directive_enabled": true,
@@ -46,6 +50,7 @@ const
   "responsive_web_media_download_video_enabled": false,
   "responsive_web_text_conversations_enabled": false,
   "responsive_web_twitter_article_tweet_consumption_enabled": true,
+  "unified_cards_destination_url_params_enabled": false,
   "responsive_web_twitter_blue_verified_badge_is_enabled": true,
   "rweb_lists_timeline_redesign_enabled": true,
   "spaces_2022_h2_clipping": true,
@@ -86,11 +91,17 @@ const
   "payments_enabled": false,
   "responsive_web_profile_redirect_enabled": false,
   "responsive_web_grok_show_grok_translated_post": false,
-  "responsive_web_grok_community_note_auto_translation_is_enabled": false
+  "responsive_web_grok_community_note_auto_translation_is_enabled": false,
+  "profile_label_improvements_pcf_label_in_profile_enabled": false,
+  "grok_android_analyze_trend_fetch_enabled": false,
+  "grok_translations_community_note_auto_translation_is_enabled": false,
+  "grok_translations_post_auto_translation_is_enabled": false,
+  "grok_translations_community_note_translation_is_enabled": false,
+  "grok_translations_timeline_user_bio_auto_translation_is_enabled": false
 }""".replace(" ", "").replace("\n", "")
 
   tweetVariables* = """{
-  "focalTweetId": "$1",
+  "postId": "$1",
   $2
   "includeHasBirdwatchNotes": false,
   "includePromotedContent": false,
