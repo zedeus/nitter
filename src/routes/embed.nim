@@ -27,6 +27,17 @@ proc createEmbedRouter*(cfg: Config) =
 
       resp renderTweetEmbed(tweet, path, prefs, cfg, request)
 
+    get "/i/status/@id/embed":
+      let
+        tweet = await getGraphTweetResult(@"id")
+        prefs = cookiePrefs()
+        path = getPath()
+
+      if tweet == nil:
+        resp Http404
+
+      resp renderTweetEmbed(tweet, path, prefs, cfg, request)
+
     get "/embed/Tweet.html":
       let id = @"id"
 
