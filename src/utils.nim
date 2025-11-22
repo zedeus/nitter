@@ -9,6 +9,7 @@ var
 const
   https* = "https://"
   twimg* = "pbs.twimg.com/"
+  twitter* = "twitter.com"
   nitterParams = ["name", "tab", "id", "list", "referer", "scroll"]
   twitterDomains = @[
     "twitter.com",
@@ -59,3 +60,9 @@ proc isTwitterUrl*(uri: Uri): bool =
 
 proc isTwitterUrl*(url: string): bool =
   isTwitterUrl(parseUri(url))
+
+proc getTwitterPicUrl*(link: string) : string =
+  if link.startsWith(twimg):
+    &"{https}{link}"
+  else:
+    &"{https}{twimg}{link}"
