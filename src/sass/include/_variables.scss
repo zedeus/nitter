@@ -39,8 +39,5 @@ $shadow: rgba(0,0,0,.6);
 $shadow_dark: rgba(0,0,0,.2);
 
 //fonts
-$font_0: Helvetica Neue;
-$font_1: Helvetica;
-$font_2: Arial;
-$font_3: sans-serif;
-$font_4: fontello;
+$font_stack: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+$font_icon: fontello;
