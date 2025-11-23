@@ -23,7 +23,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2204
     strategy:
       matrix:
-        nim: ["1.6.x", "2.0.x", "2.2.x", "devel"]
+        nim: ["2.0.x", "2.2.x", "devel"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
