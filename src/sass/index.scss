@@ -85,7 +85,6 @@ a {
 fieldset {
     border: 0;
     padding: 0;
-    margin-top: -0.6em;
 }
 
 legend {
@@ -96,6 +95,10 @@ legend {
     font-weight: 600;
     border-bottom: 1px solid var(--border_grey);
     margin-bottom: 8px;
+}
+
+.preferences > form:first-of-type {
+    margin-top: -.6em;
 }
 
 .preferences .note {

@@ -66,13 +66,14 @@
         margin-left: 23px;
     }
 
-    .checkbox {
+    input[type=checkbox] {
         right: unset;
         left: -22px;
+        top: 1px;
     }
 
-    .checkbox-container .checkbox:after {
-        top: -4px;
+    .checkbox-container input[type=checkbox]:after {
+        top: 1px;
     }
 }
 
