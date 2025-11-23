@@ -485,6 +485,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
             result.before.content.add tweet
         elif entryId.startsWith("cursor-bottom"):
           var cursorValue = select(
+            e{"content", "value"},
             e{"content", "content", "value"},
             e{"content", "itemContent", "value"}
           )
