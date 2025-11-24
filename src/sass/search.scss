@@ -42,7 +42,7 @@
         @include input-colors;
     }
 
-    @include create-toggle(search-panel, 200px);
+    @include create-toggle(search-panel, 380px);
 }
 
 .search-panel {
@@ -104,19 +104,18 @@
 .search-toggles {
     flex-grow: 1;
     display: grid;
-    grid-template-columns: repeat(6, auto);
+    grid-template-columns: repeat(5, auto);
     grid-column-gap: 10px;
 }
 
 .profile-tabs {
     @include search-resize(820px, 5);
-    @include search-resize(725px, 4);
-    @include search-resize(600px, 6);
-    @include search-resize(560px, 5);
-    @include search-resize(480px, 4);
+    @include search-resize(715px, 4);
+    @include search-resize(700px, 5);
+    @include search-resize(485px, 4);
     @include search-resize(410px, 3);
 }
 
-@include search-resize(560px, 5);
-@include search-resize(480px, 4);
+@include search-resize(700px, 5);
+@include search-resize(485px, 4);
 @include search-resize(410px, 3);
