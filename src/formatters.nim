@@ -6,7 +6,7 @@ import types, utils, query
 const
   cards = "cards.twitter.com/cards"
   tco = "https://t.co"
-  twitter = parseUri("https://twitter.com")
+  twitter = parseUri("https://x.com")
 
 let
   twRegex = re"(?<=(?<!\S)https:\/\/|(?<=\s))(www\.|mobile\.)?twitter\.com"
