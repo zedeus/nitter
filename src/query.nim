@@ -6,10 +6,9 @@ import types
 const
   validFilters* = @[
     "media", "images", "twimg", "videos",
-    "native_video", "consumer_video", "pro_video",
+    "native_video", "consumer_video", "spaces",
     "links", "news", "quote", "mentions",
-    "replies", "retweets", "nativeretweets",
-    "verified", "safe"
+    "replies", "retweets", "nativeretweets"
   ]
 
   emptyQuery* = "include:nativeretweets"

@@ -10,14 +10,12 @@ const toggles = {
   "media": "Media",
   "videos": "Videos",
   "news": "News",
-  "verified": "Verified",
   "native_video": "Native videos",
   "replies": "Replies",
   "links": "Links",
   "images": "Images",
-  "safe": "Safe",
   "quote": "Quotes",
-  "pro_video": "Pro videos"
+  "spaces": "Spaces"
 }.toOrderedTable
 
 proc renderSearch*(): VNode =
