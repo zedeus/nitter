@@ -105,6 +105,12 @@ proc createTimelineRouter*(cfg: Config) =
     get "/intent/user":
       respUserId()
 
+    get "/intent/follow/?":
+      let username = request.params.getOrDefault("screen_name")
+      if username.len == 0:
+        resp Http400, showError("Missing screen_name parameter", cfg)
+      redirect("/" & username)
+
     get "/@name/?@tab?/?":
       cond '.' notin @"name"
       cond @"name" notin ["pic", "gif", "video", "search", "settings", "login", "intent", "i"]
