@@ -59,25 +59,28 @@ proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
   result = body
 
   if prefs.replaceYouTube.len > 0 and "youtu" in result:
-    result = result.replace(ytRegex, prefs.replaceYouTube)
+    let youtubeHost = strip(prefs.replaceYouTube, chars={'/'})
+    result = result.replace(ytRegex, youtubeHost)
 
   if prefs.replaceTwitter.len > 0:
+    let twitterHost = strip(prefs.replaceTwitter, chars={'/'})
     if tco in result:
-      result = result.replace(tco, https & prefs.replaceTwitter & "/t.co")
+      result = result.replace(tco, https & twitterHost & "/t.co")
     if "x.com" in result:
-      result = result.replace(xRegex, prefs.replaceTwitter)
+      result = result.replace(xRegex, twitterHost)
       result = result.replacef(xLinkRegex, a(
-        prefs.replaceTwitter & "$2", href = https & prefs.replaceTwitter & "$1"))
+        twitterHost & "$2", href = https & twitterHost & "$1"))
     if "twitter.com" in result:
-      result = result.replace(cards, prefs.replaceTwitter & "/cards")
-      result = result.replace(twRegex, prefs.replaceTwitter)
+      result = result.replace(cards, twitterHost & "/cards")
+      result = result.replace(twRegex, twitterHost)
       result = result.replacef(twLinkRegex, a(
-        prefs.replaceTwitter & "$2", href = https & prefs.replaceTwitter & "$1"))
+        twitterHost & "$2", href = https & twitterHost & "$1"))
 
   if prefs.replaceReddit.len > 0 and ("reddit.com" in result or "redd.it" in result):
-    result = result.replace(rdShortRegex, prefs.replaceReddit & "/comments/")
-    result = result.replace(rdRegex, prefs.replaceReddit)
-    if prefs.replaceReddit in result and "/gallery/" in result:
+    let redditHost = strip(prefs.replaceReddit, chars={'/'})
+    result = result.replace(rdShortRegex, redditHost & "/comments/")
+    result = result.replace(rdRegex, redditHost)
+    if redditHost in result and "/gallery/" in result:
       result = result.replace("/gallery/", "/comments/")
 
   if absolute.len > 0 and "href" in result:
