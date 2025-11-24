@@ -14,6 +14,7 @@ button {
 
 input[type="text"],
 input[type="date"],
+input[type="number"],
 select {
     @include input-colors;
     background-color: var(--bg_elements);
@@ -24,7 +25,12 @@ select {
     font-size: 14px;
 }
 
-input[type="text"] {
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="text"],
+input[type="number"] {
     height: 16px;
 }
 
@@ -36,6 +42,17 @@ select {
 
 input[type="date"]::-webkit-inner-spin-button {
     display: none;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    display: none;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 input[type="date"]::-webkit-clear-button {
@@ -164,7 +181,8 @@ input::-webkit-datetime-edit-year-field:focus {
         appearance: none;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    input[type="number"] {
         position: absolute;
         right: 0;
         max-width: 140px;

@@ -140,7 +140,7 @@ type
     fromUser*: seq[string]
     since*: string
     until*: string
-    near*: string
+    minLikes*: string
     sep*: string
 
   Gif* = object

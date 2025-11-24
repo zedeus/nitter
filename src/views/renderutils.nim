@@ -89,6 +89,13 @@ proc genDate*(pref, state: string): VNode =
     input(name=pref, `type`="date", value=state)
     icon "calendar"
 
+proc genNumberInput*(pref, label, state, placeholder: string; class=""; autofocus=true; min="0"): VNode =
+  let p = placeholder
+  buildHtml(tdiv(class=("pref-group pref-input " & class))):
+    if label.len > 0:
+      label(`for`=pref): text label
+    input(name=pref, `type`="number", placeholder=p, value=state, autofocus=(autofocus and state.len == 0), min=min, step="1")
+
 proc genImg*(url: string; class=""): VNode =
   buildHtml():
     img(src=getPicUrl(url), class=class, alt="", loading="lazy")

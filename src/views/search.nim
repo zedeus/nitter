@@ -51,7 +51,7 @@ proc renderSearchTabs*(query: Query): VNode =
 
 proc isPanelOpen(q: Query): bool =
   q.fromUser.len == 0 and (q.filters.len > 0 or q.excludes.len > 0 or
-  @[q.near, q.until, q.since].anyIt(it.len > 0))
+  @[q.minLikes, q.until, q.since].anyIt(it.len > 0))
 
 proc renderSearchPanel*(query: Query): VNode =
   let user = query.fromUser.join(",")
@@ -83,8 +83,8 @@ proc renderSearchPanel*(query: Query): VNode =
             span(class="search-title"): text "-"
             genDate("until", query.until)
         tdiv:
-          span(class="search-title"): text "Near"
-          genInput("near", "", query.near, "Location...", autofocus=false)
+          span(class="search-title"): text "Minimum likes"
+          genNumberInput("min_faves", "", query.minLikes, "Number...", autofocus=false)
 
 proc renderTweetSearch*(results: Timeline; prefs: Prefs; path: string;
                         pinned=none(Tweet)): VNode =

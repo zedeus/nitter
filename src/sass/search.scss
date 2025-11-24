@@ -24,7 +24,8 @@
         height: 23px;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    input[type="number"] {
         height: calc(100% - 4px);
         width: calc(100% - 8px);
     }

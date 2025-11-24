@@ -17,6 +17,11 @@ template `@`(param: string): untyped =
   if param in pms: pms[param]
   else: ""
 
+proc validateNumber(value: string): string =
+  if value.anyIt(not it.isDigit):
+    return ""
+  return value
+
 proc initQuery*(pms: Table[string, string]; name=""): Query =
   result = Query(
     kind: parseEnum[QueryKind](@"f", tweets),
@@ -25,7 +30,7 @@ proc initQuery*(pms: Table[string, string]; name=""): Query =
     excludes: validFilters.filterIt("e-" & it in pms),
     since: @"since",
     until: @"until",
-    near: @"near"
+    minLikes: validateNumber(@"min_faves")
   )
 
   if name.len > 0:
@@ -77,8 +82,8 @@ proc genQueryParam*(query: Query): string =
     result &= " since:" & query.since
   if query.until.len > 0:
     result &= " until:" & query.until
-  if query.near.len > 0:
-    result &= &" near:\"{query.near}\" within:15mi"
+  if query.minLikes.len > 0:
+    result &= " min_faves:" & query.minLikes
   if query.text.len > 0:
     if result.len > 0:
       result &= " " & query.text
@@ -102,8 +107,8 @@ proc genQueryUrl*(query: Query): string =
     params.add "since=" & query.since
   if query.until.len > 0:
     params.add "until=" & query.until
-  if query.near.len > 0:
-    params.add "near=" & query.near
+  if query.minLikes.len > 0:
+    params.add "min_faves=" & query.minLikes
 
   if params.len > 0:
     result &= params.join("&")
