@@ -50,7 +50,7 @@ proc genHeaders*(session: Session, url: string): HttpHeaders =
   of SessionKind.oauth:
     result["authorization"] = getOauthHeader(url, session.oauthToken, session.oauthSecret)
   of SessionKind.cookie:
-    result["authorization"] = "Bearer AAAAAAAAAAAAAAAAAAAAAFQODgEAAAAAVHTp76lzh3rFzcHbmHVvQxYYpTw%3DckAlMINMjmCwxUcaXbAN4XqJVdgMJaHqNOFgPMK0zN1qLqLQCF"
+    result["authorization"] = "Bearer AAAAAAAAAAAAAAAAAAAAAFXzAwAAAAAAMHCxpeSDG1gLNLghVe8d74hl6k4%3DRUMF4xAQLsbeBhTSRrCiQpJtxoGWeyHrDb5te2jpGskWDFW82F"
     result["x-twitter-auth-type"] = "OAuth2Session"
     result["x-csrf-token"] = session.ct0
     result["cookie"] = getCookieHeader(session.authToken, session.ct0)

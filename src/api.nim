@@ -13,47 +13,54 @@ proc genParams(variables: string; fieldToggles = ""): seq[(string, string)] =
 
 proc mediaUrl(id: string; cursor: string): SessionAwareUrl =
   let
-    cookieVariables = userMediaVariables % [id, cursor]
-    oauthVariables = restIdVariables % [id, cursor]
+    cookieVars = userMediaVars % [id, cursor]
+    oauthVars = restIdVars % [id, cursor]
   result = SessionAwareUrl(
-    cookieUrl: graphUserMedia ? genParams(cookieVariables),
-    oauthUrl: graphUserMediaV2 ? genParams(oauthVariables)
+    cookieUrl: graphUserMedia ? genParams(cookieVars),
+    oauthUrl: graphUserMediaV2 ? genParams(oauthVars)
   )
 
 proc userTweetsUrl(id: string; cursor: string): SessionAwareUrl =
   let
-    cookieVariables = userTweetsVariables % [id, cursor]
-    oauthVariables = restIdVariables % [id, cursor]
+    cookieVars = userTweetsVars % [id, cursor]
+    oauthVars = restIdVars % [id, cursor]
   result = SessionAwareUrl(
-    # cookieUrl: graphUserTweets ? genParams(cookieVariables, fieldToggles),
-    oauthUrl: graphUserTweetsV2 ? genParams(oauthVariables)
+    # cookieUrl: graphUserTweets ? genParams(cookieVars, userTweetsFieldToggles),
+    oauthUrl: graphUserTweetsV2 ? genParams(oauthVars)
   )
   # might change this in the future pending testing
   result.cookieUrl = result.oauthUrl
 
 proc userTweetsAndRepliesUrl(id: string; cursor: string): SessionAwareUrl =
   let
-    cookieVariables = userTweetsAndRepliesVariables % [id, cursor]
-    oauthVariables = restIdVariables % [id, cursor]
+    cookieVars = userTweetsAndRepliesVars % [id, cursor]
+    oauthVars = restIdVars % [id, cursor]
   result = SessionAwareUrl(
-    cookieUrl: graphUserTweetsAndReplies ? genParams(cookieVariables, fieldToggles),
-    oauthUrl: graphUserTweetsAndRepliesV2 ? genParams(oauthVariables)
+    cookieUrl: graphUserTweetsAndReplies ? genParams(cookieVars, userTweetsFieldToggles),
+    oauthUrl: graphUserTweetsAndRepliesV2 ? genParams(oauthVars)
   )
 
 proc tweetDetailUrl(id: string; cursor: string): SessionAwareUrl =
   let
-    cookieVariables = tweetDetailVariables % [id, cursor]
-    oauthVariables = tweetVariables % [id, cursor]
+    cookieVars = tweetDetailVars % [id, cursor]
+    oauthVars = tweetVars % [id, cursor]
   result = SessionAwareUrl(
-    cookieUrl: graphTweetDetail ? genParams(cookieVariables, tweetDetailFieldToggles),
-    oauthUrl: graphTweet ? genParams(oauthVariables)
+    cookieUrl: graphTweetDetail ? genParams(cookieVars, tweetDetailFieldToggles),
+    oauthUrl: graphTweet ? genParams(oauthVars)
+  )
+
+proc userUrl(username: string): SessionAwareUrl =
+  let
+    cookieVars = """{"screen_name":"$1","withGrokTranslatedBio":false}""" % username
+    oauthVars = """{"screen_name": "$1"}""" % username
+  result = SessionAwareUrl(
+    cookieUrl: graphUser ? genParams(cookieVars, tweetDetailFieldToggles),
+    oauthUrl: graphUserV2 ? genParams(oauthVars)
   )
 
 proc getGraphUser*(username: string): Future[User] {.async.} =
   if username.len == 0: return
-  let
-    url = graphUser ? genParams("""{"screen_name": "$1"}""" % username)
-    js = await fetchRaw(url, Api.userScreenName)
+  let js = await fetchRaw(userUrl(username), Api.userScreenName)
   result = parseGraphUser(js)
 
 proc getGraphUserById*(id: string): Future[User] {.async.} =
@@ -80,7 +87,7 @@ proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
     cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
-    url = graphListTweets ? genParams(restIdVariables % [id, cursor])
+    url = graphListTweets ? genParams(restIdVars % [id, cursor])
   result = parseGraphTimeline(await fetch(url, Api.listTweets), after).tweets
 
 proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =

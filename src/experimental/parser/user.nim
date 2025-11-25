@@ -58,10 +58,12 @@ proc toUser*(raw: RawUser): User =
     media: raw.mediaCount,
     verifiedType: raw.verifiedType,
     protected: raw.protected,
-    joinDate: parseTwitterDate(raw.createdAt),
     banner: getBanner(raw),
     userPic: getImageUrl(raw.profileImageUrlHttps).replace("_normal", "")
   )
+
+  if raw.createdAt.len > 0:
+    result.joinDate = parseTwitterDate(raw.createdAt)
 
   if raw.pinnedTweetIdsStr.len > 0:
     result.pinnedTweet = parseBiggestInt(raw.pinnedTweetIdsStr[0])

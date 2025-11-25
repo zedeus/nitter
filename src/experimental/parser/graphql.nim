@@ -1,6 +1,6 @@
 import options, strutils
 import jsony
-import user, ../types/[graphuser, graphlistmembers]
+import user, utils, ../types/[graphuser, graphlistmembers]
 from ../../types import User, VerifiedType, Result, Query, QueryKind
 
 proc parseUserResult*(userResult: UserResult): User =
@@ -15,22 +15,36 @@ proc parseUserResult*(userResult: UserResult): User =
     result.fullname = userResult.core.name
     result.userPic = userResult.avatar.imageUrl.replace("_normal", "")
 
+    if userResult.privacy.isSome:
+      result.protected = userResult.privacy.get.protected
+
+    if userResult.location.isSome:
+      result.location = userResult.location.get.location
+
+    if userResult.core.createdAt.len > 0:
+      result.joinDate = parseTwitterDate(userResult.core.createdAt)
+
     if userResult.verification.isSome:
       let v = userResult.verification.get
       if v.verifiedType != VerifiedType.none:
         result.verifiedType = v.verifiedType
 
-    if userResult.profileBio.isSome:
+    if userResult.profileBio.isSome and result.bio.len == 0:
       result.bio = userResult.profileBio.get.description
 
 proc parseGraphUser*(json: string): User =
   if json.len == 0 or json[0] != '{':
     return
 
-  let raw = json.fromJson(GraphUser)
-  let userResult = raw.data.userResult.result
+  let 
+    raw = json.fromJson(GraphUser)
+    userResult = 
+      if raw.data.userResult.isSome: raw.data.userResult.get.result
+      elif raw.data.user.isSome: raw.data.user.get.result
+      else: UserResult()
 
-  if userResult.unavailableReason.get("") == "Suspended":
+  if userResult.unavailableReason.get("") == "Suspended" or
+     userResult.reason.get("") == "Suspended":
     return User(suspended: true)
 
   result = parseUserResult(userResult)

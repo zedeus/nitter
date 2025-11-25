@@ -7,7 +7,8 @@ const
 
   gql = parseUri("https://api.x.com") / "graphql"
 
-  graphUser* = gql / "WEoGnYB0EG1yGwamDCF6zg/UserResultByScreenNameQuery"
+  graphUser* = gql / "-oaLodhGbbnzJBACb1kk2Q/UserByScreenName"
+  graphUserV2* = gql / "WEoGnYB0EG1yGwamDCF6zg/UserResultByScreenNameQuery"
   graphUserById* = gql / "VN33vKXrPT7p35DgNR27aw/UserResultByIdQuery"
   graphUserTweetsV2* = gql / "6QdSuZ5feXxOadEdXa4XZg/UserWithProfileTweetsQueryV2"
   graphUserTweetsAndRepliesV2* = gql / "BDX77Xzqypdt11-mDfgdpQ/UserWithProfileTweetsAndRepliesQueryV2"
@@ -97,10 +98,14 @@ const
   "grok_translations_community_note_auto_translation_is_enabled": false,
   "grok_translations_post_auto_translation_is_enabled": false,
   "grok_translations_community_note_translation_is_enabled": false,
-  "grok_translations_timeline_user_bio_auto_translation_is_enabled": false
+  "grok_translations_timeline_user_bio_auto_translation_is_enabled": false,
+  "subscriptions_feature_can_gift_premium": false,
+  "responsive_web_twitter_article_notes_tab_enabled": false,
+  "subscriptions_verification_info_is_identity_verified_enabled": false,
+  "hidden_profile_subscriptions_enabled": false
 }""".replace(" ", "").replace("\n", "")
 
-  tweetVariables* = """{
+  tweetVars* = """{
   "postId": "$1",
   $2
   "includeHasBirdwatchNotes": false,
@@ -110,7 +115,7 @@ const
   "withV2Timeline": true
 }""".replace(" ", "").replace("\n", "")
 
-  tweetDetailVariables* = """{
+  tweetDetailVars* = """{
   "focalTweetId": "$1",
   $2
   "referrer": "profile",
@@ -123,12 +128,12 @@ const
   "withVoice": true
 }""".replace(" ", "").replace("\n", "")
 
-  restIdVariables* = """{
+  restIdVars* = """{
   "rest_id": "$1", $2
   "count": 20
 }"""
 
-  userMediaVariables* = """{
+  userMediaVars* = """{
   "userId": "$1", $2
   "count": 20,
   "includePromotedContent": false,
@@ -137,7 +142,7 @@ const
   "withVoice": true
 }""".replace(" ", "").replace("\n", "")
 
-  userTweetsVariables* = """{
+  userTweetsVars* = """{
   "userId": "$1", $2
   "count": 20,
   "includePromotedContent": false,
@@ -145,7 +150,7 @@ const
   "withVoice": true
 }""".replace(" ", "").replace("\n", "")
 
-  userTweetsAndRepliesVariables* = """{
+  userTweetsAndRepliesVars* = """{
   "userId": "$1", $2
   "count": 20,
   "includePromotedContent": false,
@@ -153,5 +158,6 @@ const
   "withVoice": true
 }""".replace(" ", "").replace("\n", "")
 
-  fieldToggles* = """{"withArticlePlainText":false}"""
+  userFieldToggles = """{"withPayments":false,"withAuxiliaryUserLabels":true}"""
+  userTweetsFieldToggles* = """{"withArticlePlainText":false}"""
   tweetDetailFieldToggles* = """{"withArticleRichContentState":true,"withArticlePlainText":false,"withGrokAnalyze":false,"withDisallowedReplyControls":false}"""

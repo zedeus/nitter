@@ -21,7 +21,7 @@ proc parseUser(js: JsonNode; id=""): User =
     tweets: js{"statuses_count"}.getInt,
     likes: js{"favourites_count"}.getInt,
     media: js{"media_count"}.getInt,
-    protected: js{"protected"}.getBool,
+    protected: js{"protected"}.getBool(js{"privacy", "protected"}.getBool),
     joinDate: js{"created_at"}.getTime
   )
 
