@@ -94,7 +94,7 @@ async def login_and_get_cookies(username, password, totp_seed=None, headless=Fal
 
 async def main():
     if len(sys.argv) < 3:
-        print('Usage: python3 twitter-auth.py username password [totp_seed] [--append sessions.jsonl] [--headless]')
+        print('Usage: python3 create_session_browser.py username password [totp_seed] [--append file.jsonl] [--headless]')
         sys.exit(1)
 
     username = sys.argv[1]
