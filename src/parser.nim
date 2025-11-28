@@ -184,7 +184,7 @@ proc parseMediaEntities(js: JsonNode; result: var Tweet) =
   # Remove media URLs from text
   with mediaList, js{"legacy", "entities", "media"}:
     for url in mediaList:
-      let expandedUrl = url{"expanded_url"}.getStr
+      let expandedUrl = url.getExpandedUrl
       if result.text.endsWith(expandedUrl):
         result.text.removeSuffix(expandedUrl)
         result.text = result.text.strip()
@@ -267,7 +267,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
 
   for u in ? urls:
     if u{"url"}.getStr == result.url:
-      result.url = u{"expanded_url"}.getStr
+      result.url = u.getExpandedUrl(result.url)
       break
 
   if kind in {videoDirectMessage, imageDirectMessage}:

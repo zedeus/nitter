@@ -112,6 +112,9 @@ proc getImageStr*(js: JsonNode): string =
 template getImageVal*(js: JsonNode): string =
   js{"image_value", "url"}.getImageStr
 
+template getExpandedUrl*(js: JsonNode; fallback=""): string =
+  js{"expanded_url"}.getStr(js{"url"}.getStr(fallback))
+
 proc getCardUrl*(js: JsonNode; kind: CardKind): string =
   result = js{"website_url"}.getStrVal
   if kind == promoVideoConvo:
@@ -177,7 +180,7 @@ proc extractSlice(js: JsonNode): Slice[int] =
 proc extractUrls(result: var seq[ReplaceSlice]; js: JsonNode;
                  textLen: int; hideTwitter = false) =
   let
-    url = js["expanded_url"].getStr
+    url = js.getExpandedUrl
     slice = js.extractSlice
 
   if hideTwitter and slice.b.succ >= textLen and url.isTwitterUrl:
@@ -238,7 +241,7 @@ proc expandUserEntities*(user: var User; js: JsonNode) =
     ent = ? js{"entities"}
 
   with urls, ent{"url", "urls"}:
-    user.website = urls[0]{"expanded_url"}.getStr
+    user.website = urls[0].getExpandedUrl
 
   var replacements = newSeq[ReplaceSlice]()
 
@@ -268,7 +271,7 @@ proc expandTextEntities(tweet: Tweet; entities: JsonNode; text: string; textSlic
       replacements.extractUrls(u, textSlice.b, hideTwitter = hasRedundantLink)
 
       if hasCard and u{"url"}.getStr == get(tweet.card).url:
-        get(tweet.card).url = u{"expanded_url"}.getStr
+        get(tweet.card).url = u.getExpandedUrl
 
   with media, entities{"media"}:
     for m in media:
