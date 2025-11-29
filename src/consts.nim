@@ -1,29 +1,29 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import uri, strutils
+import strutils
 
 const
   consumerKey* = "3nVuSoBZnx6U4vzUxf5w"
   consumerSecret* = "Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys"
+  bearerToken* = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+  bearerToken2* = "Bearer AAAAAAAAAAAAAAAAAAAAAFXzAwAAAAAAMHCxpeSDG1gLNLghVe8d74hl6k4%3DRUMF4xAQLsbeBhTSRrCiQpJtxoGWeyHrDb5te2jpGskWDFW82F"
 
-  gql = parseUri("https://api.x.com") / "graphql"
-
-  graphUser* = gql / "-oaLodhGbbnzJBACb1kk2Q/UserByScreenName"
-  graphUserV2* = gql / "WEoGnYB0EG1yGwamDCF6zg/UserResultByScreenNameQuery"
-  graphUserById* = gql / "VN33vKXrPT7p35DgNR27aw/UserResultByIdQuery"
-  graphUserTweetsV2* = gql / "6QdSuZ5feXxOadEdXa4XZg/UserWithProfileTweetsQueryV2"
-  graphUserTweetsAndRepliesV2* = gql / "BDX77Xzqypdt11-mDfgdpQ/UserWithProfileTweetsAndRepliesQueryV2"
-  graphUserTweets* = gql / "oRJs8SLCRNRbQzuZG93_oA/UserTweets"
-  graphUserTweetsAndReplies* = gql / "kkaJ0Mf34PZVarrxzLihjg/UserTweetsAndReplies"
-  graphUserMedia* = gql / "36oKqyQ7E_9CmtONGjJRsA/UserMedia"
-  graphUserMediaV2* = gql / "bp0e_WdXqgNBIwlLukzyYA/MediaTimelineV2"
-  graphTweet* = gql / "Y4Erk_-0hObvLpz0Iw3bzA/ConversationTimeline"
-  graphTweetDetail* = gql / "YVyS4SfwYW7Uw5qwy0mQCA/TweetDetail"
-  graphTweetResult* = gql / "nzme9KiYhfIOrrLrPP_XeQ/TweetResultByIdQuery"
-  graphSearchTimeline* = gql / "bshMIjqDk8LTXTq4w91WKw/SearchTimeline"
-  graphListById* = gql / "cIUpT1UjuGgl_oWiY7Snhg/ListByRestId"
-  graphListBySlug* = gql / "K6wihoTiTrzNzSF8y1aeKQ/ListBySlug"
-  graphListMembers* = gql / "fuVHh5-gFn8zDBBxb8wOMA/ListMembers"
-  graphListTweets* = gql / "VQf8_XQynI3WzH6xopOMMQ/ListTimeline"
+  graphUser* = "-oaLodhGbbnzJBACb1kk2Q/UserByScreenName"
+  graphUserV2* = "WEoGnYB0EG1yGwamDCF6zg/UserResultByScreenNameQuery"
+  graphUserById* = "VN33vKXrPT7p35DgNR27aw/UserResultByIdQuery"
+  graphUserTweetsV2* = "6QdSuZ5feXxOadEdXa4XZg/UserWithProfileTweetsQueryV2"
+  graphUserTweetsAndRepliesV2* = "BDX77Xzqypdt11-mDfgdpQ/UserWithProfileTweetsAndRepliesQueryV2"
+  graphUserTweets* = "oRJs8SLCRNRbQzuZG93_oA/UserTweets"
+  graphUserTweetsAndReplies* = "kkaJ0Mf34PZVarrxzLihjg/UserTweetsAndReplies"
+  graphUserMedia* = "36oKqyQ7E_9CmtONGjJRsA/UserMedia"
+  graphUserMediaV2* = "bp0e_WdXqgNBIwlLukzyYA/MediaTimelineV2"
+  graphTweet* = "Y4Erk_-0hObvLpz0Iw3bzA/ConversationTimeline"
+  graphTweetDetail* = "YVyS4SfwYW7Uw5qwy0mQCA/TweetDetail"
+  graphTweetResult* = "nzme9KiYhfIOrrLrPP_XeQ/TweetResultByIdQuery"
+  graphSearchTimeline* = "bshMIjqDk8LTXTq4w91WKw/SearchTimeline"
+  graphListById* = "cIUpT1UjuGgl_oWiY7Snhg/ListByRestId"
+  graphListBySlug* = "K6wihoTiTrzNzSF8y1aeKQ/ListBySlug"
+  graphListMembers* = "fuVHh5-gFn8zDBBxb8wOMA/ListMembers"
+  graphListTweets* = "VQf8_XQynI3WzH6xopOMMQ/ListTimeline"
 
   gqlFeatures* = """{
   "android_ad_formats_media_component_render_overlay_enabled": false,

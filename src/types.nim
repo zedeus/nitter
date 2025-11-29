@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import times, sequtils, options, tables, uri
+import times, sequtils, options, tables
 import prefs_impl
 
 genPrefsType()
@@ -13,19 +13,13 @@ type
   TimelineKind* {.pure.} = enum
     tweets, replies, media
 
-  Api* {.pure.} = enum
-    tweetDetail
-    tweetResult
-    search
-    list
-    listBySlug
-    listMembers
-    listTweets
-    userRestId
-    userScreenName
-    userTweets
-    userTweetsAndReplies
-    userMedia
+  ApiUrl* = object
+    endpoint*: string
+    params*: seq[(string, string)]
+
+  ApiReq* = object
+    oauth*: ApiUrl
+    cookie*: ApiUrl
 
   RateLimit* = object
     limit*: int
@@ -42,7 +36,7 @@ type
     pending*: int
     limited*: bool
     limitedAt*: int
-    apis*: Table[Api, RateLimit]
+    apis*: Table[string, RateLimit]
     case kind*: SessionKind
     of oauth:
       oauthToken*: string
@@ -50,10 +44,6 @@ type
     of cookie:
       authToken*: string
       ct0*: string
-
-  SessionAwareUrl* = object
-    oauthUrl*: Uri
-    cookieUrl*: Uri
 
   Error* = enum
     null = 0
@@ -285,6 +275,7 @@ type
     enableDebug*: bool
     proxy*: string
     proxyAuth*: string
+    disableTid*: bool
 
     rssCacheTime*: int
     listCacheTime*: int

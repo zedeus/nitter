@@ -1,6 +1,6 @@
 #SPDX-License-Identifier: AGPL-3.0-only
-import std/[asyncdispatch, times, json, random, sequtils, strutils, tables, packedsets, os]
-import types
+import std/[asyncdispatch, times, json, random, strutils, tables, packedsets, os]
+import types, consts
 import experimental/parser/session
 
 # max requests at a time per session to avoid race conditions
@@ -14,6 +14,11 @@ var
 
 template log(str: varargs[string, `$`]) =
   echo "[sessions] ", str.join("")
+
+proc endpoint(req: ApiReq; session: Session): string =
+  case session.kind
+  of oauth: req.oauth.endpoint
+  of cookie: req.cookie.endpoint
 
 proc pretty*(session: Session): string =
   if session.isNil:
@@ -122,11 +127,12 @@ proc rateLimitError*(): ref RateLimitError =
 proc noSessionsError*(): ref NoSessionsError =
   newException(NoSessionsError, "no sessions available")
 
-proc isLimited(session: Session; api: Api): bool =
+proc isLimited(session: Session; req: ApiReq): bool =
   if session.isNil:
     return true
 
-  if session.limited and api != Api.userTweets:
+  let api = req.endpoint(session)
+  if session.limited and api != graphUserTweetsV2:
     if (epochTime().int - session.limitedAt) > hourInSeconds:
       session.limited = false
       log "resetting limit: ", session.pretty
@@ -140,8 +146,8 @@ proc isLimited(session: Session; api: Api): bool =
   else:
     return false
 
-proc isReady(session: Session; api: Api): bool =
-  not (session.isNil or session.pending > maxConcurrentReqs or session.isLimited(api))
+proc isReady(session: Session; req: ApiReq): bool =
+  not (session.isNil or session.pending > maxConcurrentReqs or session.isLimited(req))
 
 proc invalidate*(session: var Session) =
   if session.isNil: return
@@ -156,24 +162,26 @@ proc release*(session: Session) =
   if session.isNil: return
   dec session.pending
 
-proc getSession*(api: Api): Future[Session] {.async.} =
+proc getSession*(req: ApiReq): Future[Session] {.async.} =
   for i in 0 ..< sessionPool.len:
-    if result.isReady(api): break
+    if result.isReady(req): break
     result = sessionPool.sample()
 
-  if not result.isNil and result.isReady(api):
+  if not result.isNil and result.isReady(req):
     inc result.pending
   else:
-    log "no sessions available for API: ", api
+    log "no sessions available for API: ", req.cookie.endpoint
     raise noSessionsError()
 
-proc setLimited*(session: Session; api: Api) =
+proc setLimited*(session: Session; req: ApiReq) =
+  let api = req.endpoint(session)
   session.limited = true
   session.limitedAt = epochTime().int
   log "rate limited by api: ", api, ", reqs left: ", session.apis[api].remaining, ", ", session.pretty
 
-proc setRateLimit*(session: Session; api: Api; remaining, reset, limit: int) =
+proc setRateLimit*(session: Session; req: ApiReq; remaining, reset, limit: int) =
   # avoid undefined behavior in race conditions
+  let api = req.endpoint(session)
   if api in session.apis:
     let rateLimit = session.apis[api]
     if rateLimit.reset >= reset and rateLimit.remaining < remaining:

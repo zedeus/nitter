@@ -40,7 +40,8 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     enableRss: cfg.get("Config", "enableRSS", true),
     enableDebug: cfg.get("Config", "enableDebug", false),
     proxy: cfg.get("Config", "proxy", ""),
-    proxyAuth: cfg.get("Config", "proxyAuth", "")
+    proxyAuth: cfg.get("Config", "proxyAuth", ""),
+    disableTid: cfg.get("Config", "disableTid", false)
   )
 
   return (conf, cfg)

@@ -11,12 +11,7 @@ card = [
     ['voidtarget/status/1094632512926605312',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too)',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too) - obsplugin.nim',
-     'gist.github.com', True],
-
-    ['nim_lang/status/1082989146040340480',
-     'Nim in 2018: A short recap',
-     'There were several big news in the Nim world in 2018 – two new major releases, partnership with Status, and much more. But let us go chronologically.',
-     'nim-lang.org', True]
+     'gist.github.com', True]
 ]
 
 no_thumb = [
