@@ -53,6 +53,16 @@ video {
     height: 40px;
   }
 
+  .overlay-duration {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background-color: #0000007a;
+    line-height: 1em;
+    padding: 4px 6px 4px 6px;
+    border-radius: 5px;
+    font-weight: bold;
+  }
 
   form {
     width: 100%;

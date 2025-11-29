@@ -109,6 +109,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
             video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
             tdiv(class="overlay-circle"): span(class="overlay-triangle")
+            tdiv(class="overlay-duration"): text getDuration(video)
             verbatim "</div>"
       if container.len > 0:
         tdiv(class="card-content"):

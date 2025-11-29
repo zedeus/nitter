@@ -154,6 +154,19 @@ proc getShortTime*(tweet: Tweet): string =
   else:
     result = "now"
 
+proc getDuration*(video: Video): string =
+  let 
+    ms = video.durationMs
+    sec = int(ms / 1000)
+    min = int(sec / 60)
+    hour = int(min / 60)
+  if hour > 1:
+    return &"{hour}:{min mod 60}:{sec mod 60:02}"
+  elif min > 1:
+    return &"{min mod 60}:{sec mod 60:02}"
+  else:
+    return &"0:{sec mod 60:02}"
+
 proc getLink*(tweet: Tweet; focus=true): string =
   if tweet.id == 0: return
   var username = tweet.user.username
