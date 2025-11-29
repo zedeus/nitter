@@ -2,7 +2,7 @@
 @import "_mixins";
 
 video {
-  max-height: 100%;
+  height: 100%;
   width: 100%;
 }
 
@@ -13,6 +13,7 @@ video {
 
 .gallery-video.card-container {
   flex-direction: column;
+  width: 100%;
 }
 
 .video-container {
@@ -20,9 +21,6 @@ video {
   min-width: 200px;
   max-height: 530px;
   margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   img {
     max-height: 100%;

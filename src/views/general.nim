@@ -52,8 +52,8 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   let opensearchUrl = getUrlPrefix(cfg) & "/opensearch"
 
   buildHtml(head):
-    link(rel="stylesheet", type="text/css", href="/css/style.css?v=21")
-    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=3")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=22")
+    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=4")
 
     if theme.len > 0:
       link(rel="stylesheet", type="text/css", href=(&"/css/themes/{theme}.css"))
