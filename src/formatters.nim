@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, strformat, times, uri, tables, xmltree, htmlparser, htmlgen
+import strutils, strformat, times, uri, tables, xmltree, htmlparser, htmlgen, math
 import std/[enumerate, re]
 import types, utils, query
 
@@ -157,15 +157,13 @@ proc getShortTime*(tweet: Tweet): string =
 proc getDuration*(video: Video): string =
   let 
     ms = video.durationMs
-    sec = int(ms / 1000)
-    min = int(sec / 60)
-    hour = int(min / 60)
-  if hour > 1:
+    sec = int(round(ms / 1000))
+    min = floorDiv(sec, 60)
+    hour = floorDiv(min, 60)
+  if hour > 0:
     return &"{hour}:{min mod 60}:{sec mod 60:02}"
-  elif min > 1:
-    return &"{min mod 60}:{sec mod 60:02}"
   else:
-    return &"0:{sec mod 60:02}"
+    return &"{min mod 60}:{sec mod 60:02}"
 
 proc getLink*(tweet: Tweet; focus=true): string =
   if tweet.id == 0: return
