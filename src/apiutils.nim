@@ -8,7 +8,7 @@ const
   rlRemaining = "x-rate-limit-remaining"
   rlReset = "x-rate-limit-reset"
   rlLimit = "x-rate-limit-limit"
-  errorsToSkip = {doesntExist, tweetNotFound, timeout, unauthorized, badRequest}
+  errorsToSkip = {null, doesntExist, tweetNotFound, timeout, unauthorized, badRequest}
 
 var pool: HttpPool
 
