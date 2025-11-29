@@ -1,42 +1,42 @@
-@import '_variables';
+@import "_variables";
 
 .poll-meter {
-    overflow: hidden;
-    position: relative;
-    margin: 6px 0;
-    height: 26px;
-    background: var(--bg_color);
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
+  overflow: hidden;
+  position: relative;
+  margin: 6px 0;
+  height: 26px;
+  background: var(--bg_color);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
 }
 
 .poll-choice-bar {
-    height: 100%;
-    position: absolute;
-    background: var(--dark_grey);
+  height: 100%;
+  position: absolute;
+  background: var(--dark_grey);
 }
 
 .poll-choice-value {
-    position: relative;
-    font-weight: bold;
-    margin-left: 5px;
-    margin-right: 6px;
-    min-width: 30px;
-    text-align: right;
-    pointer-events: all;
+  position: relative;
+  font-weight: bold;
+  margin-left: 5px;
+  margin-right: 6px;
+  min-width: 30px;
+  text-align: right;
+  pointer-events: all;
 }
 
 .poll-choice-option {
-    position: relative;
-    pointer-events: all;
+  position: relative;
+  pointer-events: all;
 }
 
 .poll-info {
-    color: var(--grey);
-    pointer-events: all;
+  color: var(--grey);
+  pointer-events: all;
 }
 
 .leader .poll-choice-bar {
-    background: var(--accent_dark);
+  background: var(--accent_dark);
 }

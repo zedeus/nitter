@@ -1,46 +1,43 @@
 // colors
-$bg_color: #0F0F0F;
-$fg_color: #F8F8F2;
-$fg_faded: #F8F8F2CF;
-$fg_dark: #FF6C60;
-$fg_nav: #FF6C60;
+$bg_color: #0f0f0f;
+$fg_color: #f8f8f2;
+$fg_faded: #f8f8f2cf;
+$fg_dark: #ff6c60;
+$fg_nav: #ff6c60;
 
 $bg_panel: #161616;
 $bg_elements: #121212;
-$bg_overlays: #1F1F1F;
-$bg_hover: #1A1A1A;
+$bg_overlays: #1f1f1f;
+$bg_hover: #1a1a1a;
 
 $grey: #888889;
 $dark_grey: #404040;
 $darker_grey: #282828;
 $darkest_grey: #222222;
-$border_grey: #3E3E35;
+$border_grey: #3e3e35;
 
-$accent: #FF6C60;
-$accent_light: #FFACA0;
-$accent_dark: #8A3731;
-$accent_border: #FF6C6091;
+$accent: #ff6c60;
+$accent_light: #ffaca0;
+$accent_dark: #8a3731;
+$accent_border: #ff6c6091;
 
-$play_button: #D8574D;
-$play_button_hover: #FF6C60;
+$play_button: #d8574d;
+$play_button_hover: #ff6c60;
 
-$more_replies_dots: #AD433B;
-$error_red: #420A05;
+$more_replies_dots: #ad433b;
+$error_red: #420a05;
 
-$verified_blue: #1DA1F2;
-$verified_business: #FAC82B;
-$verified_government: #C1B6A4;
+$verified_blue: #1da1f2;
+$verified_business: #fac82b;
+$verified_government: #c1b6a4;
 $icon_text: $fg_color;
 
 $tab: $fg_color;
 $tab_selected: $accent;
 
-$shadow: rgba(0,0,0,.6);
-$shadow_dark: rgba(0,0,0,.2);
+$shadow: rgba(0, 0, 0, 0.6);
+$shadow_dark: rgba(0, 0, 0, 0.2);
 
 //fonts
-$font_0: Helvetica Neue;
-$font_1: Helvetica;
-$font_2: Arial;
-$font_3: sans-serif;
-$font_4: fontello;
+$font_0: sans-serif;
+$font_1: fontello;
