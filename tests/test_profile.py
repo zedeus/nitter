@@ -15,7 +15,19 @@ protected = [
     ['Poop', 'Randy', 'Social media fanatic.']
 ]
 
-invalid = [['thisprofiledoesntexist'], ['%']]
+invalid = [['thisprofiledoesntexist']]
+
+malformed = [
+    ['${userId}'],
+    ['$%7BuserId%7D'],  # URL encoded version
+    ['%'],  # Percent sign is invalid
+    ['user@name'],
+    ['user.name'],
+    ['user-name'],
+    ['user$name'],
+    ['user{name}'],
+    ['user name'],  # space
+]
 
 banner_image = [
     ['mobile_test', 'profile_banners%2F82135242%2F1384108037%2F1500x500']
@@ -64,6 +76,13 @@ class ProfileTest(BaseTestCase):
     def test_invalid_username(self, username):
         self.open_nitter(username)
         self.assert_text(f'User "{username}" not found')
+
+    @parameterized.expand(malformed)
+    def test_malformed_username(self, username):
+        """Test that malformed usernames (with invalid characters) return 404"""
+        self.open_nitter(username)
+        # Malformed usernames should return 404 page not found, not try to fetch from Twitter
+        self.assert_text('Page not found')
 
     def test_suspended(self):
         self.open_nitter('suspendme')
