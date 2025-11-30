@@ -42,7 +42,8 @@ proc userTweetsAndRepliesUrl(id: string; cursor: string): ApiReq =
 proc tweetDetailUrl(id: string; cursor: string): ApiReq =
   let cookieVars = tweetDetailVars % [id, cursor]
   result = ApiReq(
-    cookie: apiUrl(graphTweetDetail, cookieVars, tweetDetailFieldToggles),
+    # cookie: apiUrl(graphTweetDetail, cookieVars, tweetDetailFieldToggles),
+    cookie: apiUrl(graphTweet, tweetVars % [id, cursor]),
     oauth: apiUrl(graphTweet, tweetVars % [id, cursor])
   )
 
