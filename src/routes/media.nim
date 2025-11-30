@@ -52,10 +52,10 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
         ""
 
     let headers = newHttpHeaders({
-      "Content-Type": res.headers["content-type", 0],
-      "Content-Length": contentLength,
-      "Cache-Control": maxAge,
-      "ETag": hashed
+      "content-type": res.headers["content-type", 0],
+      "content-length": contentLength,
+      "cache-control": maxAge,
+      "etag": hashed
     })
 
     respond(request, headers)

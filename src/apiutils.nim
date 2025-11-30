@@ -48,21 +48,19 @@ proc getCookieHeader(authToken, ct0: string): string =
 
 proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
   result = newHttpHeaders({
+    "accept": "*/*",
+    "accept-encoding": "gzip",
+    "accept-language": "en-US,en;q=0.9",
     "connection": "keep-alive",
     "content-type": "application/json",
-    "x-twitter-active-user": "yes",
-    "x-twitter-client-language": "en",
     "origin": "https://x.com",
-    "accept-encoding": "gzip",
-    "accept-language": "en-US,en;q=0.5",
-    "accept": "*/*",
-    "DNT": "1",
-    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "x-twitter-active-user": "yes",
+    "x-twitter-client-language": "en"
   })
 
   case session.kind
   of SessionKind.oauth:
-    result["authority"] = "api.x.com"
     result["authorization"] = getOauthHeader($url, session.oauthToken, session.oauthSecret)
   of SessionKind.cookie:
     result["x-twitter-auth-type"] = "OAuth2Session"
