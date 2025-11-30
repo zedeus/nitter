@@ -2,6 +2,9 @@
 ## SPDX-License-Identifier: AGPL-3.0-only
 #import strutils, xmltree, strformat, options, unicode
 #import ../types, ../utils, ../formatters, ../prefs
+## Snowflake ID cutoff for RSS GUID format transition
+## Corresponds to approximately December 14, 2025 UTC
+#const guidCutoff = 2000000000000000000'i64
 #
 #proc getTitle(tweet: Tweet; retweet: string): string =
 #if tweet.pinned: result = "Pinned: "
@@ -101,12 +104,17 @@ ${renderRssTweet(quoteTweet, cfg)}
 #    if link in links: continue
 #    end if
 #    links.add link
+#    let useGlobalGuid = tweet.id >= guidCutoff
       <item>
         <title>${getTitle(tweet, retweet)}</title>
         <dc:creator>@${tweet.user.username}</dc:creator>
         <description><![CDATA[${renderRssTweet(tweet, cfg).strip(chars={'\n'})}]]></description>
         <pubDate>${getRfc822Time(tweet)}</pubDate>
+#if useGlobalGuid:
+        <guid isPermaLink="false">${tweet.id}</guid>
+#else:
         <guid>${urlPrefix & link}</guid>
+#end if
         <link>${urlPrefix & link}</link>
       </item>
 #  end for
