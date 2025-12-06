@@ -154,6 +154,59 @@ docker-compose up -d
 Note the Docker commands expect a `nitter.conf` file in the directory you run
 them.
 
+### init.d
+
+touch /etc/init.d/nitter 
+editor /etc/init.d/nitter 
+
+```bash
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          nitter
+# Required-Start:    $network $local_fs $remote_fs
+# Required-Stop:     $network $local_fs $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Nitter (An alternative Twitter front-end)
+# Description:       Nitter service script
+### END INIT INFO
+
+# Change these to match your configuration
+USER="nitter"
+APP_DIR="/home/nitter/nitter"
+APP_EXEC="/home/nitter/nitter/nitter"
+APP_NAME="nitter"
+
+case "$1" in
+  start)
+    echo "Starting $APP_NAME"
+    cd "$APP_DIR"
+    su -s /bin/sh -c "$APP_EXEC" "$USER"
+    ;;
+  stop)
+    echo "Stopping $APP_NAME"
+    killall "$APP_NAME"
+    ;;
+  restart)
+    echo "Restarting $APP_NAME"
+    killall "$APP_NAME"
+    cd "$APP_DIR"
+    su -s /bin/sh -c "$APP_EXEC" "$USER"
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+exit 0
+```
+finally do not forget to :
+```
+sudo chmod +x /etc/init.d/nitter
+```
+
+
 ### systemd
 
 To run Nitter via systemd you can use this service file:
