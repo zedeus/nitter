@@ -37,6 +37,7 @@ setHmacKey(cfg.hmacKey)
 setProxyEncoding(cfg.base64Media)
 setMaxHttpConns(cfg.httpMaxConns)
 setHttpProxy(cfg.proxy, cfg.proxyAuth)
+setApiProxy(cfg.apiProxy)
 setDisableTid(cfg.disableTid)
 initAboutPage(cfg.staticDir)
 

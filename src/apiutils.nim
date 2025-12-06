@@ -13,9 +13,16 @@ const
 var 
   pool: HttpPool
   disableTid: bool
+  apiProxy: string
 
 proc setDisableTid*(disable: bool) =
   disableTid = disable
+
+proc setApiProxy*(url: string) =
+  if url.len > 0:
+    apiProxy = url.strip(chars={'/'}) & "/"
+    if "http" notin apiProxy:
+      apiProxy = "http://" & apiProxy
 
 proc toUrl(req: ApiReq; sessionKind: SessionKind): Uri =
   case sessionKind
@@ -99,7 +106,11 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     var resp: AsyncResponse
     pool.use(await genHeaders(session, url)):
       template getContent =
-        resp = await c.get($url)
+        # TODO: this is a temporary simple implementation
+        if apiProxy.len > 0:
+          resp = await c.get(($url).replace("https://", apiProxy))
+        else:
+          resp = await c.get($url)
         result = await resp.body
 
       getContent()

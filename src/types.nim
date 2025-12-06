@@ -275,6 +275,7 @@ type
     enableDebug*: bool
     proxy*: string
     proxyAuth*: string
+    apiProxy*: string
     disableTid*: bool
 
     rssCacheTime*: int
