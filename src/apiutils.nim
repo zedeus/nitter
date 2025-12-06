@@ -56,7 +56,8 @@ proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
     "origin": "https://x.com",
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
     "x-twitter-active-user": "yes",
-    "x-twitter-client-language": "en"
+    "x-twitter-client-language": "en",
+    "priority": "u=1, i"
   })
 
   case session.kind
@@ -66,6 +67,12 @@ proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
     result["x-twitter-auth-type"] = "OAuth2Session"
     result["x-csrf-token"] = session.ct0
     result["cookie"] = getCookieHeader(session.authToken, session.ct0)
+    result["sec-ch-ua"] = """"Google Chrome";v="142", "Chromium";v="142", "Not A(Brand";v="24""""
+    result["sec-ch-ua-mobile"] = "?0"
+    result["sec-ch-ua-platform"] = "Windows"
+    result["sec-fetch-dest"] = "empty"
+    result["sec-fetch-mode"] = "cors"
+    result["sec-fetch-site"] = "same-site"
     if disableTid:
       result["authorization"] = bearerToken2
     else:
