@@ -42,7 +42,8 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     proxy: cfg.get("Config", "proxy", ""),
     proxyAuth: cfg.get("Config", "proxyAuth", ""),
     apiProxy: cfg.get("Config", "apiProxy", ""),
-    disableTid: cfg.get("Config", "disableTid", false)
+    disableTid: cfg.get("Config", "disableTid", false),
+    maxConcurrentReqs: cfg.get("Config", "maxConcurrentReqs", 2)
   )
 
   return (conf, cfg)

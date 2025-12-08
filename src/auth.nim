@@ -3,14 +3,17 @@ import std/[asyncdispatch, times, json, random, strutils, tables, packedsets, os
 import types, consts
 import experimental/parser/session
 
-# max requests at a time per session to avoid race conditions
-const
-  maxConcurrentReqs = 2
-  hourInSeconds = 60 * 60
+const hourInSeconds = 60 * 60
 
 var
   sessionPool: seq[Session]
   enableLogging = false
+  # max requests at a time per session to avoid race conditions
+  maxConcurrentReqs = 2
+
+proc setMaxConcurrentReqs*(reqs: int) =
+  if reqs > 0:
+    maxConcurrentReqs = reqs
 
 template log(str: varargs[string, `$`]) =
   echo "[sessions] ", str.join("")

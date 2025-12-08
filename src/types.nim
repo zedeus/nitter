@@ -277,6 +277,7 @@ type
     proxyAuth*: string
     apiProxy*: string
     disableTid*: bool
+    maxConcurrentReqs*: int
 
     rssCacheTime*: int
     listCacheTime*: int
