@@ -18,6 +18,9 @@ proc setHttpProxy*(url: string; auth: string) =
   else:
     proxy = nil
 
+proc getHttpProxy*(): Proxy =
+  return proxy
+
 proc release*(pool: HttpPool; client: AsyncHttpClient; badClient=false) =
   if pool.conns.len >= maxConns or badClient:
     try: client.close()
