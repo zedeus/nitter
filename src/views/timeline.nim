@@ -66,6 +66,7 @@ proc renderUser(user: User; prefs: Prefs): VNode =
         tdiv(class="tweet-name-row"):
           tdiv(class="fullname-and-username"):
             linkUser(user, class="fullname")
+            verifiedIcon(user)
         linkUser(user, class="username")
 
       tdiv(class="tweet-content media-body", dir="auto"):

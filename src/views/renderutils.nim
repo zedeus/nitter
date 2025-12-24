@@ -42,7 +42,6 @@ proc linkUser*(user: User, class=""): VNode =
   buildHtml(a(href=href, class=class, title=nameText)):
     text nameText
     if isName:
-      verifiedIcon(user)
       if user.protected:
         text " "
         icon "lock", title="Protected account"

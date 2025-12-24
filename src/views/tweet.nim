@@ -31,6 +31,7 @@ proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VN
       tdiv(class="tweet-name-row"):
         tdiv(class="fullname-and-username"):
           linkUser(tweet.user, class="fullname")
+          verifiedIcon(tweet.user)
           linkUser(tweet.user, class="username")
 
         span(class="tweet-date"):
@@ -235,6 +236,7 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
       tdiv(class="fullname-and-username"):
         renderMiniAvatar(quote.user, prefs)
         linkUser(quote.user, class="fullname")
+        verifiedIcon(quote.user)
         linkUser(quote.user, class="username")
 
       span(class="tweet-date"):
