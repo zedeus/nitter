@@ -111,9 +111,10 @@ $ cp nitter.example.conf nitter.conf
 ```
 
 Set your hostname, port, HMAC key, https (must be correct for cookies), and
-Redis info in `nitter.conf`. To run Redis, either run
-`redis-server --daemonize yes`, or `systemctl enable --now redis` (or
-redis-server depending on the distro). Run Nitter by executing `./nitter` or
+Redis info in `nitter.conf` or Environment Variables in format of
+`NITTER_SECTION_KEY=xxxx` in upper case (for example: NITTER_SERVER_HOSTNAME=nitter.net).
+To run Redis, either run `redis-server --daemonize yes`, or `systemctl enable --now redis`
+(or redis-server depending on the distro). Run Nitter by executing `./nitter` or
 using the systemd service below. You should run Nitter behind a reverse proxy
 such as [Nginx](https://github.com/zedeus/nitter/wiki/Nginx) or
 [Apache](https://github.com/zedeus/nitter/wiki/Apache) for security and
@@ -134,6 +135,13 @@ To build and run Nitter in Docker:
 ```bash
 docker build -t nitter:latest .
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host nitter:latest
+```
+
+or
+
+```bash
+docker build -t nitter:latest .
+docker run -e NITTER_SERVER_ADDRESS=0.0.0.0 -e NITTER_SERVER_PORT=8080 -d --network host nitter:latest
 ```
 
 Note: For ARM64, use this Dockerfile: [`Dockerfile.arm64`](https://github.com/zedeus/nitter/blob/master/Dockerfile.arm64).
