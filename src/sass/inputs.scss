@@ -1,185 +1,203 @@
-@import '_variables';
-@import '_mixins';
+@import "_variables";
+@import "_mixins";
 
 button {
-    @include input-colors;
-    background-color: var(--bg_elements);
-    color: var(--fg_color);
-    border: 1px solid var(--accent_border);
-    padding: 3px 6px;
-    font-size: 14px;
-    cursor: pointer;
-    float: right;
+  @include input-colors;
+  background-color: var(--bg_elements);
+  color: var(--fg_color);
+  border: 1px solid var(--accent_border);
+  padding: 3px 6px;
+  font-size: 14px;
+  cursor: pointer;
+  float: right;
 }
 
 input[type="text"],
 input[type="date"],
+input[type="number"],
 select {
-    @include input-colors;
-    background-color: var(--bg_elements);
-    padding: 1px 4px;
-    color: var(--fg_color);
-    border: 1px solid var(--accent_border);
-    border-radius: 0;
-    font-size: 14px;
+  @include input-colors;
+  background-color: var(--bg_elements);
+  padding: 1px 4px;
+  color: var(--fg_color);
+  border: 1px solid var(--accent_border);
+  border-radius: 0;
+  font-size: 14px;
 }
 
-input[type="text"] {
-    height: 16px;
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="text"],
+input[type="number"] {
+  height: 16px;
 }
 
 select {
-    height: 20px;
-    padding: 0 2px;
-    line-height: 1;
+  height: 20px;
+  padding: 0 2px;
+  line-height: 1;
 }
 
 input[type="date"]::-webkit-inner-spin-button {
-    display: none;
+  display: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  display: none;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 input[type="date"]::-webkit-clear-button {
-    margin-left: 17px;
-    filter: grayscale(100%);
-    filter: hue-rotate(120deg);
+  margin-left: 17px;
+  filter: grayscale(100%);
+  filter: hue-rotate(120deg);
 }
 
 input::-webkit-calendar-picker-indicator {
-    opacity: 0;
+  opacity: 0;
 }
 
 input::-webkit-datetime-edit-day-field:focus,
 input::-webkit-datetime-edit-month-field:focus,
 input::-webkit-datetime-edit-year-field:focus {
-    background-color: var(--accent);
-    color: var(--fg_color);
-    outline: none;
+  background-color: var(--accent);
+  color: var(--fg_color);
+  outline: none;
 }
 
 .date-range {
-    .date-input {
-        display: inline-block;
-        position: relative;
-    }
+  .date-input {
+    display: inline-block;
+    position: relative;
+  }
 
-    .icon-container {
-        pointer-events: none;
-        position: absolute;
-        top: 2px;
-        right: 5px;
-    }
+  .icon-container {
+    pointer-events: none;
+    position: absolute;
+    top: 2px;
+    right: 5px;
+  }
 
-    .search-title {
-        margin: 0 2px;
-    }
+  .search-title {
+    margin: 0 2px;
+  }
 }
 
 .icon-button button {
-    color: var(--accent);
-    text-decoration: none;
-    background: none;
-    border: none;
-    float: none;
-    padding: unset;
-    padding-left: 4px;
+  color: var(--accent);
+  text-decoration: none;
+  background: none;
+  border: none;
+  float: none;
+  padding: unset;
+  padding-left: 4px;
 
-    &:hover {
-        color: var(--accent_light);
-    }
+  &:hover {
+    color: var(--accent_light);
+  }
 }
 
 .checkbox {
-    position: absolute;
-    top: 1px;
-    right: 0;
-    height: 17px;
-    width: 17px;
-    background-color: var(--bg_elements);
-    border: 1px solid var(--accent_border);
+  position: absolute;
+  top: 1px;
+  right: 0;
+  height: 17px;
+  width: 17px;
+  background-color: var(--bg_elements);
+  border: 1px solid var(--accent_border);
 
-    &:after {
-        content: "";
-        position: absolute;
-        display: none;
-    }
+  &:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
 }
 
 .checkbox-container {
-    display: block;
-    position: relative;
-    margin-bottom: 5px;
+  display: block;
+  position: relative;
+  margin-bottom: 5px;
+  cursor: pointer;
+  user-select: none;
+  padding-right: 22px;
+
+  input {
+    position: absolute;
+    opacity: 0;
     cursor: pointer;
-    user-select: none;
-    padding-right: 22px;
+    height: 0;
+    width: 0;
 
-    input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        height: 0;
-        width: 0;
-
-        &:checked ~ .checkbox:after {
-            display: block;
-        }
+    &:checked ~ .checkbox:after {
+      display: block;
     }
+  }
 
-    &:hover input ~ .checkbox {
-        border-color: var(--accent);
-    }
+  &:hover input ~ .checkbox {
+    border-color: var(--accent);
+  }
 
-    &:active input ~ .checkbox {
-        border-color: var(--accent_light);
-    }
+  &:active input ~ .checkbox {
+    border-color: var(--accent_light);
+  }
 
-    .checkbox:after {
-        left: 2px;
-        bottom: 0;
-        font-size: 13px;
-        font-family: $font_4;
-        content: '\e803';
-    }
+  .checkbox:after {
+    left: 2px;
+    bottom: 0;
+    font-size: 13px;
+    font-family: $font_1;
+    content: "\e811";
+  }
 }
 
 .pref-group {
-    display: inline;
+  display: inline;
 }
 
 .preferences {
-    button {
-        margin: 6px 0 3px 0;
-    }
+  button {
+    margin: 6px 0 3px 0;
+  }
 
-    label {
-        padding-right: 150px;
-    }
+  label {
+    padding-right: 150px;
+  }
 
-    select {
-        position: absolute;
-        top: 0;
-        right: 0;
-        display: block;
-        -moz-appearance: none;
-        -webkit-appearance: none;
-        appearance: none;
-    }
+  select {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
 
-    input[type="text"] {
-        position: absolute;
-        right: 0;
-        max-width: 140px;
-    }
+  input[type="text"],
+  input[type="number"] {
+    position: absolute;
+    right: 0;
+    max-width: 140px;
+  }
 
-    .pref-group {
-        display: block;
-    }
+  .pref-group {
+    display: block;
+  }
 
-    .pref-input {
-        position: relative;
-        margin-bottom: 6px;
-    }
+  .pref-input {
+    position: relative;
+    margin-bottom: 6px;
+  }
 
-    .pref-reset {
-        float: left;
-    }
+  .pref-reset {
+    float: left;
+  }
 }

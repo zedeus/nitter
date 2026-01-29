@@ -30,15 +30,15 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
       tdiv(class="nav-item right"):
         icon "search", title="Search", href="/search"
         if cfg.enableRss and rss.len > 0:
-          icon "rss-feed", title="RSS Feed", href=rss
-        icon "bird", title="Open in Twitter", href=canonical
+          icon "rss", title="RSS Feed", href=rss
+        icon "bird", title="Open in X", href=canonical
         a(href="https://liberapay.com/zedeus"): verbatim lp
         icon "info", title="About", href="/about"
         icon "cog", title="Preferences", href=("/settings?referer=" & encodeUrl(path))
 
 proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
                  video=""; images: seq[string] = @[]; banner=""; ogTitle="";
-                 rss=""; canonical=""): VNode =
+                 rss=""; alternate=""): VNode =
   var theme = prefs.theme.toTheme
   if "theme" in req.params:
     theme = req.params["theme"].toTheme
@@ -52,8 +52,8 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   let opensearchUrl = getUrlPrefix(cfg) & "/opensearch"
 
   buildHtml(head):
-    link(rel="stylesheet", type="text/css", href="/css/style.css?v=19")
-    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=2")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=22")
+    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=4")
 
     if theme.len > 0:
       link(rel="stylesheet", type="text/css", href=(&"/css/themes/{theme}.css"))
@@ -66,8 +66,8 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
     link(rel="search", type="application/opensearchdescription+xml", title=cfg.title,
                             href=opensearchUrl)
 
-    if canonical.len > 0:
-      link(rel="canonical", href=canonical)
+    if alternate.len > 0:
+      link(rel="alternate", href=alternate, title="View on X")
 
     if cfg.enableRss and rss.len > 0:
       link(rel="alternate", type="application/rss+xml", href=rss, title="RSS feed")
@@ -119,20 +119,20 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
     # this is last so images are also preloaded
     # if this is done earlier, Chrome only preloads one image for some reason
     link(rel="preload", type="font/woff2", `as`="font",
-         href="/fonts/fontello.woff2?21002321", crossorigin="anonymous")
+         href="/fonts/fontello.woff2?61663884", crossorigin="anonymous")
 
 proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
                  titleText=""; desc=""; ogTitle=""; rss=""; video="";
                  images: seq[string] = @[]; banner=""): string =
 
-  let canonical = getTwitterLink(req.path, req.params)
+  let twitterLink = getTwitterLink(req.path, req.params)
 
   let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req, titleText, desc, video, images, banner, ogTitle,
-               rss, canonical)
+               rss, twitterLink)
 
     body:
-      renderNavbar(cfg, req, rss, canonical)
+      renderNavbar(cfg, req, rss, twitterLink)
 
       tdiv(class="container"):
         body

@@ -1,33 +1,41 @@
 #SPDX-License-Identifier: AGPL-3.0-only
-import std/[asyncdispatch, times, json, random, sequtils, strutils, tables, packedsets, os]
-import types
+import std/[asyncdispatch, times, json, random, strutils, tables, packedsets, os]
+import types, consts
 import experimental/parser/session
 
-# max requests at a time per session to avoid race conditions
-const
-  maxConcurrentReqs = 2
-  hourInSeconds = 60 * 60
-  apiMaxReqs: Table[Api, int] = {
-    Api.search: 50,
-    Api.tweetDetail: 500,
-    Api.userTweets: 500,
-    Api.userTweetsAndReplies: 500,
-    Api.userMedia: 500,
-    Api.userRestId: 500,
-    Api.userScreenName: 500,
-    Api.tweetResult: 500,
-    Api.list: 500,
-    Api.listTweets: 500,
-    Api.listMembers: 500,
-    Api.listBySlug: 500
-  }.toTable
+const hourInSeconds = 60 * 60
 
 var
   sessionPool: seq[Session]
   enableLogging = false
+  # max requests at a time per session to avoid race conditions
+  maxConcurrentReqs = 2
+
+proc setMaxConcurrentReqs*(reqs: int) =
+  if reqs > 0:
+    maxConcurrentReqs = reqs
 
 template log(str: varargs[string, `$`]) =
   echo "[sessions] ", str.join("")
+
+proc endpoint(req: ApiReq; session: Session): string =
+  case session.kind
+  of oauth: req.oauth.endpoint
+  of cookie: req.cookie.endpoint
+
+proc pretty*(session: Session): string =
+  if session.isNil:
+    return "<null>"
+
+  if session.id > 0 and session.username.len > 0:
+    result = $session.id & " (" & session.username & ")"
+  elif session.username.len > 0:
+    result = session.username
+  elif session.id > 0:
+    result = $session.id
+  else:
+    result = "<unknown>"
+  result = $session.kind & " " & result
 
 proc snowflakeToEpoch(flake: int64): int64 =
   int64(((flake shr 22) + 1288834974657) div 1000)
@@ -57,7 +65,7 @@ proc getSessionPoolHealth*(): JsonNode =
     for api in session.apis.keys:
       let
         apiStatus = session.apis[api]
-        reqs = apiMaxReqs[api] - apiStatus.remaining
+        reqs = apiStatus.limit - apiStatus.remaining
 
       # no requests made with this session and endpoint since the limit reset
       if apiStatus.reset < now:
@@ -122,14 +130,15 @@ proc rateLimitError*(): ref RateLimitError =
 proc noSessionsError*(): ref NoSessionsError =
   newException(NoSessionsError, "no sessions available")
 
-proc isLimited(session: Session; api: Api): bool =
+proc isLimited(session: Session; req: ApiReq): bool =
   if session.isNil:
     return true
 
-  if session.limited and api != Api.userTweets:
+  let api = req.endpoint(session)
+  if session.limited and api != graphUserTweetsV2:
     if (epochTime().int - session.limitedAt) > hourInSeconds:
       session.limited = false
-      log "resetting limit: ", session.id
+      log "resetting limit: ", session.pretty
       return false
     else:
       return true
@@ -140,12 +149,12 @@ proc isLimited(session: Session; api: Api): bool =
   else:
     return false
 
-proc isReady(session: Session; api: Api): bool =
-  not (session.isNil or session.pending > maxConcurrentReqs or session.isLimited(api))
+proc isReady(session: Session; req: ApiReq): bool =
+  not (session.isNil or session.pending > maxConcurrentReqs or session.isLimited(req))
 
 proc invalidate*(session: var Session) =
   if session.isNil: return
-  log "invalidating: ", session.id
+  log "invalidating: ", session.pretty
 
   # TODO: This isn't sufficient, but it works for now
   let idx = sessionPool.find(session)
@@ -156,33 +165,35 @@ proc release*(session: Session) =
   if session.isNil: return
   dec session.pending
 
-proc getSession*(api: Api): Future[Session] {.async.} =
+proc getSession*(req: ApiReq): Future[Session] {.async.} =
   for i in 0 ..< sessionPool.len:
-    if result.isReady(api): break
+    if result.isReady(req): break
     result = sessionPool.sample()
 
-  if not result.isNil and result.isReady(api):
+  if not result.isNil and result.isReady(req):
     inc result.pending
   else:
-    log "no sessions available for API: ", api
+    log "no sessions available for API: ", req.cookie.endpoint
     raise noSessionsError()
 
-proc setLimited*(session: Session; api: Api) =
+proc setLimited*(session: Session; req: ApiReq) =
+  let api = req.endpoint(session)
   session.limited = true
   session.limitedAt = epochTime().int
-  log "rate limited by api: ", api, ", reqs left: ", session.apis[api].remaining, ", id: ", session.id
+  log "rate limited by api: ", api, ", reqs left: ", session.apis[api].remaining, ", ", session.pretty
 
-proc setRateLimit*(session: Session; api: Api; remaining, reset: int) =
+proc setRateLimit*(session: Session; req: ApiReq; remaining, reset, limit: int) =
   # avoid undefined behavior in race conditions
+  let api = req.endpoint(session)
   if api in session.apis:
-    let limit = session.apis[api]
-    if limit.reset >= reset and limit.remaining < remaining:
+    let rateLimit = session.apis[api]
+    if rateLimit.reset >= reset and rateLimit.remaining < remaining:
       return
-    if limit.reset == reset and limit.remaining >= remaining:
+    if rateLimit.reset == reset and rateLimit.remaining >= remaining:
       session.apis[api].remaining = remaining
       return
 
-  session.apis[api] = RateLimit(remaining: remaining, reset: reset)
+  session.apis[api] = RateLimit(limit: limit, remaining: remaining, reset: reset)
 
 proc initSessionPool*(cfg: Config; path: string) =
   enableLogging = cfg.enableDebug

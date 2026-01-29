@@ -1,94 +1,95 @@
-@import '_variables';
+@import "_variables";
 
 .quote {
-    margin-top: 10px;
-    border: solid 1px var(--dark_grey);
-    border-radius: 10px;
-    background-color: var(--bg_elements);
+  margin-top: 10px;
+  border: solid 1px var(--dark_grey);
+  border-radius: 10px;
+  background-color: var(--bg_elements);
+  overflow: hidden;
+  pointer-events: all;
+  position: relative;
+  width: 100%;
+
+  &:hover {
+    border-color: var(--grey);
+  }
+
+  &.unavailable:hover {
+    border-color: var(--dark_grey);
+  }
+
+  .tweet-name-row {
+    padding: 6px 8px;
+    margin-top: 1px;
+  }
+
+  .quote-text {
     overflow: hidden;
-    pointer-events: all;
-    position: relative;
-    width: 100%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding: 0px 8px 8px 8px;
+  }
 
-    &:hover {
-        border-color: var(--grey);
-    }
+  .show-thread {
+    padding: 0px 8px 6px 8px;
+    margin-top: -6px;
+  }
 
-    &.unavailable:hover {
-        border-color: var(--dark_grey);
-    }
-
-    .tweet-name-row {
-        padding: 6px 8px;
-        margin-top: 1px;
-    }
-
-    .quote-text {
-        overflow: hidden;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        padding: 0px 8px 8px 8px;
-    }
-
-    .show-thread {
-        padding: 0px 8px 6px 8px;
-        margin-top: -6px;
-    }
-
-    .replying-to {
-        padding: 0px 8px;
-        margin: unset;
-    }
+  .replying-to {
+    padding: 0px 8px;
+    margin: unset;
+  }
 }
 
 .unavailable-quote {
-    padding: 12px;
+  padding: 12px;
 }
 
 .quote-link {
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  position: absolute;
 }
 
 .quote-media-container {
-    max-height: 300px;
+  max-height: 300px;
+  display: flex;
+
+  .card {
+    margin: unset;
+  }
+
+  .attachments {
+    border-radius: 0;
+  }
+
+  .media-gif {
+    width: 100%;
     display: flex;
+    justify-content: center;
+  }
 
-    .card {
-        margin: unset;
+  .gallery-gif .attachment {
+    display: flex;
+    justify-content: center;
+    background-color: var(--bg_color);
+
+    video {
+      height: unset;
+      width: unset;
+      max-height: 100%;
+      max-width: 100%;
     }
+  }
 
-    .attachments {
-        border-radius: 0;
-    }
+  .gallery-video,
+  .gallery-gif {
+    max-height: 300px;
+  }
 
-    .media-gif {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-
-    .gallery-gif .attachment {
-        display: flex;
-        justify-content: center;
-        background-color: var(--bg_color);
-
-        video {
-            height: unset;
-            width: unset;
-            max-height: 100%;
-            max-width: 100%;
-        }
-    }
-
-    .gallery-video, .gallery-gif {
-        max-height: 300px;
-    }
-
-    .still-image img {
-        max-height: 250px
-    }
+  .still-image img {
+    max-height: 250px;
+  }
 }

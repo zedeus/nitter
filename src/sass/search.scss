@@ -1,122 +1,120 @@
-@import '_variables';
-@import '_mixins';
+@import "_variables";
+@import "_mixins";
 
 .search-title {
-    font-weight: bold;
-    display: inline-block;
-    margin-top: 4px;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 4px;
 }
 
 .search-field {
+  display: flex;
+  flex-wrap: wrap;
+
+  button {
+    margin: 0 2px 0 0;
+    padding: 0px 1px 1px 4px;
+    height: 23px;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+  }
 
-    button {
-        margin: 0 2px 0 0;
-        height: 23px;
-        display: flex;
-        align-items: center;
-    }
+  .pref-input {
+    margin: 0 4px 0 0;
+    flex-grow: 1;
+    height: 23px;
+  }
 
-    .pref-input {
-        margin: 0 4px 0 0;
-        flex-grow: 1;
-        height: 23px;
-    }
+  input[type="text"],
+  input[type="number"] {
+    height: calc(100% - 4px);
+    width: calc(100% - 8px);
+  }
 
-    input[type="text"] {
-        height: calc(100% - 4px);
-        width: calc(100% - 8px);
-    }
+  > label {
+    display: inline;
+    background-color: var(--bg_elements);
+    color: var(--fg_color);
+    border: 1px solid var(--accent_border);
+    padding: 1px 1px 2px 4px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 2px;
 
-    > label {
-        display: inline;
-        background-color: var(--bg_elements);
-        color: var(--fg_color);
-        border: 1px solid var(--accent_border);
-        padding: 1px 6px 2px 6px;
-        font-size: 14px;
-        cursor: pointer;
-        margin-bottom: 2px;
+    @include input-colors;
+  }
 
-        @include input-colors;
-    }
-
-    @include create-toggle(search-panel, 200px);
+  @include create-toggle(search-panel, 380px);
 }
 
 .search-panel {
-    width: 100%;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s;
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s;
 
-    flex-grow: 1;
-    font-weight: initial;
-    text-align: left;
+  flex-grow: 1;
+  font-weight: initial;
+  text-align: left;
 
-    > div {
-        line-height: 1.7em;
-    }
+  .checkbox-container {
+    display: inline;
+    padding-right: unset;
+    margin-bottom: 5px;
+    margin-left: 23px;
+  }
 
-    .checkbox-container {
-        display: inline;
-        padding-right: unset;
-        margin-bottom: unset;
-        margin-left: 23px;
-    }
+  .checkbox {
+    right: unset;
+    left: -22px;
+    line-height: 1.6em;
+  }
 
-    .checkbox {
-        right: unset;
-        left: -22px;
-    }
-
-    .checkbox-container .checkbox:after {
-        top: -4px;
-    }
+  .checkbox-container .checkbox:after {
+    top: -4px;
+  }
 }
 
 .search-row {
-    display: flex;
-    flex-wrap: wrap;
-    line-height: unset;
+  display: flex;
+  flex-wrap: wrap;
+  line-height: unset;
 
-    > div {
-        flex-grow: 1;
-        flex-shrink: 1;
-    }
+  > div {
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+
+  input {
+    height: 21px;
+  }
+
+  .pref-input {
+    display: block;
+    padding-bottom: 5px;
 
     input {
-        height: 21px;
+      height: 21px;
+      margin-top: 1px;
     }
-
-    .pref-input {
-        display: block;
-        padding-bottom: 5px;
-
-        input {
-            height: 21px;
-            margin-top: 1px;
-        }
-    }
+  }
 }
 
 .search-toggles {
-    flex-grow: 1;
-    display: grid;
-    grid-template-columns: repeat(6, auto);
-    grid-column-gap: 10px;
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  grid-column-gap: 10px;
 }
 
 .profile-tabs {
-    @include search-resize(820px, 5);
-    @include search-resize(725px, 4);
-    @include search-resize(600px, 6);
-    @include search-resize(560px, 5);
-    @include search-resize(480px, 4);
-    @include search-resize(410px, 3);
+  @include search-resize(820px, 5);
+  @include search-resize(715px, 4);
+  @include search-resize(700px, 5);
+  @include search-resize(485px, 4);
+  @include search-resize(410px, 3);
 }
 
-@include search-resize(560px, 5);
-@include search-resize(480px, 4);
+@include search-resize(700px, 5);
+@include search-resize(485px, 4);
 @include search-resize(410px, 3);

@@ -1,39 +1,40 @@
-@import '_variables';
-@import '_mixins';
+@import "_variables";
+@import "_mixins";
 
 .panel-container {
-    margin: auto;
-    font-size: 130%;
+  margin: auto;
+  font-size: 130%;
 }
 
 .error-panel {
-    @include center-panel(var(--error_red));
-    text-align: center;
+  @include center-panel(var(--error_red));
+  text-align: center;
 }
 
 .search-bar > form {
-    @include center-panel(var(--darkest_grey));
+  @include center-panel(var(--darkest_grey));
 
-    button {
-        background: var(--bg_elements);
-        color: var(--fg_color);
-        border: 0;
-        border-radius: 3px;
-        cursor: pointer;
-        font-weight: bold;
-        width: 30px;
-        height: 30px;
-    }
+  button {
+    background: var(--bg_elements);
+    color: var(--fg_color);
+    border: 0;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 30px;
+    height: 30px;
+    padding: 0px 5px 1px 8px;
+  }
 
-    input {
-        font-size: 16px;
-        width: 100%;
-        background: var(--bg_elements);
-        color: var(--fg_color);
-        border: 0;
-        border-radius: 4px;
-        padding: 4px;
-        margin-right: 8px;
-        height: unset;
-    }
+  input {
+    font-size: 16px;
+    width: 100%;
+    background: var(--bg_elements);
+    color: var(--fg_color);
+    border: 0;
+    border-radius: 4px;
+    padding: 4px;
+    margin-right: 8px;
+    height: unset;
+  }
 }

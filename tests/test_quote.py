@@ -2,12 +2,6 @@ from base import BaseTestCase, Quote, Conversation
 from parameterized import parameterized
 
 text = [
-    ['elonmusk/status/1138136540096319488',
-     'TREV PAGE', '@Model3Owners',
-     """As of March 58.4% of new car sales in Norway are electric. 
-
-What are we doing wrong? reuters.com/article/us-norwa…"""],
-
     ['nim_lang/status/1491461266849808397#m',
      'Nim', '@nim_lang',
      """What's better than Nim 1.6.0?

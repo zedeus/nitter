@@ -1,6 +1,7 @@
 import std/[options, tables, strutils, strformat, sugar]
 import jsony
 import user, ../types/unifiedcard
+import ../../formatters
 from ../../types import Card, CardKind, Video
 from ../../utils import twimg, https
 
@@ -77,6 +78,18 @@ proc parseMedia(component: Component; card: UnifiedCard; result: var Card) =
   of model3d:
     result.title = "Unsupported 3D model ad"
 
+proc parseGrokShare(data: ComponentData; card: UnifiedCard; result: var Card) =
+  result.kind = summaryLarge
+
+  data.destination.parseDestination(card, result)
+  result.dest = "Answer by Grok"
+
+  for msg in data.conversationPreview:
+    if msg.sender == "USER":
+      result.title = msg.message.shorten(70)
+    elif msg.sender == "AGENT":
+      result.text = msg.message.shorten(500)
+
 proc parseUnifiedCard*(json: string): Card =
   let card = json.fromJson(UnifiedCard)
 
@@ -92,6 +105,8 @@ proc parseUnifiedCard*(json: string): Card =
       component.parseMedia(card, result)
     of buttonGroup:
       discard
+    of grokShare:
+      component.data.parseGrokShare(card, result)
     of ComponentType.jobDetails:
       component.data.parseJobDetails(card, result)
     of ComponentType.hidden:

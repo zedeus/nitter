@@ -66,18 +66,7 @@
         }
 
         #search-panel-toggle:checked ~ .search-panel {
-            @if $rows == 6 {
-                max-height: 200px !important;
-            }
-            @if $rows == 5 {
-                max-height: 300px !important;
-            }
-            @if $rows == 4 {
-                max-height: 300px !important;
-            }
-            @if $rows == 3 {
-                max-height: 365px !important;
-            }
+            max-height: 380px !important;
         }
     }
 }

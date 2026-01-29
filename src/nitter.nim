@@ -6,7 +6,7 @@ from os import getEnv
 
 import jester
 
-import types, config, prefs, formatters, redis_cache, http_pool, auth, api
+import types, config, prefs, formatters, redis_cache, http_pool, auth, api, apiutils
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, debug,
@@ -37,6 +37,9 @@ setHmacKey(cfg.hmacKey)
 setProxyEncoding(cfg.base64Media)
 setMaxHttpConns(cfg.httpMaxConns)
 setHttpProxy(cfg.proxy, cfg.proxyAuth)
+setApiProxy(cfg.apiProxy)
+setDisableTid(cfg.disableTid)
+setMaxConcurrentReqs(cfg.maxConcurrentReqs)
 setApiConfig(cfg)
 initAboutPage(cfg.staticDir)
 

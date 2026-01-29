@@ -3,8 +3,12 @@ import requests
 import json
 import sys
 import pyotp
+import cloudscraper
 from loguru import logger
 from tools.env import OTP_SECRET, PASSWORD, PROXY_IP, PROXY_PASSWORD, PROXY_PORT, PROXY_USERNAME, USERNAME
+
+# NOTE: pyotp, requests and cloudscraper are dependencies
+# > pip install pyotp requests cloudscraper
 
 # pip install pyotp loguru requests
 TW_CONSUMER_KEY = '3nVuSoBZnx6U4vzUxf5w'
@@ -60,10 +64,13 @@ def auth(username, password, otp_secret=None):
         "X-Twitter-Client-DeviceID": ""
     }
 
+    scraper = cloudscraper.create_scraper()
+    scraper.headers = twitter_header
     session = requests.Session()
     session.headers = twitter_headers
     session.proxies.update(PROXIES)
 
+    task1 = scraper.post(
     logger.info("🚀 Starting login flow")
     task1 = session.post(
         'https://api.twitter.com/1.1/onboarding/task.json',
@@ -94,8 +101,9 @@ def auth(username, password, otp_secret=None):
     )
     logger.debug(task1.text)
 
-    session.headers['att'] = task1.headers.get('att')
+    scraper.headers['att'] = task1.headers.get('att')
 
+    task2 = scraper.post(
     # STEP: Enter user identifier (email / phone / username)
     task2 = session.post(
         'https://api.twitter.com/1.1/onboarding/task.json',
@@ -111,6 +119,8 @@ def auth(username, password, otp_secret=None):
         },
         timeout=15
     )
+
+    task3 = scraper.post(
     logger.debug(task2.text)
 
     # STEP: Enter alternate identifier if required
@@ -149,6 +159,15 @@ def auth(username, password, otp_secret=None):
         },
         timeout=15
     )
+
+    for t3_subtask in task3.json().get('subtasks', []):
+        if "open_account" in t3_subtask:
+            return t3_subtask["open_account"]
+        elif "enter_text" in t3_subtask:
+            response_text = t3_subtask["enter_text"]["hint_text"]
+            totp = pyotp.TOTP(otp_secret)
+            generated_code = totp.now()
+            task4resp = scraper.post(
     logger.debug(task3.text)
 
     # STEP: Handle possible 2FA

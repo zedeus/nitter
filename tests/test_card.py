@@ -11,12 +11,7 @@ card = [
     ['voidtarget/status/1094632512926605312',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too)',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too) - obsplugin.nim',
-     'gist.github.com', True],
-
-    ['nim_lang/status/1082989146040340480',
-     'Nim in 2018: A short recap',
-     'There were several big news in the Nim world in 2018 – two new major releases, partnership with Status, and much more. But let us go chronologically.',
-     'nim-lang.org', True]
+     'gist.github.com', True]
 ]
 
 no_thumb = [
@@ -26,14 +21,14 @@ no_thumb = [
      'lnkd.in'],
 
     ['Thom_Wolf/status/1122466524860702729',
-     'GitHub - NVIDIA/Megatron-LM: Ongoing research training transformer models at scale',
-     'Ongoing research training transformer models at scale - NVIDIA/Megatron-LM',
+     'GitHub - facebookresearch/fairseq: Facebook AI Research Sequence-to-Sequence Toolkit written in',
+     '',
      'github.com'],
 
     ['brent_p/status/1088857328680488961',
-     'Hts Nim Sugar',
-     'hts-nim is a library that allows one to use htslib via the nim programming language. Nim is a garbage-collected language that compiles to C and often has similar performance. I have become very...',
-     'brentp.github.io'],
+     'GitHub - brentp/hts-nim: nim wrapper for htslib for parsing genomics data files',
+     '',
+     'github.com'],
 
     ['voidtarget/status/1133028231672582145',
      'sinkingsugar/nimqt-example',

@@ -17,7 +17,7 @@ proc createUnsupportedRouter*(cfg: Config) =
     get "/@name/lists/?": feature()
 
     get "/intent/?@i?": 
-      cond @"i" notin ["user"]
+      cond @"i" notin ["user", "follow"]
       feature()
 
     get "/i/@i?/?@j?":

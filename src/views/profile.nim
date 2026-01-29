@@ -26,6 +26,7 @@ proc renderUserCard*(user: User; prefs: Prefs): VNode =
 
       tdiv(class="profile-card-tabs-name"):
         linkUser(user, class="profile-card-fullname")
+        verifiedIcon(user)
         linkUser(user, class="profile-card-username")
 
     tdiv(class="profile-card-extra"):

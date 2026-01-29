@@ -1,89 +1,87 @@
-@import '_variables';
+@import "_variables";
 
 nav {
-    display: flex;
-    align-items: center;
-    position: fixed;
-    background-color: var(--bg_overlays);
-    box-shadow: 0 0 4px $shadow;
-    padding: 0;
-    width: 100%;
-    height: 50px;
-    z-index: 1000;
-    font-size: 16px;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  background-color: var(--bg_overlays);
+  box-shadow: 0 0 4px $shadow;
+  padding: 0;
+  width: 100%;
+  height: 50px;
+  z-index: 1000;
+  font-size: 16px;
 
-    a, .icon-button button {
-        color: var(--fg_nav);
-    }
+  a,
+  .icon-button button {
+    color: var(--fg_nav);
+  }
 }
 
 .inner-nav {
-    margin: auto;
-    box-sizing: border-box;
-    padding: 0 10px;
-    display: flex;
-    align-items: center;
-    flex-basis: 920px;
-    height: 50px;
+  margin: auto;
+  box-sizing: border-box;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  flex-basis: 920px;
+  height: 50px;
 }
 
 .site-name {
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
 
-    &:hover {
-        color: var(--accent_light);
-        text-decoration: unset;
-    }
+  &:hover {
+    color: var(--accent_light);
+    text-decoration: unset;
+  }
 }
 
 .site-logo {
-    display: block;
-    width: 35px;
-    height: 35px;
+  display: block;
+  width: 35px;
+  height: 35px;
 }
 
 .nav-item {
-    display: flex;
-    flex: 1;
-    line-height: 50px;
-    height: 50px;
-    overflow: hidden;
-    flex-wrap: wrap;
-    align-items: center;
+  display: flex;
+  flex: 1;
+  line-height: 50px;
+  height: 50px;
+  overflow: hidden;
+  flex-wrap: wrap;
+  align-items: center;
 
-    &.right {
-        text-align: right;
-        justify-content: flex-end;
-    }
+  &.right {
+    text-align: right;
+    justify-content: flex-end;
+  }
 
-    &.right a {
-        padding-left: 4px;
-
-        &:hover {
-            color: var(--accent_light);
-            text-decoration: unset;
-        }
-    }
+  &.right a:hover {
+    color: var(--accent_light);
+    text-decoration: unset;
+  }
 }
 
 .lp {
-    height: 14px;
-    display: inline-block;
-    position: relative;
-    top: 2px;
-    fill: var(--fg_nav);
+  height: 14px;
+  display: inline-block;
+  position: relative;
+  top: 2px;
+  fill: var(--fg_nav);
 
-    &:hover {
-        fill: var(--accent_light);
-    }
+  &:hover {
+    fill: var(--accent_light);
+  }
 }
 
-.icon-info:before {
-    margin: 0 -3px;
+.icon-info {
+  margin: 0 -3px;
 }
 
 .icon-cog {
-    font-size: 15px;
+  font-size: 15px;
+  padding-left: 0 !important;
 }

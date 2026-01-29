@@ -1,68 +1,77 @@
-@import '_variables';
-@import '_mixins';
+@import "_variables";
+@import "_mixins";
 
 video {
-    max-height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
 }
 
 .gallery-video {
-    display: flex;
-    overflow: hidden;
+  display: flex;
+  overflow: hidden;
 }
 
 .gallery-video.card-container {
-    flex-direction: column;
+  flex-direction: column;
+  width: 100%;
 }
 
 .video-container {
-    min-height: 80px;
-    min-width: 200px;
-    max-height: 530px;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  min-height: 80px;
+  min-width: 200px;
+  max-height: 530px;
+  margin: 0;
 
-    img {
-        max-height: 100%;
-        max-width: 100%;
-    }
+  img {
+    max-height: 100%;
+    max-width: 100%;
+  }
 }
 
 .video-overlay {
-    @include play-button;
-    background-color: $shadow;
+  @include play-button;
+  background-color: $shadow;
 
-    p {
-        position: relative;
-        z-index: 0;
-        text-align: center;
-        top: calc(50% - 20px);
-        font-size: 20px;
-        line-height: 1.3;
-        margin: 0 20px;
-    }
+  p {
+    position: relative;
+    z-index: 0;
+    text-align: center;
+    top: calc(50% - 20px);
+    font-size: 20px;
+    line-height: 1.3;
+    margin: 0 20px;
+  }
 
-    div {
-        position: relative;
-        z-index: 0;
-        top: calc(50% - 20px);
-        margin: 0 auto;
-        width: 40px;
-        height: 40px;
-    }
+  .overlay-circle {
+    position: relative;
+    z-index: 0;
+    top: calc(50% - 20px);
+    margin: 0 auto;
+    width: 40px;
+    height: 40px;
+  }
 
-    form {
-        width: 100%;
-        height: 100%;
-        align-items: center;
-        justify-content: center;
-        display: flex;
-    }
+  .overlay-duration {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background-color: #0000007a;
+    line-height: 1em;
+    padding: 4px 6px 4px 6px;
+    border-radius: 5px;
+    font-weight: bold;
+  }
 
-    button {
-        padding: 5px 8px;
-        font-size: 16px;
-    }
+  form {
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+  }
+
+  button {
+    padding: 5px 8px;
+    font-size: 16px;
+  }
 }

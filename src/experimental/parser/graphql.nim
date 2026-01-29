@@ -1,21 +1,53 @@
-import options
+import options, strutils
 import jsony
-import user, ../types/[graphuser, graphlistmembers]
+import user, utils, ../types/[graphuser, graphlistmembers]
 from ../../types import User, VerifiedType, Result, Query, QueryKind
+
+proc parseUserResult*(userResult: UserResult): User =
+  result = userResult.legacy
+
+  if result.verifiedType == none and userResult.isBlueVerified:
+    result.verifiedType = blue
+
+  if result.username.len == 0 and userResult.core.screenName.len > 0:
+    result.id = userResult.restId
+    result.username = userResult.core.screenName
+    result.fullname = userResult.core.name
+    result.userPic = userResult.avatar.imageUrl.replace("_normal", "")
+
+    if userResult.privacy.isSome:
+      result.protected = userResult.privacy.get.protected
+
+    if userResult.location.isSome:
+      result.location = userResult.location.get.location
+
+    if userResult.core.createdAt.len > 0:
+      result.joinDate = parseTwitterDate(userResult.core.createdAt)
+
+    if userResult.verification.isSome:
+      let v = userResult.verification.get
+      if v.verifiedType != VerifiedType.none:
+        result.verifiedType = v.verifiedType
+
+    if userResult.profileBio.isSome and result.bio.len == 0:
+      result.bio = userResult.profileBio.get.description
 
 proc parseGraphUser*(json: string): User =
   if json.len == 0 or json[0] != '{':
     return
 
-  let raw = json.fromJson(GraphUser)
+  let 
+    raw = json.fromJson(GraphUser)
+    userResult = 
+      if raw.data.userResult.isSome: raw.data.userResult.get.result
+      elif raw.data.user.isSome: raw.data.user.get.result
+      else: UserResult()
 
-  if raw.data.userResult.result.unavailableReason.get("") == "Suspended":
+  if userResult.unavailableReason.get("") == "Suspended" or
+     userResult.reason.get("") == "Suspended":
     return User(suspended: true)
 
-  result = raw.data.userResult.result.legacy
-  result.id = raw.data.userResult.result.restId
-  if result.verifiedType == VerifiedType.none and raw.data.userResult.result.isBlueVerified:
-    result.verifiedType = blue
+  result = parseUserResult(userResult)
 
 proc parseGraphListMembers*(json, cursor: string): Result[User] =
   result = Result[User](
@@ -31,7 +63,7 @@ proc parseGraphListMembers*(json, cursor: string): Result[User] =
         of TimelineTimelineItem:
           let userResult = entry.content.itemContent.userResults.result
           if userResult.restId.len > 0:
-            result.content.add userResult.legacy
+            result.content.add parseUserResult(userResult)
         of TimelineTimelineCursor:
           if entry.content.cursorType == "Bottom":
             result.bottom = entry.content.value

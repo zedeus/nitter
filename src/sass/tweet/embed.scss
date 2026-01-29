@@ -1,17 +1,17 @@
-@import '_variables';
-@import '_mixins';
+@import "_variables";
+@import "_mixins";
 
 .embed-video {
-    .gallery-video {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        background-color: black;
-        top: 0%;
-        left: 0%;
-    }
+  .gallery-video {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: black;
+    top: 0%;
+    left: 0%;
+  }
 
-    .video-container {
-        max-height: unset;
-    }
+  .video-container {
+    max-height: unset;
+  }
 }

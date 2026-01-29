@@ -26,7 +26,9 @@ proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
 template verifiedIcon*(user: User): untyped {.dirty.} =
   if user.verifiedType != VerifiedType.none:
     let lower = ($user.verifiedType).toLowerAscii()
-    icon "ok", class=(&"verified-icon {lower}"), title=(&"Verified {lower} account")
+    buildHtml(tdiv(class=(&"verified-icon {lower}"))):
+      icon "circle", class="verified-icon-circle", title=(&"Verified {lower} account")
+      icon "ok", class="verified-icon-check", title=(&"Verified {lower} account")
   else:
     text ""
 
@@ -40,7 +42,6 @@ proc linkUser*(user: User, class=""): VNode =
   buildHtml(a(href=href, class=class, title=nameText)):
     text nameText
     if isName:
-      verifiedIcon(user)
       if user.protected:
         text " "
         icon "lock", title="Protected account"
@@ -88,6 +89,13 @@ proc genDate*(pref, state: string): VNode =
   buildHtml(span(class="date-input")):
     input(name=pref, `type`="date", value=state)
     icon "calendar"
+
+proc genNumberInput*(pref, label, state, placeholder: string; class=""; autofocus=true; min="0"): VNode =
+  let p = placeholder
+  buildHtml(tdiv(class=("pref-group pref-input " & class))):
+    if label.len > 0:
+      label(`for`=pref): text label
+    input(name=pref, `type`="number", placeholder=p, value=state, autofocus=(autofocus and state.len == 0), min=min, step="1")
 
 proc genImg*(url: string; class=""): VNode =
   buildHtml():

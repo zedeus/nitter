@@ -1,138 +1,139 @@
-@import '_variables';
-@import '_mixins';
+@import "_variables";
+@import "_mixins";
 
 .conversation {
-    @include panel(100%, 600px);
+  @include panel(100%, 600px);
 
-    .show-more {
-        margin-bottom: 10px;
-    }
+  .show-more {
+    margin-bottom: 10px;
+  }
 }
 
 .main-thread {
-    margin-bottom: 20px;
-    background-color: var(--bg_panel);
+  margin-bottom: 20px;
+  background-color: var(--bg_panel);
 }
 
-.main-tweet, .replies {
-    padding-top: 50px;
-    margin-top: -50px;
+.main-tweet,
+.replies {
+  padding-top: 50px;
+  margin-top: -50px;
 }
 
 .main-tweet .tweet-content {
-    font-size: 18px;
+  font-size: 18px;
 }
 
-@media(max-width: 600px) {
-    .main-tweet .tweet-content {
-        font-size: 16px;
-    }
+@media (max-width: 600px) {
+  .main-tweet .tweet-content {
+    font-size: 16px;
+  }
 }
 
 .reply {
-    background-color: var(--bg_panel);
-    margin-bottom: 10px;
+  background-color: var(--bg_panel);
+  margin-bottom: 10px;
 }
 
 .thread-line {
-    .timeline-item::before,
-    &.timeline-item::before {
-        background: var(--accent_dark);
-        content: '';
-        position: relative;
-        min-width: 3px;
-        width: 3px;
-        left: 26px;
-        border-radius: 2px;
-        margin-left: -3px;
-        margin-bottom: 37px;
-        top: 56px;
-        z-index: 1;
-        pointer-events: none;
-    }
+  .timeline-item::before,
+  &.timeline-item::before {
+    background: var(--accent_dark);
+    content: "";
+    position: relative;
+    min-width: 3px;
+    width: 3px;
+    left: 26px;
+    border-radius: 2px;
+    margin-left: -3px;
+    margin-bottom: 37px;
+    top: 56px;
+    z-index: 1;
+    pointer-events: none;
+  }
 
-    .with-header:not(:first-child)::after {
-        background: var(--accent_dark);
-        content: '';
-        position: relative;
-        float: left;
-        min-width: 3px;
-        width: 3px;
-        right: calc(100% - 26px);
-        border-radius: 2px;
-        margin-left: -3px;
-        margin-bottom: 37px;
-        bottom: 10px;
-        height: 30px;
-        z-index: 1;
-        pointer-events: none;
-    }
+  .with-header:not(:first-child)::after {
+    background: var(--accent_dark);
+    content: "";
+    position: relative;
+    float: left;
+    min-width: 3px;
+    width: 3px;
+    right: calc(100% - 26px);
+    border-radius: 2px;
+    margin-left: -3px;
+    margin-bottom: 37px;
+    bottom: 10px;
+    height: 30px;
+    z-index: 1;
+    pointer-events: none;
+  }
 
-    .unavailable::before {
-        top: 48px;
-        margin-bottom: 28px;
-    }
+  .unavailable::before {
+    top: 48px;
+    margin-bottom: 28px;
+  }
 
-    .more-replies::before {
-        content: '...';
-        background: unset;
-        color: var(--more_replies_dots);
-        font-weight: bold;
-        font-size: 20px;
-        line-height: 0.25em;
-        left: 1.2em;
-        width: 5px;
-        top: 2px;
-        margin-bottom: 0;
-        margin-left: -2.5px;
-    }
+  .more-replies::before {
+    content: "...";
+    background: unset;
+    color: var(--more_replies_dots);
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 0.25em;
+    left: 1.2em;
+    width: 5px;
+    top: 2px;
+    margin-bottom: 0;
+    margin-left: -2.5px;
+  }
 
-    .earlier-replies {
-        padding-bottom: 0;
-        margin-bottom: -5px;
-    }
+  .earlier-replies {
+    padding-bottom: 0;
+    margin-bottom: -5px;
+  }
 }
 
 .timeline-item.thread-last::before {
-    background: unset;
-    min-width: unset;
-    width: 0;
-    margin: 0;
+  background: unset;
+  min-width: unset;
+  width: 0;
+  margin: 0;
 }
 
 .more-replies {
-    padding-top: 0.3em !important;
+  padding-top: 0.3em !important;
 }
 
 .more-replies-text {
-    @include ellipsis;
-    display: block;
-    margin-left: 58px;
-    padding: 7px 0;
+  @include ellipsis;
+  display: block;
+  margin-left: 58px;
+  padding: 7px 0;
 }
 
 .timeline-item.thread.more-replies-thread {
-    padding: 0 0.75em;
+  padding: 0 0.75em;
+
+  &::before {
+    top: 40px;
+    margin-bottom: 31px;
+  }
+
+  .more-replies {
+    display: flex;
+    padding-top: unset !important;
+    margin-top: 8px;
 
     &::before {
-        top: 40px;
-        margin-bottom: 31px;
+      display: inline-block;
+      position: relative;
+      top: -1px;
+      line-height: 0.4em;
     }
 
-    .more-replies {
-        display: flex;
-        padding-top: unset !important;
-        margin-top: 8px;
-
-        &::before {
-            display: inline-block;
-            position: relative;
-            top: -1px;
-            line-height: 0.4em;
-        }
-
-        .more-replies-text {
-            display: inline;
-        }
+    .more-replies-text {
+      display: inline;
     }
+  }
 }

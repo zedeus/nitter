@@ -13,32 +13,37 @@ type
   TimelineKind* {.pure.} = enum
     tweets, replies, media
 
-  Api* {.pure.} = enum
-    tweetDetail
-    tweetResult
-    search
-    list
-    listBySlug
-    listMembers
-    listTweets
-    userRestId
-    userScreenName
-    userTweets
-    userTweetsAndReplies
-    userMedia
+  ApiUrl* = object
+    endpoint*: string
+    params*: seq[(string, string)]
+
+  ApiReq* = object
+    oauth*: ApiUrl
+    cookie*: ApiUrl
 
   RateLimit* = object
+    limit*: int
     remaining*: int
     reset*: int
 
+  SessionKind* = enum
+    oauth
+    cookie
+
   Session* = ref object
     id*: int64
-    oauthToken*: string
-    oauthSecret*: string
+    username*: string
     pending*: int
     limited*: bool
     limitedAt*: int
-    apis*: Table[Api, RateLimit]
+    apis*: Table[string, RateLimit]
+    case kind*: SessionKind
+    of oauth:
+      oauthToken*: string
+      oauthSecret*: string
+    of cookie:
+      authToken*: string
+      ct0*: string
 
   Error* = enum
     null = 0
@@ -106,7 +111,6 @@ type
     durationMs*: int
     url*: string
     thumb*: string
-    views*: string
     available*: bool
     reason*: string
     title*: string
@@ -126,7 +130,7 @@ type
     fromUser*: seq[string]
     since*: string
     until*: string
-    near*: string
+    minLikes*: string
     sep*: string
 
   Gif* = object
@@ -187,7 +191,7 @@ type
     replies*: int
     retweets*: int
     likes*: int
-    quotes*: int
+    views*: int
 
   Tweet* = ref object
     id*: int64
@@ -272,6 +276,9 @@ type
     proxy*: string
     proxyAuth*: string
     searchMode*: string
+    apiProxy*: string
+    disableTid*: bool
+    maxConcurrentReqs*: int
 
     rssCacheTime*: int
     listCacheTime*: int
