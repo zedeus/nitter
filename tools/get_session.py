@@ -21,7 +21,10 @@ def auth(username, password, otp_secret):
 
     guest_token = requests.post(
         "https://api.twitter.com/1.1/guest/activate.json",
-        headers={'Authorization': bearer_token}
+        headers={
+            'Authorization': bearer_token,
+             "User-Agent": "TwitterAndroid/10.21.0-release.0 (310210000-r-0) ONEPLUS+A3010/9"
+        }
     ).json().get('guest_token')
 
     if not guest_token:
