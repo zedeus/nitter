@@ -1,0 +1,37 @@
+src/sass/inputs.scss
+  9c559679589f9d70 203-214
+src/prefs.nim
+  9c559679589f9d70 2,7,23-27
+src/routes/preferences.nim
+  9c559679589f9d70 23-25
+src/views/preferences.nim
+  9c559679589f9d70 35-36,47-49
+src/routes/router_utils.nim
+  9c559679589f9d70 2,7,41,43,45-53,55,57-58,64,66
+src/nitter.nim
+  9c559679589f9d70 68,71-72
+src/utils.nim
+  9c559679589f9d70 12
+src/prefs_impl.nim
+  9c559679589f9d70 208-237
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "db36f75519b2295c184d107f29210141bdd01082",
+  "prompts": {
+    "9c559679589f9d70": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba88d52f-a271-4df6-b206-7efb7cddae93",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 114,
+      "total_deletions": 29,
+      "accepted_lines": 79,
+      "overriden_lines": 11
+    }
+  }
+}
