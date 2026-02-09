@@ -4,36 +4,48 @@ Requirements:
   pip install -r tools/requirements.txt
 
 Usage:
-  python3 tools/create_session_browser.py <username> <password> [totp_seed] [--append sessions.jsonl] [--headless]
+  python3 tools/create_sessions_browser.py <accounts_file> [--append sessions.jsonl] [--headless] [--delay]
 
 Examples:
   # Output to terminal
-  python3 tools/create_session_browser.py myusername mypassword TOTP_SECRET
+  python3 tools/create_sessions_browser.py <accounts_file>
 
   # Append to sessions.jsonl
-  python3 tools/create_session_browser.py myusername mypassword TOTP_SECRET --append sessions.jsonl
+  python3 tools/create_sessions_browser.py <accounts_file> --append sessions.jsonl
+
+  # Add 5 second delay between sessions (default: 1)
+  python3 tools/create_sessions_browser.py <accounts_file> --delay 5
 
   # Headless mode (may increase detection risk)
-  python3 tools/create_session_browser.py myusername mypassword TOTP_SECRET --headless
+  python3 tools/create_sessions_browser.py <accounts_file> --headless
+
+Input (accounts_file):
+  [{"username": "user", "password": "pass", "totp": "totp_code"}, {...}, ...]
 
 Output:
   {"kind": "cookie", "username": "...", "id": "...", "auth_token": "...", "ct0": "..."}
+  {"kind": "cookie", "username": "...", "id": "...", "auth_token": "...", "ct0": "..."}
+  ...
 """
 
 import asyncio
 import json
-import os
 import sys
+from time import sleep
 
 import nodriver as uc
 import pyotp
 
 
-async def login_and_get_cookies(username, password, totp_seed=None, headless=False):
+async def login_and_get_cookies(account, headless=False):
     """Authenticate with X.com and extract session cookies"""
     # Note: headless mode may increase detection risk from bot-detection systems
     browser = await uc.start(headless=headless)
     tab = await browser.get("https://x.com/i/flow/login")
+
+    username = account["username"]
+    password = account["password"]
+    totp_seed = account["totp"]
 
     try:
         # Enter username
@@ -132,20 +144,19 @@ async def login_and_get_cookies(username, password, totp_seed=None, headless=Fal
 
 
 async def main():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         print(
-            "Usage: python3 create_session_browser.py username password [totp_seed] [--append file.jsonl] [--headless]"
+            "Usage: python3 create_sessions_browser.py <accounts_file> [--append sessions.jsonl] [--headless]"
         )
         sys.exit(1)
 
-    username = sys.argv[1]
-    password = sys.argv[2]
-    totp_seed = None
+    input = sys.argv[1]
     append_file = None
     headless = False
+    delay = 1
 
     # Parse optional arguments
-    i = 3
+    i = 2
     while i < len(sys.argv):
         arg = sys.argv[i]
         if arg == "--append":
@@ -158,38 +169,50 @@ async def main():
         elif arg == "--headless":
             headless = True
             i += 1
-        elif not arg.startswith("--"):
-            if totp_seed is None:
-                totp_seed = arg
-            i += 1
+        elif arg == "--delay":
+            delay = int(sys.argv[i + 1])
+            i += 2
         else:
             # Unkown args
             print(f"[!] Warning: Unknown argument: {arg}", file=sys.stderr)
             i += 1
 
-    try:
-        cookies = await login_and_get_cookies(username, password, totp_seed, headless)
-        session = {
-            "kind": "cookie",
-            "username": cookies["username"],
-            "id": cookies.get("id"),
-            "auth_token": cookies["auth_token"],
-            "ct0": cookies["ct0"],
-        }
-        output = json.dumps(session)
+    accounts = []
+    with open(input) as f:
+        accounts = json.load(f)
 
-        if append_file:
-            with open(append_file, "a") as f:
-                f.write(output + "\n")
-            print(f"✓ Session appended to {append_file}", file=sys.stderr)
-        else:
-            print(output)
+    if len(accounts) == 0:
+        print("no accounts in file")
+        sys.exit(0)
 
-        os._exit(0)
+    sessions = 0
+    for acc in accounts:
+        sessions += 1
+        try:
+            cookies = await login_and_get_cookies(acc, headless)
+            session = {
+                "kind": "cookie",
+                "username": cookies["username"],
+                "id": cookies.get("id"),
+                "auth_token": cookies["auth_token"],
+                "ct0": cookies["ct0"],
+            }
 
-    except Exception as error:
-        print(f"[!] Error: {error}", file=sys.stderr)
-        sys.exit(1)
+            if append_file:
+                with open(append_file, "a") as f:
+                    f.write(json.dumps(session) + "\n")
+            else:
+                print(json.dumps(session))
+
+            print(f"Progress: {sessions} / {len(accounts)}")
+            if sessions < len(accounts):
+                print("Waiting", delay, "seconds")
+                sleep(delay)
+        except Exception as error:
+            print(
+                f"[!] Error getting session for {acc["username"]}, skipping: {error}",
+                file=sys.stderr,
+            )
 
 
 if __name__ == "__main__":
