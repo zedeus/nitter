@@ -1,0 +1,55 @@
+src/routes/timeline.nim
+  fe794b9722824287 120
+src/routes/resolver.nim
+  fe794b9722824287 21,25
+src/routes/unsupported.nim
+  fe794b9722824287 13
+src/views/preferences.nim
+  fe794b9722824287 49
+src/routes/router_utils.nim
+  fe794b9722824287 2,7,14-15,18,40-41,44,46-47
+src/views/renderutils.nim
+  fe794b9722824287 68,75,81
+src/routes/rss.nim
+  fe794b9722824287 18,42,68,83,92,100,110,129,154,167
+src/views/rss.nimf
+  fe794b9722824287 52,55,84,93,111,124,150,156,168,173,186
+src/routes/embed.nim
+  fe794b9722824287 22
+src/routes/search.nim
+  fe794b9722824287 22
+src/prefs.nim
+  fe794b9722824287 14,22
+src/routes/media.nim
+  fe794b9722824287 146
+src/views/general.nim
+  fe794b9722824287 42
+src/routes/preferences.nim
+  fe794b9722824287 22
+src/routes/status.nim
+  fe794b9722824287 24
+src/routes/list.nim
+  fe794b9722824287 39,48
+src/nitter.nim
+  fe794b9722824287 74,77,88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "b85e8c5d7d7af91a2d86a497265142b6f6a4f490",
+  "prompts": {
+    "fe794b9722824287": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "401c5e0c-597a-4979-a91b-7d75ded13982",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 63,
+      "total_deletions": 59,
+      "accepted_lines": 53,
+      "overriden_lines": 2
+    }
+  }
+}
