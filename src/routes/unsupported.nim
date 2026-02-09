@@ -10,7 +10,7 @@ export feature
 proc createUnsupportedRouter*(cfg: Config) =
   router unsupported:
     template feature {.dirty.} =
-      resp renderMain(renderFeature(), request, cfg, themePrefs())
+      resp renderMain(renderFeature(), request, cfg, cookiePrefs())
 
     get "/about/feature": feature()
     get "/login/?@i?": feature()

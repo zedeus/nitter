@@ -3,7 +3,6 @@
 nav {
   display: flex;
   align-items: center;
-  position: fixed;
   background-color: var(--bg_overlays);
   box-shadow: 0 0 4px $shadow;
   padding: 0;
@@ -15,6 +14,10 @@ nav {
   a,
   .icon-button button {
     color: var(--fg_nav);
+  }
+
+  body.fixed-nav & {
+    position: fixed;
   }
 }
 

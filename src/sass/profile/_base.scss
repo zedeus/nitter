@@ -39,7 +39,11 @@
     text-align: left;
     vertical-align: top;
     max-width: 32%;
-    top: 50px;
+    top: 0;
+
+    body.fixed-nav & {
+        top: 50px;
+    }
 }
 
 .profile-result {

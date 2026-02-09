@@ -60,6 +60,9 @@ genPrefs:
     stickyProfile(checkbox, true):
       "Make profile sidebar stick to top"
 
+    stickyNav(checkbox, true):
+      "Keep navbar fixed to top"
+
     bidiSupport(checkbox, false):
       "Support bidirectional text (makes clicking on tweets harder)"
 

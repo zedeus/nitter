@@ -115,9 +115,12 @@ ul {
   display: flex;
   flex-wrap: wrap;
   box-sizing: border-box;
-  padding-top: 50px;
   margin: auto;
   min-height: 100vh;
+}
+
+body.fixed-nav .container {
+  padding-top: 50px;
 }
 
 .icon-container {

@@ -131,7 +131,8 @@ proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
     renderHead(prefs, cfg, req, titleText, desc, video, images, banner, ogTitle,
                rss, twitterLink)
 
-    body:
+    let bodyClass = if prefs.stickyNav: "fixed-nav" else: ""
+    body(class=bodyClass):
       renderNavbar(cfg, req, rss, twitterLink)
 
       tdiv(class="container"):

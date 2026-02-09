@@ -16,8 +16,10 @@
 
 .main-tweet,
 .replies {
-  padding-top: 50px;
-  margin-top: -50px;
+  body.fixed-nav & {
+    padding-top: 50px;
+    margin-top: -50px;
+  }
 }
 
 .main-tweet .tweet-content {

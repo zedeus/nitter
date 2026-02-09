@@ -66,10 +66,10 @@ settings:
 
 routes:
   get "/":
-    resp renderMain(renderSearch(), request, cfg, themePrefs())
+    resp renderMain(renderSearch(), request, cfg, cookiePrefs())
 
   get "/about":
-    resp renderMain(renderAbout(), request, cfg, themePrefs())
+    resp renderMain(renderAbout(), request, cfg, cookiePrefs())
 
   get "/explore":
     redirect("/about")

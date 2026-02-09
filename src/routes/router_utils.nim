@@ -17,13 +17,8 @@ template cookiePrefs*(): untyped {.dirty.} =
 template cookiePref*(pref): untyped {.dirty.} =
   getPref(cookies(request), pref)
 
-template themePrefs*(): Prefs =
-  var res = defaultPrefs
-  res.theme = cookiePref(theme)
-  res
-
 template showError*(error: string; cfg: Config): string =
-  renderMain(renderError(error), request, cfg, themePrefs(), "Error")
+  renderMain(renderError(error), request, cfg, cookiePrefs(), "Error")
 
 template getPath*(): untyped {.dirty.} =
   $(parseUri(request.path) ? filterParams(request.params))
