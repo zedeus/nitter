@@ -1,0 +1,25 @@
+src/sass/navbar.scss
+  3e58426b92c72c23 18-20
+src/routes/router_utils.nim
+  3e58426b92c72c23 21
+src/routes/unsupported.nim
+  3e58426b92c72c23 13
+src/sass/profile/_base.scss
+  3e58426b92c72c23 42-46
+src/nitter.nim
+  3e58426b92c72c23 69,72
+src/sass/tweet/thread.scss
+  3e58426b92c72c23 19,22
+src/prefs_impl.nim
+  3e58426b92c72c23 63-65
+src/sass/index.scss
+  3e58426b92c72c23 122-123
+src/views/general.nim
+  3e58426b92c72c23 134-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "5d28bd18c631417129a6c6a1ed45e20ef4528269",
+  "prompts": {}
+}
