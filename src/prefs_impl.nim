@@ -205,6 +205,36 @@ macro genResetPrefs*(): untyped =
     result.add quote do:
       savePref(`name`, "", `req`, expire=true)
 
+macro genEncodePrefs*(prefs): untyped =
+  result = nnkStmtList.newTree()
+  for pref in allPrefs():
+    let
+      name = newLit(pref.name)
+      ident = ident(pref.name)
+      kind = newLit(pref.kind)
+      defaultIdent = nnkDotExpr.newTree(ident("defaultPrefs"), ident(pref.name))
+
+    result.add quote do:
+      when `kind` == checkbox:
+        if `prefs`.`ident` != `defaultIdent`:
+          if `prefs`.`ident`:
+            encPairs.add `name` & "=on"
+          else:
+            encPairs.add `name` & "="
+      else:
+        if `prefs`.`ident` != `defaultIdent`:
+          encPairs.add `name` & "=" & `prefs`.`ident`
+
+macro genApplyPrefs*(params, req): untyped =
+  result = nnkStmtList.newTree()
+  for pref in allPrefs():
+    let name = newLit(pref.name)
+    result.add quote do:
+      if `name` in `params`:
+        savePref(`name`, `params`[`name`], `req`)
+      else:
+        savePref(`name`, "", `req`, expire=true)
+
 macro genPrefsType*(): untyped =
   let name = nnkPostfix.newTree(ident("*"), ident("Prefs"))
   result = quote do:

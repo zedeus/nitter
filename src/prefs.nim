@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import tables
+import tables, strutils, base64
 import types, prefs_impl
 from config import get
 from parsecfg import nil
 
-export genUpdatePrefs, genResetPrefs
+export genUpdatePrefs, genResetPrefs, genApplyPrefs
 
 var defaultPrefs*: Prefs
 
@@ -20,3 +20,8 @@ template getPref*(cookies: Table[string, string], pref): untyped =
   var res = defaultPrefs.`pref`
   genCookiePref(cookies, pref, res)
   res
+
+proc encodePrefs*(prefs: Prefs): string =
+  var encPairs: seq[string]
+  genEncodePrefs(prefs)
+  encode(encPairs.join("&"), safe=true)

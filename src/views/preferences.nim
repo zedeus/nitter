@@ -32,13 +32,20 @@ macro renderPrefs*(): untyped =
 
       result[2].add stmt
 
-proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string]): VNode =
+proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string];
+                        prefsUrl: string): VNode =
   buildHtml(tdiv(class="overlay-panel")):
     fieldset(class="preferences"):
       form(`method`="post", action="/saveprefs", autocomplete="off"):
         refererField path
 
         renderPrefs()
+
+        legend: text "Bookmark"
+        p(class="bookmark-note"):
+          text "Save this URL to restore your preferences (?prefs works on all pages)"
+        pre(class="prefs-code"):
+          text prefsUrl
 
         h4(class="note"):
           text "Preferences are stored client-side using cookies without any personal information."

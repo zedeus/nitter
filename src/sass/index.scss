@@ -99,12 +99,18 @@ legend {
   margin-bottom: 8px;
 }
 
-.preferences .note {
-  border-top: 1px solid var(--border_grey);
-  border-bottom: 1px solid var(--border_grey);
-  padding: 6px 0 8px 0;
-  margin-bottom: 8px;
-  margin-top: 16px;
+.preferences {
+  .note {
+    border-top: 1px solid var(--border_grey);
+    border-bottom: 1px solid var(--border_grey);
+    padding: 6px 0 8px 0;
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+
+  .bookmark-note {
+    margin: 0;
+  }
 }
 
 ul {

@@ -65,6 +65,11 @@ settings:
   reusePort = true
 
 routes:
+  before:
+    # skip all file URLs
+    cond "." notin request.path
+    applyUrlPrefs()
+
   get "/":
     resp renderMain(renderSearch(), request, cfg, cookiePrefs())
 

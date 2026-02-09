@@ -9,7 +9,7 @@ var
 const
   https* = "https://"
   twimg* = "pbs.twimg.com/"
-  nitterParams = ["name", "tab", "id", "list", "referer", "scroll"]
+  nitterParams* = ["name", "tab", "id", "list", "referer", "scroll", "prefs"]
   twitterDomains = @[
     "twitter.com",
     "pic.twitter.com",
