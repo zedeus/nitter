@@ -36,7 +36,7 @@ proc createListRouter*(cfg: Config) =
     get "/i/lists/@id/?":
       cond '.' notin @"id"
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         list = await getCachedList(id=(@"id"))
         timeline = await getGraphListTweets(list.id, getCursor())
         vnode = renderTimelineTweets(timeline, prefs, request.path)
@@ -45,7 +45,7 @@ proc createListRouter*(cfg: Config) =
     get "/i/lists/@id/members":
       cond '.' notin @"id"
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         list = await getCachedList(id=(@"id"))
         members = await getGraphListMembers(list, getCursor())
       respList(list, members, list.title, renderTimelineUsers(members, prefs, request.path))

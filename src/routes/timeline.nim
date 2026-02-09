@@ -117,7 +117,7 @@ proc createTimelineRouter*(cfg: Config) =
       cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_', ','})
       cond @"tab" in ["with_replies", "media", "search", ""]
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         after = getCursor()
         names = getNames(@"name")
 

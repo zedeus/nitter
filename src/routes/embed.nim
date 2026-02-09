@@ -19,7 +19,7 @@ proc createEmbedRouter*(cfg: Config) =
     get "/@user/status/@id/embed":
       let
         tweet = await getGraphTweetResult(@"id")
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         path = getPath()
 
       if tweet == nil:

@@ -1,24 +1,21 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, sequtils, uri, tables, json, base64
+import strutils, sequtils, uri, tables, json
 from jester import Request, cookies
 
 import ../views/general
 import ".."/[utils, prefs, types]
-export utils, prefs, types, uri, base64
+export utils, prefs, types, uri
 
 template savePref*(pref, value: string; req: Request; expire=false) =
   if not expire or pref in cookies(req):
     setCookie(pref, value, daysForward(when expire: -10 else: 360),
               httpOnly=true, secure=cfg.useHttps, sameSite=None, path="/")
 
-template cookiePrefs*(): untyped {.dirty.} =
-  getPrefs(cookies(request))
-
-template cookiePref*(pref): untyped {.dirty.} =
-  getPref(cookies(request), pref)
+template requestPrefs*(): untyped {.dirty.} =
+  getPrefs(cookies(request), params(request))
 
 template showError*(error: string; cfg: Config): string =
-  renderMain(renderError(error), request, cfg, cookiePrefs(), "Error")
+  renderMain(renderError(error), request, cfg, requestPrefs(), "Error")
 
 template getPath*(): untyped {.dirty.} =
   $(parseUri(request.path) ? filterParams(request.params))
@@ -40,17 +37,14 @@ proc getNames*(name: string): seq[string] =
 
 template applyUrlPrefs*() {.dirty.} =
   if @"prefs".len > 0:
-    try:
-      let decoded = decode(@"prefs")
-      var params = initTable[string, string]()
-      for pair in decoded.split('&'):
-        let kv = pair.split('=', maxsplit=1)
-        if kv.len == 2:
-          params[kv[0]] = kv[1]
-        elif kv.len == 1 and kv[0].len > 0:
-          params[kv[0]] = ""
-      genApplyPrefs(params, request)
-    except: discard
+    var prefParams = initTable[string, string]()
+    for pair in @"prefs".split(','):
+      let kv = pair.split('=', maxsplit=1)
+      if kv.len == 2:
+        prefParams[kv[0]] = kv[1]
+      elif kv.len == 1 and kv[0].len > 0:
+        prefParams[kv[0]] = ""
+    genApplyPrefs(prefParams, request)
 
     # Rebuild URL without prefs param
     var params: seq[(string, string)]

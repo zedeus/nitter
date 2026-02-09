@@ -39,9 +39,7 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
 proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
                  video=""; images: seq[string] = @[]; banner=""; ogTitle="";
                  rss=""; alternate=""): VNode =
-  var theme = prefs.theme.toTheme
-  if "theme" in req.params:
-    theme = req.params["theme"].toTheme
+  let theme = prefs.theme.toTheme
     
   let ogType =
     if video.len > 0: "video"

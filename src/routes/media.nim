@@ -143,6 +143,6 @@ proc createMediaRouter*(cfg: Config) =
 
       if ".m3u8" in url:
         let vid = await safeFetch(url)
-        content = proxifyVideo(vid, cookiePref(proxyVideos))
+        content = proxifyVideo(vid, requestPrefs().proxyVideos)
 
       resp content, m3u8Mime

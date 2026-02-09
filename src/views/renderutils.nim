@@ -65,20 +65,20 @@ proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNod
       text text
 
 proc genCheckbox*(pref, label: string; state: bool): VNode =
-  buildHtml(label(class="pref-group checkbox-container")):
+  buildHtml(label(class="pref-group checkbox-container", title=pref)):
     text label
     input(name=pref, `type`="checkbox", checked=state)
     span(class="checkbox")
 
 proc genInput*(pref, label, state, placeholder: string; class=""; autofocus=true): VNode =
   let p = placeholder
-  buildHtml(tdiv(class=("pref-group pref-input " & class))):
+  buildHtml(tdiv(class=("pref-group pref-input " & class), title=pref)):
     if label.len > 0:
       label(`for`=pref): text label
     input(name=pref, `type`="text", placeholder=p, value=state, autofocus=(autofocus and state.len == 0))
 
 proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
-  buildHtml(tdiv(class="pref-group pref-input")):
+  buildHtml(tdiv(class="pref-group pref-input", title=pref)):
     label(`for`=pref): text label
     select(name=pref):
       for opt in options:

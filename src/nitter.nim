@@ -71,10 +71,10 @@ routes:
     applyUrlPrefs()
 
   get "/":
-    resp renderMain(renderSearch(), request, cfg, cookiePrefs())
+    resp renderMain(renderSearch(), request, cfg, requestPrefs())
 
   get "/about":
-    resp renderMain(renderAbout(), request, cfg, cookiePrefs())
+    resp renderMain(renderAbout(), request, cfg, requestPrefs())
 
   get "/explore":
     redirect("/about")
@@ -85,7 +85,7 @@ routes:
   get "/i/redirect":
     let url = decodeUrl(@"url")
     if url.len == 0: resp Http404
-    redirect(replaceUrls(url, cookiePrefs()))
+    redirect(replaceUrls(url, requestPrefs()))
 
   error Http404:
     resp Http404, showError("Page not found", cfg)

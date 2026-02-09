@@ -21,7 +21,7 @@ proc createStatusRouter*(cfg: Config) =
       if id.len > 19 or id.any(c => not c.isDigit):
         resp Http404, showError("Invalid tweet ID", cfg)
 
-      let prefs = cookiePrefs()
+      let prefs = requestPrefs()
 
       # used for the infinite scroll feature
       if @"scroll".len > 0:

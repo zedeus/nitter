@@ -130,7 +130,7 @@ macro genDefaultPrefs*(): untyped =
     result.add quote do:
       defaultPrefs.`ident` = cfg.get("Preferences", `name`, `default`)
 
-macro genCookiePrefs*(cookies): untyped =
+macro genParsePrefs*(prefs): untyped =
   result = nnkStmtList.newTree()
   for pref in allPrefs():
     let
@@ -140,36 +140,16 @@ macro genCookiePrefs*(cookies): untyped =
       options = pref.options
 
     result.add quote do:
-      if `name` in `cookies`:
+      if `name` in `prefs`:
         when `kind` == input or `name` == "theme":
-          result.`ident` = `cookies`[`name`]
+          result.`ident` = `prefs`[`name`]
         elif `kind` == checkbox:
-          result.`ident` = `cookies`[`name`] == "on"
+          result.`ident` = `prefs`[`name`] == "on" or 
+                           `prefs`[`name`] == "true" or
+                           `prefs`[`name`] == "1"
         else:
-          let value = `cookies`[`name`]
+          let value = `prefs`[`name`]
           if value in `options`: result.`ident` = value
-
-macro genCookiePref*(cookies, prefName, res): untyped =
-  result = nnkStmtList.newTree()
-  for pref in allPrefs():
-    let ident = ident(pref.name)
-    if ident != prefName:
-      continue
-
-    let
-      name = pref.name
-      kind = newLit(pref.kind)
-      options = pref.options
-
-    result.add quote do:
-      if `name` in `cookies`:
-        when `kind` == input or `name` == "theme":
-          `res` = `cookies`[`name`]
-        elif `kind` == checkbox:
-          `res` = `cookies`[`name`] == "on"
-        else:
-          let value = `cookies`[`name`]
-          if value in `options`: `res` = value
 
 macro genUpdatePrefs*(): untyped =
   result = nnkStmtList.newTree()

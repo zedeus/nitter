@@ -46,6 +46,8 @@ proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string];
           text "Save this URL to restore your preferences (?prefs works on all pages)"
         pre(class="prefs-code"):
           text prefsUrl
+        p(class="bookmark-note"):
+          verbatim "You can override preferences with query parameters (e.g. <code>?hlsPlayback=on</code>). These overrides aren't saved to cookies, and links won't retain the parameters. Intended for configuring RSS feeds and other cookieless environments. Hover over a preference to see its name."
 
         h4(class="note"):
           text "Preferences are stored client-side using cookies without any personal information."

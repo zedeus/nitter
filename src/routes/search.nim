@@ -19,7 +19,7 @@ proc createSearchRouter*(cfg: Config) =
         resp Http400, showError("Search input too long.", cfg)
 
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         query = initQuery(params(request))
         title = "Search" & (if q.len > 0: " (" & q & ")" else: "")
 

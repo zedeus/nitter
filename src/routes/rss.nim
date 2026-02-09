@@ -15,7 +15,7 @@ proc redisKey*(page, name, cursor: string): string =
   if cursor.len > 0:
     result &= ":" & cursor
 
-proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.} =
+proc timelineRss*(req: Request; cfg: Config; query: Query; prefs: Prefs): Future[Rss] {.async.} =
   var profile: Profile
   let
     name = req.params.getOrDefault("name")
@@ -39,7 +39,7 @@ proc timelineRss*(req: Request; cfg: Config; query: Query): Future[Rss] {.async.
     return Rss(feed: profile.user.username, cursor: "suspended")
 
   if profile.user.fullname.len > 0:
-    let rss = renderTimelineRss(profile, cfg, multi=(names.len > 1))
+    let rss = renderTimelineRss(profile, cfg, prefs, multi=(names.len > 1))
     return Rss(feed: rss, cursor: profile.tweets.bottom)
 
 template respRss*(rss, page) =
@@ -64,7 +64,9 @@ proc createRssRouter*(cfg: Config) =
       if @"q".len > 200:
         resp Http400, showError("Search input too long.", cfg)
 
-      let query = initQuery(params(request))
+      let
+        prefs = requestPrefs()
+        query = initQuery(params(request))
       if query.kind != tweets:
         resp Http400, showError("Only Tweet searches are allowed for RSS feeds.", cfg)
 
@@ -78,7 +80,7 @@ proc createRssRouter*(cfg: Config) =
 
       let tweets = await getGraphTweetSearch(query, cursor)
       rss.cursor = tweets.bottom
-      rss.feed = renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg)
+      rss.feed = renderSearchRss(tweets.content, query.text, genQueryUrl(query), cfg, prefs)
 
       await cacheRss(key, rss)
       respRss(rss, "Search")
@@ -87,6 +89,7 @@ proc createRssRouter*(cfg: Config) =
       cond cfg.enableRss
       cond '.' notin @"name"
       let
+        prefs = requestPrefs()
         name = @"name"
         key = redisKey("twitter", name, getCursor())
 
@@ -94,7 +97,7 @@ proc createRssRouter*(cfg: Config) =
       if rss.cursor.len > 0:
         respRss(rss, "User")
 
-      rss = await timelineRss(request, cfg, Query(fromUser: @[name]))
+      rss = await timelineRss(request, cfg, Query(fromUser: @[name]), prefs)
 
       await cacheRss(key, rss)
       respRss(rss, "User")
@@ -104,6 +107,7 @@ proc createRssRouter*(cfg: Config) =
       cond '.' notin @"name"
       cond @"tab" in ["with_replies", "media", "search"]
       let
+        prefs = requestPrefs()
         name = @"name"
         tab = @"tab"
         query =
@@ -122,7 +126,7 @@ proc createRssRouter*(cfg: Config) =
       if rss.cursor.len > 0:
         respRss(rss, "User")
 
-      rss = await timelineRss(request, cfg, query)
+      rss = await timelineRss(request, cfg, query, prefs)
 
       await cacheRss(key, rss)
       respRss(rss, "User")
@@ -147,6 +151,7 @@ proc createRssRouter*(cfg: Config) =
     get "/i/lists/@id/rss":
       cond cfg.enableRss
       let
+        prefs = requestPrefs()
         id = @"id"
         cursor = getCursor()
         key = redisKey("lists", id, cursor)
@@ -159,7 +164,7 @@ proc createRssRouter*(cfg: Config) =
         list = await getCachedList(id=id)
         timeline = await getGraphListTweets(list.id, cursor)
       rss.cursor = timeline.bottom
-      rss.feed = renderListRss(timeline.content, list, cfg)
+      rss.feed = renderListRss(timeline.content, list, cfg, prefs)
 
       await cacheRss(key, rss)
       respRss(rss, "List")
