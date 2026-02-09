@@ -1,0 +1,39 @@
+src/sass/profile/_base.scss
+  3e58426b92c72c23 42-46
+src/routes/router_utils.nim
+  3e58426b92c72c23 21
+src/sass/navbar.scss
+  3e58426b92c72c23 18-20
+src/sass/tweet/thread.scss
+  3e58426b92c72c23 19,22
+src/nitter.nim
+  3e58426b92c72c23 69,72
+src/views/general.nim
+  3e58426b92c72c23 134-135
+src/sass/index.scss
+  3e58426b92c72c23 122-123
+src/routes/unsupported.nim
+  3e58426b92c72c23 13
+src/prefs_impl.nim
+  3e58426b92c72c23 63-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "5ec58ec96016f7773823a09725957531783ff3bb",
+  "prompts": {
+    "3e58426b92c72c23": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b9f41b72-9984-449e-8faf-8bc3b1b3ff07",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 39,
+      "total_deletions": 28,
+      "accepted_lines": 28,
+      "overriden_lines": 0
+    }
+  }
+}
