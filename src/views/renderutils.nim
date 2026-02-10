@@ -97,9 +97,9 @@ proc genNumberInput*(pref, label, state, placeholder: string; class=""; autofocu
       label(`for`=pref): text label
     input(name=pref, `type`="number", placeholder=p, value=state, autofocus=(autofocus and state.len == 0), min=min, step="1")
 
-proc genImg*(url: string; class=""): VNode =
+proc genImg*(url: string; class=""; alt=""): VNode =
   buildHtml():
-    img(src=getPicUrl(url), class=class, alt="", loading="lazy")
+    img(src=getPicUrl(url), class=class, alt=alt, loading="lazy")
 
 proc getTabClass*(query: Query; tab: QueryKind): string =
   if query.kind == tab: "tab-item active"

@@ -137,6 +137,10 @@ type
     url*: string
     thumb*: string
 
+  Photo* = object
+    url*: string
+    altText*: string
+
   GalleryPhoto* = object
     url*: string
     tweetId*: string
@@ -217,7 +221,7 @@ type
     poll*: Option[Poll]
     gif*: Option[Gif]
     video*: Option[Video]
-    photos*: seq[string]
+    photos*: seq[Photo]
 
   Tweets* = seq[Tweet]
 
