@@ -9,7 +9,7 @@ let
   unReplace = "$1<a href=\"/$2\">@$2</a>"
 
   htRegex = nre.re"""(*U)(^|[^\w-_.?])([#＃$])([\w_]*+)(?!</a>|">|#)"""
-  htReplace = "$1<a href=\"/search?q=%23$3\">$2$3</a>"
+  htReplace = "$1<a href=\"/search?f=tweets&q=%23$3\">$2$3</a>"
 
 proc expandUserEntities(user: var User; raw: RawUser) =
   let

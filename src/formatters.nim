@@ -199,7 +199,7 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
 proc getLocation*(u: User | Tweet): (string, string) =
   if "://" in u.location: return (u.location, "")
   let loc = u.location.split(":")
-  let url = if loc.len > 1: "/search?q=place:" & loc[1] else: ""
+  let url = if loc.len > 1: "/search?f=tweets&q=place:" & loc[1] else: ""
   (loc[0], url)
 
 proc getSuspended*(username: string): string =
