@@ -1,0 +1,37 @@
+src/routes/list.nim
+  2ba4fef580a8622c 16
+src/views/general.nim
+  2ba4fef580a8622c 70
+nitter.example.conf
+  2ba4fef580a8622c 25-30
+src/routes/timeline.nim
+  2ba4fef580a8622c 141-147,149-151
+src/config.nim
+  2ba4fef580a8622c 16-17,42-46
+src/types.nim
+  2ba4fef580a8622c 278-282
+src/routes/search.nim
+  2ba4fef580a8622c 39
+src/routes/rss.nim
+  2ba4fef580a8622c 63-64,91-92,110-116,144-145,161-162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "05b6dd2a43a1672f6eadb601193f4ddfcf3804b8",
+  "prompts": {
+    "2ba4fef580a8622c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5bfd62fa-967a-411a-b6c8-be11f45a71b7",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 122,
+      "total_deletions": 92,
+      "accepted_lines": 48,
+      "overriden_lines": 0
+    }
+  }
+}
