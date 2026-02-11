@@ -13,7 +13,7 @@ template respList*(list, timeline, title, vnode: typed) =
 
   let
     html = renderList(vnode, timeline.query, list)
-    rss = &"""/i/lists/{@"id"}/rss"""
+    rss = if cfg.enableRSSList: &"""/i/lists/{@"id"}/rss""" else: ""
 
   resp renderMain(html, request, cfg, prefs, titleText=title, rss=rss, banner=list.banner)
 

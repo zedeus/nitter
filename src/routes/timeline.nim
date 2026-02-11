@@ -138,8 +138,17 @@ proc createTimelineRouter*(cfg: Config) =
           profile.tweets.beginning = true
           resp $renderTimelineTweets(profile.tweets, prefs, getPath())
 
+      let rssEnabled =
+        if @"tab".len == 0: cfg.enableRSSUserTweets
+        elif @"tab" == "with_replies": cfg.enableRSSUserReplies
+        elif @"tab" == "media": cfg.enableRSSUserMedia
+        elif @"tab" == "search": cfg.enableRSSSearch
+        else: false
+
       let rss =
-        if @"tab".len == 0:
+        if not rssEnabled: 
+          ""
+        elif @"tab".len == 0:
           "/$1/rss" % @"name"
         elif @"tab" == "search":
           "/$1/search/rss?$2" % [@"name", genQueryUrl(query)]

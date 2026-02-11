@@ -275,7 +275,11 @@ type
     hmacKey*: string
     base64Media*: bool
     minTokens*: int
-    enableRss*: bool
+    enableRSSUserTweets*: bool
+    enableRSSUserReplies*: bool
+    enableRSSUserMedia*: bool
+    enableRSSSearch*: bool
+    enableRSSList*: bool
     enableDebug*: bool
     proxy*: string
     proxyAuth*: string

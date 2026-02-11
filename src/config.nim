@@ -13,6 +13,8 @@ proc get*[T](config: parseCfg.Config; section, key: string; default: T): T =
 proc getConfig*(path: string): (Config, parseCfg.Config) =
   var cfg = loadConfig(path)
 
+  let masterRss = cfg.get("Config", "enableRSS", true)
+
   let conf = Config(
     # Server
     address: cfg.get("Server", "address", "0.0.0.0"),
@@ -37,7 +39,11 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     hmacKey: cfg.get("Config", "hmacKey", "secretkey"),
     base64Media: cfg.get("Config", "base64Media", false),
     minTokens: cfg.get("Config", "tokenCount", 10),
-    enableRss: cfg.get("Config", "enableRSS", true),
+    enableRSSUserTweets: masterRss and cfg.get("Config", "enableRSSUserTweets", true),
+    enableRSSUserReplies: masterRss and cfg.get("Config", "enableRSSUserReplies", true),
+    enableRSSUserMedia: masterRss and cfg.get("Config", "enableRSSUserMedia", true),
+    enableRSSSearch: masterRss and cfg.get("Config", "enableRSSSearch", true),
+    enableRSSList: masterRss and cfg.get("Config", "enableRSSList", true),
     enableDebug: cfg.get("Config", "enableDebug", false),
     proxy: cfg.get("Config", "proxy", ""),
     proxyAuth: cfg.get("Config", "proxyAuth", ""),
