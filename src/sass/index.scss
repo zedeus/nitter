@@ -62,6 +62,10 @@ body {
   text-decoration: none;
 }
 
+img {
+  dynamic-range-limit: standard;
+}
+
 h1 {
   display: inline;
 }
