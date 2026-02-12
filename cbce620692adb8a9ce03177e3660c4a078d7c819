@@ -1,0 +1,23 @@
+src/sass/index.scss
+  4306c0a2884b97bf 65-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "cbce620692adb8a9ce03177e3660c4a078d7c819",
+  "prompts": {
+    "4306c0a2884b97bf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b688648-69fb-469a-a0f7-6070c31fdb17",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 0,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
