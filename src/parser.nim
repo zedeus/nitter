@@ -283,7 +283,8 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
      result.url.len == 0 or result.url.startsWith("card://"):
     result.url = getPicUrl(result.image)
 
-proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
+proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull();
+                replyId: int64 = 0): Tweet =
   if js.isNull: return
 
   let time =
@@ -306,6 +307,9 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
       views: js{"views_count"}.getInt
     )
   )
+
+  if result.replyId == 0:
+    result.replyId = replyId
 
   # fix for pinned threads
   if result.hasThread and result.threadId == 0:
@@ -402,12 +406,17 @@ proc parseGraphTweet(js: JsonNode): Tweet =
           "binding_values": %bindingObj
         }
 
-  result = parseTweet(js{"legacy"}, jsCard)
+  var replyId = 0
+  with restId, js{"reply_to_results", "rest_id"}:
+    replyId = restId.getId
+
+  result = parseTweet(js{"legacy"}, jsCard, replyId)
   result.id = js{"rest_id"}.getId
   result.user = parseGraphUser(js{"core"})
 
-  if result.replyId == 0:
-    result.replyId = js{"reply_to_results", "rest_id"}.getId
+  if result.reply.len == 0:
+    with replyTo, js{"reply_to_user_results", "result", "core", "screen_name"}:
+      result.reply = @[replyTo.getStr]
 
   with count, js{"views", "count"}:
     result.stats.views = count.getStr("0").parseInt

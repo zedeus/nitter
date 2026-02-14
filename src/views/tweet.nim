@@ -307,7 +307,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       renderHeader(tweet, retweet, pinned, prefs)
 
       if not afterTweet and index == 0 and tweet.reply.len > 0 and
-         (tweet.reply.len > 1 or tweet.reply[0] != tweet.user.username):
+         (tweet.reply.len > 1 or tweet.reply[0] != tweet.user.username or pinned):
         renderReply(tweet)
 
       var tweetClass = "tweet-content media-body"
