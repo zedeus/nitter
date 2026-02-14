@@ -417,21 +417,21 @@ proc parseGraphTweet(js: JsonNode): Tweet =
 
   parseMediaEntities(js, result)
 
-  if result.quote.isSome:
-    result.quote = some(parseGraphTweet(js{"quoted_status_result", "result"}))
-
-  with quoted, js{"quotedPostResults", "result"}:
+  with quoted, js{"quoted_status_result", "result"}:
     result.quote = some(parseGraphTweet(quoted))
+
+  with quoted, js{"quotedPostResults"}:
+    if "result" in quoted:
+      result.quote = some(parseGraphTweet(quoted{"result"}))
+    else:
+      result.quote = some Tweet(id: js{"legacy", "quoted_status_id_str"}.getId)
 
 proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
   for t in ? js{"content", "items"}:
     let entryId = t.getEntryId
-    if "cursor-showmore" in entryId:
-      let cursor = t{"item", "content", "value"}
-      result.thread.cursor = cursor.getStr
-      result.thread.hasMore = true
-    elif "tweet" in entryId and "promoted" notin entryId:
-      with tweet, t.getTweetResult("item"):
+    if "tweet-" in entryId and "promoted" notin entryId:
+      let tweet = t.getTweetResult("item")
+      if not tweet.isNull:
         result.thread.content.add parseGraphTweet(tweet)
 
         let tweetDisplayType = select(
@@ -440,6 +440,12 @@ proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
         )
         if tweetDisplayType.getStr == "SelfThread":
           result.self = true
+      else:
+        result.thread.content.add Tweet(id: entryId.getId)
+    elif "cursor-showmore" in entryId:
+      let cursor = t{"item", "content", "value"}
+      result.thread.cursor = cursor.getStr
+      result.thread.hasMore = true
 
 proc parseGraphTweetResult*(js: JsonNode): Tweet =
   with tweet, js{"data", "tweet_result", "result"}:
@@ -460,7 +466,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
     if i.getTypeName == "TimelineAddEntries":
       for e in i{"entries"}:
         let entryId = e.getEntryId
-        if entryId.startsWith("tweet"):
+        if entryId.startsWith("tweet-"):
           let tweetResult = getTweetResult(e)
           if tweetResult.notNull:
             let tweet = parseGraphTweet(tweetResult)
@@ -468,10 +474,12 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
             if not tweet.available:
               tweet.id = entryId.getId
 
-            if $tweet.id == tweetId:
+            if entryId.endsWith(tweetId):
               result.tweet = tweet
             else:
               result.before.content.add tweet
+          elif not entryId.endsWith(tweetId):
+            result.before.content.add Tweet(id: entryId.getId)
         elif entryId.startsWith("conversationthread"):
           let (thread, self) = parseGraphThread(e)
           if self:

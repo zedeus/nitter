@@ -223,7 +223,7 @@ proc renderQuoteMedia(quote: Tweet; prefs: Prefs; path: string): VNode =
 proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
   if not quote.available:
     return buildHtml(tdiv(class="quote unavailable")):
-      tdiv(class="unavailable-quote"):
+      a(class="unavailable-quote", href=getLink(quote, focus=false)):
         if quote.tombstone.len > 0:
           text quote.tombstone
         elif quote.text.len > 0:
@@ -271,14 +271,14 @@ proc renderLocation*(tweet: Tweet): string =
   return $node
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
-                  last=false; showThread=false; mainTweet=false; afterTweet=false): VNode =
+                  last=false; mainTweet=false; afterTweet=false): VNode =
   var divClass = class
   if index == -1 or last:
     divClass = "thread-last " & class
 
   if not tweet.available:
     return buildHtml(tdiv(class=divClass & "unavailable timeline-item", data-username=tweet.user.username)):
-      tdiv(class="unavailable-box"):
+      a(class="unavailable-box", href=getLink(tweet)):
         if tweet.tombstone.len > 0:
           text tweet.tombstone
         elif tweet.text.len > 0:
@@ -344,10 +344,6 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
 
       if not prefs.hideTweetStats:
         renderStats(tweet.stats)
-
-      if showThread:
-        a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
-          text "Show this thread"
 
 proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): string =
   let node = buildHtml(html(lang="en")):

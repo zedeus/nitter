@@ -72,7 +72,6 @@ template getTypeName*(js: JsonNode): string =
 template getEntryId*(e: JsonNode): string =
   e{"entryId"}.getStr(e{"entry_id"}.getStr)
 
-
 template parseTime(time: string; f: static string; flen: int): DateTime =
   if time.len != flen: return
   parse(time, f, utc())

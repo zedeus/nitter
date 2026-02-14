@@ -53,7 +53,7 @@ proc renderThread(thread: Tweets; prefs: Prefs; path: string): VNode =
       let show = i == thread.high and sortedThread[0].id != tweet.threadId
       let header = if tweet.pinned or tweet.retweet.isSome: "with-header " else: ""
       renderTweet(tweet, prefs, path, class=(header & "thread"),
-                  index=i, last=(i == thread.high), showThread=show)
+                  index=i, last=(i == thread.high))
 
 proc renderUser(user: User; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-item", data-username=user.username)):
@@ -96,7 +96,7 @@ proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
 
     if not prefs.hidePins and pinned.isSome:
       let tweet = get pinned
-      renderTweet(tweet, prefs, path, showThread=tweet.hasThread)
+      renderTweet(tweet, prefs, path)
 
     if results.content.len == 0:
       if not results.beginning:
@@ -116,11 +116,9 @@ proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
              tweet.pinned and prefs.hidePins:
             continue
 
-          var hasThread = tweet.hasThread
           if retweetId != 0 and tweet.retweet.isSome:
             retweets &= retweetId
-            hasThread = get(tweet.retweet).hasThread
-          renderTweet(tweet, prefs, path, showThread=hasThread)
+          renderTweet(tweet, prefs, path)
         else:
           renderThread(thread, prefs, path)
 
