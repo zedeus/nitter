@@ -138,6 +138,13 @@ proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
   if after.len > 0:
     result.replies = await getReplies(id, after)
 
+proc getGraphEditHistory*(id: string): Future[EditHistory] {.async.} =
+  if id.len == 0: return
+  let
+    url = apiReq(graphTweetEditHistory, tweetEditHistoryVars % id)
+    js = await fetch(url)
+  result = parseGraphEditHistory(js, id)
+
 proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
   let q = genQueryParam(query)
   if q.len == 0 or q == emptyQuery:

@@ -64,9 +64,29 @@ proc createStatusRouter*(cfg: Config) =
       resp renderMain(html, request, cfg, prefs, title, desc, ogTitle,
                       images=images, video=video)
 
+    get "/@name/status/@id/history/?":
+      cond '.' notin @"name"
+      let id = @"id"
+
+      if id.len > 19 or id.any(c => not c.isDigit):
+        resp Http404, showError("Invalid tweet ID", cfg)
+
+      let edits = await getGraphEditHistory(id)
+      if edits.latest == nil or edits.latest.id == 0:
+        resp Http404, showError("Tweet history not found", cfg)
+
+      let
+        prefs = requestPrefs()
+        title = "History for " & pageTitle(edits.latest)
+        ogTitle = "Edit History for " & pageTitle(edits.latest.user)
+        desc = edits.latest.text
+
+      let html = renderEditHistory(edits, prefs, getPath())
+      resp renderMain(html, request, cfg, prefs, title, desc, ogTitle)
+
     get "/@name/@s/@id/@m/?@i?":
       cond @"s" in ["status", "statuses"]
-      cond @"m" in ["video", "photo", "history"]
+      cond @"m" in ["video", "photo"]
       redirect("/$1/status/$2" % [@"name", @"id"])
 
     get "/@name/statuses/@id/?":

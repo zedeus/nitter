@@ -1,7 +1,8 @@
 @import "_variables";
 @import "_mixins";
 
-.conversation {
+.conversation,
+.edit-history {
   @include panel(100%, 600px);
 
   .show-more {
@@ -9,17 +10,34 @@
   }
 }
 
-.main-thread {
+.main-thread,
+.latest-edit {
   margin-bottom: 20px;
-  background-color: var(--bg_panel);
+}
+
+.reply {
+  margin-bottom: 10px;
 }
 
 .main-tweet,
-.replies {
+.replies,
+.edit-history > div {
   body.fixed-nav & {
     padding-top: 50px;
     margin-top: -50px;
   }
+}
+
+.edit-history-header {
+  padding: 10px;
+  margin-bottom: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: var(--bg_panel);
+}
+
+.tweet-edit {
+  margin-bottom: 5px;
 }
 
 .main-tweet .tweet-content {
@@ -30,11 +48,6 @@
   .main-tweet .tweet-content {
     font-size: 16px;
   }
-}
-
-.reply {
-  background-color: var(--bg_panel);
-  margin-bottom: 10px;
 }
 
 .thread-line {

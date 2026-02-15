@@ -80,8 +80,8 @@
 }
 
 .tweet-published {
-  margin: 0;
-  margin-top: 5px;
+  margin-top: 10px;
+  margin-bottom: 3px;
   color: var(--grey);
   pointer-events: all;
 }
@@ -240,5 +240,17 @@
 
   &:hover {
     background-color: var(--bg_hover);
+  }
+}
+
+.latest-post-version {
+  border-bottom: 1px solid var(--dark_grey);
+  border-top: 1px solid var(--dark_grey);
+  padding: 01ch 0px;
+  margin: 1ch 0px;
+  color: var(--grey);
+
+  a {
+    pointer-events: all;
   }
 }

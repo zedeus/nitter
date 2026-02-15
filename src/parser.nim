@@ -435,12 +435,16 @@ proc parseGraphTweet(js: JsonNode): Tweet =
     else:
       result.quote = some Tweet(id: js{"legacy", "quoted_status_id_str"}.getId)
 
+  with ids, js{"edit_control", "edit_control_initial", "edit_tweet_ids"}:
+    for id in ids:
+      result.history.add parseBiggestInt(id.getStr)
+
 proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
   for t in ? js{"content", "items"}:
     let entryId = t.getEntryId
     if "tweet-" in entryId and "promoted" notin entryId:
       let tweet = t.getTweetResult("item")
-      if not tweet.isNull:
+      if tweet.notNull:
         result.thread.content.add parseGraphTweet(tweet)
 
         let tweetDisplayType = select(
@@ -515,6 +519,29 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
             e{"content", "itemContent", "value"}
           )
           result.replies.bottom = cursorValue.getStr
+
+proc parseGraphEditHistory*(js: JsonNode; tweetId: string): EditHistory =
+  let instructions = ? js{
+    "data", "tweet_result_by_rest_id", "result", 
+    "edit_history_timeline", "timeline", "instructions"
+  }
+  if instructions.len == 0:
+    return
+
+  for i in instructions:
+    if i.getTypeName == "TimelineAddEntries":
+      for e in i{"entries"}:
+        let entryId = e.getEntryId
+        if entryId == "latestTweet":
+          with item, e{"content", "items"}[0]:
+            let tweetResult = item.getTweetResult("item")
+            if tweetResult.notNull:
+              result.latest = parseGraphTweet(tweetResult)
+        elif entryId == "staleTweets":
+          for item in e{"content", "items"}:
+            let tweetResult = item.getTweetResult("item")
+            if tweetResult.notNull:
+              result.history.add parseGraphTweet(tweetResult)
 
 proc extractTweetsFromEntry*(e: JsonNode): seq[Tweet] =
   with tweetResult, getTweetResult(e):

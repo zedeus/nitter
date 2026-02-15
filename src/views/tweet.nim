@@ -211,6 +211,12 @@ proc renderMediaTags(tags: seq[User]): VNode =
       if i < tags.high:
         text ", "
 
+proc renderLatestPost(username: string; id: int64): VNode =
+  buildHtml(tdiv(class="latest-post-version")):
+    text "There's a new version of this post. "
+    a(href=getLink(id, username)):
+      text "See the latest post"
+
 proc renderQuoteMedia(quote: Tweet; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="quote-media-container")):
     if quote.photos.len > 0:
@@ -252,12 +258,16 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
       tdiv(class="quote-text", dir="auto"):
         verbatim replaceUrls(quote.text, prefs)
 
+    if quote.photos.len > 0 or quote.video.isSome or quote.gif.isSome:
+      renderQuoteMedia(quote, prefs, path)
+
     if quote.hasThread:
       a(class="show-thread", href=getLink(quote)):
         text "Show this thread"
 
-    if quote.photos.len > 0 or quote.video.isSome or quote.gif.isSome:
-      renderQuoteMedia(quote, prefs, path)
+    if quote.history.len > 0 and quote.id != max(quote.history):
+      tdiv(class="quote-latest"):
+        text "There's a new version of this post"
 
 proc renderLocation*(tweet: Tweet): string =
   let (place, url) = tweet.getLocation()
@@ -336,8 +346,20 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if tweet.quote.isSome:
         renderQuote(tweet.quote.get(), prefs, path)
 
+      let
+        hasEdits = tweet.history.len > 1
+        isLatest = hasEdits and tweet.id == max(tweet.history)
+
       if mainTweet:
-        p(class="tweet-published"): text &"{getTime(tweet)}"
+        p(class="tweet-published"): 
+          if hasEdits and isLatest:
+            a(href=(getLink(tweet, focus=false) & "/history")):
+              text &"Last edited {getTime(tweet)}"
+          else:
+            text &"{getTime(tweet)}"
+
+        if hasEdits and not isLatest:
+          renderLatestPost(tweet.user.username, max(tweet.history))
 
       if tweet.mediaTags.len > 0:
         renderMediaTags(tweet.mediaTags)

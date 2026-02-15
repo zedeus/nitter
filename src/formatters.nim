@@ -165,13 +165,17 @@ proc getDuration*(video: Video): string =
   else:
     return &"{min mod 60}:{sec mod 60:02}"
 
+proc getLink*(id: int64; username="i"; focus=true): string =
+  var username = username
+  if username.len == 0:
+    username = "i"
+  result = &"/{username}/status/{id}"
+  if focus: result &= "#m"
+
 proc getLink*(tweet: Tweet; focus=true): string =
   if tweet.id == 0: return
   var username = tweet.user.username
-  if username.len == 0:
-    username = "i"
-  result = &"/{username}/status/{tweet.id}"
-  if focus: result &= "#m"
+  return getLink(tweet.id, username, focus)
 
 proc getTwitterLink*(path: string; params: Table[string, string]): string =
   var

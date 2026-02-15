@@ -4,12 +4,8 @@
   @include panel(100%, 600px);
 }
 
-.timeline {
-  background-color: var(--bg_panel);
-
-  > div:not(:first-child) {
-    border-top: 1px solid var(--border_grey);
-  }
+.timeline > div:not(:first-child) {
+  border-top: 1px solid var(--border_grey);
 }
 
 .timeline-header {
@@ -159,4 +155,5 @@
   padding: 0.75em;
   display: flex;
   position: relative;
+  background-color: var(--bg_panel);
 }
