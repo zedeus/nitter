@@ -1,6 +1,7 @@
 import std/[asyncdispatch, base64, httpclient, random, strutils, sequtils, times]
 import nimcrypto
 import experimental/parser/tid
+import http_pool
 
 randomize()
 
@@ -18,7 +19,7 @@ proc getPair(): Future[TidPair] {.async.} =
   if cachedPairs.len == 0 or int(epochTime()) - lastCached > ttlSec:
     lastCached = int(epochTime())
 
-    let client = newAsyncHttpClient()
+    let client = newAsyncHttpClient(proxy=getHttpProxy())
     defer: client.close()
 
     let resp = await client.get(pairsUrl)
