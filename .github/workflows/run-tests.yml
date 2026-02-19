@@ -60,6 +60,13 @@ jobs:
     needs: [build-test]
     name: Integration test
     runs-on: ubuntu-24.04
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
     steps:
       - name: Install runtime deps
         run: |
@@ -101,9 +108,6 @@ jobs:
 
       - name: Make nitter binary executable
         run: chmod +x ./nitter
-
-      - name: Start Redis Service
-        uses: supercharge/redis-github-action@1.8.1
 
       - name: Prepare Nitter Environment
         run: |
