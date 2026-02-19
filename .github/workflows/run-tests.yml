@@ -125,4 +125,4 @@ jobs:
       - name: Run Tests
         run: |
           ./nitter &
-          pytest -n3 --reruns=2 tests
+          pytest -n2 --reruns=2 tests
