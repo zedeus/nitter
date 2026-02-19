@@ -20,19 +20,19 @@ defaults:
 jobs:
   build-test:
     name: Build and test
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         nim: ["2.0.x", "2.2.x", "devel"]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Cache Nimble Dependencies
         id: cache-nimble
-        uses: buildjet/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nimble
           key: ${{ matrix.nim }}-nimble-v2-${{ hashFiles('*.nimble') }}
@@ -52,16 +52,16 @@ jobs:
   integration-test:
     needs: [build-test]
     name: Integration test
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Cache Nimble Dependencies
         id: cache-nimble
-        uses: buildjet/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nimble
           key: devel-nimble-v2-${{ hashFiles('*.nimble') }}
@@ -69,7 +69,7 @@ jobs:
             devel-nimble-v2-
 
       - name: Setup Python (3.10) with pip cache
-        uses: buildjet/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: "3.10"
           cache: pip
@@ -90,7 +90,7 @@ jobs:
           seleniumbase install chromedriver
 
       - name: Start Redis Service
-        uses: supercharge/redis-github-action@1.5.0
+        uses: supercharge/redis-github-action@1.8.1
 
       - name: Prepare Nitter Environment
         run: |
