@@ -87,6 +87,7 @@ jobs:
 
       - name: Install Python deps
         run: |
+          cd tests
           poetry sync
           poetry run seleniumbase install chromedriver
 
