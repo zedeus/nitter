@@ -132,4 +132,4 @@ jobs:
         run: |
           ./nitter &
           cd tests
-          poetry run pytest -n2 --reruns=2 .
+          poetry run pytest -n3 --reruns=2 .
