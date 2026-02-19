@@ -75,6 +75,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Prepare pipx + Poetry cache
+        run: mkdir -p ~/.local/pipx ~/.cache/pipx
+
       - name: Cache pipx + Poetry
         uses: actions/cache@v5
         with:
@@ -86,12 +89,14 @@ jobs:
       - name: Install poetry
         run: pipx install poetry
 
+      - name: Show pipx environment
+        run: pipx environment
+
       - name: Setup Python (3.14) with poetry venv cache
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
           cache: poetry
-          cache-dependency-path: tests/poetry.lock
 
       - name: Install Python deps
         run: |
