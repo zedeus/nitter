@@ -75,15 +75,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Python (3.14) with pip cache
+      - name: Setup Python (3.14) with poetry venv cache
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
-          cache: pip
-          cache-dependency-path: tests/requirements.txt
+          cache: poetry
+          cache-dependency-path: tests/poetry.lock
+
+      - name: Install poetry
+        run: pipx install poetry
 
       - name: Install Python deps
-        run: pip install -r tests/requirements.txt
+        run: |
+          poetry sync
+          poetry run seleniumbase install chromedriver
 
       - name: Cache Nimble Dependencies
         uses: actions/cache@v5
@@ -125,4 +130,5 @@ jobs:
       - name: Run Tests
         run: |
           ./nitter &
-          pytest -n2 --reruns=2 tests
+          cd tests
+          poetry run pytest -n2 --reruns=2 .
