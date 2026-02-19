@@ -49,6 +49,15 @@ jobs:
       - name: Build Project
         run: nimble build -d:release -Y
 
+      - name: Upload 2.2.x build artifact
+        if: matrix.nim == '2.2.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nitter-linux-nim-2.2.x-${{ github.sha }}
+          path: |
+            ./nitter
+          if-no-files-found: error
+
   integration-test:
     needs: [build-test]
     name: Integration test
@@ -60,13 +69,12 @@ jobs:
           fetch-depth: 0
 
       - name: Cache Nimble Dependencies
-        id: cache-nimble
         uses: actions/cache@v5
         with:
           path: ~/.nimble
-          key: devel-nimble-v2-${{ hashFiles('*.nimble') }}
+          key: 2.2.x-nimble-v2-${{ hashFiles('*.nimble') }}
           restore-keys: |
-            devel-nimble-v2-
+            2.2.x-nimble-v2-
 
       - name: Setup Python (3.14) with pip cache
         uses: actions/setup-python@v6
@@ -77,12 +85,15 @@ jobs:
       - name: Setup Nim
         uses: jiro4989/setup-nim-action@v2
         with:
-          nim-version: devel
+          nim-version: 2.2.x
           use-nightlies: true
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Project
-        run: nimble build -d:release -Y
+      - name: Download 2.2.x build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nitter-linux-nim-2.2.x-${{ github.sha }}
+          path: .
 
       - name: Install SeleniumBase and Chromedriver
         run: |
