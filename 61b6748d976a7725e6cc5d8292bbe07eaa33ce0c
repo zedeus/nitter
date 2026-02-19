@@ -1,0 +1,23 @@
+src/views/rss.nimf
+  b0f0624e8a1e13df 77-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "61b6748d976a7725e6cc5d8292bbe07eaa33ce0c",
+  "prompts": {
+    "b0f0624e8a1e13df": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "601b75ab-fe06-48d1-90df-9748cc8c669a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
