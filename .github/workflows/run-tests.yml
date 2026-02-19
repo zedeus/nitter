@@ -76,22 +76,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Prepare pipx + Poetry cache
-        run: mkdir -p ~/.local/pipx ~/.cache/pipx
-
-      - name: Cache pipx + Poetry
+      - name: Cache pipx (Poetry)
         uses: actions/cache@v5
         with:
           path: |
-            ~/.local/pipx
-            ~/.cache/pipx
-          key: pipx-poetry-${{ runner.os }}-v1
+            /opt/pipx
+            /opt/pipx_bin
+          key: pipx-poetry-${{ runner.os }}-poetry-v1
 
       - name: Install poetry
-        run: pipx install poetry
-
-      - name: Show pipx environment
-        run: pipx environment
+        run: |
+          if command -v poetry >/dev/null 2>&1; then
+            poetry --version
+          else
+            pipx install poetry
+          fi
 
       - name: Setup Python (3.14) with poetry venv cache
         uses: actions/setup-python@v6
