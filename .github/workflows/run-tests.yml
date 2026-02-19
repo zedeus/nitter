@@ -114,8 +114,12 @@ jobs:
         run: |
           cp nitter.example.conf nitter.conf
           sed -i 's/enableDebug = false/enableDebug = true/g' nitter.conf
-          nimble md
-          nimble scss
+
+          # Run both Nimble tasks concurrently
+          nim r tools/rendermd.nim &
+          nim r tools/gencss.nim &
+          wait
+
           echo '${{ secrets.SESSIONS }}' | head -n1
           echo '${{ secrets.SESSIONS }}' > ./sessions.jsonl
 

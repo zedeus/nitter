@@ -28,7 +28,7 @@ requires "oauth#b8c163b"
 # Tasks
 
 task scss, "Generate css":
-  exec "nimble c --hint[Processing]:off -d:danger -r tools/gencss"
+  exec "nim r --hint[Processing]:off tools/gencss"
 
 task md, "Render md":
-  exec "nimble c --hint[Processing]:off -d:danger -r tools/rendermd"
+  exec "nim r --hint[Processing]:off tools/rendermd"
