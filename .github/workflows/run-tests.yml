@@ -71,38 +71,35 @@ jobs:
     steps:
       - name: Install runtime deps
         run: |
-          sudo apt-get update && sudo apt-get install -y libsass-dev libpcre3
+          sudo apt-get install -y --no-install-recommends libsass-dev libpcre3
 
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Cache pipx (Poetry)
+      - name: Cache pipx (poetry)
         uses: actions/cache@v5
         with:
           path: |
-            /opt/pipx
-            /opt/pipx_bin
-          key: pipx-poetry-${{ runner.os }}-poetry-v1
+            ~/.local/pipx
+            ~/.local/bin
+          key: pipx-poetry-${{ runner.os }}-poetry-v13
 
       - name: Install poetry
-        run: |
-          if command -v poetry >/dev/null 2>&1; then
-            poetry --version
-          else
-            pipx install poetry
-          fi
+        env:
+          PIPX_HOME: ~/.local/pipx
+          PIPX_BIN_DIR: ~/.local/bin
+        run: command -v poetry >/dev/null 2>&1 || pipx install poetry
 
-      - name: Setup Python (3.14) with poetry venv cache
+      - name: Setup Python (3.14) with Poetry cache
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
           cache: poetry
+          cache-dependency-path: tests/poetry.lock
 
       - name: Install Python deps
-        run: |
-          cd tests
-          poetry sync
-          poetry run seleniumbase install chromedriver
+        working-directory: tests
+        run: poetry sync
 
       - name: Cache Nimble Dependencies
         uses: actions/cache@v5
