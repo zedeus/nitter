@@ -99,6 +99,9 @@ jobs:
           name: nitter-linux-nim-2.2.x-${{ github.sha }}
           path: .
 
+      - name: Make nitter binary executable
+        run: chmod +x ./nitter
+
       - name: Install SeleniumBase and Chromedriver
         run: |
           pip install seleniumbase
