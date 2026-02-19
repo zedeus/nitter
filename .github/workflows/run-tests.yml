@@ -23,8 +23,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        # nim: ["2.0.x", "2.2.x", "devel"]
-        nim: ["2.2.x"]
+        nim: ["2.0.x", "2.2.x", "devel"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -82,7 +81,7 @@ jobs:
           path: |
             ~/.local/pipx
             ~/.local/bin
-          key: pipx-poetry-${{ runner.os }}-poetry-v13
+          key: pipx-poetry-${{ runner.os }}
 
       - name: Install poetry
         env:
