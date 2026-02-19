@@ -126,4 +126,4 @@ jobs:
       - name: Run Tests
         run: |
           ./nitter &
-          pytest -n1 tests
+          pytest -n4 tests
