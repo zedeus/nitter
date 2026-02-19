@@ -113,7 +113,7 @@ const
   $2
   "includeHasBirdwatchNotes": false,
   "includePromotedContent": false,
-  "withBirdwatchNotes": false,
+  "withBirdwatchNotes": true,
   "withVoice": false,
   "withV2Timeline": true
 }""".replace(" ", "").replace("\n", "")

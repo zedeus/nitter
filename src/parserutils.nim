@@ -330,6 +330,26 @@ proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
 
   tweet.text = tweet.text.multiReplace((unicodeOpen, xmlOpen), (unicodeClose, xmlClose))
 
+proc expandBirdwatchEntities*(text: string; entities: JsonNode): string =
+  let runes = text.toRunes
+  var replacements: seq[ReplaceSlice]
+
+  for entity in entities:
+    let
+      fromIdx = entity{"from_index"}.getInt
+      toIdx = entity{"to_index"}.getInt
+      url = entity{"ref", "url"}.getStr
+    if url.len > 0:
+      replacements.add ReplaceSlice(
+        kind: rkUrl,
+        slice: fromIdx ..< toIdx,
+        url: url,
+        display: $runes[fromIdx ..< min(toIdx, runes.len)]
+      )
+
+  replacements.sort(cmp)
+  result = runes.replacedWith(replacements, 0 ..< runes.len)
+
 proc extractGalleryPhoto*(t: Tweet): GalleryPhoto =
   let url =
     if t.photos.len > 0: t.photos[0].url

@@ -254,3 +254,38 @@
     pointer-events: all;
   }
 }
+
+.community-note {
+  background-color: var(--bg_elements);
+  margin-top: 10px;
+  border: solid 1px var(--dark_grey);
+  border-radius: 10px;
+  overflow: hidden;
+  pointer-events: all;
+
+  &:hover {
+    background-color: var(--bg_panel);
+    border-color: var(--grey);
+  }
+}
+
+.community-note-header {
+  background-color: var(--bg_hover);
+  font-weight: 700;
+  padding: 8px 10px;
+  padding-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  .icon-container {
+    flex-shrink: 0;
+    color: var(--accent);
+  }
+}
+
+.community-note-text {
+  white-space: pre-line;
+  padding: 10px 10px;
+  padding-top: 6px;
+}

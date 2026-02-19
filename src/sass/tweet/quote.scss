@@ -19,30 +19,48 @@
   }
 
   .tweet-name-row {
-    padding: 6px 8px;
-    margin-top: 1px;
+    padding: 8px 10px 6px 10px;
   }
 
   .quote-text {
     overflow: hidden;
     white-space: pre-wrap;
     word-wrap: break-word;
-    padding: 0px 8px 8px 8px;
+    padding: 10px;
+    padding-top: 0;
   }
 
   .show-thread {
-    padding: 0px 8px 6px 8px;
+    padding: 0px 10px 6px 10px;
     margin-top: -6px;
   }
 
   .quote-latest {
-    padding: 0px 8px 6px 8px;
+    padding: 0px 10px 6px 10px;
     color: var(--grey);
   }
 
   .replying-to {
-    padding: 0px 8px;
+    padding: 0px 10px;
+    padding-bottom: 4px;
     margin: unset;
+  }
+
+  .community-note {
+    background-color: var(--bg_panel);
+    border: unset;
+    border-top: solid 1px var(--dark_grey);
+    border-radius: unset;
+    margin-top: 0;
+
+    &:hover {
+      border-top-color: var(--grey);
+    }
+
+    .community-note-header {
+      background-color: var(--bg_panel);
+      padding-bottom: 0;
+    }
   }
 }
 

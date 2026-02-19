@@ -78,6 +78,9 @@ genPrefs:
     hideReplies(checkbox, false):
       "Hide tweet replies"
 
+    hideCommunityNotes(checkbox, false):
+      "Hide community notes"
+
     squareAvatars(checkbox, false):
       "Square profile pictures"
 

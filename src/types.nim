@@ -223,6 +223,7 @@ type
     video*: Option[Video]
     photos*: seq[Photo]
     history*: seq[int64]
+    note*: string
 
   Tweets* = seq[Tweet]
 
