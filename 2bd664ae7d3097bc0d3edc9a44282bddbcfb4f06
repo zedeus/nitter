@@ -1,0 +1,33 @@
+src/types.nim
+  77b2333e0b1e11f0 226
+src/sass/tweet/_base.scss
+  77b2333e0b1e11f0 257-258,260-264,270-272,274,277-278,280-282,284-288,291
+src/prefs_impl.nim
+  77b2333e0b1e11f0 81-83
+src/parserutils.nim
+  77b2333e0b1e11f0 333-352
+src/parser.nim
+  77b2333e0b1e11f0 9-14,448-450
+src/views/tweet.nim
+  77b2333e0b1e11f0 229-231,233-236,272-274
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "2bd664ae7d3097bc0d3edc9a44282bddbcfb4f06",
+  "prompts": {
+    "77b2333e0b1e11f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc3d860a-6af9-4544-9883-73a2e3b54f58",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 115,
+      "total_deletions": 40,
+      "accepted_lines": 65,
+      "overriden_lines": 5
+    }
+  }
+}
