@@ -75,15 +75,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Setup Python (3.14) with poetry venv cache
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
           cache: poetry
           cache-dependency-path: tests/poetry.lock
-
-      - name: Install poetry
-        run: pipx install poetry
 
       - name: Install Python deps
         run: |
