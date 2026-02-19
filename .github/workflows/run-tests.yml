@@ -23,7 +23,8 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        nim: ["2.0.x", "2.2.x", "devel"]
+        # nim: ["2.0.x", "2.2.x", "devel"]
+        nim: ["2.2.x"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -45,7 +46,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Project
-        run: nimble build -d:release -Y
+        run: nimble build -Y
 
       - name: Upload 2.2.x build artifact
         if: matrix.nim == '2.2.x'
