@@ -20,19 +20,17 @@ defaults:
 jobs:
   build-test:
     name: Build and test
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         nim: ["2.0.x", "2.2.x", "devel"]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v6
 
       - name: Cache Nimble Dependencies
         id: cache-nimble
-        uses: buildjet/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nimble
           key: ${{ matrix.nim }}-nimble-v2-${{ hashFiles('*.nimble') }}
@@ -47,62 +45,100 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Project
-        run: nimble build -d:release -Y
+        run: nimble build -Y
+
+      - name: Upload 2.2.x build artifact
+        if: matrix.nim == '2.2.x'
+        uses: actions/upload-artifact@v6
+        with:
+          name: nitter-linux-nim-2.2.x-${{ github.sha }}
+          path: |
+            ./nitter
+          if-no-files-found: error
 
   integration-test:
     needs: [build-test]
     name: Integration test
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-24.04
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
     steps:
+      - name: Install runtime deps
+        run: |
+          sudo apt-get install -y --no-install-recommends libsass-dev libpcre3
+
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Cache pipx (poetry)
+        uses: actions/cache@v5
         with:
-          fetch-depth: 0
+          path: |
+            ~/.local/pipx
+            ~/.local/bin
+          key: pipx-poetry-${{ runner.os }}
+
+      - name: Install poetry
+        env:
+          PIPX_HOME: ~/.local/pipx
+          PIPX_BIN_DIR: ~/.local/bin
+        run: command -v poetry >/dev/null 2>&1 || pipx install poetry
+
+      - name: Setup Python (3.14) with Poetry cache
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: poetry
+          cache-dependency-path: tests/poetry.lock
+
+      - name: Install Python deps
+        working-directory: tests
+        run: poetry sync
 
       - name: Cache Nimble Dependencies
-        id: cache-nimble
-        uses: buildjet/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nimble
-          key: devel-nimble-v2-${{ hashFiles('*.nimble') }}
+          key: 2.2.x-nimble-v2-${{ hashFiles('*.nimble') }}
           restore-keys: |
-            devel-nimble-v2-
-
-      - name: Setup Python (3.10) with pip cache
-        uses: buildjet/setup-python@v4
-        with:
-          python-version: "3.10"
-          cache: pip
+            2.2.x-nimble-v2-
 
       - name: Setup Nim
         uses: jiro4989/setup-nim-action@v2
         with:
-          nim-version: devel
+          nim-version: 2.2.x
           use-nightlies: true
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Project
-        run: nimble build -d:release -Y
+      - name: Download 2.2.x build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nitter-linux-nim-2.2.x-${{ github.sha }}
+          path: .
 
-      - name: Install SeleniumBase and Chromedriver
-        run: |
-          pip install seleniumbase
-          seleniumbase install chromedriver
-
-      - name: Start Redis Service
-        uses: supercharge/redis-github-action@1.5.0
+      - name: Make nitter binary executable
+        run: chmod +x ./nitter
 
       - name: Prepare Nitter Environment
         run: |
-          sudo apt-get update && sudo apt-get install -y libsass-dev
           cp nitter.example.conf nitter.conf
           sed -i 's/enableDebug = false/enableDebug = true/g' nitter.conf
-          nimble md
-          nimble scss
+
+          # Run both Nimble tasks concurrently
+          nim r tools/rendermd.nim &
+          nim r tools/gencss.nim &
+          wait
+
           echo '${{ secrets.SESSIONS }}' | head -n1
           echo '${{ secrets.SESSIONS }}' > ./sessions.jsonl
 
       - name: Run Tests
         run: |
           ./nitter &
-          pytest -n1 tests
+          cd tests
+          poetry run pytest -n3 --reruns=3 --rs .
