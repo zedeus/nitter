@@ -63,6 +63,11 @@ jobs:
     name: Integration test
     runs-on: ubuntu-24.04
     steps:
+      - name: Install runtime deps (PCRE)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpcre3
+
       - name: Checkout code
         uses: actions/checkout@v6
         with:
