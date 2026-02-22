@@ -93,7 +93,7 @@ proc createMediaRouter*(cfg: Config) =
 
     get re"^\/pic\/orig\/(enc)?\/?(.+)":
       var url = decoded(request, 1)
-      cond "amplify_video" notin url
+      cond "/amplify_video/" notin url
 
       if "twimg.com" notin url:
         url.insert(twimg)
@@ -109,7 +109,7 @@ proc createMediaRouter*(cfg: Config) =
 
     get re"^\/pic\/(enc)?\/?(.+)":
       var url = decoded(request, 1)
-      cond "amplify_video" notin url
+      cond "/amplify_video/" notin url
 
       if "twimg.com" notin url:
         url.insert(twimg)
