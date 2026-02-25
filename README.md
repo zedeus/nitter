@@ -2,7 +2,7 @@
 
 [![Test Matrix](https://github.com/zedeus/nitter/workflows/Tests/badge.svg)](https://github.com/zedeus/nitter/actions/workflows/run-tests.yml)
 [![Test Matrix](https://github.com/zedeus/nitter/workflows/Docker/badge.svg)](https://github.com/zedeus/nitter/actions/workflows/build-docker.yml)
-[![License](https://img.shields.io/github/license/zedeus/nitter?style=flat)](#license)
+[![License](https://img.shields.io/github/license/zedeus/nitter?style=flat)](https://github.com/zedeus/nitter/blob/master/LICENSE)
 
 > [!NOTE]
 > Running a Nitter instance now requires real accounts, since Twitter removed the previous methods. \
