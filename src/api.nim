@@ -170,7 +170,8 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
 
   # when no more items are available the API just returns the last page in
   # full. this detects that and clears the page instead.
-  if after.len > 0 and after[0..<64] == result.bottom[0..<64]:
+  if after.len > 0 and result.bottom.len > 0 and 
+     after[0..<64] == result.bottom[0..<64]:
     result.content.setLen(0)
 
 proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.} =
