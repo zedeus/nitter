@@ -58,16 +58,18 @@ proc genQueryParam*(query: Query): string =
   if query.kind == users:
     return query.text
 
+  param = "("
   for i, user in query.fromUser:
-    param &= &"from:{user} "
+    param &= &"from:{user}"
     if i < query.fromUser.high:
-      param &= "OR "
+      param &= " OR "
+  param &= ")"
 
   if query.fromUser.len > 0 and query.kind in {posts, media}:
-    param &= "filter:self_threads OR -filter:replies "
+    param &= " (filter:self_threads OR -filter:replies)"
 
   if "nativeretweets" notin query.excludes:
-    param &= "include:nativeretweets "
+    param &= " include:nativeretweets"
 
   for f in query.filters:
     filters.add "filter:" & f
@@ -77,7 +79,11 @@ proc genQueryParam*(query: Query): string =
   for i in query.includes:
     filters.add "include:" & i
 
-  result = strip(param & filters.join(&" {query.sep} "))
+  if filters.len > 0:
+    result = strip(param & " (" & filters.join(&" {query.sep} ") & ")")
+  else:
+    result = strip(param)
+
   if query.since.len > 0:
     result &= " since:" & query.since
   if query.until.len > 0:
