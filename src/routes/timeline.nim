@@ -129,7 +129,8 @@ proc createTimelineRouter*(cfg: Config) =
       if @"scroll".len > 0:
         if query.fromUser.len != 1:
           var timeline = await getGraphTweetSearch(query, after)
-          if timeline.content.len == 0: resp Http404
+          if timeline.content.len == 0: 
+            resp Http204
           timeline.beginning = true
           resp $renderTweetSearch(timeline, prefs, getPath())
         else:
