@@ -1,0 +1,64 @@
+src/views/general.nim
+  f223098b8def5f5e 53
+src/parserutils.nim
+  f223098b8def5f5e 355
+src/parser.nim
+  f223098b8def5f5e 143-151,157,160,162,169,171-173,183,188,191,194,197,200,202,204-206,209-210,367,369,373
+.gitignore
+  f223098b8def5f5e 16-17
+src/views/tweet.nim
+  f223098b8def5f5e 41-51,53,63,79,81-90,94-96,100-103,106-107,109-110,113-115,121-133,136,139-169,262,304,382-383
+src/routes/embed.nim
+  f223098b8def5f5e 14
+src/views/embed.nim
+  f223098b8def5f5e 13-15,17
+src/sass/tweet/quote.scss
+  f223098b8def5f5e 98,111-113
+src/apiutils.nim
+  f223098b8def5f5e 22
+src/views/rss.nimf
+  f223098b8def5f5e 3,10-13,19-22,24-35,43-62,86-88
+src/routes/status.nim
+  f223098b8def5f5e 47,50-55,57-59
+src/sass/tweet/embed.scss
+  f223098b8def5f5e 14
+src/types.nim
+  f223098b8def5f5e 139,145-159,239,328-348
+src/sass/tweet/video.scss
+  f223098b8def5f5e 12-15,18-20,22,27
+src/sass/tweet/media.scss
+  f223098b8def5f5e 13-53,90,93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "35a929c415be774cf0c96d65613217a8702be5ab",
+  "prompts": {
+    "ee5cd8ad93412219": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ce422-6a52-7e21-837a-97b4cbf3f6da",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 3157,
+      "total_deletions": 0,
+      "accepted_lines": 3153,
+      "overriden_lines": 0
+    },
+    "f223098b8def5f5e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ce426-a807-7a61-bb61-3818b11867ae",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 417,
+      "total_deletions": 288,
+      "accepted_lines": 286,
+      "overriden_lines": 2
+    }
+  }
+}
