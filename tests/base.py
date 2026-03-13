@@ -79,7 +79,7 @@ class Media(object):
     row = '.gallery-row'
     image = '.still-image'
     video = '.gallery-video'
-    gif = '.gallery-gif'
+    gif = '.media-gif'
 
 
 class BaseTestCase(BaseCase):
