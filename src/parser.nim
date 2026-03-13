@@ -140,27 +140,37 @@ proc parseVideo(js: JsonNode): Video =
 
   result.variants = parseVideoVariants(js{"video_info", "variants"})
 
+proc addMedia(media: var MediaEntities; photo: Photo) =
+  media.add Media(kind: photoMedia, photo: photo)
+
+proc addMedia(media: var MediaEntities; video: Video) =
+  media.add Media(kind: videoMedia, video: video)
+
+proc addMedia(media: var MediaEntities; gif: Gif) =
+  media.add Media(kind: gifMedia, gif: gif)
+
 proc parseLegacyMediaEntities(js: JsonNode; result: var Tweet) =
   with jsMedia, js{"extended_entities", "media"}:
     for m in jsMedia:
       case m.getTypeName:
       of "photo":
-        result.photos.add Photo(
+        result.media.addMedia(Photo(
           url: m{"media_url_https"}.getImageStr,
           altText: m{"ext_alt_text"}.getStr
-        )
+        ))
       of "video":
-        result.video = some(parseVideo(m))
+        result.media.addMedia(parseVideo(m))
         with user, m{"additional_media_info", "source_user"}:
           if user{"id"}.getInt > 0:
             result.attribution = some(parseUser(user))
           else:
             result.attribution = some(parseGraphUser(user))
       of "animated_gif":
-        result.gif = some Gif(
+        result.media.addMedia(Gif(
           url: m{"video_info", "variants"}[0]{"url"}.getImageStr,
-          thumb: m{"media_url_https"}.getImageStr
-        )
+          thumb: m{"media_url_https"}.getImageStr,
+          altText: m{"ext_alt_text"}.getStr
+        ))
       else: discard
 
       with url, m{"url"}:
@@ -170,28 +180,34 @@ proc parseLegacyMediaEntities(js: JsonNode; result: var Tweet) =
 
 proc parseMediaEntities(js: JsonNode; result: var Tweet) =
   with mediaEntities, js{"media_entities"}:
+    var parsedMedia: MediaEntities
     for mediaEntity in mediaEntities:
       with mediaInfo, mediaEntity{"media_results", "result", "media_info"}:
         case mediaInfo.getTypeName
         of "ApiImage":
-          result.photos.add Photo(
+          parsedMedia.addMedia(Photo(
             url: mediaInfo{"original_img_url"}.getImageStr,
             altText: mediaInfo{"alt_text"}.getStr
-          )
+          ))
         of "ApiVideo":
           let status = mediaEntity{"media_results", "result", "media_availability_v2", "status"}
-          result.video = some Video(
+          parsedMedia.addMedia(Video(
             available: status.getStr == "Available",
             thumb: mediaInfo{"preview_image", "original_img_url"}.getImageStr,
+            title: mediaInfo{"alt_text"}.getStr,
             durationMs: mediaInfo{"duration_millis"}.getInt,
             variants: parseVideoVariants(mediaInfo{"variants"})
-          )
+          ))
         of "ApiGif":
-          result.gif = some Gif(
+          parsedMedia.addMedia(Gif(
             url: mediaInfo{"variants"}[0]{"url"}.getImageStr,
-            thumb: mediaInfo{"preview_image", "original_img_url"}.getImageStr
-          )
+            thumb: mediaInfo{"preview_image", "original_img_url"}.getImageStr,
+            altText: mediaInfo{"alt_text"}.getStr
+          ))
         else: discard
+
+    if mediaEntities.len > 0 and parsedMedia.len == mediaEntities.len:
+      result.media = parsedMedia
 
   # Remove media URLs from text
   with mediaList, js{"legacy", "entities", "media"}:
@@ -348,13 +364,13 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull();
     let name = jsCard{"name"}.getStr
     if "poll" in name:
       if "image" in name:
-        result.photos.add Photo(
+        result.media.addMedia(Photo(
           url: jsCard{"binding_values", "image_large"}.getImageVal
-        )
+        ))
 
       result.poll = some parsePoll(jsCard)
     elif name == "amplify":
-      result.video = some parsePromoVideo(jsCard{"binding_values"})
+      result.media.addMedia(parsePromoVideo(jsCard{"binding_values"}))
     else:
       result.card = some parseCard(jsCard, js{"entities", "urls"})
 

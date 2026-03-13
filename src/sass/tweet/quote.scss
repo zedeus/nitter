@@ -95,7 +95,7 @@
     justify-content: center;
   }
 
-  .gallery-gif .attachment {
+  .media-gif > .attachment {
     display: flex;
     justify-content: center;
     background-color: var(--bg_color);
@@ -108,8 +108,9 @@
     }
   }
 
-  .gallery-video,
-  .gallery-gif {
+  .gallery-row .attachment,
+  .gallery-row .attachment > video,
+  .gallery-row .attachment > img {
     max-height: 300px;
   }
 

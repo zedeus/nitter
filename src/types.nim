@@ -136,10 +136,27 @@ type
   Gif* = object
     url*: string
     thumb*: string
+    altText*: string
 
   Photo* = object
     url*: string
     altText*: string
+
+  MediaKind* = enum
+    photoMedia
+    videoMedia
+    gifMedia
+
+  Media* = object
+    case kind*: MediaKind
+    of photoMedia:
+      photo*: Photo
+    of videoMedia:
+      video*: Video
+    of gifMedia:
+      gif*: Gif
+
+  MediaEntities* = seq[Media]
 
   GalleryPhoto* = object
     url*: string
@@ -219,9 +236,7 @@ type
     quote*: Option[Tweet]
     card*: Option[Card]
     poll*: Option[Poll]
-    gif*: Option[Gif]
-    video*: Option[Video]
-    photos*: seq[Photo]
+    media*: MediaEntities
     history*: seq[int64]
     note*: string
 
@@ -310,3 +325,24 @@ proc contains*(thread: Chain; tweet: Tweet): bool =
 
 proc add*(timeline: var seq[Tweets]; tweet: Tweet) =
   timeline.add @[tweet]
+
+proc getPhotos*(tweet: Tweet): seq[Photo] =
+  tweet.media.filterIt(it.kind == photoMedia).mapIt(it.photo)
+
+proc getVideos*(tweet: Tweet): seq[Video] =
+  tweet.media.filterIt(it.kind == videoMedia).mapIt(it.video)
+
+proc hasPhotos*(tweet: Tweet): bool =
+  tweet.media.anyIt(it.kind == photoMedia)
+
+proc hasVideos*(tweet: Tweet): bool =
+  tweet.media.anyIt(it.kind == videoMedia)
+
+proc hasGifs*(tweet: Tweet): bool =
+  tweet.media.anyIt(it.kind == gifMedia)
+
+proc getThumb*(media: Media): string =
+  case media.kind
+  of photoMedia: media.photo.url
+  of videoMedia: media.video.thumb
+  of gifMedia: media.gif.thumb

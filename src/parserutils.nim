@@ -352,9 +352,7 @@ proc expandBirdwatchEntities*(text: string; entities: JsonNode): string =
 
 proc extractGalleryPhoto*(t: Tweet): GalleryPhoto =
   let url =
-    if t.photos.len > 0: t.photos[0].url
-    elif t.video.isSome: get(t.video).thumb
-    elif t.gif.isSome: get(t.gif).thumb
+    if t.media.len > 0: t.media[0].getThumb
     elif t.card.isSome: get(t.card).image
     else: ""
 

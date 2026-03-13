@@ -19,6 +19,7 @@ proc setDisableTid*(disable: bool) =
   disableTid = disable
 
 proc setApiProxy*(url: string) =
+  apiProxy = ""
   if url.len > 0:
     apiProxy = url.strip(chars={'/'}) & "/"
     if "http" notin apiProxy:

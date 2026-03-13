@@ -38,24 +38,19 @@ proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VN
           a(href=getLink(tweet), title=tweet.getTime):
             text tweet.getShortTime
 
-proc renderAlbum(tweet: Tweet): VNode =
-  let
-    groups = if tweet.photos.len < 3: @[tweet.photos]
-             else: tweet.photos.distribute(2)
+proc renderAltText(altText: string): VNode =
+  buildHtml(p(class="alt-text")):
+    text "ALT  " & altText
 
-  buildHtml(tdiv(class="attachments")):
-    for i, photos in groups:
-      let margin = if i > 0: ".25em" else: ""
-      tdiv(class="gallery-row", style={marginTop: margin}):
-        for photo in photos:
-          tdiv(class="attachment image"):
-            let
-              named = "name=" in photo.url
-              small = if named: photo.url else: photo.url & smallWebp
-            a(href=getOrigPicUrl(photo.url), class="still-image", target="_blank"):
-              genImg(small, alt=photo.altText)
-            if photo.altText.len > 0:
-              p(class="alt-text"): text "ALT  " & photo.altText
+proc renderPhotoAttachment(photo: Photo): VNode =
+  buildHtml(tdiv(class="attachment")):
+    let
+      named = "name=" in photo.url
+      small = if named: photo.url else: photo.url & smallWebp
+    a(href=getOrigPicUrl(photo.url), class="still-image", target="_blank"):
+      genImg(small, alt=photo.altText)
+    if photo.altText.len > 0:
+      renderAltText(photo.altText)
 
 proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
   case playbackType
@@ -65,7 +60,7 @@ proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
 proc hasMp4Url(video: Video): bool =
   video.variants.anyIt(it.contentType == mp4)
 
-proc renderVideoDisabled(playbackType: VideoType; path: string): VNode =
+proc renderVideoDisabled(playbackType: VideoType; path=""): VNode =
   buildHtml(tdiv(class="video-overlay")):
     case playbackType
     of mp4:
@@ -81,52 +76,97 @@ proc renderVideoUnavailable(video: Video): VNode =
     else:
       p: text "This media is unavailable"
 
-proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
+proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""): VNode =
   let
-    container = if video.description.len == 0 and video.title.len == 0: ""
-                else: " card-container"
-    playbackType = if not prefs.proxyVideos and video.hasMp4Url: mp4
-                   else: video.playbackType
+    playbackType = if not prefs.proxyVideos and videoData.hasMp4Url: mp4
+                   else: videoData.playbackType
+    thumb = getSmallPic(videoData.thumb)
+
+  buildHtml(tdiv(class="attachment")):
+    if not videoData.available:
+      img(src=thumb, loading="lazy")
+      renderVideoUnavailable(videoData)
+    elif not prefs.isPlaybackEnabled(playbackType):
+      img(src=thumb, loading="lazy")
+      renderVideoDisabled(playbackType, path)
+    else:
+      let
+        vars = videoData.variants.filterIt(it.contentType == playbackType)
+        vidUrl = vars.sortedByIt(it.resolution)[^1].url
+        source = if prefs.proxyVideos: getVidUrl(vidUrl)
+                 else: vidUrl
+      case playbackType
+      of mp4:
+        video(poster=thumb, controls="", muted=prefs.muteVideos):
+          source(src=source, `type`="video/mp4")
+      of m3u8, vmap:
+        video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
+        verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
+        tdiv(class="overlay-circle"): span(class="overlay-triangle")
+        tdiv(class="overlay-duration"): text getDuration(videoData)
+        verbatim "</div>"
+
+proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
+  let hasCardContent = video.description.len > 0 or video.title.len > 0
 
   buildHtml(tdiv(class="attachments card")):
-    tdiv(class="gallery-video" & container):
-      tdiv(class="attachment video-container"):
-        let thumb = getSmallPic(video.thumb)
-        if not video.available:
-          img(src=thumb, loading="lazy")
-          renderVideoUnavailable(video)
-        elif not prefs.isPlaybackEnabled(playbackType):
-          img(src=thumb, loading="lazy")
-          renderVideoDisabled(playbackType, path)
-        else:
-          let
-            vars = video.variants.filterIt(it.contentType == playbackType)
-            vidUrl = vars.sortedByIt(it.resolution)[^1].url
-            source = if prefs.proxyVideos: getVidUrl(vidUrl)
-                     else: vidUrl
-          case playbackType
-          of mp4:
-            video(poster=thumb, controls="", muted=prefs.muteVideos):
-              source(src=source, `type`="video/mp4")
-          of m3u8, vmap:
-            video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
-            verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
-            tdiv(class="overlay-circle"): span(class="overlay-triangle")
-            tdiv(class="overlay-duration"): text getDuration(video)
-            verbatim "</div>"
-      if container.len > 0:
+    tdiv(class=("gallery-video" & (if hasCardContent: " card-container" else: ""))):
+      renderVideoAttachment(video, prefs, path)
+      if hasCardContent:
         tdiv(class="card-content"):
           h2(class="card-title"): text video.title
           if video.description.len > 0:
             p(class="card-description"): text video.description
 
+proc renderGifAttachment(gif: Gif; prefs: Prefs): VNode =
+  let thumb = getSmallPic(gif.thumb)
+
+  buildHtml(tdiv(class="attachment")):
+    if not prefs.mp4Playback:
+      img(src=thumb, loading="lazy")
+      renderVideoDisabled(mp4)
+    elif prefs.autoplayGifs:
+      video(class="gif", poster=thumb, autoplay="", muted="", loop=""):
+        source(src=getPicUrl(gif.url), `type`="video/mp4")
+    else:
+      video(class="gif", poster=thumb, controls="", muted="", loop=""):
+        source(src=getPicUrl(gif.url), `type`="video/mp4")
+    if gif.altText.len > 0:
+      renderAltText(gif.altText)
+
 proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
-    tdiv(class="gallery-gif", style={maxHeight: "unset"}):
-      tdiv(class="attachment"):
-        video(class="gif", poster=getSmallPic(gif.thumb), autoplay=prefs.autoplayGifs,
-              controls="", muted="", loop=""):
-          source(src=getPicUrl(gif.url), `type`="video/mp4")
+    renderGifAttachment(gif, prefs)
+
+proc renderMedia(media: seq[Media]; prefs: Prefs; path: string): VNode =
+  if media.len == 0:
+    return nil
+
+  if media.len == 1:
+    let item = media[0]
+    if item.kind == videoMedia:
+      return renderVideo(item.video, prefs, path)
+    if item.kind == gifMedia:
+      return renderGif(item.gif, prefs)
+
+  let
+    groups = if media.len < 3: @[media]
+             else: media.distribute(2)
+
+  buildHtml(tdiv(class="attachments")):
+    for i, mediaGroup in groups:
+      let margin = if i > 0: ".25em" else: ""
+      let rowClass = "gallery-row" &
+                     (if mediaGroup.allIt(it.kind == photoMedia): "" else: " mixed-row")
+      tdiv(class=rowClass, style={marginTop: margin}):
+        for mediaItem in mediaGroup:
+          case mediaItem.kind
+          of photoMedia:
+            renderPhotoAttachment(mediaItem.photo)
+          of videoMedia:
+            renderVideoAttachment(mediaItem.video, prefs, path)
+          of gifMedia:
+            renderGifAttachment(mediaItem.gif, prefs)
 
 proc renderPoll(poll: Poll): VNode =
   buildHtml(tdiv(class="poll")):
@@ -219,12 +259,7 @@ proc renderLatestPost(username: string; id: int64): VNode =
 
 proc renderQuoteMedia(quote: Tweet; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="quote-media-container")):
-    if quote.photos.len > 0:
-      renderAlbum(quote)
-    elif quote.video.isSome:
-      renderVideo(quote.video.get(), prefs, path)
-    elif quote.gif.isSome:
-      renderGif(quote.gif.get(), prefs)
+    renderMedia(quote.media, prefs, path)
 
 proc renderCommunityNote(note: string; prefs: Prefs): VNode =
   buildHtml(tdiv(class="community-note")):
@@ -266,7 +301,7 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
       tdiv(class="quote-text", dir="auto"):
         verbatim replaceUrls(quote.text, prefs)
 
-    if quote.photos.len > 0 or quote.video.isSome or quote.gif.isSome:
+    if quote.media.len > 0:
       renderQuoteMedia(quote, prefs, path)
 
     if quote.note.len > 0 and not prefs.hideCommunityNotes:
@@ -344,12 +379,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if tweet.card.isSome and tweet.card.get().kind != hidden:
         renderCard(tweet.card.get(), prefs, path)
 
-      if tweet.photos.len > 0:
-        renderAlbum(tweet)
-      elif tweet.video.isSome:
-        renderVideo(tweet.video.get(), prefs, path)
-      elif tweet.gif.isSome:
-        renderGif(tweet.gif.get(), prefs)
+      if tweet.media.len > 0:
+        renderMedia(tweet.media, prefs, path)
 
       if tweet.poll.isSome:
         renderPoll(tweet.poll.get())
