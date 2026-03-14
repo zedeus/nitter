@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, strformat, uri, tables, base64
+import sequtils, strutils, strformat, uri, tables, base64
 import nimcrypto
 
 var
@@ -59,3 +59,8 @@ proc isTwitterUrl*(uri: Uri): bool =
 
 proc isTwitterUrl*(url: string): bool =
   isTwitterUrl(parseUri(url))
+
+proc validateNumber*(value: string): string =
+  if value.anyIt(not it.isDigit):
+    return ""
+  return value

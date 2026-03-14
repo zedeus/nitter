@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, strformat, sequtils, tables, uri
 
-import types
+import types, utils
 
 const
   validFilters* = @[
@@ -16,11 +16,6 @@ const
 template `@`(param: string): untyped =
   if param in pms: pms[param]
   else: ""
-
-proc validateNumber(value: string): string =
-  if value.anyIt(not it.isDigit):
-    return ""
-  return value
 
 proc initQuery*(pms: Table[string, string]; name=""): Query =
   result = Query(
@@ -50,7 +45,7 @@ proc getReplyQuery*(name: string): Query =
     fromUser: @[name]
   )
 
-proc genQueryParam*(query: Query): string =
+proc genQueryParam*(query: Query; maxId=""): string =
   var
     filters: seq[string]
     param: string
@@ -58,12 +53,15 @@ proc genQueryParam*(query: Query): string =
   if query.kind == users:
     return query.text
 
-  param = "("
   for i, user in query.fromUser:
+    if i == 0:
+      param = "("
+
     param &= &"from:{user}"
     if i < query.fromUser.high:
       param &= " OR "
-  param &= ")"
+    else:
+      param &= ")"
 
   if query.fromUser.len > 0 and query.kind in {posts, media}:
     param &= " (filter:self_threads OR -filter:replies)"
@@ -86,7 +84,7 @@ proc genQueryParam*(query: Query): string =
 
   if query.since.len > 0:
     result &= " since:" & query.since
-  if query.until.len > 0:
+  if query.until.len > 0 and maxId.len == 0:
     result &= " until:" & query.until
   if query.minLikes.len > 0:
     result &= " min_faves:" & query.minLikes
@@ -95,6 +93,9 @@ proc genQueryParam*(query: Query): string =
       result &= " " & query.text
     else:
       result = query.text
+
+  if result.len > 0 and maxId.len > 0:
+    result &= " max_id:" & maxId
 
 proc genQueryUrl*(query: Query): string =
   if query.kind notin {tweets, users}: return

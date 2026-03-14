@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch, httpclient, strutils, sequtils, sugar
 import packedjson
-import types, query, formatters, consts, apiutils, parser
+import types, query, formatters, consts, apiutils, parser, utils
 import experimental/parser as newParser
 
 # Helper to generate params object for GraphQL requests
@@ -146,7 +146,12 @@ proc getGraphEditHistory*(id: string): Future[EditHistory] {.async.} =
   result = parseGraphEditHistory(js, id)
 
 proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
-  let q = genQueryParam(query)
+  # workaround for #1372
+  let maxId =
+    if not after.startsWith("maxid:"): ""
+    else: validateNumber(after[6..^1])
+
+  let q = genQueryParam(query, maxId)
   if q.len == 0 or q == emptyQuery:
     return Timeline(query: query, beginning: true)
 
@@ -160,9 +165,9 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
       "withReactionsMetadata": false,
       "withReactionsPerspective": false
     }
-  if after.len > 0:
+  if after.len > 0 and maxId.len == 0:
     variables["cursor"] = % after
-  let 
+  let
     url = apiReq(graphSearchTimeline, $variables)
     js = await fetch(url)
   result = parseGraphSearch[Tweets](js, after)
@@ -170,7 +175,7 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
 
   # when no more items are available the API just returns the last page in
   # full. this detects that and clears the page instead.
-  if after.len > 0 and result.bottom.len > 0 and 
+  if after.len > 0 and result.bottom.len > 0 and maxId.len == 0 and
      after[0..<64] == result.bottom[0..<64]:
     result.content.setLen(0)
 

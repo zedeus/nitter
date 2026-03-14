@@ -11,6 +11,23 @@ proc getQuery(query: Query): string =
   if result.len > 0:
     result &= "&"
 
+proc getSearchMaxId(results: Timeline; path: string): string =
+  if results.query.kind != tweets or results.content.len == 0 or
+     results.query.until.len == 0:
+    return
+
+  let lastThread = results.content[^1]
+  if lastThread.len == 0 or lastThread[^1].id == 0:
+    return
+
+  # 2000000 is the minimum decrement to guarantee no result overlap
+  var maxId = lastThread[^1].id - 2_000_000'i64
+  if maxId <= 0:
+    maxId = lastThread[^1].id - 1
+
+  if maxId > 0:
+    return "maxid:" & $maxId
+
 proc renderToTop*(focus="#"): VNode =
   buildHtml(tdiv(class="top-ref")):
     icon "down", href=focus
@@ -122,6 +139,9 @@ proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
         else:
           renderThread(thread, prefs, path)
 
-      if results.bottom.len > 0:
+      var cursor = getSearchMaxId(results, path)
+      if cursor.len > 0:
+        renderMore(results.query, cursor)
+      elif results.bottom.len > 0:
         renderMore(results.query, results.bottom)
       renderToTop()
