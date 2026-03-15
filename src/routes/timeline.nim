@@ -12,12 +12,20 @@ export router_utils
 export redis_cache, formatters, query, api
 export profile, timeline, status
 
-proc getQuery*(request: Request; tab, name: string): Query =
+proc getQuery*(request: Request; tab, name: string; prefs: Prefs): Query =
+  let view = request.params.getOrDefault("view")
   case tab
-  of "with_replies": getReplyQuery(name)
-  of "media": getMediaQuery(name)
-  of "search": initQuery(params(request), name=name)
-  else: Query(fromUser: @[name])
+  of "with_replies":
+    result = getReplyQuery(name)
+  of "media":
+    result = getMediaQuery(name)
+    result.view =
+      if view in ["timeline", "grid", "gallery"]: view
+      else: prefs.mediaView.toLowerAscii
+  of "search":
+    result = initQuery(params(request), name=name)
+  else:
+    result = Query(fromUser: @[name])
 
 template skipIf[T](cond: bool; default; body: Future[T]): Future[T] =
   if cond:
@@ -121,7 +129,7 @@ proc createTimelineRouter*(cfg: Config) =
         after = getCursor()
         names = getNames(@"name")
 
-      var query = request.getQuery(@"tab", @"name")
+      var query = request.getQuery(@"tab", @"name", prefs)
       if names.len != 1:
         query.fromUser = names
 

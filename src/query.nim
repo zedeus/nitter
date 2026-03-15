@@ -20,6 +20,7 @@ template `@`(param: string): untyped =
 proc initQuery*(pms: Table[string, string]; name=""): Query =
   result = Query(
     kind: parseEnum[QueryKind](@"f", tweets),
+    view: @"view",
     text: @"q",
     filters: validFilters.filterIt("f-" & it in pms),
     excludes: validFilters.filterIt("e-" & it in pms),
@@ -98,24 +99,28 @@ proc genQueryParam*(query: Query; maxId=""): string =
     result &= " max_id:" & maxId
 
 proc genQueryUrl*(query: Query): string =
-  if query.kind notin {tweets, users}: return
+  var params: seq[string]
 
-  var params = @[&"f={query.kind}"]
-  if query.text.len > 0:
-    params.add "q=" & encodeUrl(query.text)
-  for f in query.filters:
-    params.add &"f-{f}=on"
-  for e in query.excludes:
-    params.add &"e-{e}=on"
-  for i in query.includes.filterIt(it != "nativeretweets"):
-    params.add &"i-{i}=on"
+  if query.view.len > 0:
+    params.add "view=" & encodeUrl(query.view)
 
-  if query.since.len > 0:
-    params.add "since=" & query.since
-  if query.until.len > 0:
-    params.add "until=" & query.until
-  if query.minLikes.len > 0:
-    params.add "min_faves=" & query.minLikes
+  if query.kind in {tweets, users}:
+    params.add &"f={query.kind}"
+    if query.text.len > 0:
+      params.add "q=" & encodeUrl(query.text)
+    for f in query.filters:
+      params.add &"f-{f}=on"
+    for e in query.excludes:
+      params.add &"e-{e}=on"
+    for i in query.includes.filterIt(it != "nativeretweets"):
+      params.add &"i-{i}=on"
+
+    if query.since.len > 0:
+      params.add "since=" & query.since
+    if query.until.len > 0:
+      params.add "until=" & query.until
+    if query.minLikes.len > 0:
+      params.add "min_faves=" & query.minLikes
 
   if params.len > 0:
     result &= params.join("&")

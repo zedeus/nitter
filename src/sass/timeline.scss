@@ -15,7 +15,7 @@
   padding: 8px;
   display: block;
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   box-sizing: border-box;
 
   button {
@@ -36,7 +36,7 @@
   display: flex;
   flex-wrap: wrap;
   list-style: none;
-  margin: 0 0 5px 0;
+  margin: 0 0 4px 0;
   background-color: var(--bg_panel);
   padding: 0;
 }
@@ -156,4 +156,341 @@
   display: flex;
   position: relative;
   background-color: var(--bg_panel);
+}
+
+.timeline.media-grid-view,
+.timeline.media-gallery-view {
+  > div:not(:first-child) {
+    border-top: none;
+  }
+
+  .timeline-item::before {
+    display: none;
+  }
+}
+
+.timeline.media-grid-view,
+.timeline.media-gallery-view .gallery-masonry.compact {
+  .tweet-header,
+  .replying-to,
+  .retweet-header,
+  .pinned,
+  .tweet-stats,
+  .attribution,
+  .poll,
+  .quote,
+  .community-note,
+  .media-tag-block,
+  .tweet-content,
+  .card-content {
+    display: none;
+  }
+
+  .card {
+    margin: unset;
+
+    .card-container {
+      border: unset;
+      border-radius: unset;
+
+      .card-image-container {
+        width: 100%;
+        min-height: 100%;
+      }
+
+      .card-content-container {
+        display: none;
+      }
+    }
+  }
+}
+
+.timeline.media-grid-view {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  > div:not(:first-child) {
+    margin-top: 0;
+  }
+
+  .timeline-item {
+    padding: 0;
+  }
+
+  .tweet-link {
+    z-index: 1000;
+
+    &:hover {
+      background-color: unset;
+    }
+  }
+
+  > .show-more,
+  > .top-ref,
+  > .timeline-footer,
+  > .timeline-header {
+    grid-column: 1 / -1;
+  }
+
+  .tweet-body {
+    height: 100%;
+    margin-left: 0;
+    padding: 0;
+    position: relative;
+    aspect-ratio: 1/1;
+  }
+
+  .gallery-row + .gallery-row {
+    margin-top: 0.25em !important;
+  }
+
+  .attachments {
+    background-color: var(--darkest_grey);
+    border-radius: 0;
+    margin: 0;
+    max-height: none;
+  }
+
+  .attachments,
+  .gallery-row,
+  .still-image {
+    height: 100%;
+    width: 100%;
+  }
+
+  .still-image img,
+  .attachment > video,
+  .attachment > img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+  }
+
+  .attachment {
+    display: flex;
+    align-items: center;
+  }
+
+  .gallery-video {
+    height: 100%;
+  }
+
+  .media-gif {
+    display: flex;
+  }
+
+  .timeline-item:hover {
+    opacity: 0.85;
+  }
+
+  .alt-text {
+    display: none;
+  }
+}
+
+.timeline.media-gallery-view {
+  .gallery-masonry {
+    margin: 10px 0;
+    column-gap: 10px;
+    column-width: 350px;
+
+    &.masonry-active {
+      column-width: unset;
+      column-gap: unset;
+      position: relative;
+
+      .timeline-item {
+        animation: none;
+        position: absolute;
+        box-sizing: border-box;
+        margin-bottom: 0;
+      }
+    }
+
+    &.compact {
+      .tweet-body {
+        padding: 0;
+
+        > .attachments {
+          margin: 0;
+        }
+      }
+
+      .card-image-container img {
+        max-height: unset;
+      }
+    }
+  }
+
+  @keyframes masonry-init {
+    to {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  // Start hidden. CSS animation reveals after a delay as a no-JS fallback.
+  // With JS, masonry-active cancels the animation and masonry-visible reveals.
+  .gallery-masonry .timeline-item,
+  > .show-more,
+  > .top-ref,
+  > .timeline-footer {
+    opacity: 0;
+    pointer-events: none;
+    animation: masonry-init 0.2s 0.3s forwards;
+  }
+
+  .gallery-masonry.masonry-active .timeline-item.masonry-visible,
+  > .show-more.masonry-visible,
+  > .top-ref.masonry-visible,
+  > .timeline-footer.masonry-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.15s ease;
+    animation: none;
+  }
+
+  .timeline-item {
+    margin-bottom: 10px;
+    break-inside: avoid;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  > .show-more,
+  > .top-ref,
+  > .timeline-footer,
+  > .timeline-header {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 900px;
+  }
+
+  > .show-more {
+    padding: 0;
+    margin-top: 8px;
+    background-color: unset;
+  }
+
+  .tweet-content {
+    margin: 3px 0;
+  }
+
+  .tweet-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin-left: 0;
+    padding: 10px;
+
+    > .attachments {
+      align-self: stretch;
+      border-radius: 0;
+      margin: -10px -10px 10px;
+      max-height: none;
+      order: -1;
+      width: auto;
+      background-color: var(--bg_elements);
+
+      .gallery-row {
+        max-height: none;
+        max-width: none;
+        align-items: center;
+      }
+
+      .still-image img,
+      .attachment > video,
+      .attachment > img {
+        max-height: none;
+        width: 100%;
+      }
+
+      .attachment:last-child {
+        max-height: none;
+      }
+
+      .card-container {
+        border: unset;
+        border-radius: unset;
+      }
+    }
+
+    .tweet-stat {
+      padding-top: unset;
+    }
+
+    .quote {
+      margin-bottom: 5px;
+      margin-top: 5px;
+    }
+
+    .replying-to {
+      margin: 0;
+    }
+  }
+
+  .tweet-header {
+    align-items: flex-start;
+    display: flex;
+    gap: 0.75em;
+    margin-bottom: 0;
+
+    .tweet-avatar {
+      img {
+        float: none;
+        height: 42px;
+        margin: 0;
+        width: 42px;
+      }
+    }
+
+    .tweet-name-row {
+      flex: 1;
+    }
+
+    .fullname-and-username {
+      flex-wrap: wrap;
+    }
+
+    .fullname {
+      max-width: calc(100% - 18px);
+    }
+
+    .verified-icon {
+      margin-left: 4px;
+      margin-top: 1px;
+    }
+
+    .username {
+      display: block;
+      flex-basis: 100%;
+      margin-left: 0;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .timeline.media-grid-view {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .timeline.media-grid-view {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline.media-gallery-view {
+    padding: 8px 0;
+
+    .gallery-masonry {
+      columns: 1;
+      column-gap: 0;
+
+      &.masonry-active {
+        columns: unset;
+      }
+    }
+  }
 }

@@ -54,6 +54,13 @@ class Timeline(object):
     none = '.timeline-none'
     protected = '.timeline-protected'
     photo_rail = '.photo-rail-grid'
+    media_view_tabs = '.media-view-tabs'
+    media_view_timeline = '.media-view-tabs a[href$="media?view=timeline"]'
+    media_view_grid = '.media-view-tabs a[href$="media?view=grid"]'
+    media_view_gallery = '.media-view-tabs a[href$="media?view=gallery"]'
+    media_view_active = '.media-view-tabs .tab-item.active a'
+    grid_view = '.timeline.media-grid-view'
+    gallery_view = '.timeline.media-gallery-view'
 
 
 class Conversation(object):

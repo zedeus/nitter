@@ -5,6 +5,15 @@ import karax/[karaxdsl, vdom]
 import ".."/[types, query, formatters]
 import tweet, renderutils
 
+proc timelineViewClass(query: Query): string =
+  if query.kind != media:
+    return "timeline"
+
+  case query.view
+  of "grid": "timeline media-grid-view"
+  of "gallery": "timeline media-gallery-view"
+  else: "timeline"
+
 proc getQuery(query: Query): string =
   if query.kind != posts:
     result = genQueryUrl(query)
@@ -105,9 +114,22 @@ proc renderTimelineUsers*(results: Result[User]; prefs: Prefs; path=""): VNode =
     else:
       renderNoMore()
 
+proc filterThreads(threads: seq[Tweets]; prefs: Prefs): seq[Tweets] =
+  var retweets: seq[int64]
+  for thread in threads:
+    if thread.len == 1:
+      let tweet = thread[0]
+      let retweetId = if tweet.retweet.isSome: get(tweet.retweet).id else: 0
+      if retweetId in retweets or tweet.id in retweets or
+         tweet.pinned and prefs.hidePins:
+        continue
+      if retweetId != 0 and tweet.retweet.isSome:
+        retweets &= retweetId
+    result.add(thread)
+
 proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
                            pinned=none(Tweet)): VNode =
-  buildHtml(tdiv(class="timeline")):
+  buildHtml(tdiv(class=results.query.timelineViewClass)):
     if not results.beginning:
       renderNewer(results.query, parseUri(path).path)
 
@@ -121,23 +143,17 @@ proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
       else:
         renderNoneFound()
     else:
-      var retweets: seq[int64]
+      let filtered = filterThreads(results.content, prefs)
 
-      for thread in results.content:
-        if thread.len == 1:
-          let
-            tweet = thread[0]
-            retweetId = if tweet.retweet.isSome: get(tweet.retweet).id else: 0
-
-          if retweetId in retweets or tweet.id in retweets or
-             tweet.pinned and prefs.hidePins:
-            continue
-
-          if retweetId != 0 and tweet.retweet.isSome:
-            retweets &= retweetId
-          renderTweet(tweet, prefs, path)
-        else:
-          renderThread(thread, prefs, path)
+      if results.query.view == "gallery":
+        tdiv(class=if prefs.compactGallery: "gallery-masonry compact" else: "gallery-masonry"):
+          for thread in filtered:
+            if thread.len == 1: renderTweet(thread[0], prefs, path)
+            else: renderThread(thread, prefs, path)
+      else:
+        for thread in filtered:
+          if thread.len == 1: renderTweet(thread[0], prefs, path)
+          else: renderThread(thread, prefs, path)
 
       var cursor = getSearchMaxId(results, path)
       if cursor.len > 0:

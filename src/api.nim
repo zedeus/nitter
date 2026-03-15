@@ -18,16 +18,16 @@ proc apiReq(endpoint, variables: string; fieldToggles = ""): ApiReq =
   let url = apiUrl(endpoint, variables, fieldToggles)
   return ApiReq(cookie: url, oauth: url)
 
-proc mediaUrl(id: string; cursor: string): ApiReq =
+proc mediaUrl(id, cursor: string; count=20): ApiReq =
   result = ApiReq(
-    cookie: apiUrl(graphUserMedia, userMediaVars % [id, cursor]),
-    oauth: apiUrl(graphUserMediaV2, restIdVars % [id, cursor])
+    cookie: apiUrl(graphUserMedia, userMediaVars % [id, cursor, $count]),
+    oauth: apiUrl(graphUserMediaV2, restIdVars % [id, cursor, $count])
   )
 
 proc userTweetsUrl(id: string; cursor: string): ApiReq =
   result = ApiReq(
     # cookie: apiUrl(graphUserTweets, userTweetsVars % [id, cursor], userTweetsFieldToggles),
-    oauth: apiUrl(graphUserTweetsV2, restIdVars % [id, cursor])
+    oauth: apiUrl(graphUserTweetsV2, restIdVars % [id, cursor, "20"])
   )
   # might change this in the future pending testing
   result.cookie = result.oauth
@@ -36,7 +36,7 @@ proc userTweetsAndRepliesUrl(id: string; cursor: string): ApiReq =
   let cookieVars = userTweetsAndRepliesVars % [id, cursor]
   result = ApiReq(
     cookie: apiUrl(graphUserTweetsAndReplies, cookieVars, userTweetsFieldToggles),
-    oauth: apiUrl(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor])
+    oauth: apiUrl(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"])
   )
 
 proc tweetDetailUrl(id: string; cursor: string): ApiReq =
@@ -73,7 +73,7 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
     url = case kind
       of TimelineKind.tweets: userTweetsUrl(id, cursor)
       of TimelineKind.replies: userTweetsAndRepliesUrl(id, cursor)
-      of TimelineKind.media: mediaUrl(id, cursor)
+      of TimelineKind.media: mediaUrl(id, cursor, 100)
     js = await fetch(url)
   result = parseGraphTimeline(js, after)
 
@@ -81,7 +81,7 @@ proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
     cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
-    url = apiReq(graphListTweets, restIdVars % [id, cursor])
+    url = apiReq(graphListTweets, restIdVars % [id, cursor, "20"])
     js = await fetch(url)
   result = parseGraphTimeline(js, after).tweets
 
@@ -205,7 +205,7 @@ proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.}
 
 proc getPhotoRail*(id: string): Future[PhotoRail] {.async.} =
   if id.len == 0: return
-  let js = await fetch(mediaUrl(id, ""))
+  let js = await fetch(mediaUrl(id, "", 30))
   result = parseGraphPhotoRail(js)
 
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =

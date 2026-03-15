@@ -123,6 +123,7 @@ type
 
   Query* = object
     kind*: QueryKind
+    view*: string
     text*: string
     filters*: seq[string]
     includes*: seq[string]

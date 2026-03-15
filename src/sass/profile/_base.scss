@@ -1,87 +1,116 @@
-@import '_variables';
-@import '_mixins';
+@import "_variables";
+@import "_mixins";
 
-@import 'card';
-@import 'photo-rail';
+@import "card";
+@import "photo-rail";
 
 .profile-tabs {
-    @include panel(auto, 900px);
+  @include panel(auto, 900px);
 
-    .timeline-container {
-        float: right;
-        width: 68% !important;
-        max-width: unset;
-    }
+  .timeline-container {
+    float: right;
+    width: 68% !important;
+    max-width: unset;
+  }
 }
 
 .profile-banner {
-    margin-bottom: 4px;
-    background-color: var(--bg_panel);
+  margin-bottom: 4px;
+  background-color: var(--bg_panel);
 
-    a {
-        display: block;
-        position: relative;
-        padding: 33.34% 0 0 0;
-    }
+  a {
+    display: block;
+    position: relative;
+    padding: 33.34% 0 0 0;
+  }
 
-    img {
-        max-width: 100%;
-        position: absolute;
-        top: 0;
-    }
+  img {
+    max-width: 100%;
+    position: absolute;
+    top: 0;
+  }
 }
 
 .profile-tab {
-    padding: 0 4px 0 0;
-    box-sizing: border-box;
-    display: inline-block;
-    font-size: 14px;
-    text-align: left;
-    vertical-align: top;
-    max-width: 32%;
-    top: 0;
+  padding: 0 4px 0 0;
+  box-sizing: border-box;
+  display: inline-block;
+  font-size: 14px;
+  text-align: left;
+  vertical-align: top;
+  max-width: 32%;
+  top: 0;
 
-    body.fixed-nav & {
-        top: 50px;
-    }
+  body.fixed-nav & {
+    top: 50px;
+  }
 }
 
 .profile-result {
-    min-height: 54px;
+  min-height: 54px;
 
-    .username {
-        margin: 0 !important;
-    }
+  .username {
+    margin: 0 !important;
+  }
 
-    .tweet-header {
-        margin-bottom: unset;
-    }
+  .tweet-header {
+    margin-bottom: unset;
+  }
 }
 
-@media(max-width: 700px) {
-    .profile-tabs {
-        width: 100vw;
-        max-width: 600px;
+.profile-tabs.media-only {
+  max-width: none;
+  width: 100%;
 
-        .timeline-container {
-            width: 100% !important;
+  .timeline-container {
+    float: none;
+    width: 100% !important;
+    max-width: none;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
 
-            .tab-item wide {
-                flex-grow: 1.4;
-            }
-        }
+  .timeline-container > .tab {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .profile-tabs {
+    width: 100vw;
+    max-width: 600px;
+
+    .timeline-container {
+      width: 100% !important;
+
+      .tab-item wide {
+        flex-grow: 1.4;
+      }
     }
+  }
 
-    .profile-tab {
-        width: 100%;
-        max-width: unset;
-        position: initial !important;
-        padding: 0;
+  .profile-tabs.media-only {
+    width: 100%;
+    max-width: none;
+
+    .timeline-container {
+      width: 100vw !important;
+      padding: 0;
     }
+  }
+
+  .profile-tab {
+    width: 100%;
+    max-width: unset;
+    position: initial !important;
+    padding: 0;
+  }
 }
 
 @media (min-height: 900px) {
-    .profile-tab.sticky {
-        position: sticky;
-    }
+  .profile-tab.sticky {
+    position: sticky;
+  }
 }

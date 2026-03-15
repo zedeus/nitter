@@ -102,17 +102,22 @@ proc renderProtected(username: string): VNode =
 
 proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
   profile.tweets.query.fromUser = @[profile.user.username]
+  let
+    isGalleryView = profile.tweets.query.kind == media and
+      profile.tweets.query.view == "gallery"
+    viewClass = if isGalleryView: " media-only" else: ""
 
-  buildHtml(tdiv(class="profile-tabs")):
-    if not prefs.hideBanner:
+  buildHtml(tdiv(class=("profile-tabs" & viewClass))):
+    if not isGalleryView and not prefs.hideBanner:
       tdiv(class="profile-banner"):
         renderBanner(profile.user.banner)
 
-    let sticky = if prefs.stickyProfile: " sticky" else: ""
-    tdiv(class=("profile-tab" & sticky)):
-      renderUserCard(profile.user, prefs)
-      if profile.photoRail.len > 0:
-        renderPhotoRail(profile)
+    if not isGalleryView:
+      let sticky = if prefs.stickyProfile: " sticky" else: ""
+      tdiv(class=("profile-tab" & sticky)):
+        renderUserCard(profile.user, prefs)
+        if profile.photoRail.len > 0:
+          renderPhotoRail(profile)
 
     if profile.user.protected:
       renderProtected(profile.user.username)

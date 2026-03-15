@@ -179,6 +179,7 @@ input::-webkit-datetime-edit-year-field:focus {
     -moz-appearance: none;
     -webkit-appearance: none;
     appearance: none;
+    min-width: 100px;
   }
 
   input[type="text"],

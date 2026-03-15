@@ -55,6 +55,28 @@ class TweetTest(BaseTestCase):
         self.assert_element_absent(Timeline.older)
         self.assert_element_absent(Timeline.end)
 
+    def test_media_view_tabs(self):
+        self.open_nitter('mobile_test/media')
+        self.assert_element_present(Timeline.media_view_tabs)
+        self.assert_text('Timeline', Timeline.media_view_timeline)
+        self.assert_text('Grid', Timeline.media_view_grid)
+        self.assert_text('Gallery', Timeline.media_view_gallery)
+        self.assert_text('Timeline', Timeline.media_view_active)
+
+    def test_media_view_grid_tab(self):
+        self.open_nitter('mobile_test/media?view=grid')
+        self.assert_element_present(Timeline.grid_view)
+        self.assert_text('Grid', Timeline.media_view_active)
+
+    def test_media_view_gallery_tab(self):
+        self.open_nitter('mobile_test/media?view=gallery')
+        self.assert_element_present(Timeline.gallery_view)
+        self.assert_text('Gallery', Timeline.media_view_active)
+
+    def test_media_view_tabs_not_on_posts(self):
+        self.open_nitter('mobile_test')
+        self.assert_element_absent(Timeline.media_view_tabs)
+
     #@parameterized.expand(photo_rail)
     #def test_photo_rail(self, username, images):
         #self.open_nitter(username)

@@ -101,6 +101,7 @@
 .avatar {
   &.round {
     border-radius: 50%;
+    user-select: none;
     -webkit-user-select: none;
   }
 
@@ -204,6 +205,7 @@
 
 .tweet-stats {
   margin-bottom: -3px;
+  user-select: none;
   -webkit-user-select: none;
 }
 
@@ -236,6 +238,7 @@
   left: 0;
   top: 0;
   position: absolute;
+  user-select: none;
   -webkit-user-select: none;
 
   &:hover {

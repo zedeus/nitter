@@ -138,12 +138,12 @@ const
 
   restIdVars* = """{
   "rest_id": "$1", $2
-  "count": 20
+  "count": $3
 }"""
 
   userMediaVars* = """{
   "userId": "$1", $2
-  "count": 20,
+  "count": $3,
   "includePromotedContent": false,
   "withClientEventToken": false,
   "withBirdwatchNotes": false,

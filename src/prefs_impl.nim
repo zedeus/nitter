@@ -100,6 +100,13 @@ genPrefs:
     autoplayGifs(checkbox, true):
       "Autoplay gifs"
 
+    compactGallery(checkbox, false):
+      "Compact media gallery (no profile info or text)"
+
+    mediaView(select, "Timeline"):
+      "Default media view"
+      options: @["Timeline", "Grid", "Gallery"]
+
   "Link replacements (blank to disable)":
     replaceTwitter(input, ""):
       "Twitter -> Nitter"
