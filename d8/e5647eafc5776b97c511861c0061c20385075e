@@ -1,0 +1,134 @@
+src/types.nim
+  d802a89c3d86a45d 126
+public/js/infiniteScroll.js
+  fa4e4c7ddea54dd5 3,12-22,25-68,70-153,156-157,160-164,167,169-171,173-174,176,178-180,182-183,185-191,193-199,201-210,217
+src/query.nim
+  d802a89c3d86a45d 23,102,107-108
+tests/base.py
+  d802a89c3d86a45d 57-63
+src/views/search.nim
+  c263d45a51ef8158 111
+  d802a89c3d86a45d 42-43,47,54,112-114
+  fa4e4c7ddea54dd5 44-46,48-53
+src/api.nim
+  d802a89c3d86a45d 21,23-24,30,39,76,84,208
+src/views/profile.nim
+  c263d45a51ef8158 106-108,111,115
+  d802a89c3d86a45d 105,110
+src/sass/profile/_base.scss
+  d802a89c3d86a45d 1-2,4-5,20,26,36,43-46,50,52-54,56-58,61-66,68-69,71,73-76,80-83,85-86,88-90,94-96,99
+  fa4e4c7ddea54dd5 100,102
+  34f992de431fad98 67
+src/routes/timeline.nim
+  d802a89c3d86a45d 15-16,19,21-23,26,28,132
+src/views/timeline.nim
+  d802a89c3d86a45d 8-16,123-125,132,148,152-153
+  fa4e4c7ddea54dd5 117-122,126-129,146,149-151,154-155
+src/consts.nim
+  d802a89c3d86a45d 141,146
+src/sass/timeline.scss
+  fa4e4c7ddea54dd5 169-173,187-208,212-214,295-306,315-316,320-340,342-353,355-356,469-470,486-494
+  d802a89c3d86a45d 18,39,160-168,174-183,186,209-211,215-220,229-235,248-252,259-261,263-264,266,268-269,273-274,277-278,281-282,285-294,354,357-370,372,374-375,378-393,395-411,426,431-468,471-485,495
+src/views/general.nim
+  fa4e4c7ddea54dd5 53
+tests/test_timeline.py
+  d802a89c3d86a45d 58-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "d8e5647eafc5776b97c511861c0061c20385075e",
+  "prompts": {
+    "34f992de431fad98": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019cee00-a858-7893-83f5-39090fa4a19d",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 5,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "5046a52d851e904c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ced26-dd43-7bc1-94da-ce1ac04eba8b",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "c263d45a51ef8158": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019cee08-c670-7d20-ba46-51325a66c7c8",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 5,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    },
+    "d802a89c3d86a45d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019cedff-6bc3-7262-bae7-41f6d719676a",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 497,
+      "total_deletions": 104,
+      "accepted_lines": 308,
+      "overriden_lines": 19
+    },
+    "ee5cd8ad93412219": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ce422-6a52-7e21-837a-97b4cbf3f6da",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3152,
+      "overriden_lines": 0
+    },
+    "f223098b8def5f5e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ce426-a807-7a61-bb61-3818b11867ae",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "fa4e4c7ddea54dd5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09ba3026-292f-429f-91e1-7face35bffe3",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 1302,
+      "total_deletions": 1146,
+      "accepted_lines": 306,
+      "overriden_lines": 2
+    }
+  }
+}
