@@ -10,13 +10,21 @@ const
   rlLimit = "x-rate-limit-limit"
   errorsToSkip = {null, doesntExist, tweetNotFound, timeout, unauthorized, badRequest}
 
-var 
+var
   pool: HttpPool
   disableTid: bool
   apiProxy: string
+  maxRetries: int
+  retryDelayMs: int
 
 proc setDisableTid*(disable: bool) =
   disableTid = disable
+
+proc setMaxRetries*(n: int) =
+  maxRetries = n
+
+proc setRetryDelayMs*(ms: int) =
+  retryDelayMs = ms
 
 proc setApiProxy*(url: string) =
   apiProxy = ""
@@ -120,6 +128,10 @@ template fetchImpl(result, fetchBody) {.dirty.} =
         badClient = true
         raise newException(BadClientError, "Bad client")
 
+      if resp.status == $Http404 and result.len == 0:
+        echo "[sessions] transient 404 (empty body), retrying: ", url.path
+        raise rateLimitError()
+
     if resp.headers.hasKey(rlRemaining):
       let
         remaining = parseInt(resp.headers[rlRemaining])
@@ -165,11 +177,15 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     release(session)
 
 template retry(bod) =
-  try:
-    bod
-  except RateLimitError:
-    echo "[sessions] Rate limited, retrying ", req.cookie.endpoint, " request..."
-    bod
+  for i in 0 ..< maxRetries:
+    try:
+      bod
+      break
+    except RateLimitError:
+      echo "[sessions] Rate limited, retrying ", req.cookie.endpoint,
+           " request (", i, "/", maxRetries, ")..."
+      if retryDelayMs > 0:
+        await sleepAsync(retryDelayMs)
 
 proc fetch*(req: ApiReq): Future[JsonNode] {.async.} =
   retry:

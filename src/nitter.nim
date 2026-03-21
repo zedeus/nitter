@@ -40,6 +40,8 @@ setHttpProxy(cfg.proxy, cfg.proxyAuth)
 setApiProxy(cfg.apiProxy)
 setDisableTid(cfg.disableTid)
 setMaxConcurrentReqs(cfg.maxConcurrentReqs)
+setMaxRetries(cfg.maxRetries)
+setRetryDelayMs(cfg.retryDelayMs)
 initAboutPage(cfg.staticDir)
 
 waitFor initRedisPool(cfg)

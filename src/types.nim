@@ -310,6 +310,8 @@ type
     apiProxy*: string
     disableTid*: bool
     maxConcurrentReqs*: int
+    maxRetries*: int
+    retryDelayMs*: int
 
     rssCacheTime*: int
     listCacheTime*: int
