@@ -1,0 +1,35 @@
+src/sass/timeline.scss
+  619413a54f694e5c 296,298-300,302-304
+src/views/renderutils.nim
+  619413a54f694e5c 7,15-18
+src/views/tweet.nim
+  619413a54f694e5c 49,53
+public/js/infiniteScroll.js
+  619413a54f694e5c 30-36,101
+src/prefs_impl.nim
+  619413a54f694e5c 106-109
+src/views/general.nim
+  619413a54f694e5c 53
+src/views/timeline.nim
+  619413a54f694e5c 150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "1ec0cf373e49ee4787fe331f9127956915c4dd94",
+  "prompts": {
+    "619413a54f694e5c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "098b46cc-cf3a-422a-b4e3-73e3a400dc30",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 121,
+      "total_deletions": 111,
+      "accepted_lines": 32,
+      "overriden_lines": 2
+    }
+  }
+}
