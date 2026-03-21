@@ -314,7 +314,7 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
 
 proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull();
                 replyId: int64 = 0): Tweet =
-  if js.isNull: return
+  if js.isNull: return Tweet()
 
   let time =
     if js{"created_at"}.notNull: js{"created_at"}.getTime
