@@ -65,7 +65,7 @@ proc renderNoneFound(): VNode =
     h2(class="timeline-none"):
       text "No items found"
 
-proc renderThread(thread: Tweets; prefs: Prefs; path: string): VNode =
+proc renderThread(thread: Tweets; prefs: Prefs; path: string; bigThumb=false): VNode =
   buildHtml(tdiv(class="thread-line")):
     let sortedThread = thread.sortedByIt(it.id)
     for i, tweet in sortedThread:
@@ -79,7 +79,7 @@ proc renderThread(thread: Tweets; prefs: Prefs; path: string): VNode =
       let show = i == thread.high and sortedThread[0].id != tweet.threadId
       let header = if tweet.pinned or tweet.retweet.isSome: "with-header " else: ""
       renderTweet(tweet, prefs, path, class=(header & "thread"),
-                  index=i, last=(i == thread.high))
+                  index=i, last=(i == thread.high), bigThumb=bigThumb)
 
 proc renderUser(user: User; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-item", data-username=user.username)):
@@ -146,10 +146,12 @@ proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
       let filtered = filterThreads(results.content, prefs)
 
       if results.query.view == "gallery":
-        tdiv(class=if prefs.compactGallery: "gallery-masonry compact" else: "gallery-masonry"):
+        let bigThumb = prefs.gallerySize == "Large"
+        let galClass = if prefs.compactGallery: "gallery-masonry compact" else: "gallery-masonry"
+        tdiv(class=galClass, `data-col-size`=prefs.gallerySize.toLowerAscii):
           for thread in filtered:
-            if thread.len == 1: renderTweet(thread[0], prefs, path)
-            else: renderThread(thread, prefs, path)
+            if thread.len == 1: renderTweet(thread[0], prefs, path, bigThumb=bigThumb)
+            else: renderThread(thread, prefs, path, bigThumb)
       else:
         for thread in filtered:
           if thread.len == 1: renderTweet(thread[0], prefs, path)

@@ -4,11 +4,18 @@ import karax/[karaxdsl, vdom, vstyles]
 import ".."/[types, utils]
 
 const smallWebp* = "?name=small&format=webp"
+const mediumWebp* = "?name=medium&format=webp"
 
 proc getSmallPic*(url: string): string =
   result = url
   if "?" notin url and not url.endsWith("placeholder.png"):
     result &= smallWebp
+  result = getPicUrl(result)
+
+proc getMediumPic*(url: string): string =
+  result = url
+  if "?" notin url and not url.endsWith("placeholder.png"):
+    result &= mediumWebp
   result = getPicUrl(result)
 
 proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =

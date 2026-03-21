@@ -27,6 +27,13 @@ const GAP = 10;
 class Masonry {
   constructor(container) {
     this.container = container;
+    const colSizes = {
+      small:  w => Math.max(130, w * 0.11),
+      medium: w => Math.max(190, Math.min(350, w * 0.22)),
+      large:  w => Math.max(350, Math.min(480, w * 0.22)),
+    };
+    const size = container.dataset.colSize || "medium";
+    this._targetWidth = colSizes[size] || colSizes.medium;
     this.colHeights = [];
     this.colCounts = [];
     this.colCount = 0;
@@ -90,8 +97,8 @@ class Masonry {
   }
 
   _rebuild() {
-    const n = Math.max(1, Math.floor(this.container.clientWidth / 350));
     const w = this.container.clientWidth;
+    const n = Math.max(1, Math.floor(w / this._targetWidth(w)));
     if (n === this.colCount && w === this._lastWidth) return;
 
     const isFirst = this.colCount === 0;

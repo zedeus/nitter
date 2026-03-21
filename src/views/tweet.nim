@@ -42,13 +42,15 @@ proc renderAltText(altText: string): VNode =
   buildHtml(p(class="alt-text")):
     text "ALT  " & altText
 
-proc renderPhotoAttachment(photo: Photo): VNode =
+proc renderPhotoAttachment(photo: Photo; bigThumb=false): VNode =
   buildHtml(tdiv(class="attachment")):
     let
       named = "name=" in photo.url
-      small = if named: photo.url else: photo.url & smallWebp
+      thumb = if named: photo.url
+              elif bigThumb: photo.url & mediumWebp
+              else: photo.url & smallWebp
     a(href=getOrigPicUrl(photo.url), class="still-image", target="_blank"):
-      genImg(small, alt=photo.altText)
+      genImg(thumb, alt=photo.altText)
     if photo.altText.len > 0:
       renderAltText(photo.altText)
 
@@ -76,11 +78,11 @@ proc renderVideoUnavailable(video: Video): VNode =
     else:
       p: text "This media is unavailable"
 
-proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""): VNode =
+proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""; bigThumb=false): VNode =
   let
     playbackType = if not prefs.proxyVideos and videoData.hasMp4Url: mp4
                    else: videoData.playbackType
-    thumb = getSmallPic(videoData.thumb)
+    thumb = if bigThumb: getMediumPic(videoData.thumb) else: getSmallPic(videoData.thumb)
 
   buildHtml(tdiv(class="attachment")):
     if not videoData.available:
@@ -106,12 +108,12 @@ proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""): VNode =
         tdiv(class="overlay-duration"): text getDuration(videoData)
         verbatim "</div>"
 
-proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
+proc renderVideo*(video: Video; prefs: Prefs; path: string; bigThumb=false): VNode =
   let hasCardContent = video.description.len > 0 or video.title.len > 0
 
   buildHtml(tdiv(class="attachments card")):
     tdiv(class=("gallery-video" & (if hasCardContent: " card-container" else: ""))):
-      renderVideoAttachment(video, prefs, path)
+      renderVideoAttachment(video, prefs, path, bigThumb)
       if hasCardContent:
         tdiv(class="card-content"):
           h2(class="card-title"): text video.title
@@ -138,14 +140,14 @@ proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
     renderGifAttachment(gif, prefs)
 
-proc renderMedia(media: seq[Media]; prefs: Prefs; path: string): VNode =
+proc renderMedia(media: seq[Media]; prefs: Prefs; path: string; bigThumb=false): VNode =
   if media.len == 0:
     return nil
 
   if media.len == 1:
     let item = media[0]
     if item.kind == videoMedia:
-      return renderVideo(item.video, prefs, path)
+      return renderVideo(item.video, prefs, path, bigThumb)
     if item.kind == gifMedia:
       return renderGif(item.gif, prefs)
 
@@ -162,9 +164,9 @@ proc renderMedia(media: seq[Media]; prefs: Prefs; path: string): VNode =
         for mediaItem in mediaGroup:
           case mediaItem.kind
           of photoMedia:
-            renderPhotoAttachment(mediaItem.photo)
+            renderPhotoAttachment(mediaItem.photo, bigThumb)
           of videoMedia:
-            renderVideoAttachment(mediaItem.video, prefs, path)
+            renderVideoAttachment(mediaItem.video, prefs, path, bigThumb)
           of gifMedia:
             renderGifAttachment(mediaItem.gif, prefs)
 
@@ -336,7 +338,7 @@ proc renderLocation*(tweet: Tweet): string =
   return $node
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
-                  last=false; mainTweet=false; afterTweet=false): VNode =
+                  last=false; mainTweet=false; afterTweet=false; bigThumb=false): VNode =
   var divClass = class
   if index == -1 or last:
     divClass = "thread-last " & class
@@ -389,7 +391,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         renderCard(tweet.card.get(), prefs, path)
 
       if tweet.media.len > 0:
-        renderMedia(tweet.media, prefs, path)
+        renderMedia(tweet.media, prefs, path, bigThumb)
 
       if tweet.poll.isSome:
         renderPoll(tweet.poll.get())

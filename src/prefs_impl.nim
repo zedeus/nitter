@@ -103,6 +103,10 @@ genPrefs:
     compactGallery(checkbox, false):
       "Compact media gallery (no profile info or text)"
 
+    gallerySize(select, "Medium"):
+      "Gallery column size"
+      options: @["Small", "Medium", "Large"]
+
     mediaView(select, "Timeline"):
       "Default media view"
       options: @["Timeline", "Grid", "Gallery"]
