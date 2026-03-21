@@ -1,0 +1,21 @@
+src/views/timeline.nim
+  619413a54f694e5c 150
+public/js/infiniteScroll.js
+  619413a54f694e5c 30-36,101
+src/views/renderutils.nim
+  619413a54f694e5c 7,15-18
+src/prefs_impl.nim
+  619413a54f694e5c 106-109
+src/views/general.nim
+  619413a54f694e5c 53
+src/sass/timeline.scss
+  619413a54f694e5c 296,298-300,302-304
+src/views/tweet.nim
+  619413a54f694e5c 49,53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "fea6f59005e7178abffb65b26149f18267f84093",
+  "prompts": {}
+}
