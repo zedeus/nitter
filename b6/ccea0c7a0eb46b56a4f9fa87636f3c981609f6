@@ -1,0 +1,31 @@
+src/config.nim
+  51f424a7888de972 52-54
+src/apiutils.nim
+  51f424a7888de972 23-27,132,134,183,187-188
+src/nitter.nim
+  51f424a7888de972 43-44
+nitter.example.conf
+  51f424a7888de972 37-38
+src/types.nim
+  51f424a7888de972 313-314
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "b6ccea0c7a0eb46b56a4f9fa87636f3c981609f6",
+  "prompts": {
+    "51f424a7888de972": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e0d299e1-5708-4c9e-ab4c-68878e5c7822",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 51,
+      "total_deletions": 20,
+      "accepted_lines": 20,
+      "overriden_lines": 6
+    }
+  }
+}
