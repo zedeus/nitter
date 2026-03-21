@@ -257,10 +257,6 @@ proc renderLatestPost(username: string; id: int64): VNode =
     a(href=getLink(id, username)):
       text "See the latest post"
 
-proc renderQuoteMedia(quote: Tweet; prefs: Prefs; path: string): VNode =
-  buildHtml(tdiv(class="quote-media-container")):
-    renderMedia(quote.media, prefs, path)
-
 proc renderCommunityNote(note: string; prefs: Prefs): VNode =
   buildHtml(tdiv(class="community-note")):
     tdiv(class="community-note-header"):
@@ -268,6 +264,10 @@ proc renderCommunityNote(note: string; prefs: Prefs): VNode =
       span: text "Community note"
     tdiv(class="community-note-text", dir="auto"):
       verbatim replaceUrls(note, prefs)
+
+proc renderQuoteMedia(quote: Tweet; prefs: Prefs; path: string): VNode =
+  buildHtml(tdiv(class="quote-media-container")):
+    renderMedia(quote.media, prefs, path)
 
 proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
   if not quote.available:
@@ -314,6 +314,15 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
     if quote.history.len > 0 and quote.id != max(quote.history):
       tdiv(class="quote-latest"):
         text "There's a new version of this post"
+
+proc renderDisclosures*(tweet: Tweet): VNode =
+  buildHtml(tdiv(class="disclosures")):
+    if tweet.isAI:
+      span(data-disclosure="ai"):
+        icon "attention", "Made with AI"
+    if tweet.isAd:
+      span(data-disclosure="ad"):
+        icon "attention", "Paid partnership (ad)"
 
 proc renderLocation*(tweet: Tweet): string =
   let (place, url) = tweet.getLocation()
@@ -390,6 +399,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
 
       if tweet.note.len > 0 and not prefs.hideCommunityNotes:
         renderCommunityNote(tweet.note, prefs)
+
+      if tweet.isAI or tweet.isAd:
+        renderDisclosures(tweet)
 
       let
         hasEdits = tweet.history.len > 1

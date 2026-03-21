@@ -61,7 +61,8 @@ proc parseGraphUser(js: JsonNode): User =
     result.fullname = user{"core", "name"}.getStr
     result.userPic = user{"avatar", "image_url"}.getImageStr.replace("_normal", "")
 
-    if user{"is_blue_verified"}.getBool(false):
+    if user{"is_blue_verified"}.getBool(
+       user{"verification", "is_blue_verified"}.getBool(false)):
       result.verifiedType = blue
 
     with verifiedType, user{"verification", "verified_type"}:
@@ -205,6 +206,12 @@ proc parseMediaEntities(js: JsonNode; result: var Tweet) =
             altText: mediaInfo{"alt_text"}.getStr
           ))
         else: discard
+
+      if "expanded_url" in mediaEntity:
+        let expandedUrl = js.getExpandedUrl
+        if result.text.endsWith(expandedUrl):
+          result.text.removeSuffix(expandedUrl)
+          result.text = result.text.strip()
 
     if mediaEntities.len > 0 and parsedMedia.len == mediaEntities.len:
       result.media = parsedMedia
@@ -409,7 +416,7 @@ proc parseGraphTweet(js: JsonNode): Tweet =
   else:
     discard
 
-  if not js.hasKey("legacy"):
+  if "legacy" notin js and "rest_id" notin js:
     return Tweet()
 
   var jsCard = select(js{"card"}, js{"tweet_card"}, js{"legacy", "tweet_card"})
@@ -432,8 +439,41 @@ proc parseGraphTweet(js: JsonNode): Tweet =
   with restId, js{"reply_to_results", "rest_id"}:
     replyId = restId.getId
 
-  result = parseTweet(js{"legacy"}, jsCard, replyId)
-  result.id = js{"rest_id"}.getId
+  if "details" in js:
+    result = Tweet(
+      id: js{"rest_id"}.getId,
+      available: true,
+      text: js{"details", "full_text"}.getStr,
+      time: js{"details", "created_at_ms"}.getTimeFromMs,
+      replyId: js{"reply_to_results", "rest_id"}.getId,
+      isAd: js{"content_disclosure", "advertising_disclosure", "is_paid_promotion"}.getBool,
+      isAI: js{"content_disclosure", "ai_generated_disclosure", "has_ai_generated_media"}.getBool,
+      stats: TweetStats(
+        replies: js{"counts", "reply_count"}.getInt,
+        retweets: js{"counts", "retweet_count"}.getInt,
+        likes: js{"counts", "favorite_count"}.getInt,
+      )
+    )
+
+    if jsCard.kind != JNull:
+      let name = jsCard{"name"}.getStr
+      if "poll" in name:
+        if "image" in name:
+          result.media.addMedia(Photo(
+            url: jsCard{"binding_values", "image_large"}.getImageVal
+          ))
+
+        result.poll = some parsePoll(jsCard)
+      elif name == "amplify":
+        result.media.addMedia(parsePromoVideo(jsCard{"binding_values"}))
+      else:
+        result.card = some parseCard(jsCard, js{"url_entities"})
+
+    result.expandTweetEntitiesV2(js)
+  else:
+    result = parseTweet(js{"legacy"}, jsCard, replyId)
+    result.id = js{"rest_id"}.getId
+
   result.user = parseGraphUser(js{"core"})
 
   if result.reply.len == 0:

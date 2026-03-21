@@ -320,6 +320,58 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
 
   tweet.expandTextEntities(entities, tweet.text, textSlice, replyTo, hasQuote or hasJobCard)
 
+proc expandTextEntitiesV2(tweet: Tweet; js: JsonNode; text: string; textSlice: Slice[int];
+                          hasRedundantLink=false) =
+  let hasCard = tweet.card.isSome
+
+  var replacements = newSeq[ReplaceSlice]()
+
+  with urls, js{"url_entities"}:
+    for u in urls:
+      let urlStr = u["url"].getStr
+      if urlStr.len == 0 or urlStr notin text:
+        continue
+
+      replacements.extractUrls(u, textSlice.b, hideTwitter = hasRedundantLink)
+
+      if hasCard and u{"url"}.getStr == get(tweet.card).url:
+        get(tweet.card).url = u.getExpandedUrl
+
+  with hashtags, js{"details", "hashtag_entities"}:
+    for hashtag in hashtags:
+      replacements.extractHashtags(hashtag)
+
+  with cashtags, js{"details", "cashtag_entities"}:
+    for cashtag in cashtags:
+      replacements.extractHashtags(cashtag)
+
+  with mentions, js{"mention_entities"}:
+    for mention in mentions:
+      let
+        name = mention{"screen_name"}.getStr
+        slice = mention.extractSlice
+        idx = tweet.reply.find(name)
+
+      if slice.a >= textSlice.a:
+        replacements.add ReplaceSlice(kind: rkMention, slice: slice,
+          url: "/" & name, display: mention["name"].getStr)
+      elif idx == -1 and tweet.replyId != 0:
+        tweet.reply.add name
+
+  replacements.deduplicate
+  replacements.sort(cmp)
+
+  tweet.text = text.toRunes.replacedWith(replacements, textSlice).strip(leading=false)
+
+proc expandTweetEntitiesV2*(tweet: Tweet; js: JsonNode) =
+  let
+    textRange = js{"details", "display_text_range"}
+    textSlice = textRange{0}.getInt .. textRange{1}.getInt
+    hasQuote = "quoted_tweet_results" in js
+    hasJobCard = tweet.card.isSome and get(tweet.card).kind == jobDetails
+
+  tweet.expandTextEntitiesV2(js, tweet.text, textSlice, hasQuote or hasJobCard)
+
 proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
     entities = ? js{"entity_set"}

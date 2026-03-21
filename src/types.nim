@@ -240,6 +240,8 @@ type
     media*: MediaEntities
     history*: seq[int64]
     note*: string
+    isAd*: bool
+    isAI*: bool
 
   Tweets* = seq[Tweet]
 

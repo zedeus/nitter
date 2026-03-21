@@ -1,12 +1,12 @@
 @font-face {
   font-family: "fontello";
-  src: url("/fonts/fontello.eot?42791196");
+  src: url("/fonts/fontello.eot?49059696");
   src:
-    url("/fonts/fontello.eot?42791196#iefix") format("embedded-opentype"),
-    url("/fonts/fontello.woff2?42791196") format("woff2"),
-    url("/fonts/fontello.woff?42791196") format("woff"),
-    url("/fonts/fontello.ttf?42791196") format("truetype"),
-    url("/fonts/fontello.svg?42791196#fontello") format("svg");
+    url("/fonts/fontello.eot?49059696#iefix") format("embedded-opentype"),
+    url("/fonts/fontello.woff2?49059696") format("woff2"),
+    url("/fonts/fontello.woff?49059696") format("woff"),
+    url("/fonts/fontello.ttf?49059696") format("truetype"),
+    url("/fonts/fontello.svg?49059696#fontello") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -126,6 +126,11 @@
 }
 
 /* '' */
+.icon-attention:before {
+  content: "\e812";
+}
+
+/* '' */
 .icon-circle:before {
   content: "\f111";
 }

@@ -16,7 +16,7 @@ const
   graphUserTweetsAndReplies* = "kkaJ0Mf34PZVarrxzLihjg/UserTweetsAndReplies"
   graphUserMedia* = "36oKqyQ7E_9CmtONGjJRsA/UserMedia"
   graphUserMediaV2* = "bp0e_WdXqgNBIwlLukzyYA/MediaTimelineV2"
-  graphTweet* = "Y4Erk_-0hObvLpz0Iw3bzA/ConversationTimeline"
+  graphTweet* = "b4pV7sWOe97RncwHcGESUA/ConversationTimeline"
   graphTweetDetail* = "YVyS4SfwYW7Uw5qwy0mQCA/TweetDetail"
   graphTweetResult* = "nzme9KiYhfIOrrLrPP_XeQ/TweetResultByIdQuery"
   graphTweetEditHistory* = "upS9teTSG45aljmP9oTuXA/TweetEditHistory"

@@ -80,8 +80,8 @@
 }
 
 .tweet-published {
-  margin-top: 10px;
-  margin-bottom: 3px;
+  margin-top: 6px;
+  margin-bottom: 0px;
   color: var(--grey);
   pointer-events: all;
 }
@@ -291,4 +291,17 @@
   white-space: pre-line;
   padding: 10px 10px;
   padding-top: 6px;
+}
+
+.disclosures {
+  display: flex;
+  flex-direction: column;
+  color: var(--grey);
+  font-size: 14px;
+  margin-top: 4px;
+  margin-bottom: -2px;
+
+  .icon-attention {
+    margin-right: -3px;
+  }
 }
