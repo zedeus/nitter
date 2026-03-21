@@ -1,0 +1,23 @@
+src/parser.nim
+  03bc66f944dc49f2 317
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "34296674143c4f94036805e2d7ca168f6e25e613",
+  "prompts": {
+    "03bc66f944dc49f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b89c7f8b-5d84-4f9e-9e88-1b56c9f22184",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 7,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
