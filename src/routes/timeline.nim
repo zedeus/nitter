@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, strutils, sequtils, uri, options, times
+import asyncdispatch, strutils, sequtils, uri, options, times, json
 import jester, karax/vdom
 
 import router_utils
@@ -11,6 +11,168 @@ export uri, sequtils
 export router_utils
 export redis_cache, formatters, query, api
 export profile, timeline, status, about_account
+
+proc formatApiTime(dt: DateTime): string =
+  dt.format("yyyy-MM-dd'T'HH:mm:ss'Z'")
+
+proc userToJson(user: User): JsonNode =
+  %*{
+    "id": user.id,
+    "username": user.username,
+    "fullname": user.fullname,
+    "bio": user.bio,
+    "location": user.location,
+    "website": user.website,
+    "avatar": getUserPic(user.userPic, "_400x400"),
+    "banner": user.banner,
+    "followers": user.followers,
+    "following": user.following,
+    "tweets": user.tweets,
+    "likes": user.likes,
+    "media": user.media,
+    "verified_type": $user.verifiedType,
+    "protected": user.protected,
+    "suspended": user.suspended,
+    "join_date": if user.joinDate.year > 0: user.joinDate.formatApiTime else: ""
+  }
+
+proc videoVariantToJson(variant: VideoVariant): JsonNode =
+  %*{
+    "content_type": $variant.contentType,
+    "url": variant.url,
+    "bitrate": variant.bitrate,
+    "resolution": variant.resolution
+  }
+
+proc videoToJson(video: Video): JsonNode =
+  var variants = newJArray()
+  for variant in video.variants:
+    variants.add videoVariantToJson(variant)
+
+  %*{
+    "type": $video.playbackType,
+    "url": video.url,
+    "proxy_url": getVidUrl(video.url),
+    "thumbnail": video.thumb,
+    "duration_ms": video.durationMs,
+    "available": video.available,
+    "reason": video.reason,
+    "title": video.title,
+    "description": video.description,
+    "variants": variants
+  }
+
+proc mediaToJson(media: Media): JsonNode =
+  case media.kind
+  of photoMedia:
+    %*{
+      "type": "photo",
+      "url": media.photo.url,
+      "proxy_url": getPicUrl(media.photo.url),
+      "alt_text": media.photo.altText
+    }
+  of videoMedia:
+    videoToJson(media.video)
+  of gifMedia:
+    %*{
+      "type": "gif",
+      "url": media.gif.url,
+      "proxy_url": getVidUrl(media.gif.url),
+      "thumbnail": media.gif.thumb,
+      "alt_text": media.gif.altText
+    }
+
+proc pollToJson(poll: Poll): JsonNode =
+  %*{
+    "options": poll.options,
+    "values": poll.values,
+    "votes": poll.votes,
+    "leader": poll.leader,
+    "status": poll.status
+  }
+
+proc cardToJson(card: Card): JsonNode =
+  var result = %*{
+    "kind": $card.kind,
+    "url": card.url,
+    "title": card.title,
+    "destination": card.dest,
+    "text": card.text,
+    "image": card.image
+  }
+  if card.video.isSome:
+    result["video"] = videoToJson(card.video.get())
+  result
+
+proc tweetToJson(tweet: Tweet; cfg: Config; prefs: Prefs; depth=1): JsonNode =
+  if tweet.isNil:
+    return newJNull()
+
+  var media = newJArray()
+  for item in tweet.media:
+    media.add mediaToJson(item)
+
+  var result = %*{
+    "id": $tweet.id,
+    "url": getUrlPrefix(cfg) & getLink(tweet, focus=false),
+    "created_at": tweet.time.formatApiTime,
+    "text": tweet.text,
+    "html": replaceUrls(tweet.text, prefs),
+    "available": tweet.available,
+    "tombstone": tweet.tombstone,
+    "location": tweet.location,
+    "reply_to": tweet.reply,
+    "pinned": tweet.pinned,
+    "has_thread": tweet.hasThread,
+    "note": tweet.note,
+    "is_ad": tweet.isAd,
+    "is_ai": tweet.isAI,
+    "user": userToJson(tweet.user),
+    "stats": %*{
+      "replies": tweet.stats.replies,
+      "retweets": tweet.stats.retweets,
+      "likes": tweet.stats.likes,
+      "views": tweet.stats.views
+    },
+    "media": media,
+    "history": tweet.history
+  }
+
+  if tweet.poll.isSome:
+    result["poll"] = pollToJson(tweet.poll.get())
+
+  if tweet.card.isSome:
+    result["card"] = cardToJson(tweet.card.get())
+
+  if depth > 0 and tweet.quote.isSome:
+    result["quote"] = tweetToJson(tweet.quote.get(), cfg, prefs, depth - 1)
+
+  if depth > 0 and tweet.retweet.isSome:
+    result["retweet"] = tweetToJson(tweet.retweet.get(), cfg, prefs, depth - 1)
+
+  result
+
+proc tweetsToJson(tweets: Tweets; cfg: Config; prefs: Prefs): JsonNode =
+  result = newJArray()
+  for tweet in tweets:
+    result.add tweetToJson(tweet, cfg, prefs)
+
+proc timelineToJson(groups: seq[Tweets]; cfg: Config; prefs: Prefs): JsonNode =
+  result = newJArray()
+  for group in groups:
+    for tweet in group:
+      result.add tweetToJson(tweet, cfg, prefs)
+
+proc timelineApiResponse*(profile: Profile; cfg: Config; prefs: Prefs): string =
+  $(%*{
+    "user": userToJson(profile.user),
+    "cursor": profile.tweets.bottom,
+    "has_more": profile.tweets.bottom.len > 0,
+    "tweets": timelineToJson(profile.tweets.content, cfg, prefs)
+  })
+
+proc apiErrorResponse*(message: string): string =
+  $(%*{"error": message})
 
 proc getQuery*(request: Request; tab, name: string; prefs: Prefs): Query =
   let view = request.params.getOrDefault("view")
@@ -134,6 +296,26 @@ proc createTimelineRouter*(cfg: Config) =
       let aboutHtml = renderAboutAccount(info)
       resp renderMain(aboutHtml, request, cfg, prefs,
                       "About @" & info.username)
+
+    get "/@name/api":
+      cond '.' notin @"name"
+      cond @"name" notin ["pic", "gif", "video", "search", "settings", "login", "intent", "i"]
+      cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_', ','})
+
+      let
+        prefs = requestPrefs()
+        after = getCursor()
+        name = @"name"
+        profile = await fetchProfile(after, Query(fromUser: @[name]), skipRail=true)
+
+      if profile.user.suspended:
+        resp Http404, {"Content-Type": "application/json; charset=utf-8"}, apiErrorResponse(getSuspended(name))
+
+      if profile.user.id.len == 0:
+        resp Http404, {"Content-Type": "application/json; charset=utf-8"}, apiErrorResponse("User not found")
+
+      resp Http200, {"Content-Type": "application/json; charset=utf-8"},
+           timelineApiResponse(profile, cfg, prefs)
 
     get "/@name/?@tab?/?":
       cond '.' notin @"name"

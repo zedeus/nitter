@@ -5,7 +5,7 @@ import asynchttpserver, asyncstreams, asyncfile, asyncnet
 import jester
 
 import router_utils
-import ".."/[types, formatters, utils]
+import ".."/[types, formatters, utils, http_pool]
 
 export asynchttpserver, asyncstreams, asyncfile, asyncnet
 export httpclient, os, strutils, asyncstreams, base64, re
@@ -15,7 +15,7 @@ const
   maxAge* = "max-age=604800"
 
 proc safeFetch*(url: string): Future[string] {.async.} =
-  let client = newAsyncHttpClient()
+  let client = newClient()
   try: result = await client.getContent(url)
   except: discard
   finally: client.close()
@@ -32,7 +32,7 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   result = Http200
   let
     request = req.getNativeReq()
-    client = newAsyncHttpClient()
+    client = newClient()
 
   try:
     let res = await client.get(url)

@@ -1,12 +1,13 @@
-version: "3"
-
 services:
 
   nitter:
-    image: zedeus/nitter:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.arm64 # Change to Dockerfile.amd64 if you want to build for AMD64 architecture
+    image: nitter-local:arm64 # Change to nitter-local:amd64 if you built for AMD64 architecture
     container_name: nitter
     ports:
-      - "127.0.0.1:8080:8080" # Replace with "8080:8080" if you don't use a reverse proxy
+      - "127.0.0.1:1145:1145"
     volumes:
       - ./nitter.conf:/src/nitter.conf:Z,ro
       - ./sessions.jsonl:/src/sessions.jsonl:Z,ro # Run get_sessions.py to get the credentials
@@ -14,7 +15,7 @@ services:
       - nitter-redis
     restart: unless-stopped
     healthcheck:
-      test: wget -nv --tries=1 --spider http://127.0.0.1:8080/Jack/status/20 || exit 1
+      test: wget -nv --tries=1 --spider http://127.0.0.1:1145/.health || exit 1
       interval: 30s
       timeout: 5s
       retries: 2

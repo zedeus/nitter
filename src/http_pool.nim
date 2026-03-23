@@ -18,6 +18,10 @@ proc setHttpProxy*(url: string; auth: string) =
   else:
     proxy = nil
 
+proc newClient*(heads: HttpHeaders = nil): AsyncHttpClient =
+  let clientHeaders = if heads.isNil: newHttpHeaders() else: heads
+  newAsyncHttpClient(headers=clientHeaders, proxy=proxy)
+
 proc release*(pool: HttpPool; client: AsyncHttpClient; badClient=false) =
   if pool.conns.len >= maxConns or badClient:
     try: client.close()
@@ -27,7 +31,7 @@ proc release*(pool: HttpPool; client: AsyncHttpClient; badClient=false) =
 
 proc acquire*(pool: HttpPool; heads: HttpHeaders): AsyncHttpClient =
   if pool.conns.len == 0:
-    result = newAsyncHttpClient(headers=heads, proxy=proxy)
+    result = newClient(heads)
   else:
     result = pool.conns.pop()
     result.headers = heads
