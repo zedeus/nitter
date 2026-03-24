@@ -74,8 +74,8 @@ proc createStatusRouter*(cfg: Config) =
       let id = @"id"
 
       if id.len > 19 or id.any(c => not c.isDigit):
-        resp Http404, {"Content-Type": "application/json; charset=utf-8"},
-             apiErrorResponse("Invalid tweet ID")
+        resp Http404, apiErrorResponse("Invalid tweet ID"),
+             "application/json; charset=utf-8"
 
       let
         prefs = requestPrefs()
@@ -85,11 +85,10 @@ proc createStatusRouter*(cfg: Config) =
         var error = "Tweet not found"
         if conv != nil and conv.tweet != nil and conv.tweet.tombstone.len > 0:
           error = conv.tweet.tombstone
-        resp Http404, {"Content-Type": "application/json; charset=utf-8"},
-             apiErrorResponse(error)
+        resp Http404, apiErrorResponse(error), "application/json; charset=utf-8"
 
       let body = tweetApiResponse(conv.tweet, cfg, prefs)
-      resp Http200, {"Content-Type": "application/json; charset=utf-8"}, body
+      resp Http200, body, "application/json; charset=utf-8"
 
     get "/@name/status/@id/history/?":
       cond '.' notin @"name"

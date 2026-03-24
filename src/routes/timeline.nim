@@ -312,13 +312,13 @@ proc createTimelineRouter*(cfg: Config) =
         profile = await fetchProfile(after, Query(fromUser: @[name]), skipRail=true)
 
       if profile.user.suspended:
-        resp Http404, {"Content-Type": "application/json; charset=utf-8"}, apiErrorResponse(getSuspended(name))
+        resp Http404, apiErrorResponse(getSuspended(name)), "application/json; charset=utf-8"
 
       if profile.user.id.len == 0:
-        resp Http404, {"Content-Type": "application/json; charset=utf-8"}, apiErrorResponse("User not found")
+        resp Http404, apiErrorResponse("User not found"), "application/json; charset=utf-8"
 
-      resp Http200, {"Content-Type": "application/json; charset=utf-8"},
-           timelineApiResponse(profile, cfg, prefs)
+      resp Http200, timelineApiResponse(profile, cfg, prefs),
+           "application/json; charset=utf-8"
 
     get "/@name/?@tab?/?":
       cond '.' notin @"name"
