@@ -104,7 +104,7 @@ proc cardToJson(card: Card): JsonNode =
     result["video"] = videoToJson(card.video.get())
   result
 
-proc tweetToJson(tweet: Tweet; cfg: Config; prefs: Prefs; depth=1): JsonNode =
+proc tweetToJson*(tweet: Tweet; cfg: Config; prefs: Prefs; depth=1): JsonNode =
   if tweet.isNil:
     return newJNull()
 
@@ -170,6 +170,9 @@ proc timelineApiResponse*(profile: Profile; cfg: Config; prefs: Prefs): string =
     "has_more": profile.tweets.bottom.len > 0,
     "tweets": timelineToJson(profile.tweets.content, cfg, prefs)
   })
+
+proc tweetApiResponse*(tweet: Tweet; cfg: Config; prefs: Prefs): string =
+  $(tweetToJson(tweet, cfg, prefs))
 
 proc apiErrorResponse*(message: string): string =
   $(%*{"error": message})

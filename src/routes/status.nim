@@ -5,6 +5,7 @@ import jester, karax/vdom
 
 import router_utils
 import ".."/[types, formatters, api]
+from timeline import tweetApiResponse, apiErrorResponse
 import ../views/[general, status]
 
 export uri, sequtils, options, sugar
@@ -67,6 +68,28 @@ proc createStatusRouter*(cfg: Config) =
       let html = renderConversation(conv, prefs, getPath() & "#m")
       resp renderMain(html, request, cfg, prefs, title, desc, ogTitle,
                       images=images, video=video)
+
+    get "/@name/status/@id/api":
+      cond '.' notin @"name"
+      let id = @"id"
+
+      if id.len > 19 or id.any(c => not c.isDigit):
+        resp Http404, {"Content-Type": "application/json; charset=utf-8"},
+             apiErrorResponse("Invalid tweet ID")
+
+      let
+        prefs = requestPrefs()
+        conv = await getTweet(id, getCursor())
+
+      if conv == nil or conv.tweet == nil or conv.tweet.id == 0:
+        var error = "Tweet not found"
+        if conv != nil and conv.tweet != nil and conv.tweet.tombstone.len > 0:
+          error = conv.tweet.tombstone
+        resp Http404, {"Content-Type": "application/json; charset=utf-8"},
+             apiErrorResponse(error)
+
+      let body = tweetApiResponse(conv.tweet, cfg, prefs)
+      resp Http200, {"Content-Type": "application/json; charset=utf-8"}, body
 
     get "/@name/status/@id/history/?":
       cond '.' notin @"name"

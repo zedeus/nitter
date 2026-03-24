@@ -1,17 +1,27 @@
-# User Timeline API
+# Timeline API
 
-This repository exposes a JSON endpoint for a user's public timeline.
+This repository exposes JSON endpoints for a user's public timeline and for a single tweet.
 
-## Endpoint
+## Endpoints
+
+### User timeline
 
 - Path: `GET /<username>/api`
 - Example: `GET /SOUNDVOLTEX573/api`
 - Optional query parameter: `cursor`
 - Response type: `application/json; charset=utf-8`
 
-This endpoint returns the same first-page timeline data source used by the HTML timeline, but serialized as JSON.
+This endpoint returns the same timeline data source used by the HTML timeline, but serialized as JSON.
 
-## Top-level response
+### Single tweet
+
+- Path: `GET /<username>/status/<tweet_id>/api`
+- Example: `GET /SOUNDVOLTEX573/status/2035299206743961670/api`
+- Response type: `application/json; charset=utf-8`
+
+This endpoint returns one `Tweet object` using the same schema as each item inside the timeline response.
+
+## User timeline response
 
 ```json
 {
@@ -28,6 +38,34 @@ Top-level fields:
 - `cursor`: pagination token for the next request
 - `has_more`: whether another page is likely available
 - `tweets`: recent tweets in reverse chronological order
+
+## Single tweet response
+
+The single-tweet endpoint returns one tweet object directly, not a wrapper object.
+
+```json
+{
+  "id": "2035299206743961670",
+  "url": "http://127.0.0.1:1145/SOUNDVOLTEX573/status/2035299206743961670",
+  "created_at": "2026-03-21T10:15:19Z",
+  "text": "...",
+  "user": {"...": "author fields"},
+  "stats": {"...": "counts"},
+  "media": [{"...": "media objects"}]
+}
+```
+
+Real example request:
+
+```text
+GET /SOUNDVOLTEX573/status/2035299206743961670/api
+```
+
+Invalid tweet ids return JSON errors, for example:
+
+```json
+{"error":"Invalid tweet ID"}
+```
 
 ## Pagination
 
