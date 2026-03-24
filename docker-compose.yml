@@ -3,7 +3,7 @@ services:
   nitter:
     build:
       context: .
-      dockerfile: Dockerfile.arm64 # Change to Dockerfile.amd64 if you want to build for AMD64 architecture
+      dockerfile: Dockerfile.arm64 # Change to Dockerfile if you want to build for AMD64 architecture
     image: nitter-local:arm64 # Change to nitter-local:amd64 if you built for AMD64 architecture
     container_name: nitter
     ports:
