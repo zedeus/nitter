@@ -39,6 +39,8 @@ Top-level fields:
 - `has_more`: whether another page is likely available
 - `tweets`: recent tweets in reverse chronological order
 
+When a profile has a pinned tweet, it is included in the `tweets` array as well. If it is not already present in the fetched timeline page, Nitter inserts it at the beginning of the response.
+
 ## Single tweet response
 
 The single-tweet endpoint returns one tweet object directly, not a wrapper object.

@@ -157,6 +157,20 @@ proc tweetsToJson(tweets: Tweets; cfg: Config; prefs: Prefs): JsonNode =
   for tweet in tweets:
     result.add tweetToJson(tweet, cfg, prefs)
 
+proc getTweetsWithPinned*(profile: Profile): seq[Tweets] =
+  result = profile.tweets.content
+
+  if not profile.pinned.isSome:
+    return
+
+  let pinnedTweet = profile.pinned.get
+  for thread in result:
+    for tweet in thread:
+      if tweet.id == pinnedTweet.id:
+        return
+
+  result.insert(@[pinnedTweet], 0)
+
 proc timelineToJson(groups: seq[Tweets]; cfg: Config; prefs: Prefs): JsonNode =
   result = newJArray()
   for group in groups:
@@ -168,7 +182,7 @@ proc timelineApiResponse*(profile: Profile; cfg: Config; prefs: Prefs): string =
     "user": userToJson(profile.user),
     "cursor": profile.tweets.bottom,
     "has_more": profile.tweets.bottom.len > 0,
-    "tweets": timelineToJson(profile.tweets.content, cfg, prefs)
+    "tweets": timelineToJson(getTweetsWithPinned(profile), cfg, prefs)
   })
 
 proc tweetApiResponse*(tweet: Tweet; cfg: Config; prefs: Prefs): string =
