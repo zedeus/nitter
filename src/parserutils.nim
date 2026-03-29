@@ -88,6 +88,14 @@ proc getTimeFromMs*(js: JsonNode): DateTime =
   let seconds = ms div 1000
   return fromUnix(seconds).utc()
 
+proc getTimeFromMsStr*(js: JsonNode): DateTime =
+  var ms: int64
+  try: ms = parseBiggestInt(js.getStr("0"))
+  except ValueError: return
+  if ms == 0: return
+  let seconds = ms div 1000
+  return fromUnix(seconds).utc()
+
 proc getId*(id: string): int64 {.inline.} =
   let start = id.rfind("-")
   if start < 0:

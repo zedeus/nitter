@@ -4,13 +4,13 @@ import jester, karax/vdom
 
 import router_utils
 import ".."/[types, redis_cache, formatters, query, api]
-import ../views/[general, profile, timeline, status, search]
+import ../views/[general, profile, timeline, status, search, about_account]
 
 export vdom
 export uri, sequtils
 export router_utils
 export redis_cache, formatters, query, api
-export profile, timeline, status
+export profile, timeline, status, about_account
 
 proc getQuery*(request: Request; tab, name: string; prefs: Prefs): Query =
   let view = request.params.getOrDefault("view")
@@ -57,6 +57,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false): Future[Profile]
         getCachedPhotoRail(userId)
 
     user = getCachedUser(name)
+    info = getCachedAccountInfo(name, fetch=false)
 
   result =
     case query.kind
@@ -67,6 +68,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false): Future[Profile]
 
   result.user = await user
   result.photoRail = await rail
+  result.accountInfo = await info
 
   result.tweets.query = query
 
@@ -118,6 +120,20 @@ proc createTimelineRouter*(cfg: Config) =
       if username.len == 0:
         resp Http400, showError("Missing screen_name parameter", cfg)
       redirect("/" & username)
+
+    get "/@name/about/?":
+      cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_'})
+      let
+        prefs = requestPrefs()
+        name = @"name"
+        info = await getCachedAccountInfo(name)
+      if info.suspended:
+        resp showError(getSuspended(name), cfg)
+      if info.username.len == 0:
+        resp Http404, showError("User \"" & name & "\" not found", cfg)
+      let aboutHtml = renderAboutAccount(info)
+      resp renderMain(aboutHtml, request, cfg, prefs,
+                      "About @" & info.username)
 
     get "/@name/?@tab?/?":
       cond '.' notin @"name"

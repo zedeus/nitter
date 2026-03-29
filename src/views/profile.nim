@@ -12,7 +12,7 @@ proc renderStat(num: int; class: string; text=""): VNode =
     span(class="profile-stat-num"):
       text insertSep($num, ',')
 
-proc renderUserCard*(user: User; prefs: Prefs): VNode =
+proc renderUserCard*(user: User; prefs: Prefs; info: AccountInfo): VNode =
   buildHtml(tdiv(class="profile-card")):
     tdiv(class="profile-card-info"):
       let
@@ -46,6 +46,11 @@ proc renderUserCard*(user: User; prefs: Prefs): VNode =
           else:
             span: text place
 
+      if info.basedIn.len > 0:
+        tdiv(class="profile-location"):
+          span: icon "location"
+          span: text "Based in " & info.basedIn
+
       if user.website.len > 0:
         tdiv(class="profile-website"):
           span:
@@ -54,7 +59,7 @@ proc renderUserCard*(user: User; prefs: Prefs): VNode =
             a(href=url): text url.shortLink
 
       tdiv(class="profile-joindate"):
-        span(title=getJoinDateFull(user)):
+        a(href=(&"/{user.username}/about"), title=getJoinDateFull(user)):
           icon "calendar", getJoinDate(user)
 
       tdiv(class="profile-card-extra-links"):
@@ -115,7 +120,7 @@ proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
     if not isGalleryView:
       let sticky = if prefs.stickyProfile: " sticky" else: ""
       tdiv(class=("profile-tab" & sticky)):
-        renderUserCard(profile.user, prefs)
+        renderUserCard(profile.user, prefs, profile.accountInfo)
         if profile.photoRail.len > 0:
           renderPhotoRail(profile)
 

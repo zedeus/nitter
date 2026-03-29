@@ -66,6 +66,13 @@ proc getGraphUserById*(id: string): Future[User] {.async.} =
     js = await fetchRaw(url)
   result = parseGraphUser(js)
 
+proc getAboutAccount*(username: string): Future[AccountInfo] {.async.} =
+  if username.len == 0: return
+  let
+    url = apiReq(graphAboutAccount, """{"screenName":"$1"}""" % username)
+    js = await fetch(url)
+  result = parseAboutAccount(js)
+
 proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profile] {.async.} =
   if id.len == 0: return
   let

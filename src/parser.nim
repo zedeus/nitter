@@ -68,6 +68,48 @@ proc parseGraphUser(js: JsonNode): User =
     with verifiedType, user{"verification", "verified_type"}:
       result.verifiedType = parseEnum[VerifiedType](verifiedType.getStr)
 
+proc parseAboutAccount*(js: JsonNode): AccountInfo =
+  if js.isNull: return
+
+  let user = ? js{"data", "user_result_by_screen_name", "result"}
+
+  if user{"unavailable_reason"}.getStr == "Suspended":
+    result.suspended = true
+    return
+
+  result = AccountInfo(
+    username: user{"core", "screen_name"}.getStr,
+    fullname: user{"core", "name"}.getStr,
+    joinDate: user{"core", "created_at"}.getTime,
+    userPic: user{"avatar", "image_url"}.getImageStr.replace("_normal", ""),
+    affiliateLabel: user{"identity_profile_labels_highlighted_label", "label", "description"}.getStr,
+  )
+
+  if user{"is_blue_verified"}.getBool(false):
+    result.verifiedType = blue
+  with verifiedType, user{"verification", "verified_type"}:
+    result.verifiedType = parseEnum[VerifiedType](verifiedType.getStr)
+
+  with about, user{"about_profile"}:
+    result.basedIn = about{"account_based_in"}.getStr
+    result.source = about{"source"}.getStr
+    result.affiliateUsername = about{"affiliate_username"}.getStr
+
+    try: 
+      result.usernameChanges = about{"username_changes", "count"}.getStr("0").parseInt
+    except ValueError: 
+      discard
+
+    with lastChange, about{"username_changes", "last_changed_at_msec"}:
+      result.lastUsernameChange = lastChange.getTimeFromMsStr
+
+  with info, user{"verification_info"}:
+    result.isIdentityVerified = info{"is_identity_verified"}.getBool
+    with reason, info{"reason"}:
+      result.overrideVerifiedYear = reason{"override_verified_year"}.getInt
+      with since, reason{"verified_since_msec"}:
+        result.verifiedSince = since.getTimeFromMsStr
+
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
 
