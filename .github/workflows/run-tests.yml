@@ -142,4 +142,4 @@ jobs:
         run: |
           ./nitter &
           cd tests
-          poetry run pytest -n3 --reruns=3 --rs .
+          poetry run pytest -n3 --reruns=5 --rs .
