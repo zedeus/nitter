@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.21",
+  "base_commit_sha": "0c7583432c0f7c92c69b5de80c748fd755017ce2",
+  "prompts": {
+    "1f014208146aef92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "466be865-daed-46f6-b601-8364c87af190",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 154,
+      "overriden_lines": 0
+    }
+  }
+}
