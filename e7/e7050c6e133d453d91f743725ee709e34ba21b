@@ -1,0 +1,45 @@
+src/sass/profile/_base.scss
+  1f014208146aef92 5
+src/sass/profile/about-account.scss
+  1f014208146aef92 1-71
+src/views/about_account.nim
+  1f014208146aef92 1-93
+src/types.nim
+  1f014208146aef92 99-114,293
+src/views/general.nim
+  1f014208146aef92 53
+src/views/profile.nim
+  1f014208146aef92 15,49-53,62,123
+src/consts.nim
+  1f014208146aef92 28
+src/redis_cache.nim
+  1f014208146aef92 161-173
+src/routes/timeline.nim
+  1f014208146aef92 7,13,60,71,124-137
+src/api.nim
+  1f014208146aef92 69-75
+src/parserutils.nim
+  1f014208146aef92 91-96
+src/parser.nim
+  1f014208146aef92 71-73,76-79,87-96,98-101,103-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.21",
+  "base_commit_sha": "e7e7050c6e133d453d91f743725ee709e34ba21b",
+  "prompts": {
+    "1f014208146aef92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "466be865-daed-46f6-b601-8364c87af190",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 853,
+      "total_deletions": 289,
+      "accepted_lines": 564,
+      "overriden_lines": 6
+    }
+  }
+}
