@@ -113,6 +113,20 @@ type
     verifiedSince*: DateTime
     overrideVerifiedYear*: int
 
+  Broadcast* = object
+    id*: string
+    title*: string
+    state*: string
+    thumb*: string
+    mediaKey*: string
+    m3u8Url*: string
+    totalWatched*: int
+    startTime*: DateTime
+    endTime*: DateTime
+    replayStart*: int
+    availableForReplay*: bool
+    user*: User
+
   VideoType* = enum
     m3u8 = "application/x-mpegURL"
     mp4 = "video/mp4"

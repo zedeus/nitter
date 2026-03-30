@@ -44,6 +44,10 @@
   padding: 0;
   display: flex;
   justify-content: space-between;
+
+  .verified-icon {
+    margin-left: 2px;
+  }
 }
 
 .fullname-and-username {

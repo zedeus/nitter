@@ -34,13 +34,14 @@ proc setApiProxy*(url: string) =
       apiProxy = "http://" & apiProxy
 
 proc toUrl(req: ApiReq; sessionKind: SessionKind): Uri =
-  case sessionKind
-  of oauth:  
-    let o = req.oauth
-    parseUri("https://api.x.com/graphql")   / o.endpoint ? o.params
-  of cookie: 
-    let c = req.cookie
-    parseUri("https://x.com/i/api/graphql") / c.endpoint ? c.params
+  let url = case sessionKind
+    of oauth:  req.oauth
+    of cookie: req.cookie
+  let base = case sessionKind
+    of oauth:  "https://api.x.com"
+    of cookie: "https://x.com/i/api"
+  let prefix = if url.endpoint.startsWith("1.1/"): "" else: "graphql/"
+  parseUri(base) / (prefix & url.endpoint) ? url.params
 
 proc getOauthHeader(url, oauthToken, oauthTokenSecret: string): string =
   let
@@ -89,7 +90,7 @@ proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
     result["sec-fetch-dest"] = "empty"
     result["sec-fetch-mode"] = "cors"
     result["sec-fetch-site"] = "same-site"
-    if disableTid:
+    if disableTid or "/1.1/" in url.path:
       result["authorization"] = bearerToken2
     else:
       result["authorization"] = bearerToken
@@ -116,7 +117,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     pool.use(await genHeaders(session, url)):
       template getContent =
         # TODO: this is a temporary simple implementation
-        if apiProxy.len > 0:
+        if apiProxy.len > 0 and "/1.1/" notin url.path:
           resp = await c.get(($url).replace("https://", apiProxy))
         else:
           resp = await c.get($url)

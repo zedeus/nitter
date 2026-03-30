@@ -110,6 +110,22 @@ proc parseAboutAccount*(js: JsonNode): AccountInfo =
       with since, reason{"verified_since_msec"}:
         result.verifiedSince = since.getTimeFromMsStr
 
+proc parseBroadcastInfo*(js: JsonNode): Broadcast =
+  let bc = ? js{"data", "broadcast"}
+  result = Broadcast(
+    id: bc{"broadcast_id"}.getStr,
+    title: bc{"status"}.getStr,
+    state: bc{"state"}.getStr.toUpperAscii,
+    thumb: bc{"image_url"}.getStr,
+    mediaKey: bc{"media_key"}.getStr,
+    totalWatched: bc{"total_watched"}.getInt,
+    startTime: bc{"start_time"}.getTimeFromMs,
+    endTime: bc{"end_time"}.getTimeFromMs,
+    replayStart: bc{"edited_replay", "start_time"}.getInt,
+    availableForReplay: bc{"available_for_replay"}.getBool,
+    user: parseGraphUser(bc)
+  )
+
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
 
@@ -287,14 +303,23 @@ proc parsePromoVideo(js: JsonNode): Video =
   result.variants.add variant
 
 proc parseBroadcast(js: JsonNode): Card =
-  let image = js{"broadcast_thumbnail_large"}.getImageVal
+  let
+    image = js{"broadcast_thumbnail_large"}.getImageVal
+    broadcastUrl = js{"broadcast_url"}.getStrVal
+    broadcastId = broadcastUrl.rsplit('/', maxsplit=1)[^1]
+    streamUrl = "/i/broadcasts/" & broadcastId & "/stream"
   result = Card(
     kind: broadcast,
-    url: js{"broadcast_url"}.getStrVal,
+    url: "/i/broadcasts/" & broadcastId,
     title: js{"broadcaster_display_name"}.getStrVal,
     text: js{"broadcast_title"}.getStrVal,
     image: image,
-    video: some Video(thumb: image)
+    video: some Video(
+      thumb: image,
+      available: true,
+      playbackType: m3u8,
+      variants: @[VideoVariant(contentType: m3u8, url: streamUrl)]
+    )
   )
 
 proc parseCard(js: JsonNode; urls: JsonNode): Card =

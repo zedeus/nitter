@@ -95,8 +95,8 @@ proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""; bigThumb=fal
       let
         vars = videoData.variants.filterIt(it.contentType == playbackType)
         vidUrl = vars.sortedByIt(it.resolution)[^1].url
-        source = if prefs.proxyVideos: getVidUrl(vidUrl)
-                 else: vidUrl
+        source = if prefs.proxyVideos and vidUrl.startsWith("http"):
+                   getVidUrl(vidUrl) else: vidUrl
       case playbackType
       of mp4:
         video(poster=thumb, controls="", muted=prefs.muteVideos):
@@ -105,7 +105,8 @@ proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""; bigThumb=fal
         video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
         verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
         tdiv(class="overlay-circle"): span(class="overlay-triangle")
-        tdiv(class="overlay-duration"): text getDuration(videoData)
+        if videoData.durationMs > 0:
+          tdiv(class="overlay-duration"): text getDuration(videoData)
         verbatim "</div>"
 
 proc renderVideo*(video: Video; prefs: Prefs; path: string; bigThumb=false): VNode =

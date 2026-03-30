@@ -27,6 +27,9 @@ const
   graphListTweets* = "VQf8_XQynI3WzH6xopOMMQ/ListTimeline"
   graphAboutAccount* = "zs_jFPFT78rBpXv9Z3U2YQ/AboutAccountQuery"
 
+  graphBroadcast* = "0nMmbMh-_JwwRRFNXkyH3Q/BroadcastQuery"
+  restLiveStream* = "1.1/live_video_stream/status/"
+
   gqlFeatures* = """{
   "android_ad_formats_media_component_render_overlay_enabled": false,
   "android_graphql_skip_api_media_color_palette": false,

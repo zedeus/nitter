@@ -73,6 +73,25 @@ proc getAboutAccount*(username: string): Future[AccountInfo] {.async.} =
     js = await fetch(url)
   result = parseAboutAccount(js)
 
+proc restReq(endpoint: string; params: seq[(string, string)] = @[]): ApiReq =
+  let url = ApiUrl(endpoint: endpoint, params: params)
+  ApiReq(cookie: url, oauth: url)
+
+proc getBroadcastInfo*(id: string): Future[Broadcast] {.async.} =
+  if id.len == 0: return
+  let
+    req = apiReq(graphBroadcast, """{"id":"$1"}""" % id)
+    js = await fetch(req)
+  result = parseBroadcastInfo(js)
+
+proc fetchBroadcastStream*(mediaKey: string): Future[string] {.async.} =
+  if mediaKey.len == 0: return
+  let
+    streamReq = restReq(restLiveStream & mediaKey)
+    streamJs = await fetch(streamReq)
+  result = streamJs{"source", "noRedirectPlaybackUrl"}.getStr(
+    streamJs{"source", "location"}.getStr)
+
 proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profile] {.async.} =
   if id.len == 0: return
   let
