@@ -1,0 +1,68 @@
+src/nitter.nim
+  ad0929e16f57cbcd 13,61,125
+src/formatters.nim
+  ad0929e16f57cbcd 94-104,112-118,171-172,177,179-182
+src/views/broadcast.nim
+  ad0929e16f57cbcd 1-9,11-18,22,24-60,63-64,68-69,72-75
+src/sass/index.scss
+  ad0929e16f57cbcd 10
+src/consts.nim
+  ad0929e16f57cbcd 30-32
+src/routes/media.nim
+  ad0929e16f57cbcd 89-94,103,115,144
+src/routes/broadcast.nim
+  ad0929e16f57cbcd 1-44
+src/views/tweet.nim
+  ad0929e16f57cbcd 98-99,108-109
+src/sass/_broadcast.scss
+  ad0929e16f57cbcd 1-60,62-71
+src/utils.nim
+  ad0929e16f57cbcd 20-22,60-61
+src/api.nim
+  ad0929e16f57cbcd 76-94
+public/js/hlsPlayback.js
+  ad0929e16f57cbcd 6,16,22
+src/views/general.nim
+  ad0929e16f57cbcd 53
+src/parser.nim
+  ad0929e16f57cbcd 113-128,306-310,313,317-322
+src/types.nim
+  ad0929e16f57cbcd 116-129
+src/apiutils.nim
+  ad0929e16f57cbcd 37-44,93,120
+src/redis_cache.nim
+  ad0929e16f57cbcd 161-174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.21",
+  "base_commit_sha": "eba8ae2aed6552771370cdab85b8a8ae20188fd4",
+  "prompts": {
+    "1f014208146aef92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "466be865-daed-46f6-b601-8364c87af190",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 154,
+      "overriden_lines": 0
+    },
+    "ad0929e16f57cbcd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "29c25923-55f2-483f-8ffd-f07aa092a9fb",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 909,
+      "total_deletions": 407,
+      "accepted_lines": 527,
+      "overriden_lines": 12
+    }
+  }
+}
