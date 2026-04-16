@@ -1,0 +1,49 @@
+src/parser.nim
+  f330d8a21e8e2007 9-12,42,73,95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "4e38317582d04aa33a4a94f9350982433da0b024",
+  "prompts": {
+    "1f014208146aef92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "466be865-daed-46f6-b601-8364c87af190",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 154,
+      "overriden_lines": 0
+    },
+    "ad0929e16f57cbcd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "29c25923-55f2-483f-8ffd-f07aa092a9fb",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 211,
+      "overriden_lines": 0
+    },
+    "f330d8a21e8e2007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b58044c1-b12f-45bf-b93f-c10e21ef5597",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 3,
+      "accepted_lines": 7,
+      "overriden_lines": 0
+    }
+  }
+}
