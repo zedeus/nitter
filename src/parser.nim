@@ -6,6 +6,10 @@ import experimental/parser/unifiedcard
 
 proc parseGraphTweet(js: JsonNode): Tweet
 
+proc parseVerifiedType(s: string; current: VerifiedType): VerifiedType =
+  try: parseEnum[VerifiedType](s)
+  except ValueError: current
+
 proc parseCommunityNote(js: JsonNode): string =
   let subtitle = js{"subtitle"}
   result = subtitle{"text"}.getStr
@@ -35,7 +39,7 @@ proc parseUser(js: JsonNode; id=""): User =
     result.verifiedType = blue
 
   with verifiedType, js{"verified_type"}:
-    result.verifiedType = parseEnum[VerifiedType](verifiedType.getStr)
+    result.verifiedType = parseVerifiedType(verifiedType.getStr, result.verifiedType)
 
   result.expandUserEntities(js)
 
@@ -66,7 +70,7 @@ proc parseGraphUser(js: JsonNode): User =
       result.verifiedType = blue
 
     with verifiedType, user{"verification", "verified_type"}:
-      result.verifiedType = parseEnum[VerifiedType](verifiedType.getStr)
+      result.verifiedType = parseVerifiedType(verifiedType.getStr, result.verifiedType)
 
 proc parseAboutAccount*(js: JsonNode): AccountInfo =
   if js.isNull: return
@@ -88,7 +92,7 @@ proc parseAboutAccount*(js: JsonNode): AccountInfo =
   if user{"is_blue_verified"}.getBool(false):
     result.verifiedType = blue
   with verifiedType, user{"verification", "verified_type"}:
-    result.verifiedType = parseEnum[VerifiedType](verifiedType.getStr)
+    result.verifiedType = parseVerifiedType(verifiedType.getStr, result.verifiedType)
 
   with about, user{"about_profile"}:
     result.basedIn = about{"account_based_in"}.getStr
