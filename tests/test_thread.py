@@ -1,27 +1,38 @@
-from base import BaseTestCase, Conversation
 from parameterized import parameterized
 
+from base import BaseTestCase, Conversation
+
 thread = [
-    ['octonion/status/975253897697611777', [], 'Based', ['Crystal', 'Julia'], [
-        ['For', 'Then', 'Okay,', 'Python', 'Speed', 'Java', 'Coding', 'I', 'You'],
-        ['yeah,']
-    ]],
-
-    ['octonion/status/975254452625002496', ['Based'], 'Crystal', ['Julia'], []],
-
-    ['octonion/status/975256058384887808', ['Based', 'Crystal'], 'Julia', [], []],
-
-    ['gauravssnl/status/975364889039417344',
-     ['Based', 'For', 'Then', 'Okay,', 'Python'], 'Speed', [], [
-         ['Java', 'Coding', 'I', 'You'], ['JAVA!']
-     ]],
-
-    ['d0m96/status/1141811379407425537', [], 'I\'m',
-     ['The', 'The', 'Today', 'Some', 'If', 'There', 'Above'],
-     [['Thank', 'Also,']]],
-
-    ['gmpreussner/status/999766552546299904', [], 'A', [],
-     [['I', 'Especially'], ['I']]]
+    [
+        "octonion/status/975253897697611777",
+        [],
+        "Based",
+        ["Crystal", "Julia"],
+        [["yeah,"]],
+    ],
+    ["octonion/status/975254452625002496", ["Based"], "Crystal", ["Julia"], []],
+    ["octonion/status/975256058384887808", ["Based", "Crystal"], "Julia", [], []],
+    [
+        "gauravssnl/status/975364889039417344",
+        ["Based", "For", "Then", "Okay,", "Python"],
+        "Speed",
+        [],
+        [["Java", "Coding", "I", "You"], ["JAVA!"]],
+    ],
+    [
+        "d0m96/status/1141811379407425537",
+        [],
+        "I'm",
+        ["The", "The", "Today", "Some", "If", "There", "Above"],
+        [["Thank", "Also,"]],
+    ],
+    [
+        "gmpreussner/status/999766552546299904",
+        [],
+        "A",
+        [],
+        [["I", "Especially"], ["I"]],
+    ],
 ]
 
 
