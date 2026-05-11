@@ -438,7 +438,7 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull();
         result.retweet = some parseGraphTweet(rt)
         return
 
-  if jsCard.kind != JNull:
+  if jsCard.kind != JNull and jsCard{"rest_id"}.getStr.allCharsInSet({'0'..'9'}):
     let name = jsCard{"name"}.getStr
     if "poll" in name:
       if "image" in name:
@@ -498,13 +498,17 @@ proc parseGraphTweet(js: JsonNode): Tweet =
       if bindingArray.kind == JArray:
         var bindingObj: seq[(string, JsonNode)]
         for item in bindingArray:
+          if item{"key"}.getStr == "_omit_link_":
+            jsCard = newJNull()
+            break
           bindingObj.add((item{"key"}.getStr, item{"value"}))
-        # Create a new card object with flattened structure
-        jsCard = %*{
-          "name": legacyCard{"name"},
-          "url": legacyCard{"url"},
-          "binding_values": %bindingObj
-        }
+        if jsCard.kind != JNull:
+          # Create a new card object with flattened structure
+          jsCard = %*{
+            "name": legacyCard{"name"},
+            "url": legacyCard{"url"},
+            "binding_values": %bindingObj
+          }
 
   var replyId = 0
   with restId, js{"reply_to_results", "rest_id"}:
@@ -526,7 +530,7 @@ proc parseGraphTweet(js: JsonNode): Tweet =
       )
     )
 
-    if jsCard.kind != JNull:
+    if jsCard.kind != JNull and jsCard{"rest_id"}.getStr.allCharsInSet({'0'..'9'}):
       let name = jsCard{"name"}.getStr
       if "poll" in name:
         if "image" in name:
