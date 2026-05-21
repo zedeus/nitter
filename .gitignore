@@ -19,3 +19,6 @@ dump.rdb
 
 node_modules
 debug_responses
+
+.claude
+.vercel
