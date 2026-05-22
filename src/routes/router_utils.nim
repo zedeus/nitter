@@ -59,7 +59,7 @@ template applyUrlPrefs*() {.dirty.} =
       redirect(request.path)
 
 template corsOrigin*(): string {.dirty.} =
-  if request.headers.hasKey("Origin"): request.headers["Origin"] else: "*"
+  if request.headers.hasKey("Origin"): request.headers["Origin", 0] else: "*"
 
 template respJson*(node: JsonNode) =
   let origin = corsOrigin()

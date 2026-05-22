@@ -76,7 +76,7 @@ settings:
 
 routes:
   options re"/api/.*":
-    let origin = if request.headers.hasKey("Origin"): request.headers["Origin"] else: "*"
+    let origin = if request.headers.hasKey("Origin"): request.headers["Origin", 0] else: "*"
     resp Http204, {
       "Vary": "Origin",
       "Access-Control-Allow-Origin": origin,
