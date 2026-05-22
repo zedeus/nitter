@@ -39,6 +39,19 @@ proc renderProfileTabs*(query: Query; username: string): VNode =
     li(class=query.getTabClass(tweets)):
       a(href=(link & "/search")): text "Search"
 
+proc renderMediaViewTabs*(query: Query; username: string): VNode =
+  let currentView = if query.view.len > 0: query.view else: "timeline"
+  let base = "/" & username & "/media?view="
+  func cls(view: string): string =
+    if currentView == view: "tab-item active" else: "tab-item"
+  buildHtml(ul(class="tab media-view-tabs")):
+    li(class=cls("timeline")):
+      a(href=(base & "timeline")): text "Timeline"
+    li(class=cls("grid")):
+      a(href=(base & "grid")): text "Grid"
+    li(class=cls("gallery")):
+      a(href=(base & "gallery")): text "Gallery"
+
 proc renderSearchTabs*(query: Query): VNode =
   var q = query
   buildHtml(ul(class="tab")):
@@ -95,7 +108,10 @@ proc renderTweetSearch*(results: Timeline; prefs: Prefs; path: string;
         text query.fromUser.join(" | ")
 
     if query.fromUser.len > 0:
-      renderProfileTabs(query, query.fromUser.join(","))
+      if query.kind != media or query.view != "gallery":
+        renderProfileTabs(query, query.fromUser.join(","))
+      if query.kind == media and query.fromUser.len == 1:
+        renderMediaViewTabs(query, query.fromUser[0])
 
     if query.fromUser.len == 0 or query.kind == tweets:
       tdiv(class="timeline-header"):

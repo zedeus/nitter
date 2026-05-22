@@ -11,7 +11,7 @@ proc createEmbedRouter*(cfg: Config) =
   router embed:
     get "/i/videos/tweet/@id":
       let tweet = await getGraphTweetResult(@"id")
-      if tweet == nil or tweet.video.isNone:
+      if tweet == nil or not tweet.hasVideos:
         resp Http404
 
       resp renderVideoEmbed(tweet, cfg, request)
@@ -19,7 +19,7 @@ proc createEmbedRouter*(cfg: Config) =
     get "/@user/status/@id/embed":
       let
         tweet = await getGraphTweetResult(@"id")
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         path = getPath()
 
       if tweet == nil:

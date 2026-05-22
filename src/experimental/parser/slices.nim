@@ -54,7 +54,7 @@ proc replacedWith*(runes: seq[Rune]; repls: openArray[ReplaceSlice];
       let
         name = $runes[rep.slice.a.succ .. rep.slice.b]
         symbol = $runes[rep.slice.a]
-      result.add a(symbol & name, href = "/search?q=%23" & name)
+      result.add a(symbol & name, href = "/search?f=tweets&q=%23" & name)
     of rkMention:
       result.add a($runes[rep.slice], href = rep.url, title = rep.display)
     of rkUrl:

@@ -13,7 +13,7 @@ template respList*(list, timeline, title, vnode: typed) =
 
   let
     html = renderList(vnode, timeline.query, list)
-    rss = &"""/i/lists/{@"id"}/rss"""
+    rss = if cfg.enableRSSList: &"""/i/lists/{@"id"}/rss""" else: ""
 
   resp renderMain(html, request, cfg, prefs, titleText=title, rss=rss, banner=list.banner)
 
@@ -36,7 +36,7 @@ proc createListRouter*(cfg: Config) =
     get "/i/lists/@id/?":
       cond '.' notin @"id"
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         list = await getCachedList(id=(@"id"))
         timeline = await getGraphListTweets(list.id, getCursor())
         vnode = renderTimelineTweets(timeline, prefs, request.path)
@@ -45,7 +45,7 @@ proc createListRouter*(cfg: Config) =
     get "/i/lists/@id/members":
       cond '.' notin @"id"
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         list = await getCachedList(id=(@"id"))
         members = await getGraphListMembers(list, getCursor())
       respList(list, members, list.title, renderTimelineUsers(members, prefs, request.path))

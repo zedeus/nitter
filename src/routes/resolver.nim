@@ -18,8 +18,8 @@ proc createResolverRouter*(cfg: Config) =
   router resolver:
     get "/cards/@card/@id":
       let url = "https://cards.twitter.com/cards/$1/$2" % [@"card", @"id"]
-      respResolved(await resolve(url, cookiePrefs()), "card")
+      respResolved(await resolve(url, requestPrefs()), "card")
 
     get "/t.co/@url":
       let url = "https://t.co/" & @"url"
-      respResolved(await resolve(url, cookiePrefs()), "t.co")
+      respResolved(await resolve(url, requestPrefs()), "t.co")

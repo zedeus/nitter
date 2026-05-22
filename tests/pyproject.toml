@@ -1,0 +1,8 @@
+[tool.poetry]
+name = "nitter-tests"
+version = "0.0.0"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.14"
+seleniumbase = "4.46.5"

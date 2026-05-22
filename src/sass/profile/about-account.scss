@@ -1,0 +1,71 @@
+@import '_variables';
+
+.about-account {
+    max-width: 500px;
+    width: 100%;
+    margin: 20px auto 0;
+    align-self: flex-start;
+    background: var(--bg_panel);
+    border-radius: 4px;
+    padding: 12px 20px 20px;
+}
+
+.about-account-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border_grey);
+}
+
+.about-account-avatar img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    margin-bottom: 4px;
+}
+
+.about-account-name {
+    @include breakable;
+    font-weight: bold;
+}
+
+.about-account-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.about-account-at {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.about-account-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    > span:first-child {
+        color: var(--fg_faded);
+        flex-shrink: 0;
+    }
+
+    > div {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.about-account-label {
+    color: var(--fg_faded);
+    font-size: 13px;
+}
+
+@media(max-width: 700px) {
+    .about-account {
+        max-width: none;
+        margin: 10px;
+    }
+}

@@ -158,6 +158,33 @@ proc getCachedUsername*(userId: string): Future[string] {.async.} =
 #     if not result.isNil:
 #       await cache(result)
 
+proc cache*(data: Broadcast) {.async.} =
+  if data.id.len == 0: return
+  await setEx("bc:" & data.id, baseCacheTime, compress(toFlatty(data)))
+
+proc getCachedBroadcast*(id: string): Future[Broadcast] {.async.} =
+  if id.len == 0: return
+  let cached = await get("bc:" & id)
+  if cached != redisNil:
+    cached.deserialize(Broadcast)
+  else:
+    result = await getBroadcastInfo(id)
+    await cache(result)
+  result.m3u8Url = await fetchBroadcastStream(result.mediaKey)
+
+proc cache*(data: AccountInfo; name: string) {.async.} =
+  await setEx("ai:" & toLower(name), baseCacheTime * 24, compress(toFlatty(data)))
+
+proc getCachedAccountInfo*(username: string; fetch=true): Future[AccountInfo] {.async.} =
+  if username.len == 0: return
+  let name = toLower(username)
+  let cached = await get("ai:" & name)
+  if cached != redisNil:
+    cached.deserialize(AccountInfo)
+  elif fetch:
+    result = await getAboutAccount(username)
+    await cache(result, name)
+
 proc getCachedPhotoRail*(id: string): Future[PhotoRail] {.async.} =
   if id.len == 0: return
   let rail = await get("pr2:" & toLower(id))

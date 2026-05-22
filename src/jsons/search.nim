@@ -16,9 +16,7 @@ proc createJsonApiSearchRouter*(cfg: Config) =
       if q.len > 500:
         respJsonError("Search input too long.", "invalid_input", Http400)
 
-      let
-        prefs = cookiePrefs()
-        query = initQuery(params(request))
+      let query = initQuery(params(request))
 
       case query.kind
       of users:

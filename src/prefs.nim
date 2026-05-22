@@ -1,22 +1,22 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import tables
+import tables, strutils
 import types, prefs_impl
 from config import get
 from parsecfg import nil
 
-export genUpdatePrefs, genResetPrefs
+export genUpdatePrefs, genResetPrefs, genApplyPrefs
 
 var defaultPrefs*: Prefs
 
 proc updateDefaultPrefs*(cfg: parsecfg.Config) =
   genDefaultPrefs()
 
-proc getPrefs*(cookies: Table[string, string]): Prefs =
+proc getPrefs*(cookies, params: Table[string, string]): Prefs =
   result = defaultPrefs
-  genCookiePrefs(cookies)
+  genParsePrefs(cookies)
+  genParsePrefs(params)
 
-template getPref*(cookies: Table[string, string], pref): untyped =
-  bind genCookiePref
-  var res = defaultPrefs.`pref`
-  genCookiePref(cookies, pref, res)
-  res
+proc encodePrefs*(prefs: Prefs): string =
+  var encPairs: seq[string]
+  genEncodePrefs(prefs)
+  encPairs.join(",")

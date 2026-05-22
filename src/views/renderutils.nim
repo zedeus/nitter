@@ -4,11 +4,18 @@ import karax/[karaxdsl, vdom, vstyles]
 import ".."/[types, utils]
 
 const smallWebp* = "?name=small&format=webp"
+const mediumWebp* = "?name=medium&format=webp"
 
 proc getSmallPic*(url: string): string =
   result = url
   if "?" notin url and not url.endsWith("placeholder.png"):
     result &= smallWebp
+  result = getPicUrl(result)
+
+proc getMediumPic*(url: string): string =
+  result = url
+  if "?" notin url and not url.endsWith("placeholder.png"):
+    result &= mediumWebp
   result = getPicUrl(result)
 
 proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
@@ -42,7 +49,6 @@ proc linkUser*(user: User, class=""): VNode =
   buildHtml(a(href=href, class=class, title=nameText)):
     text nameText
     if isName:
-      verifiedIcon(user)
       if user.protected:
         text " "
         icon "lock", title="Protected account"
@@ -66,20 +72,20 @@ proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNod
       text text
 
 proc genCheckbox*(pref, label: string; state: bool): VNode =
-  buildHtml(label(class="pref-group checkbox-container")):
+  buildHtml(label(class="pref-group checkbox-container", title=pref)):
     text label
     input(name=pref, `type`="checkbox", checked=state)
     span(class="checkbox")
 
 proc genInput*(pref, label, state, placeholder: string; class=""; autofocus=true): VNode =
   let p = placeholder
-  buildHtml(tdiv(class=("pref-group pref-input " & class))):
+  buildHtml(tdiv(class=("pref-group pref-input " & class), title=pref)):
     if label.len > 0:
       label(`for`=pref): text label
     input(name=pref, `type`="text", placeholder=p, value=state, autofocus=(autofocus and state.len == 0))
 
 proc genSelect*(pref, label, state: string; options: seq[string]): VNode =
-  buildHtml(tdiv(class="pref-group pref-input")):
+  buildHtml(tdiv(class="pref-group pref-input", title=pref)):
     label(`for`=pref): text label
     select(name=pref):
       for opt in options:
@@ -98,9 +104,9 @@ proc genNumberInput*(pref, label, state, placeholder: string; class=""; autofocu
       label(`for`=pref): text label
     input(name=pref, `type`="number", placeholder=p, value=state, autofocus=(autofocus and state.len == 0), min=min, step="1")
 
-proc genImg*(url: string; class=""): VNode =
+proc genImg*(url: string; class=""; alt=""): VNode =
   buildHtml():
-    img(src=getPicUrl(url), class=class, alt="", loading="lazy")
+    img(src=getPicUrl(url), class=class, alt=alt, loading="lazy")
 
 proc getTabClass*(query: Query; tab: QueryKind): string =
   if query.kind == tab: "tab-item active"

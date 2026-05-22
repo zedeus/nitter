@@ -60,6 +60,9 @@ genPrefs:
     stickyProfile(checkbox, true):
       "Make profile sidebar stick to top"
 
+    stickyNav(checkbox, true):
+      "Keep navbar fixed to top"
+
     bidiSupport(checkbox, false):
       "Support bidirectional text (makes clicking on tweets harder)"
 
@@ -74,6 +77,9 @@ genPrefs:
 
     hideReplies(checkbox, false):
       "Hide tweet replies"
+
+    hideCommunityNotes(checkbox, false):
+      "Hide community notes"
 
     squareAvatars(checkbox, false):
       "Square profile pictures"
@@ -93,6 +99,17 @@ genPrefs:
 
     autoplayGifs(checkbox, true):
       "Autoplay gifs"
+
+    compactGallery(checkbox, false):
+      "Compact media gallery (no profile info or text)"
+
+    gallerySize(select, "Medium"):
+      "Gallery column size"
+      options: @["Small", "Medium", "Large"]
+
+    mediaView(select, "Timeline"):
+      "Default media view"
+      options: @["Timeline", "Grid", "Gallery"]
 
   "Link replacements (blank to disable)":
     replaceTwitter(input, ""):
@@ -127,7 +144,7 @@ macro genDefaultPrefs*(): untyped =
     result.add quote do:
       defaultPrefs.`ident` = cfg.get("Preferences", `name`, `default`)
 
-macro genCookiePrefs*(cookies): untyped =
+macro genParsePrefs*(prefs): untyped =
   result = nnkStmtList.newTree()
   for pref in allPrefs():
     let
@@ -137,36 +154,16 @@ macro genCookiePrefs*(cookies): untyped =
       options = pref.options
 
     result.add quote do:
-      if `name` in `cookies`:
+      if `name` in `prefs`:
         when `kind` == input or `name` == "theme":
-          result.`ident` = `cookies`[`name`]
+          result.`ident` = `prefs`[`name`]
         elif `kind` == checkbox:
-          result.`ident` = `cookies`[`name`] == "on"
+          result.`ident` = `prefs`[`name`] == "on" or 
+                           `prefs`[`name`] == "true" or
+                           `prefs`[`name`] == "1"
         else:
-          let value = `cookies`[`name`]
+          let value = `prefs`[`name`]
           if value in `options`: result.`ident` = value
-
-macro genCookiePref*(cookies, prefName, res): untyped =
-  result = nnkStmtList.newTree()
-  for pref in allPrefs():
-    let ident = ident(pref.name)
-    if ident != prefName:
-      continue
-
-    let
-      name = pref.name
-      kind = newLit(pref.kind)
-      options = pref.options
-
-    result.add quote do:
-      if `name` in `cookies`:
-        when `kind` == input or `name` == "theme":
-          `res` = `cookies`[`name`]
-        elif `kind` == checkbox:
-          `res` = `cookies`[`name`] == "on"
-        else:
-          let value = `cookies`[`name`]
-          if value in `options`: `res` = value
 
 macro genUpdatePrefs*(): untyped =
   result = nnkStmtList.newTree()
@@ -201,6 +198,36 @@ macro genResetPrefs*(): untyped =
     let name = newLit(pref.name)
     result.add quote do:
       savePref(`name`, "", `req`, expire=true)
+
+macro genEncodePrefs*(prefs): untyped =
+  result = nnkStmtList.newTree()
+  for pref in allPrefs():
+    let
+      name = newLit(pref.name)
+      ident = ident(pref.name)
+      kind = newLit(pref.kind)
+      defaultIdent = nnkDotExpr.newTree(ident("defaultPrefs"), ident(pref.name))
+
+    result.add quote do:
+      when `kind` == checkbox:
+        if `prefs`.`ident` != `defaultIdent`:
+          if `prefs`.`ident`:
+            encPairs.add `name` & "=on"
+          else:
+            encPairs.add `name` & "="
+      else:
+        if `prefs`.`ident` != `defaultIdent`:
+          encPairs.add `name` & "=" & `prefs`.`ident`
+
+macro genApplyPrefs*(params, req): untyped =
+  result = nnkStmtList.newTree()
+  for pref in allPrefs():
+    let name = newLit(pref.name)
+    result.add quote do:
+      if `name` in `params`:
+        savePref(`name`, `params`[`name`], `req`)
+      else:
+        savePref(`name`, "", `req`, expire=true)
 
 macro genPrefsType*(): untyped =
   let name = nnkPostfix.newTree(ident("*"), ident("Prefs"))

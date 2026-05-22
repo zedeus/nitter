@@ -31,28 +31,28 @@ proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VN
       tdiv(class="tweet-name-row"):
         tdiv(class="fullname-and-username"):
           linkUser(tweet.user, class="fullname")
+          verifiedIcon(tweet.user)
           linkUser(tweet.user, class="username")
 
         span(class="tweet-date"):
           a(href=getLink(tweet), title=tweet.getTime):
             text tweet.getShortTime
 
-proc renderAlbum(tweet: Tweet): VNode =
-  let
-    groups = if tweet.photos.len < 3: @[tweet.photos]
-             else: tweet.photos.distribute(2)
+proc renderAltText(altText: string): VNode =
+  buildHtml(p(class="alt-text")):
+    text "ALT  " & altText
 
-  buildHtml(tdiv(class="attachments")):
-    for i, photos in groups:
-      let margin = if i > 0: ".25em" else: ""
-      tdiv(class="gallery-row", style={marginTop: margin}):
-        for photo in photos:
-          tdiv(class="attachment image"):
-            let
-              named = "name=" in photo
-              small = if named: photo else: photo & smallWebp
-            a(href=getOrigPicUrl(photo), class="still-image", target="_blank"):
-              genImg(small)
+proc renderPhotoAttachment(photo: Photo; bigThumb=false): VNode =
+  buildHtml(tdiv(class="attachment")):
+    let
+      named = "name=" in photo.url
+      thumb = if named: photo.url
+              elif bigThumb: photo.url & mediumWebp
+              else: photo.url & smallWebp
+    a(href=getOrigPicUrl(photo.url), class="still-image", target="_blank"):
+      genImg(thumb, alt=photo.altText)
+    if photo.altText.len > 0:
+      renderAltText(photo.altText)
 
 proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
   case playbackType
@@ -62,7 +62,7 @@ proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
 proc hasMp4Url(video: Video): bool =
   video.variants.anyIt(it.contentType == mp4)
 
-proc renderVideoDisabled(playbackType: VideoType; path: string): VNode =
+proc renderVideoDisabled(playbackType: VideoType; path=""): VNode =
   buildHtml(tdiv(class="video-overlay")):
     case playbackType
     of mp4:
@@ -78,52 +78,98 @@ proc renderVideoUnavailable(video: Video): VNode =
     else:
       p: text "This media is unavailable"
 
-proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
+proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""; bigThumb=false): VNode =
   let
-    container = if video.description.len == 0 and video.title.len == 0: ""
-                else: " card-container"
-    playbackType = if not prefs.proxyVideos and video.hasMp4Url: mp4
-                   else: video.playbackType
+    playbackType = if not prefs.proxyVideos and videoData.hasMp4Url: mp4
+                   else: videoData.playbackType
+    thumb = if bigThumb: getMediumPic(videoData.thumb) else: getSmallPic(videoData.thumb)
+
+  buildHtml(tdiv(class="attachment")):
+    if not videoData.available:
+      img(src=thumb, loading="lazy")
+      renderVideoUnavailable(videoData)
+    elif not prefs.isPlaybackEnabled(playbackType):
+      img(src=thumb, loading="lazy")
+      renderVideoDisabled(playbackType, path)
+    else:
+      let
+        vars = videoData.variants.filterIt(it.contentType == playbackType)
+        vidUrl = vars.sortedByIt(it.resolution)[^1].url
+        source = if prefs.proxyVideos and vidUrl.startsWith("http"):
+                   getVidUrl(vidUrl) else: vidUrl
+      case playbackType
+      of mp4:
+        video(poster=thumb, controls="", muted=prefs.muteVideos):
+          source(src=source, `type`="video/mp4")
+      of m3u8, vmap:
+        video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
+        verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
+        tdiv(class="overlay-circle"): span(class="overlay-triangle")
+        if videoData.durationMs > 0:
+          tdiv(class="overlay-duration"): text getDuration(videoData)
+        verbatim "</div>"
+
+proc renderVideo*(video: Video; prefs: Prefs; path: string; bigThumb=false): VNode =
+  let hasCardContent = video.description.len > 0 or video.title.len > 0
 
   buildHtml(tdiv(class="attachments card")):
-    tdiv(class="gallery-video" & container):
-      tdiv(class="attachment video-container"):
-        let thumb = getSmallPic(video.thumb)
-        if not video.available:
-          img(src=thumb, loading="lazy")
-          renderVideoUnavailable(video)
-        elif not prefs.isPlaybackEnabled(playbackType):
-          img(src=thumb, loading="lazy")
-          renderVideoDisabled(playbackType, path)
-        else:
-          let
-            vars = video.variants.filterIt(it.contentType == playbackType)
-            vidUrl = vars.sortedByIt(it.resolution)[^1].url
-            source = if prefs.proxyVideos: getVidUrl(vidUrl)
-                     else: vidUrl
-          case playbackType
-          of mp4:
-            video(poster=thumb, controls="", muted=prefs.muteVideos):
-              source(src=source, `type`="video/mp4")
-          of m3u8, vmap:
-            video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
-            verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
-            tdiv(class="overlay-circle"): span(class="overlay-triangle")
-            tdiv(class="overlay-duration"): text getDuration(video)
-            verbatim "</div>"
-      if container.len > 0:
+    tdiv(class=("gallery-video" & (if hasCardContent: " card-container" else: ""))):
+      renderVideoAttachment(video, prefs, path, bigThumb)
+      if hasCardContent:
         tdiv(class="card-content"):
           h2(class="card-title"): text video.title
           if video.description.len > 0:
             p(class="card-description"): text video.description
 
+proc renderGifAttachment(gif: Gif; prefs: Prefs): VNode =
+  let thumb = getSmallPic(gif.thumb)
+
+  buildHtml(tdiv(class="attachment")):
+    if not prefs.mp4Playback:
+      img(src=thumb, loading="lazy")
+      renderVideoDisabled(mp4)
+    elif prefs.autoplayGifs:
+      video(class="gif", poster=thumb, autoplay="", muted="", loop=""):
+        source(src=getPicUrl(gif.url), `type`="video/mp4")
+    else:
+      video(class="gif", poster=thumb, controls="", muted="", loop=""):
+        source(src=getPicUrl(gif.url), `type`="video/mp4")
+    if gif.altText.len > 0:
+      renderAltText(gif.altText)
+
 proc renderGif(gif: Gif; prefs: Prefs): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
-    tdiv(class="gallery-gif", style={maxHeight: "unset"}):
-      tdiv(class="attachment"):
-        video(class="gif", poster=getSmallPic(gif.thumb), autoplay=prefs.autoplayGifs,
-              controls="", muted="", loop=""):
-          source(src=getPicUrl(gif.url), `type`="video/mp4")
+    renderGifAttachment(gif, prefs)
+
+proc renderMedia(media: seq[Media]; prefs: Prefs; path: string; bigThumb=false): VNode =
+  if media.len == 0:
+    return nil
+
+  if media.len == 1:
+    let item = media[0]
+    if item.kind == videoMedia:
+      return renderVideo(item.video, prefs, path, bigThumb)
+    if item.kind == gifMedia:
+      return renderGif(item.gif, prefs)
+
+  let
+    groups = if media.len < 3: @[media]
+             else: media.distribute(2)
+
+  buildHtml(tdiv(class="attachments")):
+    for i, mediaGroup in groups:
+      let margin = if i > 0: ".25em" else: ""
+      let rowClass = "gallery-row" &
+                     (if mediaGroup.allIt(it.kind == photoMedia): "" else: " mixed-row")
+      tdiv(class=rowClass, style={marginTop: margin}):
+        for mediaItem in mediaGroup:
+          case mediaItem.kind
+          of photoMedia:
+            renderPhotoAttachment(mediaItem.photo, bigThumb)
+          of videoMedia:
+            renderVideoAttachment(mediaItem.video, prefs, path, bigThumb)
+          of gifMedia:
+            renderGifAttachment(mediaItem.gif, prefs)
 
 proc renderPoll(poll: Poll): VNode =
   buildHtml(tdiv(class="poll")):
@@ -208,19 +254,28 @@ proc renderMediaTags(tags: seq[User]): VNode =
       if i < tags.high:
         text ", "
 
+proc renderLatestPost(username: string; id: int64): VNode =
+  buildHtml(tdiv(class="latest-post-version")):
+    text "There's a new version of this post. "
+    a(href=getLink(id, username)):
+      text "See the latest post"
+
+proc renderCommunityNote(note: string; prefs: Prefs): VNode =
+  buildHtml(tdiv(class="community-note")):
+    tdiv(class="community-note-header"):
+      icon "group"
+      span: text "Community note"
+    tdiv(class="community-note-text", dir="auto"):
+      verbatim replaceUrls(note, prefs)
+
 proc renderQuoteMedia(quote: Tweet; prefs: Prefs; path: string): VNode =
   buildHtml(tdiv(class="quote-media-container")):
-    if quote.photos.len > 0:
-      renderAlbum(quote)
-    elif quote.video.isSome:
-      renderVideo(quote.video.get(), prefs, path)
-    elif quote.gif.isSome:
-      renderGif(quote.gif.get(), prefs)
+    renderMedia(quote.media, prefs, path)
 
 proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
   if not quote.available:
     return buildHtml(tdiv(class="quote unavailable")):
-      tdiv(class="unavailable-quote"):
+      a(class="unavailable-quote", href=getLink(quote, focus=false)):
         if quote.tombstone.len > 0:
           text quote.tombstone
         elif quote.text.len > 0:
@@ -235,6 +290,7 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
       tdiv(class="fullname-and-username"):
         renderMiniAvatar(quote.user, prefs)
         linkUser(quote.user, class="fullname")
+        verifiedIcon(quote.user)
         linkUser(quote.user, class="username")
 
       span(class="tweet-date"):
@@ -248,12 +304,28 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
       tdiv(class="quote-text", dir="auto"):
         verbatim replaceUrls(quote.text, prefs)
 
+    if quote.media.len > 0:
+      renderQuoteMedia(quote, prefs, path)
+
+    if quote.note.len > 0 and not prefs.hideCommunityNotes:
+      renderCommunityNote(quote.note, prefs)
+
     if quote.hasThread:
       a(class="show-thread", href=getLink(quote)):
         text "Show this thread"
 
-    if quote.photos.len > 0 or quote.video.isSome or quote.gif.isSome:
-      renderQuoteMedia(quote, prefs, path)
+    if quote.history.len > 0 and quote.id != max(quote.history):
+      tdiv(class="quote-latest"):
+        text "There's a new version of this post"
+
+proc renderDisclosures*(tweet: Tweet): VNode =
+  buildHtml(tdiv(class="disclosures")):
+    if tweet.isAI:
+      span(data-disclosure="ai"):
+        icon "attention", "Made with AI"
+    if tweet.isAd:
+      span(data-disclosure="ad"):
+        icon "attention", "Paid partnership (ad)"
 
 proc renderLocation*(tweet: Tweet): string =
   let (place, url) = tweet.getLocation()
@@ -267,14 +339,14 @@ proc renderLocation*(tweet: Tweet): string =
   return $node
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
-                  last=false; showThread=false; mainTweet=false; afterTweet=false): VNode =
+                  last=false; mainTweet=false; afterTweet=false; bigThumb=false): VNode =
   var divClass = class
   if index == -1 or last:
     divClass = "thread-last " & class
 
   if not tweet.available:
     return buildHtml(tdiv(class=divClass & "unavailable timeline-item", data-username=tweet.user.username)):
-      tdiv(class="unavailable-box"):
+      a(class="unavailable-box", href=getLink(tweet)):
         if tweet.tombstone.len > 0:
           text tweet.tombstone
         elif tweet.text.len > 0:
@@ -303,7 +375,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       renderHeader(tweet, retweet, pinned, prefs)
 
       if not afterTweet and index == 0 and tweet.reply.len > 0 and
-         (tweet.reply.len > 1 or tweet.reply[0] != tweet.user.username):
+         (tweet.reply.len > 1 or tweet.reply[0] != tweet.user.username or pinned):
         renderReply(tweet)
 
       var tweetClass = "tweet-content media-body"
@@ -319,12 +391,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if tweet.card.isSome and tweet.card.get().kind != hidden:
         renderCard(tweet.card.get(), prefs, path)
 
-      if tweet.photos.len > 0:
-        renderAlbum(tweet)
-      elif tweet.video.isSome:
-        renderVideo(tweet.video.get(), prefs, path)
-      elif tweet.gif.isSome:
-        renderGif(tweet.gif.get(), prefs)
+      if tweet.media.len > 0:
+        renderMedia(tweet.media, prefs, path, bigThumb)
 
       if tweet.poll.isSome:
         renderPoll(tweet.poll.get())
@@ -332,18 +400,32 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       if tweet.quote.isSome:
         renderQuote(tweet.quote.get(), prefs, path)
 
+      if tweet.note.len > 0 and not prefs.hideCommunityNotes:
+        renderCommunityNote(tweet.note, prefs)
+
+      if tweet.isAI or tweet.isAd:
+        renderDisclosures(tweet)
+
+      let
+        hasEdits = tweet.history.len > 1
+        isLatest = hasEdits and tweet.id == max(tweet.history)
+
       if mainTweet:
-        p(class="tweet-published"): text &"{getTime(tweet)}"
+        p(class="tweet-published"): 
+          if hasEdits and isLatest:
+            a(href=(getLink(tweet, focus=false) & "/history")):
+              text &"Last edited {getTime(tweet)}"
+          else:
+            text &"{getTime(tweet)}"
+
+        if hasEdits and not isLatest:
+          renderLatestPost(tweet.user.username, max(tweet.history))
 
       if tweet.mediaTags.len > 0:
         renderMediaTags(tweet.mediaTags)
 
       if not prefs.hideTweetStats:
         renderStats(tweet.stats)
-
-      if showThread:
-        a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
-          text "Show this thread"
 
 proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): string =
   let node = buildHtml(html(lang="en")):

@@ -12,7 +12,7 @@ proc renderStat(num: int; class: string; text=""): VNode =
     span(class="profile-stat-num"):
       text insertSep($num, ',')
 
-proc renderUserCard*(user: User; prefs: Prefs): VNode =
+proc renderUserCard*(user: User; prefs: Prefs; info: AccountInfo): VNode =
   buildHtml(tdiv(class="profile-card")):
     tdiv(class="profile-card-info"):
       let
@@ -26,6 +26,7 @@ proc renderUserCard*(user: User; prefs: Prefs): VNode =
 
       tdiv(class="profile-card-tabs-name"):
         linkUser(user, class="profile-card-fullname")
+        verifiedIcon(user)
         linkUser(user, class="profile-card-username")
 
     tdiv(class="profile-card-extra"):
@@ -45,6 +46,11 @@ proc renderUserCard*(user: User; prefs: Prefs): VNode =
           else:
             span: text place
 
+      if info.basedIn.len > 0:
+        tdiv(class="profile-location"):
+          span: icon "location"
+          span: text "Based in " & info.basedIn
+
       if user.website.len > 0:
         tdiv(class="profile-website"):
           span:
@@ -53,7 +59,7 @@ proc renderUserCard*(user: User; prefs: Prefs): VNode =
             a(href=url): text url.shortLink
 
       tdiv(class="profile-joindate"):
-        span(title=getJoinDateFull(user)):
+        a(href=(&"/{user.username}/about"), title=getJoinDateFull(user)):
           icon "calendar", getJoinDate(user)
 
       tdiv(class="profile-card-extra-links"):
@@ -101,17 +107,22 @@ proc renderProtected(username: string): VNode =
 
 proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
   profile.tweets.query.fromUser = @[profile.user.username]
+  let
+    isGalleryView = profile.tweets.query.kind == media and
+      profile.tweets.query.view == "gallery"
+    viewClass = if isGalleryView: " media-only" else: ""
 
-  buildHtml(tdiv(class="profile-tabs")):
-    if not prefs.hideBanner:
+  buildHtml(tdiv(class=("profile-tabs" & viewClass))):
+    if not isGalleryView and not prefs.hideBanner:
       tdiv(class="profile-banner"):
         renderBanner(profile.user.banner)
 
-    let sticky = if prefs.stickyProfile: " sticky" else: ""
-    tdiv(class=("profile-tab" & sticky)):
-      renderUserCard(profile.user, prefs)
-      if profile.photoRail.len > 0:
-        renderPhotoRail(profile)
+    if not isGalleryView:
+      let sticky = if prefs.stickyProfile: " sticky" else: ""
+      tdiv(class=("profile-tab" & sticky)):
+        renderUserCard(profile.user, prefs, profile.accountInfo)
+        if profile.photoRail.len > 0:
+          renderPhotoRail(profile)
 
     if profile.user.protected:
       renderProtected(profile.user.username)

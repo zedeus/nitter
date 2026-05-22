@@ -29,7 +29,7 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
 
       tdiv(class="nav-item right"):
         icon "search", title="Search", href="/search"
-        if cfg.enableRss and rss.len > 0:
+        if rss.len > 0:
           icon "rss", title="RSS Feed", href=rss
         icon "bird", title="Open in X", href=canonical
         a(href="https://liberapay.com/zedeus"): verbatim lp
@@ -39,9 +39,7 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
 proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
                  video=""; images: seq[string] = @[]; banner=""; ogTitle="";
                  rss=""; alternate=""): VNode =
-  var theme = prefs.theme.toTheme
-  if "theme" in req.params:
-    theme = req.params["theme"].toTheme
+  let theme = prefs.theme.toTheme
     
   let ogType =
     if video.len > 0: "video"
@@ -52,8 +50,8 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   let opensearchUrl = getUrlPrefix(cfg) & "/opensearch"
 
   buildHtml(head):
-    link(rel="stylesheet", type="text/css", href="/css/style.css?v=22")
-    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=4")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=35")
+    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=5")
 
     if theme.len > 0:
       link(rel="stylesheet", type="text/css", href=(&"/css/themes/{theme}.css"))
@@ -69,7 +67,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
     if alternate.len > 0:
       link(rel="alternate", href=alternate, title="View on X")
 
-    if cfg.enableRss and rss.len > 0:
+    if rss.len > 0:
       link(rel="alternate", type="application/rss+xml", href=rss, title="RSS feed")
 
     if prefs.hlsPlayback:
@@ -131,7 +129,8 @@ proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
     renderHead(prefs, cfg, req, titleText, desc, video, images, banner, ogTitle,
                rss, twitterLink)
 
-    body:
+    let bodyClass = if prefs.stickyNav: "fixed-nav" else: ""
+    body(class=bodyClass):
       renderNavbar(cfg, req, rss, twitterLink)
 
       tdiv(class="container"):

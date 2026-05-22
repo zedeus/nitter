@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, strformat, uri, tables, base64
+import sequtils, strutils, strformat, uri, tables, base64
 import nimcrypto
 
 var
@@ -9,7 +9,7 @@ var
 const
   https* = "https://"
   twimg* = "pbs.twimg.com/"
-  nitterParams = ["name", "tab", "id", "list", "referer", "scroll"]
+  nitterParams* = ["name", "tab", "id", "list", "referer", "scroll", "prefs"]
   twitterDomains = @[
     "twitter.com",
     "pic.twitter.com",
@@ -17,7 +17,9 @@ const
     "abs.twimg.com",
     "pbs.twimg.com",
     "video.twimg.com",
-    "x.com"
+    "x.com",
+    "pscp.tv",
+    "video.pscp.tv"
   ]
 
 proc setHmacKey*(key: string) =
@@ -55,7 +57,13 @@ proc filterParams*(params: Table): seq[(string, string)] =
       result.add p
 
 proc isTwitterUrl*(uri: Uri): bool =
-  uri.hostname in twitterDomains
+  uri.hostname in twitterDomains or
+    uri.hostname.endsWith(".video.pscp.tv")
 
 proc isTwitterUrl*(url: string): bool =
   isTwitterUrl(parseUri(url))
+
+proc validateNumber*(value: string): string =
+  if value.anyIt(not it.isDigit):
+    return ""
+  return value

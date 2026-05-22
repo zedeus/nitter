@@ -11,5 +11,11 @@ proc createJsonApiHealthRouter*(cfg: Config) =
   router jsonapi_health:
     get "/api/health":
       cond cfg.enableJsonApi
-      let headers = {"Content-Type": "application/json; charset=utf-8"}
+      let origin = corsOrigin()
+      let headers = {
+        "Content-Type": "application/json; charset=utf-8",
+        "Vary": "Origin",
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Credentials": "true"
+      }
       resp Http200, headers, """{"message": "OK"}"""

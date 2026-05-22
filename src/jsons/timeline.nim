@@ -1,9 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import json, asyncdispatch, strutils, sequtils, uri, options, times
 
-import options
-import times
-
 import jester, karax/vdom
 
 import ".."/routes/[router_utils, timeline]
@@ -32,6 +29,33 @@ proc formatUserAsJson*(user: User): JsonNode =
     "joinDate": user.joinDate.toTime.toUnix()
   }
 
+proc formatMediaAsJson*(m: Media): JsonNode =
+  case m.kind
+  of photoMedia:
+    return %*{"type": "photo", "url": m.photo.url, "altText": m.photo.altText}
+  of videoMedia:
+    var variants = newJArray()
+    for v in m.video.variants:
+      variants.add %*{
+        "contentType": $v.contentType,
+        "url": v.url,
+        "bitrate": v.bitrate,
+        "resolution": v.resolution
+      }
+    return %*{
+      "type": "video",
+      "durationMs": m.video.durationMs,
+      "url": m.video.url,
+      "thumb": m.video.thumb,
+      "available": m.video.available,
+      "reason": m.video.reason,
+      "title": m.video.title,
+      "description": m.video.description,
+      "variants": variants
+    }
+  of gifMedia:
+    return %*{"type": "gif", "url": m.gif.url, "thumb": m.gif.thumb, "altText": m.gif.altText}
+
 proc formatTweetAsJson*(tweet: Tweet): JsonNode =
   return %*{
     "id": $tweet.id,
@@ -51,7 +75,8 @@ proc formatTweetAsJson*(tweet: Tweet): JsonNode =
       "replies": tweet.stats.replies,
       "retweets": tweet.stats.retweets,
       "likes": tweet.stats.likes,
-      "quotes": tweet.stats.quotes
+      "quotes": tweet.stats.quotes,
+      "views": tweet.stats.views
     },
     "retweet": if tweet.retweet.isSome: formatTweetAsJson(get(
         tweet.retweet)) else: newJNull(),
@@ -63,10 +88,11 @@ proc formatTweetAsJson*(tweet: Tweet): JsonNode =
         tweet.quote)) else: newJNull(),
     "card": if tweet.card.isSome: %*get(tweet.card) else: newJNull(),
     "poll": if tweet.poll.isSome: %*get(tweet.poll) else: newJNull(),
-    "gif": if tweet.gif.isSome: %*get(tweet.gif) else: newJNull(),
-    "gifs": if tweet.gifs.len > 0: %tweet.gifs else: newJNull(),
-    "video": if tweet.video.isSome: %*get(tweet.video) else: newJNull(),
-    "photos": if tweet.photos.len > 0: %tweet.photos else: newJNull()
+    "media": (if tweet.media.len > 0: %tweet.media.map(formatMediaAsJson) else: newJNull()),
+    "history": (if tweet.history.len > 0: %tweet.history else: newJNull()),
+    "note": (if tweet.note.len > 0: %tweet.note else: newJNull()),
+    "isAd": %tweet.isAd,
+    "isAI": %tweet.isAI
   }
 
 proc formatTimelineAsJson*(results: Timeline): JsonNode =
@@ -127,10 +153,10 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
       cond @"name" notin ["pic", "gif", "video", "search", "settings", "login",
           "intent", "i"]
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         names = getNames(@"name")
 
-      var query = request.getQuery("", @"name")
+      var query = request.getQuery("", @"name", prefs)
       if names.len != 1:
         query.fromUser = names
 
@@ -145,11 +171,11 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
       cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_', ','})
       cond @"tab" in ["with_replies", "media", "search", ""]
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         after = getCursor()
         names = getNames(@"name")
 
-      var query = request.getQuery(@"tab", @"name")
+      var query = request.getQuery(@"tab", @"name", prefs)
       if names.len != 1:
         query.fromUser = names
 

@@ -3,6 +3,7 @@
 function playVideo(overlay) {
     const video = overlay.parentElement.querySelector('video');
     const url = video.getAttribute("data-url");
+    const startTime = parseFloat(video.getAttribute("data-start") || "0");
     video.setAttribute("controls", "");
     overlay.style.display = "none";
 
@@ -12,12 +13,13 @@ function playVideo(overlay) {
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, function () {
             hls.loadLevel = hls.levels.length - 1;
-            hls.startLoad();
+            hls.startLoad(startTime);
             video.play();
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = url;
         video.addEventListener('canplay', function() {
+            if (startTime > 0) video.currentTime = startTime;
             video.play();
         });
     }

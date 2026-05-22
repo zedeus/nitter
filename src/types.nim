@@ -96,6 +96,37 @@ type
     suspended*: bool
     joinDate*: DateTime
 
+  AccountInfo* = object
+    username*: string
+    fullname*: string
+    userPic*: string
+    joinDate*: DateTime
+    verifiedType*: VerifiedType
+    suspended*: bool
+    basedIn*: string
+    source*: string
+    usernameChanges*: int
+    lastUsernameChange*: DateTime
+    affiliateUsername*: string
+    affiliateLabel*: string
+    isIdentityVerified*: bool
+    verifiedSince*: DateTime
+    overrideVerifiedYear*: int
+
+  Broadcast* = object
+    id*: string
+    title*: string
+    state*: string
+    thumb*: string
+    mediaKey*: string
+    m3u8Url*: string
+    totalWatched*: int
+    startTime*: DateTime
+    endTime*: DateTime
+    replayStart*: int
+    availableForReplay*: bool
+    user*: User
+
   VideoType* = enum
     m3u8 = "application/x-mpegURL"
     mp4 = "video/mp4"
@@ -123,6 +154,7 @@ type
 
   Query* = object
     kind*: QueryKind
+    view*: string
     text*: string
     filters*: seq[string]
     includes*: seq[string]
@@ -136,6 +168,27 @@ type
   Gif* = object
     url*: string
     thumb*: string
+    altText*: string
+
+  Photo* = object
+    url*: string
+    altText*: string
+
+  MediaKind* = enum
+    photoMedia
+    videoMedia
+    gifMedia
+
+  Media* = object
+    case kind*: MediaKind
+    of photoMedia:
+      photo*: Photo
+    of videoMedia:
+      video*: Video
+    of gifMedia:
+      gif*: Gif
+
+  MediaEntities* = seq[Media]
 
   GalleryPhoto* = object
     url*: string
@@ -219,10 +272,11 @@ type
     quote*: Option[Tweet]
     card*: Option[Card]
     poll*: Option[Poll]
-    gif*: Option[Gif]
-    gifs*: seq[Gif]
-    video*: Option[Video]
-    photos*: seq[string]
+    media*: MediaEntities
+    history*: seq[int64]
+    note*: string
+    isAd*: bool
+    isAI*: bool
 
   Tweets* = seq[Tweet]
 
@@ -243,6 +297,10 @@ type
     after*: Chain
     replies*: Result[Chain]
 
+  EditHistory* = object
+    latest*: Tweet
+    history*: Tweets
+
   Timeline* = Result[Tweets]
 
   Profile* = object
@@ -250,6 +308,7 @@ type
     photoRail*: PhotoRail
     pinned*: Option[Tweet]
     tweets*: Timeline
+    accountInfo*: AccountInfo
 
   List* = object
     id*: string
@@ -276,13 +335,20 @@ type
     hmacKey*: string
     base64Media*: bool
     minTokens*: int
-    enableRss*: bool
+    enableRSSUserTweets*: bool
+    enableRSSUserReplies*: bool
+    enableRSSUserMedia*: bool
+    enableRSSSearch*: bool
+    enableRSSList*: bool
     enableJsonApi*: bool
     enableDebug*: bool
     proxy*: string
     proxyAuth*: string
     apiProxy*: string
     disableTid*: bool
+    maxConcurrentReqs*: int
+    maxRetries*: int
+    retryDelayMs*: int
 
     rssCacheTime*: int
     listCacheTime*: int
@@ -301,3 +367,24 @@ proc contains*(thread: Chain; tweet: Tweet): bool =
 
 proc add*(timeline: var seq[Tweets]; tweet: Tweet) =
   timeline.add @[tweet]
+
+proc getPhotos*(tweet: Tweet): seq[Photo] =
+  tweet.media.filterIt(it.kind == photoMedia).mapIt(it.photo)
+
+proc getVideos*(tweet: Tweet): seq[Video] =
+  tweet.media.filterIt(it.kind == videoMedia).mapIt(it.video)
+
+proc hasPhotos*(tweet: Tweet): bool =
+  tweet.media.anyIt(it.kind == photoMedia)
+
+proc hasVideos*(tweet: Tweet): bool =
+  tweet.media.anyIt(it.kind == videoMedia)
+
+proc hasGifs*(tweet: Tweet): bool =
+  tweet.media.anyIt(it.kind == gifMedia)
+
+proc getThumb*(media: Media): string =
+  case media.kind
+  of photoMedia: media.photo.url
+  of videoMedia: media.video.thumb
+  of gifMedia: media.gif.thumb

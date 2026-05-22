@@ -86,6 +86,12 @@ proc decoded*(req: jester.Request; index: int): string =
   if based: decode(encoded)
   else: decodeUrl(encoded)
 
+proc normalizeImgUrl*(url: var string) =
+  if not url.startsWith("http"):
+    if "twimg.com" notin url:
+      url.insert(twimg)
+    url.insert(https)
+
 proc createMediaRouter*(cfg: Config) =
   router media:
     get "/pic/?":
@@ -93,10 +99,8 @@ proc createMediaRouter*(cfg: Config) =
 
     get re"^\/pic\/orig\/(enc)?\/?(.+)":
       var url = decoded(request, 1)
-      if "twimg.com" notin url:
-        url.insert(twimg)
-      if not url.startsWith(https):
-        url.insert(https)
+      cond "/amplify_video/" notin url
+      normalizeImgUrl(url)
       url.add("?name=orig")
 
       let uri = parseUri(url)
@@ -107,10 +111,8 @@ proc createMediaRouter*(cfg: Config) =
 
     get re"^\/pic\/(enc)?\/?(.+)":
       var url = decoded(request, 1)
-      if "twimg.com" notin url:
-        url.insert(twimg)
-      if not url.startsWith(https):
-        url.insert(https)
+      cond "/amplify_video/" notin url
+      normalizeImgUrl(url)
 
       let uri = parseUri(url)
       cond isTwitterUrl(uri) == true
@@ -139,6 +141,6 @@ proc createMediaRouter*(cfg: Config) =
 
       if ".m3u8" in url:
         let vid = await safeFetch(url)
-        content = proxifyVideo(vid, cookiePref(proxyVideos))
+        content = proxifyVideo(vid, requestPrefs().proxyVideos, url)
 
       resp content, m3u8Mime

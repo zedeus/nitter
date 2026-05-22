@@ -7,6 +7,7 @@
 @import "inputs";
 @import "timeline";
 @import "search";
+@import "broadcast";
 
 body {
   // colors
@@ -62,6 +63,10 @@ body {
   text-decoration: none;
 }
 
+img {
+  dynamic-range-limit: standard;
+}
+
 h1 {
   display: inline;
 }
@@ -99,12 +104,19 @@ legend {
   margin-bottom: 8px;
 }
 
-.preferences .note {
-  border-top: 1px solid var(--border_grey);
-  border-bottom: 1px solid var(--border_grey);
-  padding: 6px 0 8px 0;
-  margin-bottom: 8px;
-  margin-top: 16px;
+.preferences {
+  .note {
+    border-top: 1px solid var(--border_grey);
+    border-bottom: 1px solid var(--border_grey);
+    padding: 6px 0 8px 0;
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+
+  .bookmark-note {
+    margin: 0;
+    margin-bottom: 10px;
+  }
 }
 
 ul {
@@ -115,9 +127,12 @@ ul {
   display: flex;
   flex-wrap: wrap;
   box-sizing: border-box;
-  padding-top: 50px;
   margin: auto;
   min-height: 100vh;
+}
+
+body.fixed-nav .container {
+  padding-top: 50px;
 }
 
 .icon-container {
@@ -146,7 +161,7 @@ ul {
   display: inline-block;
   width: 14px;
   height: 14px;
-  margin-left: 2px;
+  margin-bottom: 2px;
 
   .verified-icon-circle {
     position: absolute;

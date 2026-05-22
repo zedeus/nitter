@@ -9,22 +9,22 @@ video {
 .gallery-video {
   display: flex;
   overflow: hidden;
-}
+  
+  &.card-container {
+    flex-direction: column;
+    width: 100%;
+  }
 
-.gallery-video.card-container {
-  flex-direction: column;
-  width: 100%;
-}
+  > .attachment {
+    min-height: 80px;
+    min-width: 200px;
+    max-height: 530px;
+    margin: 0;
 
-.video-container {
-  min-height: 80px;
-  min-width: 200px;
-  max-height: 530px;
-  margin: 0;
-
-  img {
-    max-height: 100%;
-    max-width: 100%;
+    img {
+      max-height: 100%;
+      max-width: 100%;
+    }
   }
 }
 

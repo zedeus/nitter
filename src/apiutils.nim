@@ -10,28 +10,38 @@ const
   rlLimit = "x-rate-limit-limit"
   errorsToSkip = {null, doesntExist, tweetNotFound, timeout, unauthorized, badRequest}
 
-var 
+var
   pool: HttpPool
   disableTid: bool
   apiProxy: string
+  maxRetries: int
+  retryDelayMs: int
 
 proc setDisableTid*(disable: bool) =
   disableTid = disable
 
+proc setMaxRetries*(n: int) =
+  maxRetries = n
+
+proc setRetryDelayMs*(ms: int) =
+  retryDelayMs = ms
+
 proc setApiProxy*(url: string) =
+  apiProxy = ""
   if url.len > 0:
     apiProxy = url.strip(chars={'/'}) & "/"
     if "http" notin apiProxy:
       apiProxy = "http://" & apiProxy
 
 proc toUrl(req: ApiReq; sessionKind: SessionKind): Uri =
-  case sessionKind
-  of oauth:  
-    let o = req.oauth
-    parseUri("https://api.x.com/graphql")   / o.endpoint ? o.params
-  of cookie: 
-    let c = req.cookie
-    parseUri("https://x.com/i/api/graphql") / c.endpoint ? c.params
+  let url = case sessionKind
+    of oauth:  req.oauth
+    of cookie: req.cookie
+  let base = case sessionKind
+    of oauth:  "https://api.x.com"
+    of cookie: "https://x.com/i/api"
+  let prefix = if url.endpoint.startsWith("1.1/"): "" else: "graphql/"
+  parseUri(base) / (prefix & url.endpoint) ? url.params
 
 proc getOauthHeader(url, oauthToken, oauthTokenSecret: string): string =
   let
@@ -80,7 +90,7 @@ proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
     result["sec-fetch-dest"] = "empty"
     result["sec-fetch-mode"] = "cors"
     result["sec-fetch-site"] = "same-site"
-    if disableTid:
+    if disableTid or "/1.1/" in url.path:
       result["authorization"] = bearerToken2
     else:
       result["authorization"] = bearerToken
@@ -107,7 +117,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     pool.use(await genHeaders(session, url)):
       template getContent =
         # TODO: this is a temporary simple implementation
-        if apiProxy.len > 0:
+        if apiProxy.len > 0 and "/1.1/" notin url.path:
           resp = await c.get(($url).replace("https://", apiProxy))
         else:
           resp = await c.get($url)
@@ -118,6 +128,10 @@ template fetchImpl(result, fetchBody) {.dirty.} =
       if resp.status == $Http503:
         badClient = true
         raise newException(BadClientError, "Bad client")
+
+      if resp.status == $Http404 and result.len == 0:
+        echo "[sessions] transient 404 (empty body), retrying: ", url.path
+        raise rateLimitError()
 
     if resp.headers.hasKey(rlRemaining):
       let
@@ -164,11 +178,15 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     release(session)
 
 template retry(bod) =
-  try:
-    bod
-  except RateLimitError:
-    echo "[sessions] Rate limited, retrying ", req.cookie.endpoint, " request..."
-    bod
+  for i in 0 ..< maxRetries:
+    try:
+      bod
+      break
+    except RateLimitError:
+      echo "[sessions] Rate limited, retrying ", req.cookie.endpoint,
+           " request (", i, "/", maxRetries, ")..."
+      if retryDelayMs > 0:
+        await sleepAsync(retryDelayMs)
 
 proc fetch*(req: ApiReq): Future[JsonNode] {.async.} =
   retry:

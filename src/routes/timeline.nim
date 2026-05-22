@@ -4,20 +4,28 @@ import jester, karax/vdom
 
 import router_utils
 import ".."/[types, redis_cache, formatters, query, api]
-import ../views/[general, profile, timeline, status, search]
+import ../views/[general, profile, timeline, status, search, about_account]
 
 export vdom
 export uri, sequtils
 export router_utils
 export redis_cache, formatters, query, api
-export profile, timeline, status
+export profile, timeline, status, about_account
 
-proc getQuery*(request: Request; tab, name: string): Query =
+proc getQuery*(request: Request; tab, name: string; prefs: Prefs): Query =
+  let view = request.params.getOrDefault("view")
   case tab
-  of "with_replies": getReplyQuery(name)
-  of "media": getMediaQuery(name)
-  of "search": initQuery(params(request), name=name)
-  else: Query(fromUser: @[name])
+  of "with_replies":
+    result = getReplyQuery(name)
+  of "media":
+    result = getMediaQuery(name)
+    result.view =
+      if view in ["timeline", "grid", "gallery"]: view
+      else: prefs.mediaView.toLowerAscii
+  of "search":
+    result = initQuery(params(request), name=name)
+  else:
+    result = Query(fromUser: @[name])
 
 template skipIf[T](cond: bool; default; body: Future[T]): Future[T] =
   if cond:
@@ -49,6 +57,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false): Future[Profile]
         getCachedPhotoRail(userId)
 
     user = getCachedUser(name)
+    info = getCachedAccountInfo(name, fetch=false)
 
   result =
     case query.kind
@@ -59,6 +68,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false): Future[Profile]
 
   result.user = await user
   result.photoRail = await rail
+  result.accountInfo = await info
 
   result.tweets.query = query
 
@@ -111,17 +121,31 @@ proc createTimelineRouter*(cfg: Config) =
         resp Http400, showError("Missing screen_name parameter", cfg)
       redirect("/" & username)
 
+    get "/@name/about/?":
+      cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_'})
+      let
+        prefs = requestPrefs()
+        name = @"name"
+        info = await getCachedAccountInfo(name)
+      if info.suspended:
+        resp showError(getSuspended(name), cfg)
+      if info.username.len == 0:
+        resp Http404, showError("User \"" & name & "\" not found", cfg)
+      let aboutHtml = renderAboutAccount(info)
+      resp renderMain(aboutHtml, request, cfg, prefs,
+                      "About @" & info.username)
+
     get "/@name/?@tab?/?":
       cond '.' notin @"name"
       cond @"name" notin ["pic", "gif", "video", "search", "settings", "login", "intent", "i"]
       cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_', ','})
       cond @"tab" in ["with_replies", "media", "search", ""]
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         after = getCursor()
         names = getNames(@"name")
 
-      var query = request.getQuery(@"tab", @"name")
+      var query = request.getQuery(@"tab", @"name", prefs)
       if names.len != 1:
         query.fromUser = names
 
@@ -129,7 +153,8 @@ proc createTimelineRouter*(cfg: Config) =
       if @"scroll".len > 0:
         if query.fromUser.len != 1:
           var timeline = await getGraphTweetSearch(query, after)
-          if timeline.content.len == 0: resp Http404
+          if timeline.content.len == 0: 
+            resp Http204
           timeline.beginning = true
           resp $renderTweetSearch(timeline, prefs, getPath())
         else:
@@ -138,8 +163,17 @@ proc createTimelineRouter*(cfg: Config) =
           profile.tweets.beginning = true
           resp $renderTimelineTweets(profile.tweets, prefs, getPath())
 
+      let rssEnabled =
+        if @"tab".len == 0: cfg.enableRSSUserTweets
+        elif @"tab" == "with_replies": cfg.enableRSSUserReplies
+        elif @"tab" == "media": cfg.enableRSSUserMedia
+        elif @"tab" == "search": cfg.enableRSSSearch
+        else: false
+
       let rss =
-        if @"tab".len == 0:
+        if not rssEnabled: 
+          ""
+        elif @"tab".len == 0:
           "/$1/rss" % @"name"
         elif @"tab" == "search":
           "/$1/search/rss?$2" % [@"name", genQueryUrl(query)]

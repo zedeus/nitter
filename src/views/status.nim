@@ -78,3 +78,17 @@ proc renderConversation*(conv: Conversation; prefs: Prefs; path: string): VNode 
         renderReplies(conv.replies, prefs, path, conv.tweet)
 
     renderToTop(focus="#m")
+
+proc renderEditHistory*(edits: EditHistory; prefs: Prefs; path: string): VNode =
+  buildHtml(tdiv(class="edit-history")):
+    tdiv(class="latest-edit"):
+      tdiv(class="edit-history-header"): 
+        text "Latest post"
+      renderTweet(edits.latest, prefs, path)
+
+    tdiv(class="previous-edits"):
+      tdiv(class="edit-history-header"): 
+        text "Version history"
+      for tweet in edits.history:
+        tdiv(class="tweet-edit"):
+          renderTweet(tweet, prefs, path)

@@ -13,6 +13,8 @@ proc get*[T](config: parseCfg.Config; section, key: string; default: T): T =
 proc getConfig*(path: string): (Config, parseCfg.Config) =
   var cfg = loadConfig(path)
 
+  let masterRss = cfg.get("Config", "enableRSS", true)
+
   let conf = Config(
     # Server
     address: cfg.get("Server", "address", "0.0.0.0"),
@@ -37,13 +39,20 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     hmacKey: cfg.get("Config", "hmacKey", "secretkey"),
     base64Media: cfg.get("Config", "base64Media", false),
     minTokens: cfg.get("Config", "tokenCount", 10),
-    enableRss: cfg.get("Config", "enableRSS", true),
+    enableRSSUserTweets: masterRss and cfg.get("Config", "enableRSSUserTweets", true),
+    enableRSSUserReplies: masterRss and cfg.get("Config", "enableRSSUserReplies", true),
+    enableRSSUserMedia: masterRss and cfg.get("Config", "enableRSSUserMedia", true),
+    enableRSSSearch: masterRss and cfg.get("Config", "enableRSSSearch", true),
+    enableRSSList: masterRss and cfg.get("Config", "enableRSSList", true),
     enableJsonApi: cfg.get("Config", "enableJsonApi", true),
     enableDebug: cfg.get("Config", "enableDebug", false),
     proxy: cfg.get("Config", "proxy", ""),
     proxyAuth: cfg.get("Config", "proxyAuth", ""),
     apiProxy: cfg.get("Config", "apiProxy", ""),
-    disableTid: cfg.get("Config", "disableTid", false)
+    disableTid: cfg.get("Config", "disableTid", false),
+    maxConcurrentReqs: cfg.get("Config", "maxConcurrentReqs", 2),
+    maxRetries: cfg.get("Config", "maxRetries", 1),
+    retryDelayMs: cfg.get("Config", "retryDelayMs", 150)
   )
 
   return (conf, cfg)

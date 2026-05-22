@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import asyncdispatch, httpclient, strutils, sequtils, sugar
 import packedjson
-import types, query, formatters, consts, apiutils, parser
+import types, query, formatters, consts, apiutils, parser, utils
 import experimental/parser as newParser
 
 # Helper to generate params object for GraphQL requests
@@ -18,16 +18,16 @@ proc apiReq(endpoint, variables: string; fieldToggles = ""): ApiReq =
   let url = apiUrl(endpoint, variables, fieldToggles)
   return ApiReq(cookie: url, oauth: url)
 
-proc mediaUrl(id: string; cursor: string): ApiReq =
+proc mediaUrl(id, cursor: string; count=20): ApiReq =
   result = ApiReq(
-    cookie: apiUrl(graphUserMedia, userMediaVars % [id, cursor]),
-    oauth: apiUrl(graphUserMediaV2, restIdVars % [id, cursor])
+    cookie: apiUrl(graphUserMedia, userMediaVars % [id, cursor, $count]),
+    oauth: apiUrl(graphUserMediaV2, restIdVars % [id, cursor, $count])
   )
 
 proc userTweetsUrl(id: string; cursor: string): ApiReq =
   result = ApiReq(
     # cookie: apiUrl(graphUserTweets, userTweetsVars % [id, cursor], userTweetsFieldToggles),
-    oauth: apiUrl(graphUserTweetsV2, restIdVars % [id, cursor])
+    oauth: apiUrl(graphUserTweetsV2, restIdVars % [id, cursor, "20"])
   )
   # might change this in the future pending testing
   result.cookie = result.oauth
@@ -36,7 +36,7 @@ proc userTweetsAndRepliesUrl(id: string; cursor: string): ApiReq =
   let cookieVars = userTweetsAndRepliesVars % [id, cursor]
   result = ApiReq(
     cookie: apiUrl(graphUserTweetsAndReplies, cookieVars, userTweetsFieldToggles),
-    oauth: apiUrl(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor])
+    oauth: apiUrl(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"])
   )
 
 proc tweetDetailUrl(id: string; cursor: string): ApiReq =
@@ -66,6 +66,32 @@ proc getGraphUserById*(id: string): Future[User] {.async.} =
     js = await fetchRaw(url)
   result = parseGraphUser(js)
 
+proc getAboutAccount*(username: string): Future[AccountInfo] {.async.} =
+  if username.len == 0: return
+  let
+    url = apiReq(graphAboutAccount, """{"screenName":"$1"}""" % username)
+    js = await fetch(url)
+  result = parseAboutAccount(js)
+
+proc restReq(endpoint: string; params: seq[(string, string)] = @[]): ApiReq =
+  let url = ApiUrl(endpoint: endpoint, params: params)
+  ApiReq(cookie: url, oauth: url)
+
+proc getBroadcastInfo*(id: string): Future[Broadcast] {.async.} =
+  if id.len == 0: return
+  let
+    req = apiReq(graphBroadcast, """{"id":"$1"}""" % id)
+    js = await fetch(req)
+  result = parseBroadcastInfo(js)
+
+proc fetchBroadcastStream*(mediaKey: string): Future[string] {.async.} =
+  if mediaKey.len == 0: return
+  let
+    streamReq = restReq(restLiveStream & mediaKey)
+    streamJs = await fetch(streamReq)
+  result = streamJs{"source", "noRedirectPlaybackUrl"}.getStr(
+    streamJs{"source", "location"}.getStr)
+
 proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profile] {.async.} =
   if id.len == 0: return
   let
@@ -73,7 +99,7 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
     url = case kind
       of TimelineKind.tweets: userTweetsUrl(id, cursor)
       of TimelineKind.replies: userTweetsAndRepliesUrl(id, cursor)
-      of TimelineKind.media: mediaUrl(id, cursor)
+      of TimelineKind.media: mediaUrl(id, cursor, 100)
     js = await fetch(url)
   result = parseGraphTimeline(js, after)
 
@@ -81,7 +107,7 @@ proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
     cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
-    url = apiReq(graphListTweets, restIdVars % [id, cursor])
+    url = apiReq(graphListTweets, restIdVars % [id, cursor, "20"])
     js = await fetch(url)
   result = parseGraphTimeline(js, after).tweets
 
@@ -138,8 +164,20 @@ proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
   if after.len > 0:
     result.replies = await getReplies(id, after)
 
+proc getGraphEditHistory*(id: string): Future[EditHistory] {.async.} =
+  if id.len == 0: return
+  let
+    url = apiReq(graphTweetEditHistory, tweetEditHistoryVars % id)
+    js = await fetch(url)
+  result = parseGraphEditHistory(js, id)
+
 proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
-  let q = genQueryParam(query)
+  # workaround for #1372
+  let maxId =
+    if not after.startsWith("maxid:"): ""
+    else: validateNumber(after[6..^1])
+
+  let q = genQueryParam(query, maxId)
   if q.len == 0 or q == emptyQuery:
     return Timeline(query: query, beginning: true)
 
@@ -153,13 +191,19 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
       "withReactionsMetadata": false,
       "withReactionsPerspective": false
     }
-  if after.len > 0:
+  if after.len > 0 and maxId.len == 0:
     variables["cursor"] = % after
-  let 
+  let
     url = apiReq(graphSearchTimeline, $variables)
     js = await fetch(url)
   result = parseGraphSearch[Tweets](js, after)
   result.query = query
+
+  # when no more items are available the API just returns the last page in
+  # full. this detects that and clears the page instead.
+  if after.len > 0 and result.bottom.len > 0 and maxId.len == 0 and
+     after[0..<64] == result.bottom[0..<64]:
+    result.content.setLen(0)
 
 proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.} =
   if query.text.len == 0:
@@ -187,7 +231,7 @@ proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.}
 
 proc getPhotoRail*(id: string): Future[PhotoRail] {.async.} =
   if id.len == 0: return
-  let js = await fetch(mediaUrl(id, ""))
+  let js = await fetch(mediaUrl(id, "", 30))
   result = parseGraphPhotoRail(js)
 
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =

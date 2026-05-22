@@ -91,7 +91,17 @@ proc getM3u8Url*(content: string): string =
   if re.find(content, m3u8Regex, matches) != -1:
     result = matches[0]
 
-proc proxifyVideo*(manifest: string; proxy: bool): string =
+proc proxifyVideo*(manifest: string; proxy: bool; manifestUrl = ""): string =
+  let (baseUrl, basePath) =
+    if manifestUrl.len > 0:
+      let
+        u = parseUri(manifestUrl)
+        origin = u.scheme & "://" & u.hostname
+        idx = manifestUrl.rfind('/')
+        dirPath = if idx > 8: manifestUrl[0 .. idx] else: ""
+      (origin, dirPath)
+    else:
+      ("https://video.twimg.com", "")
   var replacements: seq[(string, string)]
   for line in manifest.splitLines:
     let url =
@@ -99,9 +109,13 @@ proc proxifyVideo*(manifest: string; proxy: bool): string =
       elif line.startsWith("#EXT-X-MEDIA") and "URI=" in line:
         line[line.find("URI=") + 5 .. -1 + line.find("\"", start= 5 + line.find("URI="))]
       else: line
-    if url.startsWith('/'):
-      let path = "https://video.twimg.com" & url
-      replacements.add (url, if proxy: path.getVidUrl else: path)
+    let resolved =
+      if url.startsWith('/'): baseUrl & url
+      elif basePath.len > 0 and url.len > 0 and not url.startsWith('#') and
+           not url.startsWith("http") and ('.' in url): basePath & url
+      else: ""
+    if resolved.len > 0:
+      replacements.add (url, if proxy: resolved.getVidUrl else: resolved)
   return manifest.multiReplace(replacements)
 
 proc getUserPic*(userPic: string; style=""): string =
@@ -154,24 +168,30 @@ proc getShortTime*(tweet: Tweet): string =
   else:
     result = "now"
 
-proc getDuration*(video: Video): string =
-  let 
-    ms = video.durationMs
+proc getDuration*(ms: int): string =
+  let
     sec = int(round(ms / 1000))
     min = floorDiv(sec, 60)
     hour = floorDiv(min, 60)
   if hour > 0:
-    return &"{hour}:{min mod 60}:{sec mod 60:02}"
+    &"{hour}:{min mod 60:02}:{sec mod 60:02}"
   else:
-    return &"{min mod 60}:{sec mod 60:02}"
+    &"{min mod 60}:{sec mod 60:02}"
+
+proc getDuration*(video: Video): string =
+  getDuration(video.durationMs)
+
+proc getLink*(id: int64; username="i"; focus=true): string =
+  var username = username
+  if username.len == 0:
+    username = "i"
+  result = &"/{username}/status/{id}"
+  if focus: result &= "#m"
 
 proc getLink*(tweet: Tweet; focus=true): string =
   if tweet.id == 0: return
   var username = tweet.user.username
-  if username.len == 0:
-    username = "i"
-  result = &"/{username}/status/{tweet.id}"
-  if focus: result &= "#m"
+  return getLink(tweet.id, username, focus)
 
 proc getTwitterLink*(path: string; params: Table[string, string]): string =
   var
@@ -199,7 +219,7 @@ proc getTwitterLink*(path: string; params: Table[string, string]): string =
 proc getLocation*(u: User | Tweet): (string, string) =
   if "://" in u.location: return (u.location, "")
   let loc = u.location.split(":")
-  let url = if loc.len > 1: "/search?q=place:" & loc[1] else: ""
+  let url = if loc.len > 1: "/search?f=tweets&q=place:" & loc[1] else: ""
   (loc[0], url)
 
 proc getSuspended*(username: string): string =

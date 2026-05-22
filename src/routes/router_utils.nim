@@ -9,21 +9,13 @@ export utils, prefs, types, uri
 template savePref*(pref, value: string; req: Request; expire=false) =
   if not expire or pref in cookies(req):
     setCookie(pref, value, daysForward(when expire: -10 else: 360),
-              httpOnly=true, secure=cfg.useHttps, sameSite=None)
+              httpOnly=true, secure=cfg.useHttps, sameSite=None, path="/")
 
-template cookiePrefs*(): untyped {.dirty.} =
-  getPrefs(cookies(request))
-
-template cookiePref*(pref): untyped {.dirty.} =
-  getPref(cookies(request), pref)
-
-template themePrefs*(): Prefs =
-  var res = defaultPrefs
-  res.theme = cookiePref(theme)
-  res
+template requestPrefs*(): untyped {.dirty.} =
+  getPrefs(cookies(request), params(request))
 
 template showError*(error: string; cfg: Config): string =
-  renderMain(renderError(error), request, cfg, themePrefs(), "Error")
+  renderMain(renderError(error), request, cfg, requestPrefs(), "Error")
 
 template getPath*(): untyped {.dirty.} =
   $(parseUri(request.path) ? filterParams(request.params))
@@ -43,25 +35,74 @@ template getCursor*(req: Request): string =
 proc getNames*(name: string): seq[string] =
   name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
 
+template applyUrlPrefs*() {.dirty.} =
+  if @"prefs".len > 0:
+    var prefParams = initTable[string, string]()
+    for pair in @"prefs".split(','):
+      let kv = pair.split('=', maxsplit=1)
+      if kv.len == 2:
+        prefParams[kv[0]] = kv[1]
+      elif kv.len == 1 and kv[0].len > 0:
+        prefParams[kv[0]] = ""
+    genApplyPrefs(prefParams, request)
+
+    # Rebuild URL without prefs param
+    var params: seq[(string, string)]
+    for k, v in request.params:
+      if k != "prefs":
+        params.add (k, v)
+
+    if params.len > 0:
+      let cleanUrl = request.getNativeReq.url ? params
+      redirect($cleanUrl)
+    else:
+      redirect(request.path)
+
+template corsOrigin*(): string {.dirty.} =
+  if request.headers.hasKey("Origin"): request.headers["Origin"] else: "*"
+
 template respJson*(node: JsonNode) =
-  resp $node, "application/json"
+  let origin = corsOrigin()
+  resp Http200, {
+    "Content-Type": "application/json",
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Credentials": "true"
+  }, $node
 
 template respJsonSuccess*(data: JsonNode) =
+  let origin = corsOrigin()
   let successResponse = %*{
     "code": 0,
     "data": data
   }
-  resp $successResponse, "application/json"
+  resp Http200, {
+    "Content-Type": "application/json",
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Credentials": "true"
+  }, $successResponse
 
 template respJsonError*(message: string, errorType: string = "", httpCode: HttpCode = Http200) =
+  let origin = corsOrigin()
   var errorResponse = %*{
     "code": -1,
     "error": message
   }
   if errorType.len > 0:
     errorResponse["error_type"] = %errorType
-  resp httpCode, $errorResponse, "application/json"
+  resp httpCode, {
+    "Content-Type": "application/json",
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Credentials": "true"
+  }, $errorResponse
 
 template respJsonNull*() =
-  let nullResponse = newJNull()
-  resp $nullResponse, "application/json"
+  let origin = corsOrigin()
+  resp Http200, {
+    "Content-Type": "application/json",
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Credentials": "true"
+  }, $newJNull()
