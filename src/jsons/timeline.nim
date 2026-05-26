@@ -139,6 +139,28 @@ proc formatProfileAsJson*(profile: Profile): JsonNode =
         profile.pinned)) else: newJNull()
   }
 
+proc formatAccountInfoAsJson*(info: AccountInfo): JsonNode =
+  proc dateToUnix(dt: DateTime): int64 =
+    if dt.year > 0: dt.toTime.toUnix() else: 0
+
+  return %*{
+    "username": info.username,
+    "fullname": info.fullname,
+    "userPic": info.userPic,
+    "joinDate": dateToUnix(info.joinDate),
+    "verifiedType": $info.verifiedType,
+    "suspended": info.suspended,
+    "basedIn": info.basedIn,
+    "source": info.source,
+    "usernameChanges": info.usernameChanges,
+    "lastUsernameChange": dateToUnix(info.lastUsernameChange),
+    "affiliateUsername": info.affiliateUsername,
+    "affiliateLabel": info.affiliateLabel,
+    "isIdentityVerified": info.isIdentityVerified,
+    "verifiedSince": dateToUnix(info.verifiedSince),
+    "overrideVerifiedYear": info.overrideVerifiedYear
+  }
+
 proc createJsonApiTimelineRouter*(cfg: Config) =
   router jsonapi_timeline:
     get "/api/i/user/@user_id":
@@ -148,6 +170,17 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
         respJsonSuccess formatUserName(username)
       else:
         respJsonError("User not found", "not_found", Http404)
+
+    get "/api/@name/about":
+      cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_'})
+      let
+        name = @"name"
+        info = await getCachedAccountInfo(name)
+      if info.suspended:
+        respJsonError("Account suspended", "suspended", Http200)
+      if info.username.len == 0:
+        respJsonError("User not found", "not_found", Http404)
+      respJsonSuccess formatAccountInfoAsJson(info)
 
     get "/api/@name/profile":
       cond @"name" notin ["pic", "gif", "video", "search", "settings", "login",
