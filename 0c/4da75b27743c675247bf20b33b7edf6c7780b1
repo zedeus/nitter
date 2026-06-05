@@ -1,0 +1,15 @@
+src/consts.nim
+  ai_agent 10-23,25-31,35-36,38-41,43-46,49,51-58,60-65,68-73
+src/api.nim
+  ai_agent 28-32,35-40,43-48,188,190-191,193,216,218-219
+src/parser.nim
+  ai_agent 7,49,52,64,265-278,446,452,467,487,555,559-569,588-592
+src/apiutils.nim
+  ai_agent 87,93,118-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "0c4da75b27743c675247bf20b33b7edf6c7780b1",
+  "prompts": {}
+}
