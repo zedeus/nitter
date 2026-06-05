@@ -25,27 +25,27 @@ proc mediaUrl(id, cursor: string; count=20): ApiReq =
   )
 
 proc userTweetsUrl(id: string; cursor: string): ApiReq =
-  result = ApiReq(
-    # cookie: apiUrl(graphUserTweets, userTweetsVars % [id, cursor], userTweetsFieldToggles),
-    oauth: apiUrl(graphUserTweetsV2, restIdVars % [id, cursor, "20"])
-  )
-  # might change this in the future pending testing
-  result.cookie = result.oauth
+  return apiReq(graphUserTweetsV2, restIdVars % [id, cursor, "20"])
+  # result = ApiReq(
+  #   cookie: apiUrl(graphUserTweets, userTweetsVars % [id, cursor], userTweetsFieldToggles),
+  #   oauth: apiUrl(graphUserTweetsV2, restIdVars % [id, cursor, "20"])
+  # )
 
 proc userTweetsAndRepliesUrl(id: string; cursor: string): ApiReq =
-  let cookieVars = userTweetsAndRepliesVars % [id, cursor]
-  result = ApiReq(
-    cookie: apiUrl(graphUserTweetsAndReplies, cookieVars, userTweetsFieldToggles),
-    oauth: apiUrl(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"])
-  )
+  return apiReq(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"])
+  #let cookieVars = userTweetsAndRepliesVars % [id, cursor]
+  # result = ApiReq(
+  #   cookie: apiUrl(graphUserTweetsAndReplies, cookieVars, userTweetsFieldToggles),
+  #   oauth: apiUrl(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"])
+  # )
 
 proc tweetDetailUrl(id: string; cursor: string): ApiReq =
-  let cookieVars = tweetDetailVars % [id, cursor]
-  result = ApiReq(
-    # cookie: apiUrl(graphTweetDetail, cookieVars, tweetDetailFieldToggles),
-    cookie: apiUrl(graphTweet, tweetVars % [id, cursor]),
-    oauth: apiUrl(graphTweet, tweetVars % [id, cursor])
-  )
+  return apiReq(graphTweet, tweetVars % [id, cursor])
+  # let cookieVars = tweetDetailVars % [id, cursor]
+  # result = ApiReq(
+  #   cookie: apiUrl(graphTweetDetail, cookieVars, tweetDetailFieldToggles),
+  #   oauth: apiUrl(graphTweet, tweetVars % [id, cursor])
+  # )
 
 proc userUrl(username: string): ApiReq =
   let cookieVars = """{"screen_name":"$1","withGrokTranslatedBio":false}""" % username
@@ -184,13 +184,13 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
   var
     variables = %*{
       "rawQuery": q,
-      "query_source": "typedQuery",
       "count": 20,
+      "querySource": "typed_query",
       "product": "Latest",
-      "withDownvotePerspective": false,
-      "withReactionsMetadata": false,
-      "withReactionsPerspective": false
+      "withGrokTranslatedBio":true,
+      "withQuickPromoteEligibilityTweetFields":false
     }
+
   if after.len > 0 and maxId.len == 0:
     variables["cursor"] = % after
   let
@@ -212,12 +212,11 @@ proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.}
   var
     variables = %*{
       "rawQuery": query.text,
-      "query_source": "typedQuery",
       "count": 20,
+      "querySource": "typed_query",
       "product": "People",
-      "withDownvotePerspective": false,
-      "withReactionsMetadata": false,
-      "withReactionsPerspective": false
+      "withGrokTranslatedBio":true,
+      "withQuickPromoteEligibilityTweetFields":false
     }
   if after.len > 0:
     variables["cursor"] = % after

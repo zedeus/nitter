@@ -84,12 +84,13 @@ proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
     result["x-twitter-auth-type"] = "OAuth2Session"
     result["x-csrf-token"] = session.ct0
     result["cookie"] = getCookieHeader(session.authToken, session.ct0)
+    result["referer"] = "https://x.com/"
     result["sec-ch-ua"] = """"Google Chrome";v="142", "Chromium";v="142", "Not A(Brand";v="24""""
     result["sec-ch-ua-mobile"] = "?0"
     result["sec-ch-ua-platform"] = "Windows"
     result["sec-fetch-dest"] = "empty"
     result["sec-fetch-mode"] = "cors"
-    result["sec-fetch-site"] = "same-site"
+    result["sec-fetch-site"] = "same-origin"
     if disableTid or "/1.1/" in url.path:
       result["authorization"] = bearerToken2
     else:
@@ -114,7 +115,9 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
   try:
     var resp: AsyncResponse
-    pool.use(await genHeaders(session, url)):
+    let headers = await genHeaders(session, url)
+
+    pool.use(headers):
       template getContent =
         # TODO: this is a temporary simple implementation
         if apiProxy.len > 0 and "/1.1/" notin url.path:
