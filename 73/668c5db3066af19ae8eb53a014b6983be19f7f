@@ -1,0 +1,20 @@
+tests/test_about_account.py
+  s_ac9814a1014ce5::t_f6308566a2f0d7 28
+  s_ac9814a1014ce5::t_6b675f64195560 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "73668c5db3066af19ae8eb53a014b6983be19f7f",
+  "prompts": {},
+  "sessions": {
+    "s_ac9814a1014ce5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "53de62f3-6497-4df9-9394-0bebacf6338a",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
