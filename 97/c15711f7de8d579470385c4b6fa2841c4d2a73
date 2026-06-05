@@ -1,0 +1,37 @@
+src/consts.nim
+  s_ac9814a1014ce5::t_c29df4f0d67f01 31
+  s_ac9814a1014ce5::t_0ca12023434585 29
+  s_ac9814a1014ce5::t_e0d2995dd2f04d 12
+  s_ac9814a1014ce5::t_ad3177544f96a2 26
+  s_ac9814a1014ce5::t_cc61d0d8b947a1 21
+  s_ac9814a1014ce5::t_f3dfd33cff6a2c 17
+  s_ac9814a1014ce5::t_375290514df9aa 11
+  s_ac9814a1014ce5::t_80eae635549122 19
+  s_ac9814a1014ce5::t_3c9408b4d06945 25
+  s_ac9814a1014ce5::t_9c67b0cda23f73 28
+  s_ac9814a1014ce5::t_c32bfe395f2c1c 15
+  s_ac9814a1014ce5::t_f077afc3b2915d 16
+  s_ac9814a1014ce5::t_d5eb423a436c8c 27
+  s_ac9814a1014ce5::t_7b688700b4b1b4 10
+  s_ac9814a1014ce5::t_8562f07247bf87 20
+  s_ac9814a1014ce5::t_a436416619ba3e 13-14
+  s_ac9814a1014ce5::t_6982fd489b781d 18
+  s_ac9814a1014ce5::t_be9b6f46f428e7 23
+  s_ac9814a1014ce5::t_4e62b717aeba42 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "97c15711f7de8d579470385c4b6fa2841c4d2a73",
+  "prompts": {},
+  "sessions": {
+    "s_ac9814a1014ce5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "53de62f3-6497-4df9-9394-0bebacf6338a",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
