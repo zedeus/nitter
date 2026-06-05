@@ -56,7 +56,7 @@ proc renderUserCard*(user: User; prefs: Prefs; info: AccountInfo): VNode =
           span:
             let url = replaceUrls(user.website, prefs)
             icon "link"
-            a(href=url): text url.shortLink
+            a(rel="me", href=url): text url.shortLink
 
       tdiv(class="profile-joindate"):
         a(href=(&"/{user.username}/about"), title=getJoinDateFull(user)):
