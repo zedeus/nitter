@@ -1,0 +1,21 @@
+.github/workflows/run-tests.yml
+  s_ac9814a1014ce5::t_4ff944cc7ded42 36,38,107,109
+nitter.nimble
+  s_ac9814a1014ce5::t_800d06bd31881a 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "a86be15f852eadfd95b7441db97f1605a709e768",
+  "prompts": {},
+  "sessions": {
+    "s_ac9814a1014ce5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "53de62f3-6497-4df9-9394-0bebacf6338a",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
