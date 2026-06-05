@@ -264,6 +264,7 @@ type
     stats*: TweetStats
     retweet*: Option[Tweet]
     attribution*: Option[User]
+    attributionLink*: string
     mediaTags*: seq[User]
     quote*: Option[Tweet]
     card*: Option[Card]
