@@ -1,0 +1,29 @@
+tests/test_tweet.py
+  s_ac9814a1014ce5::t_5c96255cd2c88a 123
+  s_ac9814a1014ce5::t_e961e25a57e000 74-75
+tests/test_card.py
+  s_ac9814a1014ce5::t_80ce59448bc5ac 40-42
+  s_ac9814a1014ce5::t_cf7f8fbe950cde 24-25
+  s_ac9814a1014ce5::t_e42a4e184259b2 14-19
+  s_ac9814a1014ce5::t_cf14bfed6dbf86 70
+tests/test_thread.py
+  s_ac9814a1014ce5::t_4cc74caa3c48de 11
+tests/test_tweet_media.py
+  s_ac9814a1014ce5::t_0b6a8a961753e6 31-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "6edef26a2b99ed3cb836b08ca199fa34b5bc8e7d",
+  "prompts": {},
+  "sessions": {
+    "s_ac9814a1014ce5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "53de62f3-6497-4df9-9394-0bebacf6338a",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
