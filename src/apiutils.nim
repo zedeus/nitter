@@ -130,7 +130,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
         raise newException(BadClientError, "Bad client")
 
       if resp.status == $Http404 and result.len == 0:
-        echo "[sessions] transient 404 (empty body), retrying: ", url.path
+        echo "[sessions] transient 404 (empty body), retrying: ", url.path, ", session: ", session.pretty
         raise rateLimitError()
 
     if resp.headers.hasKey(rlRemaining):
@@ -147,7 +147,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
       if result.startsWith("{\"errors"):
         let errors = result.fromJson(Errors)
         if errors notin errorsToSkip:
-          echo "Fetch error, API: ", url.path, ", errors: ", errors
+          echo "Fetch error, API: ", url.path, ", errors: ", errors, ", session: ", session.pretty
           if errors in {expiredToken, badToken, locked}:
             invalidate(session)
             raise rateLimitError()
@@ -162,7 +162,7 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     fetchBody
 
     if resp.status == $Http400:
-      echo "ERROR 400, ", url.path, ": ", result
+      echo "ERROR 400, ", url.path, ": ", result, ", session: ", session.pretty
       raise newException(InternalError, $url)
   except InternalError as e:
     raise e
@@ -177,22 +177,30 @@ template fetchImpl(result, fetchBody) {.dirty.} =
   finally:
     release(session)
 
-template retry(bod) =
+template retry(bod) {.dirty.} =
+  var session: Session
   for i in 0 ..< maxRetries:
     try:
+      session = nil
       bod
       break
     except RateLimitError:
-      echo "[sessions] Rate limited, retrying ", req.cookie.endpoint,
-           " request (", i, "/", maxRetries, ")..."
+      let api = if session.isNil: req.cookie.endpoint
+                else: req.endpoint(session)
+      if session.isNil:
+        echo "[sessions] Rate limited, retrying ", api,
+             " request (", i, "/", maxRetries, ")..."
+      else:
+        echo "[sessions] Rate limited, retrying ", api,
+             " request (", i, "/", maxRetries, ")..., session: ", session.pretty
+      session = nil
       if retryDelayMs > 0:
         await sleepAsync(retryDelayMs)
 
 proc fetch*(req: ApiReq): Future[JsonNode] {.async.} =
   retry:
-    var 
-      body: string
-      session = await getAndValidateSession(req)
+    var body: string
+    session = await getAndValidateSession(req)
 
     let url = req.toUrl(session.kind)
 
@@ -200,22 +208,22 @@ proc fetch*(req: ApiReq): Future[JsonNode] {.async.} =
       if body.startsWith('{') or body.startsWith('['):
         result = parseJson(body)
       else:
-        echo resp.status, ": ", body, " --- url: ", url
+        echo resp.status, ": ", body, " --- url: ", url, ", session: ", session.pretty
         result = newJNull()
 
       let error = result.getError
       if error != null and error notin errorsToSkip:
-        echo "Fetch error, API: ", url.path, ", error: ", error
+        echo "Fetch error, API: ", url.path, ", error: ", error, ", session: ", session.pretty
         if error in {expiredToken, badToken, locked}:
           invalidate(session)
           raise rateLimitError()
 
 proc fetchRaw*(req: ApiReq): Future[string] {.async.} =
   retry:
-    var session = await getAndValidateSession(req)
+    session = await getAndValidateSession(req)
     let url = req.toUrl(session.kind)
 
     fetchImpl result:
       if not (result.startsWith('{') or result.startsWith('[')):
-        echo resp.status, ": ", result, " --- url: ", url
+        echo resp.status, ": ", result, " --- url: ", url, ", session: ", session.pretty
         result.setLen(0)

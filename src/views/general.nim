@@ -84,6 +84,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
         text cfg.title
 
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(name="referrer", content="same-origin")
     meta(name="theme-color", content="#1F1F1F")
     meta(property="og:type", content=ogType)
     meta(property="og:title", content=(if ogTitle.len > 0: ogTitle else: titleText))
