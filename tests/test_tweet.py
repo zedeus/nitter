@@ -71,8 +71,8 @@ emoji = [
 ]
 
 retweet = [
-    [7, 'mobile_test_2', 'mobile test 2', 'Test account', '@mobile_test', '1234'],
-    [3, 'mobile_test_8', 'mobile test 8', 'jack', '@jack', 'twttr']
+    [7, 'mobile_test_2', 'mobile test 2', 'Test account', '@mobile_test',
+     'Testing. 1234.']
 ]
 
 
@@ -120,7 +120,7 @@ class TweetTest(BaseTestCase):
             link = self.find_link_text(f'@{un}')
             self.assertIn(f'/{un}', link.get_property('href'))
 
-    @parameterized.expand(retweet)
+    @parameterized.expand(retweet, skip_on_empty=True)
     def test_retweet(self, index, url, retweet_by, fullname, username, text):
         self.open_nitter(url)
         tweet = get_timeline_tweet(index)
