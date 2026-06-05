@@ -33,9 +33,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.nimble
-          key: ${{ matrix.nim }}-nimble-v2-${{ hashFiles('*.nimble') }}
+          key: ${{ matrix.nim }}-nimble-v3-${{ hashFiles('*.nimble') }}
           restore-keys: |
-            ${{ matrix.nim }}-nimble-v2-
+            ${{ matrix.nim }}-nimble-v3-
 
       - name: Setup Nim
         uses: jiro4989/setup-nim-action@v2
@@ -104,9 +104,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.nimble
-          key: 2.2.x-nimble-v2-${{ hashFiles('*.nimble') }}
+          key: 2.2.x-nimble-v3-${{ hashFiles('*.nimble') }}
           restore-keys: |
-            2.2.x-nimble-v2-
+            2.2.x-nimble-v3-
 
       - name: Setup Nim
         uses: jiro4989/setup-nim-action@v2
