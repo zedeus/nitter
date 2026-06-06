@@ -1,0 +1,19 @@
+.github/workflows/build-docker.yml
+  s_6e321fd66fb1ee::t_198fa05f6ee0c5 10-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "fc136c0a8db0e94409089ce3582c14b7fa24686b",
+  "prompts": {},
+  "sessions": {
+    "s_6e321fd66fb1ee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f067bd94-f613-4c04-a487-8355f526a860",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
