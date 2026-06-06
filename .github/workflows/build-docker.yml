@@ -7,55 +7,109 @@ on:
     branches:
       - master
 
+env:
+  IMAGE: zedeus/nitter
+
 jobs:
   tests:
     uses: ./.github/workflows/run-tests.yml
     secrets: inherit
 
-  build-docker-amd64:
+  # Build each architecture natively (no emulation) and push by digest only.
+  # The digests are stitched into a single multi-arch tag by the merge job.
+  build:
     needs: [tests]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            platform: linux/amd64
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Prepare platform name
+        run: echo "PLATFORM_PAIR=${platform//\//-}" >> "$GITHUB_ENV"
+        env:
+          platform: ${{ matrix.platform }}
+
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          # Attestations turn a single-platform push into a manifest index, which
+          # breaks push-by-digest + the imagetools merge below. Disable them.
+          provenance: false
+          sbom: false
+
+      - name: Export digest
+        run: |
+          mkdir -p "${{ runner.temp }}/digests"
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # Combine the per-arch digests into one multi-arch manifest so that
+  # `docker pull zedeus/nitter:latest` serves the right image on any CPU.
+  merge:
+    needs: [build]
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Download digests
+        uses: actions/download-artifact@v4
         with:
-          version: latest
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and push AMD64 Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: zedeus/nitter:latest,zedeus/nitter:${{ github.sha }}
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
 
-  build-docker-arm64:
-    needs: [tests]
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - uses: actions/checkout@v6
       - name: Set up Docker Buildx
-        id: buildx
         uses: docker/setup-buildx-action@v3
         with:
           version: latest
+
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and push ARM64 Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/arm64
-          push: true
-          tags: zedeus/nitter:latest-arm64,zedeus/nitter:${{ github.sha }}-arm64
+
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          # latest-arm64 is a backward-compat alias of the (now multi-arch)
+          # latest tag, for users still pinned to the old ARM64-only image.
+          # word splitting is intentional: one image ref arg per digest file
+          # shellcheck disable=SC2046
+          docker buildx imagetools create \
+            -t ${{ env.IMAGE }}:latest \
+            -t ${{ env.IMAGE }}:latest-arm64 \
+            -t ${{ env.IMAGE }}:${{ github.sha }} \
+            $(printf '${{ env.IMAGE }}@sha256:%s ' *)
+
+      - name: Inspect image
+        run: docker buildx imagetools inspect ${{ env.IMAGE }}:${{ github.sha }}
