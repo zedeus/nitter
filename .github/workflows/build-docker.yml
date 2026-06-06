@@ -55,7 +55,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./Dockerfile.arm64
+          file: ./Dockerfile
           platforms: linux/arm64
           push: true
           tags: zedeus/nitter:latest-arm64,zedeus/nitter:${{ github.sha }}-arm64
