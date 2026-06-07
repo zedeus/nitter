@@ -1,0 +1,24 @@
+.github/workflows/build-docker.yml
+  s_6e321fd66fb1ee::t_198fa05f6ee0c5 10-17
+.github/workflows/run-tests.yml
+  s_6e321fd66fb1ee::t_54cdec3599fa9c 145-149
+  s_6e321fd66fb1ee::t_1cd3ce8474f734 35-38,40
+  s_6e321fd66fb1ee::t_1f5803e545c444 123-129
+  s_6e321fd66fb1ee::t_eb7ed234a132ab 108-112,114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "b85ab1214e06c4293adfe06efac3efb440d49436",
+  "prompts": {},
+  "sessions": {
+    "s_6e321fd66fb1ee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f067bd94-f613-4c04-a487-8355f526a860",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
