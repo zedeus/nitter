@@ -32,10 +32,12 @@ jobs:
         id: cache-nimble
         uses: actions/cache@v5
         with:
-          path: ~/.nimble
-          key: ${{ matrix.nim }}-nimble-v3-${{ hashFiles('*.nimble') }}
+          path: |
+            ~/.nimble/pkgcache
+            ~/.nimble/packages_official.json
+          key: ${{ matrix.nim }}-nimble-v6-${{ hashFiles('*.nimble') }}
           restore-keys: |
-            ${{ matrix.nim }}-nimble-v3-
+            ${{ matrix.nim }}-nimble-v6-
 
       - name: Setup Nim
         uses: jiro4989/setup-nim-action@v2
@@ -103,10 +105,12 @@ jobs:
       - name: Cache Nimble Dependencies
         uses: actions/cache@v5
         with:
-          path: ~/.nimble
-          key: 2.2.x-nimble-v3-${{ hashFiles('*.nimble') }}
+          path: |
+            ~/.nimble/pkgcache
+            ~/.nimble/packages_official.json
+          key: 2.2.x-nimble-v6-${{ hashFiles('*.nimble') }}
           restore-keys: |
-            2.2.x-nimble-v3-
+            2.2.x-nimble-v6-
 
       - name: Setup Nim
         uses: jiro4989/setup-nim-action@v2
@@ -114,6 +118,9 @@ jobs:
           nim-version: 2.2.x
           use-nightlies: true
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Nimble dependencies
+        run: nimble install -y --depsOnly
 
       - name: Download 2.2.x build artifact
         uses: actions/download-artifact@v4
@@ -130,10 +137,8 @@ jobs:
           sed -i 's/enableDebug = false/enableDebug = true/g' nitter.conf
           sed -i 's/maxRetries = 1/maxRetries = 10/g' nitter.conf
 
-          # Run both Nimble tasks concurrently
-          nim r tools/rendermd.nim &
-          nim r tools/gencss.nim &
-          wait
+          nim r tools/rendermd.nim
+          nim r tools/gencss.nim
 
           echo '${{ secrets.SESSIONS }}' | head -n1
           echo '${{ secrets.SESSIONS }}' > ./sessions.jsonl

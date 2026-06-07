@@ -7,6 +7,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: docker-publish-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   IMAGE: zedeus/nitter
 
@@ -15,8 +19,6 @@ jobs:
     uses: ./.github/workflows/run-tests.yml
     secrets: inherit
 
-  # Build each architecture natively (no emulation) and push by digest only.
-  # The digests are stitched into a single multi-arch tag by the merge job.
   build:
     needs: [tests]
     strategy:
@@ -55,8 +57,6 @@ jobs:
           file: ./Dockerfile
           platforms: ${{ matrix.platform }}
           outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          # Attestations turn a single-platform push into a manifest index, which
-          # breaks push-by-digest + the imagetools merge below. Disable them.
           provenance: false
           sbom: false
 
@@ -101,10 +101,6 @@ jobs:
       - name: Create manifest list and push
         working-directory: ${{ runner.temp }}/digests
         run: |
-          # latest-arm64 is a backward-compat alias of the (now multi-arch)
-          # latest tag, for users still pinned to the old ARM64-only image.
-          # word splitting is intentional: one image ref arg per digest file
-          # shellcheck disable=SC2046
           docker buildx imagetools create \
             -t ${{ env.IMAGE }}:latest \
             -t ${{ env.IMAGE }}:latest-arm64 \
