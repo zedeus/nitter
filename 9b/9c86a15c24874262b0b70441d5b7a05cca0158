@@ -1,0 +1,23 @@
+.gitignore
+  s_c4240aea50335b::t_29440a6d475b5c 18-20
+config.nims
+  s_c4240aea50335b::t_bd941f47fcb205 14-17
+README.md
+  s_c4240aea50335b::t_63baef5a128697 107-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "9b9c86a15c24874262b0b70441d5b7a05cca0158",
+  "prompts": {},
+  "sessions": {
+    "s_c4240aea50335b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aa27cea4-caed-4627-8151-e17e78525cc2",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
