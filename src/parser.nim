@@ -521,7 +521,7 @@ proc parseGraphTweet*(js: JsonNode): Tweet =
           "binding_values": %bindingObj
         }
 
-  var replyId = 0
+  var replyId: int64 = 0
   with restId, js{"reply_to_results", "rest_id"}:
     replyId = restId.getId
 
