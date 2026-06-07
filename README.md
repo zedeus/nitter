@@ -104,9 +104,9 @@ along with the scss and md files.
 # su nitter
 $ git clone https://github.com/zedeus/nitter
 $ cd nitter
-$ nimble build -d:danger --mm:refc
-$ nimble scss
-$ nimble md
+$ nimble -l build -d:danger --mm:refc
+$ nimble -l scss
+$ nimble -l md
 $ cp nitter.example.conf nitter.conf
 ```
 
