@@ -1,0 +1,20 @@
+.github/workflows/run-tests.yml
+  s_6e321fd66fb1ee::t_1f5803e545c444 123-129
+  s_6e321fd66fb1ee::t_54cdec3599fa9c 145-149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "a1d60a4cde843ebeb2459b1ff9794cc3bf8b8ab2",
+  "prompts": {},
+  "sessions": {
+    "s_6e321fd66fb1ee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f067bd94-f613-4c04-a487-8355f526a860",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
