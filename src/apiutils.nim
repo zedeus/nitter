@@ -182,10 +182,12 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
 template retry(bod) {.dirty.} =
   var session: Session
+  var retrySuccess = false
   for i in 0 ..< maxRetries:
     try:
       session = nil
       bod
+      retrySuccess = true
       break
     except RateLimitError:
       let api = if session.isNil: req.cookie.endpoint
@@ -199,6 +201,8 @@ template retry(bod) {.dirty.} =
       session = nil
       if retryDelayMs > 0:
         await sleepAsync(retryDelayMs)
+  if not retrySuccess:
+    raise rateLimitError()
 
 proc fetch*(req: ApiReq): Future[JsonNode] {.async.} =
   retry:
