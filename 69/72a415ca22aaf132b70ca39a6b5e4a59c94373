@@ -1,0 +1,21 @@
+tests/test_security.py
+  s_05566b34b5da77::t_6ce48b389f2a00 2-6,16,18,27,29-30,32,38-45,49-50,54,57-58
+  s_05566b34b5da77::t_a3e85da5fcd717 17,19-26,28,31,33-34,51-53
+  s_05566b34b5da77::t_1f6517cb0d6104 1,7-15,35-37,46-48,55-56,59-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "6972a415ca22aaf132b70ca39a6b5e4a59c94373",
+  "prompts": {},
+  "sessions": {
+    "s_05566b34b5da77": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fbf9a478-3ac9-400b-af5a-68974d419e6f",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
