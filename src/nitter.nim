@@ -2,7 +2,7 @@
 import asyncdispatch, strformat, logging
 from net import Port
 from htmlgen import a
-from os import getEnv
+from os import getEnv, normalizedPath
 
 import jester
 
@@ -63,12 +63,17 @@ createDebugRouter(cfg)
 
 settings:
   port = Port(cfg.port)
-  staticDir = cfg.staticDir
+  staticDir = normalizedPath(cfg.staticDir)
   bindAddr = cfg.address
   reusePort = true
+  maxBody = 64 * 1024
 
 routes:
   before:
+    # Reject malformed paths
+    if request.path.len == 0 or request.path[0] != '/':
+      halt Http400
+
     # skip all file URLs
     cond "." notin request.path
     applyUrlPrefs()
