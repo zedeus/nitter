@@ -1,0 +1,9 @@
+src/nitter.nim
+  ai_agent 5,66,69,73-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "a8ee10006e8a5714ac3ad303fca0a11c43be7804",
+  "prompts": {}
+}
