@@ -1,0 +1,21 @@
+src/redis_cache.nim
+  s_05b2a9048a4036::t_0f43ebbb7a9e9a 147-150
+src/apiutils.nim
+  s_05b2a9048a4036::t_0f43ebbb7a9e9a 185,190,204-205
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "5a4c8dd12c616958b59dfd9259fcb7befc9b3ff9",
+  "prompts": {},
+  "sessions": {
+    "s_05b2a9048a4036": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20cd3d92-6d7a-4cf4-be08-bfce57b945b7",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
