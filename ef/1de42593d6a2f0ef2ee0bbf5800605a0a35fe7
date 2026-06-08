@@ -1,0 +1,11 @@
+src/apiutils.nim
+  ai_agent 3
+nitter.nimble
+  ai_agent 14-18,20,22-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "ef1de42593d6a2f0ef2ee0bbf5800605a0a35fe7",
+  "prompts": {}
+}
