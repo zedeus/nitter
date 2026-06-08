@@ -1,0 +1,9 @@
+src/routes/router_utils.nim
+  ai_agent 11,13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "60cb10229fe18c5f6b59e6d4e554a86b884ea7bb",
+  "prompts": {}
+}
