@@ -104,7 +104,7 @@ const
   restIdVars* = """{
   "rest_id": "$1", $2
   "count": $3
-}"""
+}""".replace(" ", "").replace("\n", "")
 
   userMediaVars* = """{
   "userId": "$1", $2
