@@ -1,0 +1,21 @@
+src/parserutils.nim
+  s_72471fbe1f32b5::t_cbeda804e397db 330
+src/parser.nim
+  s_72471fbe1f32b5::t_f6fe2f3b539d6f 454
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "7eed720894abf3496b9db3c7071be821fb40a7c7",
+  "prompts": {},
+  "sessions": {
+    "s_72471fbe1f32b5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "43e8a3e9-3c25-4f8c-8717-dcc3f69732da",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
