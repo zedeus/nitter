@@ -16,6 +16,7 @@ type
   ApiUrl* = object
     endpoint*: string
     params*: seq[(string, string)]
+    skipTid*: bool
 
   ApiReq* = object
     oauth*: ApiUrl
@@ -265,6 +266,7 @@ type
     stats*: TweetStats
     retweet*: Option[Tweet]
     attribution*: Option[User]
+    attributionLink*: string
     mediaTags*: seq[User]
     quote*: Option[Tweet]
     card*: Option[Card]

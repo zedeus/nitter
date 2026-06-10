@@ -11,3 +11,7 @@ warning("HoleEnumConv", off)
 hint("XDeclaredButNotUsed", off)
 hint("XCannotRaiseY", off)
 hint("User", off)
+# begin Nimble config (version 2)
+when withDir(thisDir(), system.fileExists("nimble.paths")):
+  include "nimble.paths"
+# end Nimble config

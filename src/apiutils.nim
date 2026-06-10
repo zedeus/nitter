@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import httpclient, asyncdispatch, options, strutils, uri, times, math, tables
-import jsony, packedjson, zippy, oauth1
+import jsony, packedjson, zippy, oauth/oauth1
 import types, auth, consts, parserutils, http_pool, tid
 import experimental/types/common
 
@@ -63,7 +63,7 @@ proc getOauthHeader(url, oauthToken, oauthTokenSecret: string): string =
 proc getCookieHeader(authToken, ct0: string): string =
   "auth_token=" & authToken & "; ct0=" & ct0
 
-proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
+proc genHeaders*(session: Session, url: Uri, skipTid: bool): Future[HttpHeaders] {.async.} =
   result = newHttpHeaders({
     "accept": "*/*",
     "accept-encoding": "gzip",
@@ -84,13 +84,14 @@ proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
     result["x-twitter-auth-type"] = "OAuth2Session"
     result["x-csrf-token"] = session.ct0
     result["cookie"] = getCookieHeader(session.authToken, session.ct0)
+    result["referer"] = "https://x.com/"
     result["sec-ch-ua"] = """"Google Chrome";v="142", "Chromium";v="142", "Not A(Brand";v="24""""
     result["sec-ch-ua-mobile"] = "?0"
     result["sec-ch-ua-platform"] = "Windows"
     result["sec-fetch-dest"] = "empty"
     result["sec-fetch-mode"] = "cors"
-    result["sec-fetch-site"] = "same-site"
-    if disableTid or "/1.1/" in url.path:
+    result["sec-fetch-site"] = "same-origin"
+    if disableTid or skipTid or "/1.1/" in url.path:
       result["authorization"] = bearerToken2
     else:
       result["authorization"] = bearerToken
@@ -114,7 +115,12 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
   try:
     var resp: AsyncResponse
-    pool.use(await genHeaders(session, url)):
+    let skipTid = case session.kind
+      of oauth: req.oauth.skipTid
+      of cookie: req.cookie.skipTid
+    let headers = await genHeaders(session, url, skipTid)
+
+    pool.use(headers):
       template getContent =
         # TODO: this is a temporary simple implementation
         if apiProxy.len > 0 and "/1.1/" notin url.path:
@@ -179,10 +185,12 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
 template retry(bod) {.dirty.} =
   var session: Session
+  var retrySuccess = false
   for i in 0 ..< maxRetries:
     try:
       session = nil
       bod
+      retrySuccess = true
       break
     except RateLimitError:
       let api = if session.isNil: req.cookie.endpoint
@@ -196,6 +204,8 @@ template retry(bod) {.dirty.} =
       session = nil
       if retryDelayMs > 0:
         await sleepAsync(retryDelayMs)
+  if not retrySuccess:
+    raise rateLimitError()
 
 proc fetch*(req: ApiReq): Future[JsonNode] {.async.} =
   retry:

@@ -144,9 +144,10 @@ proc getCachedUsername*(userId: string): Future[string] {.async.} =
   else:
     let user = await getGraphUserById(userId)
     result = user.username
-    await setEx(key, baseCacheTime, result)
-    if result.len > 0 and user.id.len > 0:
-      await all(cacheUserId(result, user.id), cache(user))
+    if result.len > 0:
+      await setEx(key, baseCacheTime, result)
+      if user.id.len > 0:
+        await all(cacheUserId(result, user.id), cache(user))
 
 # proc getCachedTweet*(id: int64): Future[Tweet] {.async.} =
 #   if id == 0: return

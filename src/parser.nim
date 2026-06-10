@@ -4,7 +4,7 @@ import packedjson, packedjson/deserialiser
 import types, parserutils, utils
 import experimental/parser/unifiedcard
 
-proc parseGraphTweet(js: JsonNode): Tweet
+proc parseGraphTweet*(js: JsonNode): Tweet
 
 proc parseVerifiedType(s: string; current: VerifiedType): VerifiedType =
   try: parseEnum[VerifiedType](s)
@@ -46,10 +46,10 @@ proc parseUser(js: JsonNode; id=""): User =
 proc parseGraphUser(js: JsonNode): User =
   var user = js{"user_result", "result"}
   if user.isNull:
-    user = ? js{"user_results", "result"}
+    user = js{"user_results", "result"}
 
   if user.isNull:
-    if js{"core"}.notNull and js{"legacy"}.notNull:
+    if js{"core"}.notNull:
       user = js
     else:
       return
@@ -61,6 +61,7 @@ proc parseGraphUser(js: JsonNode): User =
 
   # fallback to support UserMedia/recent GraphQL updates
   if result.username.len == 0:
+    result.id = user{"rest_id"}.getStr
     result.username = user{"core", "screen_name"}.getStr
     result.fullname = user{"core", "name"}.getStr
     result.userPic = user{"avatar", "image_url"}.getImageStr.replace("_normal", "")
@@ -261,6 +262,20 @@ proc parseMediaEntities(js: JsonNode; result: var Tweet) =
             durationMs: mediaInfo{"duration_millis"}.getInt,
             variants: parseVideoVariants(mediaInfo{"variants"})
           ))
+
+          # Parse source user for video attribution
+          with sourceUser, mediaEntity{"source_user_results", "result"}:
+            if result.attribution.isNone:
+              let
+                expanded = mediaEntity{"expanded_url"}.getStr
+                pathStart = expanded.find('/', expanded.find("://") + 3)
+              if pathStart >= 0:
+                result.attributionLink = expanded[pathStart .. ^1].replace("/video/1", "")
+              result.attribution = some(User(
+                id: sourceUser{"rest_id"}.getStr,
+                fullname: sourceUser{"core", "name"}.getStr,
+                userPic: sourceUser{"avatar", "image_url"}.getImageStr.replace("_normal", "")
+              ))
         of "ApiGif":
           parsedMedia.addMedia(Gif(
             url: mediaInfo{"variants"}[0]{"url"}.getImageStr,
@@ -428,13 +443,13 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull();
   # graphql
   with rt, js{"retweeted_status_result", "result"}:
     # needed due to weird edgecase where the actual tweet data isn't included
-    if "legacy" in rt:
+    if "legacy" in rt or "rest_id" in rt:
       result.retweet = some parseGraphTweet(rt)
       return
 
   with reposts, js{"repostedStatusResults"}:
     with rt, reposts{"result"}:
-      if "legacy" in rt:
+      if "legacy" in rt or "rest_id" in rt:
         result.retweet = some parseGraphTweet(rt)
         return
 
@@ -449,7 +464,7 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull();
       result.poll = some parsePoll(jsCard)
     elif name == "amplify":
       result.media.addMedia(parsePromoVideo(jsCard{"binding_values"}))
-    else:
+    elif name.len > 0 and jsCard{"binding_values"}.notNull:
       result.card = some parseCard(jsCard, js{"entities", "urls"})
 
   result.expandTweetEntities(js)
@@ -469,7 +484,7 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull();
       result.text.removeSuffix(" Learn more.")
       result.available = false
 
-proc parseGraphTweet(js: JsonNode): Tweet =
+proc parseGraphTweet*(js: JsonNode): Tweet =
   if js.kind == JNull:
     return Tweet()
 
@@ -506,7 +521,7 @@ proc parseGraphTweet(js: JsonNode): Tweet =
           "binding_values": %bindingObj
         }
 
-  var replyId = 0
+  var replyId: int64 = 0
   with restId, js{"reply_to_results", "rest_id"}:
     replyId = restId.getId
 
@@ -537,10 +552,21 @@ proc parseGraphTweet(js: JsonNode): Tweet =
         result.poll = some parsePoll(jsCard)
       elif name == "amplify":
         result.media.addMedia(parsePromoVideo(jsCard{"binding_values"}))
-      else:
+      elif name.len > 0 and jsCard{"binding_values"}.notNull:
         result.card = some parseCard(jsCard, js{"url_entities"})
 
     result.expandTweetEntitiesV2(js)
+
+    # Strip video source URL from text (for videos from other tweets)
+    with mediaEntities, js{"media_entities"}:
+      for m in mediaEntities:
+        if "source_status_id_str" in m:
+          let mediaUrl = m{"url"}.getStr
+          if mediaUrl.len > 0:
+            let idx = result.text.rfind(mediaUrl)
+            if idx >= 0:
+              result.text = result.text[0 ..< idx].strip()
+            break
   else:
     result = parseTweet(js{"legacy"}, jsCard, replyId)
     result.id = js{"rest_id"}.getId
@@ -558,6 +584,12 @@ proc parseGraphTweet(js: JsonNode): Tweet =
     result.expandNoteTweetEntities(noteTweet)
 
   parseMediaEntities(js, result)
+
+  # Handle retweets - check both legacy and top-level paths
+  with reposts, js{"legacy", "repostedStatusResults"}:
+    with rt, reposts{"result"}:
+      if "legacy" in rt or "rest_id" in rt:
+        result.retweet = some parseGraphTweet(rt)
 
   with quoted, js{"quoted_status_result", "result"}:
     result.quote = some(parseGraphTweet(quoted))

@@ -245,8 +245,9 @@ proc renderReply(tweet: Tweet): VNode =
       if i > 0: text " "
       a(href=("/" & u)): text "@" & u
 
-proc renderAttribution(user: User; prefs: Prefs): VNode =
-  buildHtml(a(class="attribution", href=("/" & user.username))):
+proc renderAttribution(user: User; prefs: Prefs; link = ""): VNode =
+  let href = if link.len > 0: link else: "/" & user.username
+  buildHtml(a(class="attribution", href=href)):
     renderMiniAvatar(user, prefs)
     strong: text user.fullname
     verifiedIcon(user)
@@ -392,7 +393,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         verbatim replaceUrls(tweet.text, prefs) & renderLocation(tweet)
 
       if tweet.attribution.isSome:
-        renderAttribution(tweet.attribution.get(), prefs)
+        renderAttribution(tweet.attribution.get(), prefs, tweet.attributionLink)
 
       if tweet.card.isSome and tweet.card.get().kind != hidden:
         renderCard(tweet.card.get(), prefs, path)
