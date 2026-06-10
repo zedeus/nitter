@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import strutils, options, times, math, tables
+import strutils, options, times, math, tables, uri
 import packedjson, packedjson/deserialiser
 import types, parserutils, utils
 import experimental/parser/unifiedcard
@@ -229,6 +229,10 @@ proc parseLegacyMediaEntities(js: JsonNode; result: var Tweet) =
             result.attribution = some(parseUser(user))
           else:
             result.attribution = some(parseGraphUser(user))
+          # Set attribution link from expanded_url (strip /video/N suffix)
+          let expanded = m{"expanded_url"}.getStr
+          if expanded.len > 0:
+            result.attributionLink = expanded.parseUri.path.replace("/video/1", "")
       of "animated_gif":
         result.media.addMedia(Gif(
           url: m{"video_info", "variants"}[0]{"url"}.getImageStr,
@@ -266,11 +270,9 @@ proc parseMediaEntities(js: JsonNode; result: var Tweet) =
           # Parse source user for video attribution
           with sourceUser, mediaEntity{"source_user_results", "result"}:
             if result.attribution.isNone:
-              let
-                expanded = mediaEntity{"expanded_url"}.getStr
-                pathStart = expanded.find('/', expanded.find("://") + 3)
-              if pathStart >= 0:
-                result.attributionLink = expanded[pathStart .. ^1].replace("/video/1", "")
+              let expanded = mediaEntity{"expanded_url"}.getStr
+              if expanded.len > 0:
+                result.attributionLink = expanded.parseUri.path.replace("/video/1", "")
               result.attribution = some(User(
                 id: sourceUser{"rest_id"}.getStr,
                 fullname: sourceUser{"core", "name"}.getStr,
@@ -467,8 +469,8 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull();
     elif name.len > 0 and jsCard{"binding_values"}.notNull:
       result.card = some parseCard(jsCard, js{"entities", "urls"})
 
-  result.expandTweetEntities(js)
   parseLegacyMediaEntities(js, result)
+  result.expandTweetEntities(js)
 
   with jsWithheld, js{"withheld_in_countries"}:
     let withheldInCountries: seq[string] =
@@ -555,6 +557,10 @@ proc parseGraphTweet*(js: JsonNode): Tweet =
       elif name.len > 0 and jsCard{"binding_values"}.notNull:
         result.card = some parseCard(jsCard, js{"url_entities"})
 
+    parseMediaEntities(js, result)
+    if result.attribution.isNone:
+      parseLegacyMediaEntities(js{"legacy"}, result)
+
     result.expandTweetEntitiesV2(js)
 
     # Strip video source URL from text (for videos from other tweets)
@@ -584,6 +590,14 @@ proc parseGraphTweet*(js: JsonNode): Tweet =
     result.expandNoteTweetEntities(noteTweet)
 
   parseMediaEntities(js, result)
+
+  # Hide card if it's redundant with attribution (same video shown via embed)
+  if result.attribution.isSome and result.card.isSome:
+    let cardUri = get(result.card).url.parseUri
+    if cardUri.isTwitterUrl:
+      let cardPath = cardUri.path.replace("/video/1", "")
+      if cardPath.len > 0 and cardPath == result.attributionLink:
+        get(result.card).kind = hidden
 
   # Handle retweets - check both legacy and top-level paths
   with reposts, js{"legacy", "repostedStatusResults"}:

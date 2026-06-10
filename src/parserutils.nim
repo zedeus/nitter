@@ -319,6 +319,7 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
     textSlice = textRange{0}.getInt .. textRange{1}.getInt
     hasQuote = js{"is_quote_status"}.getBool
     hasJobCard = tweet.card.isSome and get(tweet.card).kind == jobDetails
+    hasAttribution = tweet.attribution.isSome
 
   var replyTo = ""
   if tweet.replyId != 0:
@@ -326,7 +327,8 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
       replyTo = reply.getStr
       tweet.reply.add replyTo
 
-  tweet.expandTextEntities(entities, tweet.text, textSlice, replyTo, hasQuote or hasJobCard)
+  tweet.expandTextEntities(entities, tweet.text, textSlice, replyTo,
+                           hasQuote or hasJobCard or hasAttribution)
 
 proc expandTextEntitiesV2(tweet: Tweet; js: JsonNode; text: string; textSlice: Slice[int];
                           hasRedundantLink=false) =
@@ -377,16 +379,19 @@ proc expandTweetEntitiesV2*(tweet: Tweet; js: JsonNode) =
     textSlice = textRange{0}.getInt .. textRange{1}.getInt
     hasQuote = "quoted_tweet_results" in js
     hasJobCard = tweet.card.isSome and get(tweet.card).kind == jobDetails
+    hasAttribution = tweet.attribution.isSome
 
-  tweet.expandTextEntitiesV2(js, tweet.text, textSlice, hasQuote or hasJobCard)
+  tweet.expandTextEntitiesV2(js, tweet.text, textSlice,
+                             hasQuote or hasJobCard or hasAttribution)
 
 proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
   let
     entities = ? js{"entity_set"}
     text = js{"text"}.getStr.multiReplace(("<", unicodeOpen), (">", unicodeClose))
     textSlice = 0..text.runeLen
+    hasAttribution = tweet.attribution.isSome
 
-  tweet.expandTextEntities(entities, text, textSlice)
+  tweet.expandTextEntities(entities, text, textSlice, hasRedundantLink=hasAttribution)
 
   tweet.text = tweet.text.multiReplace((unicodeOpen, xmlOpen), (unicodeClose, xmlClose))
 
