@@ -14,7 +14,7 @@ card = [
      'gist.github.com', True],
 
     ['NASA/status/2061872347477418301',
-     'Nancy Grace Roman Space Telescope Mission - NASA Science',
+     'Nancy Grace Roman Space Telescope - NASA Science',
      'The Nancy Grace Roman Space Telescope will settle essential questions in the areas of dark energy, exoplanets, and astrophysics.',
      'science.nasa.gov', True]
 ]
