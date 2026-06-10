@@ -11,11 +11,11 @@ proc genParams(variables: string; fieldToggles = ""): seq[(string, string)] =
   if fieldToggles.len > 0:
     result.add ("fieldToggles", fieldToggles)
 
-proc apiUrl(endpoint, variables: string; fieldToggles = ""): ApiUrl =
-  return ApiUrl(endpoint: endpoint, params: genParams(variables, fieldToggles))
+proc apiUrl(endpoint, variables: string; fieldToggles = ""; skipTid = false): ApiUrl =
+  return ApiUrl(endpoint: endpoint, params: genParams(variables, fieldToggles), skipTid: skipTid)
 
-proc apiReq(endpoint, variables: string; fieldToggles = ""): ApiReq =
-  let url = apiUrl(endpoint, variables, fieldToggles)
+proc apiReq(endpoint, variables: string; fieldToggles = ""; skipTid = false): ApiReq =
+  let url = apiUrl(endpoint, variables, fieldToggles, skipTid)
   return ApiReq(cookie: url, oauth: url)
 
 proc mediaUrl(id, cursor: string; count=20): ApiReq =
@@ -32,12 +32,7 @@ proc userTweetsUrl(id: string; cursor: string): ApiReq =
   # )
 
 proc userTweetsAndRepliesUrl(id: string; cursor: string): ApiReq =
-  return apiReq(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"])
-  #let cookieVars = userTweetsAndRepliesVars % [id, cursor]
-  # result = ApiReq(
-  #   cookie: apiUrl(graphUserTweetsAndReplies, cookieVars, userTweetsFieldToggles),
-  #   oauth: apiUrl(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"])
-  # )
+  return apiReq(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"], skipTid=true)
 
 proc tweetDetailUrl(id: string; cursor: string): ApiReq =
   return apiReq(graphTweet, tweetVars % [id, cursor])

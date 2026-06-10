@@ -16,6 +16,7 @@ type
   ApiUrl* = object
     endpoint*: string
     params*: seq[(string, string)]
+    skipTid*: bool
 
   ApiReq* = object
     oauth*: ApiUrl

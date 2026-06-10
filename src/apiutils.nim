@@ -63,7 +63,7 @@ proc getOauthHeader(url, oauthToken, oauthTokenSecret: string): string =
 proc getCookieHeader(authToken, ct0: string): string =
   "auth_token=" & authToken & "; ct0=" & ct0
 
-proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
+proc genHeaders*(session: Session, url: Uri, skipTid: bool): Future[HttpHeaders] {.async.} =
   result = newHttpHeaders({
     "accept": "*/*",
     "accept-encoding": "gzip",
@@ -91,7 +91,7 @@ proc genHeaders*(session: Session, url: Uri): Future[HttpHeaders] {.async.} =
     result["sec-fetch-dest"] = "empty"
     result["sec-fetch-mode"] = "cors"
     result["sec-fetch-site"] = "same-origin"
-    if disableTid or "/1.1/" in url.path:
+    if disableTid or skipTid or "/1.1/" in url.path:
       result["authorization"] = bearerToken2
     else:
       result["authorization"] = bearerToken
@@ -115,7 +115,10 @@ template fetchImpl(result, fetchBody) {.dirty.} =
 
   try:
     var resp: AsyncResponse
-    let headers = await genHeaders(session, url)
+    let skipTid = case session.kind
+      of oauth: req.oauth.skipTid
+      of cookie: req.cookie.skipTid
+    let headers = await genHeaders(session, url, skipTid)
 
     pool.use(headers):
       template getContent =
