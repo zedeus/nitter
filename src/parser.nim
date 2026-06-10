@@ -241,11 +241,6 @@ proc parseLegacyMediaEntities(js: JsonNode; result: var Tweet) =
         ))
       else: discard
 
-      with url, m{"url"}:
-        if result.text.endsWith(url.getStr):
-          result.text.removeSuffix(url.getStr)
-          result.text = result.text.strip()
-
 proc parseMediaEntities(js: JsonNode; result: var Tweet) =
   with mediaEntities, js{"media_entities"}:
     var parsedMedia: MediaEntities
@@ -286,22 +281,8 @@ proc parseMediaEntities(js: JsonNode; result: var Tweet) =
           ))
         else: discard
 
-      if "expanded_url" in mediaEntity:
-        let expandedUrl = js.getExpandedUrl
-        if result.text.endsWith(expandedUrl):
-          result.text.removeSuffix(expandedUrl)
-          result.text = result.text.strip()
-
     if mediaEntities.len > 0 and parsedMedia.len == mediaEntities.len:
       result.media = parsedMedia
-
-  # Remove media URLs from text
-  with mediaList, js{"legacy", "entities", "media"}:
-    for url in mediaList:
-      let expandedUrl = url.getExpandedUrl
-      if result.text.endsWith(expandedUrl):
-        result.text.removeSuffix(expandedUrl)
-        result.text = result.text.strip()
 
 proc parsePromoVideo(js: JsonNode): Video =
   result = Video(
@@ -469,8 +450,8 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull();
     elif name.len > 0 and jsCard{"binding_values"}.notNull:
       result.card = some parseCard(jsCard, js{"entities", "urls"})
 
-  parseLegacyMediaEntities(js, result)
   result.expandTweetEntities(js)
+  parseLegacyMediaEntities(js, result)
 
   with jsWithheld, js{"withheld_in_countries"}:
     let withheldInCountries: seq[string] =

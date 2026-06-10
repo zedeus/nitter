@@ -319,7 +319,6 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
     textSlice = textRange{0}.getInt .. textRange{1}.getInt
     hasQuote = js{"is_quote_status"}.getBool
     hasJobCard = tweet.card.isSome and get(tweet.card).kind == jobDetails
-    hasAttribution = tweet.attribution.isSome
 
   var replyTo = ""
   if tweet.replyId != 0:
@@ -328,7 +327,7 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
       tweet.reply.add replyTo
 
   tweet.expandTextEntities(entities, tweet.text, textSlice, replyTo,
-                           hasQuote or hasJobCard or hasAttribution)
+                           hasQuote or hasJobCard)
 
 proc expandTextEntitiesV2(tweet: Tweet; js: JsonNode; text: string; textSlice: Slice[int];
                           hasRedundantLink=false) =
