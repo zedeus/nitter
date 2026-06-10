@@ -15,6 +15,7 @@ proc getPrefs*(cookies, params: Table[string, string]): Prefs =
   result = defaultPrefs
   genParsePrefs(cookies)
   genParsePrefs(params)
+  result.autoTzOffset = cookies.getOrDefault("tz-offset", "")
 
 proc encodePrefs*(prefs: Prefs): string =
   var encPairs: seq[string]

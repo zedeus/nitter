@@ -70,6 +70,9 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
     if rss.len > 0:
       link(rel="alternate", type="application/rss+xml", href=rss, title="RSS feed")
 
+    if prefs.timezone == "Auto":
+      script(src="/js/timezone.js")
+
     if prefs.hlsPlayback:
       script(src="/js/hls.min.js", `defer`="")
       script(src="/js/hlsPlayback.js", `defer`="")

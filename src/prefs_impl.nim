@@ -54,6 +54,17 @@ genPrefs:
     theme(select, "Nitter"):
       "Theme"
 
+    timezone(select, "Auto"):
+      "Timezone"
+      options: @["Auto", "UTC-12:00", "UTC-11:00", "UTC-10:00", "UTC-09:30", "UTC-09:00",
+                 "UTC-08:00", "UTC-07:00", "UTC-06:00", "UTC-05:00", "UTC-04:00",
+                 "UTC-03:30", "UTC-03:00", "UTC-02:00", "UTC-01:00", "UTC",
+                 "UTC+01:00", "UTC+02:00", "UTC+03:00", "UTC+03:30", "UTC+04:00",
+                 "UTC+04:30", "UTC+05:00", "UTC+05:30", "UTC+05:45", "UTC+06:00",
+                 "UTC+06:30", "UTC+07:00", "UTC+08:00", "UTC+08:45", "UTC+09:00",
+                 "UTC+09:30", "UTC+10:00", "UTC+10:30", "UTC+11:00", "UTC+12:00",
+                 "UTC+12:45", "UTC+13:00", "UTC+14:00"]
+
     infiniteScroll(checkbox, false):
       "Infinite scrolling (experimental, requires JavaScript)"
 
@@ -233,7 +244,8 @@ macro genPrefsType*(): untyped =
   let name = nnkPostfix.newTree(ident("*"), ident("Prefs"))
   result = quote do:
     type `name` = object
-      discard
+      # Client-detected UTC offset (e.g. "+09:00"), used when timezone == "Auto"
+      autoTzOffset*: string
 
   for pref in allPrefs():
     result[0][2][2].add nnkIdentDefs.newTree(

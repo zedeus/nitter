@@ -139,26 +139,50 @@ proc pageDesc*(user: User): string =
   else:
     "The latest tweets from " & user.fullname
 
-proc getJoinDate*(user: User): string =
-  user.joinDate.format("'Joined' MMMM YYYY")
+proc getTzLabel*(prefs: Prefs): string =
+  if prefs.timezone == "Auto":
+    if prefs.autoTzOffset.len == 6 and prefs.autoTzOffset[0] in {'+', '-'}:
+      "UTC" & prefs.autoTzOffset
+    else:
+      "UTC"
+  else:
+    prefs.timezone
 
-proc getJoinDateFull*(user: User): string =
-  user.joinDate.format("h:mm tt - d MMM YYYY")
+proc getTzOffset*(prefs: Prefs): Duration =
+  let tz = getTzLabel(prefs)
+  if tz.len <= len("UTC"):
+    return initDuration()
+  let
+    sign = if tz[3] == '-': -1 else: 1
+    hours = parseInt(tz[4 .. 5])
+    minutes = parseInt(tz[7 .. 8])
+  initDuration(hours = sign * hours, minutes = sign * minutes)
 
-proc getTime*(tweet: Tweet): string =
-  tweet.time.format("MMM d', 'YYYY' · 'h:mm tt' UTC'")
+proc applyTz*(time: DateTime; prefs: Prefs): DateTime =
+  (time.toTime + getTzOffset(prefs)).utc()
+
+proc getJoinDate*(user: User; prefs: Prefs): string =
+  applyTz(user.joinDate, prefs).format("'Joined' MMMM YYYY")
+
+proc getJoinDateFull*(user: User; prefs: Prefs): string =
+  applyTz(user.joinDate, prefs).format("h:mm tt - d MMM YYYY")
+
+proc getTime*(tweet: Tweet; prefs: Prefs): string =
+  applyTz(tweet.time, prefs).format("MMM d', 'YYYY' · 'h:mm tt' '") & getTzLabel(prefs)
 
 proc getRfc822Time*(tweet: Tweet): string =
   tweet.time.format("ddd', 'dd MMM yyyy HH:mm:ss 'GMT'")
 
-proc getShortTime*(tweet: Tweet): string =
-  let now = now()
-  let since = now - tweet.time
+proc getShortTime*(tweet: Tweet; prefs: Prefs): string =
+  let
+    since = now() - tweet.time
+    time = applyTz(tweet.time, prefs)
+    today = applyTz(now().utc(), prefs)
 
-  if now.year != tweet.time.year:
-    result = tweet.time.format("d MMM yyyy")
+  if today.year != time.year:
+    result = time.format("d MMM yyyy")
   elif since.inDays >= 1:
-    result = tweet.time.format("MMM d")
+    result = time.format("MMM d")
   elif since.inHours >= 1:
     result = $since.inHours & "h"
   elif since.inMinutes >= 1:

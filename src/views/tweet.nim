@@ -35,8 +35,8 @@ proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VN
           linkUser(tweet.user, class="username")
 
         span(class="tweet-date"):
-          a(href=getLink(tweet), title=tweet.getTime):
-            text tweet.getShortTime
+          a(href=getLink(tweet), title=tweet.getTime(prefs)):
+            text tweet.getShortTime(prefs)
 
 proc renderAltText(altText: string): VNode =
   buildHtml(p(class="alt-text")):
@@ -301,8 +301,8 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
         linkUser(quote.user, class="username")
 
       span(class="tweet-date"):
-        a(href=getLink(quote), title=quote.getTime):
-          text quote.getShortTime
+        a(href=getLink(quote), title=quote.getTime(prefs)):
+          text quote.getShortTime(prefs)
 
     if quote.reply.len > 0:
       renderReply(quote)
@@ -421,9 +421,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         p(class="tweet-published"): 
           if hasEdits and isLatest:
             a(href=(getLink(tweet, focus=false) & "/history")):
-              text &"Last edited {getTime(tweet)}"
+              text &"Last edited {getTime(tweet, prefs)}"
           else:
-            text &"{getTime(tweet)}"
+            text &"{getTime(tweet, prefs)}"
 
         if hasEdits and not isLatest:
           renderLatestPost(tweet.user.username, max(tweet.history))
