@@ -1,0 +1,23 @@
+src/types.nim
+  s_ba016cb2d5c5b6::t_f10f313a47bf05 19
+src/api.nim
+  s_ba016cb2d5c5b6::t_f10f313a47bf05 14-15,17-18,35
+src/apiutils.nim
+  s_ba016cb2d5c5b6::t_f10f313a47bf05 66,94,118-121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ac2f93b3619ed7604539f0bf1c5dc132cfd38b7f",
+  "prompts": {},
+  "sessions": {
+    "s_ba016cb2d5c5b6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "154dd853-c989-4b51-a495-425e3f463212",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
