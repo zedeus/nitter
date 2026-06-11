@@ -1,0 +1,30 @@
+src/parserutils.nim
+  s_dcd9cbc9bbeb41::t_52784d648b20b4 205-214,216,220-223,226-230,238-239
+src/formatters.nim
+  s_dcd9cbc9bbeb41::t_ffb04baa474cee 143,147,151,155,158-159,161,163-164,166,176-177
+  s_f8c756e53141ef::t_7c9b73e207584c 178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "31ffbedc82be1ee7b7dcdb3297116fcf0a25c64f",
+  "prompts": {},
+  "sessions": {
+    "s_dcd9cbc9bbeb41": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "202dc2a9-0a1d-465f-afc1-9ebf803ff846",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    },
+    "s_f8c756e53141ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf76b761-9a89-4ede-8274-29e93fe682b0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
