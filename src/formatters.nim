@@ -140,25 +140,30 @@ proc pageDesc*(user: User): string =
     "The latest tweets from " & user.fullname
 
 proc getJoinDate*(user: User): string =
+  if user.joinDate.year == 0: return ""
   user.joinDate.format("'Joined' MMMM YYYY")
 
 proc getJoinDateFull*(user: User): string =
+  if user.joinDate.year == 0: return ""
   user.joinDate.format("h:mm tt - d MMM YYYY")
 
 proc getTime*(tweet: Tweet): string =
+  if tweet.time.year == 0: return ""
   tweet.time.format("MMM d', 'YYYY' · 'h:mm tt' UTC'")
 
 proc getRfc822Time*(tweet: Tweet): string =
+  if tweet.time.year == 0: return ""
   tweet.time.format("ddd', 'dd MMM yyyy HH:mm:ss 'GMT'")
 
-proc getShortTime*(tweet: Tweet): string =
+proc getShortTime*(time: DateTime): string =
+  if time.year == 0: return ""
   let now = now()
-  let since = now - tweet.time
+  let since = now - time
 
-  if now.year != tweet.time.year:
-    result = tweet.time.format("d MMM yyyy")
+  if now.year != time.year:
+    result = time.format("d MMM yyyy")
   elif since.inDays >= 1:
-    result = tweet.time.format("MMM d")
+    result = time.format("MMM d")
   elif since.inHours >= 1:
     result = $since.inHours & "h"
   elif since.inMinutes >= 1:
@@ -167,6 +172,9 @@ proc getShortTime*(tweet: Tweet): string =
     result = $since.inSeconds & "s"
   else:
     result = "now"
+
+proc getShortTime*(tweet: Tweet): string =
+  getShortTime(tweet.time)
 
 proc getDuration*(ms: int): string =
   let

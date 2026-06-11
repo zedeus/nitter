@@ -202,19 +202,32 @@ proc extractHashtags(result: var seq[ReplaceSlice]; js: JsonNode) =
 
 proc replacedWith(runes: seq[Rune]; repls: openArray[ReplaceSlice];
                   textSlice: Slice[int]): string =
+  let
+    runeLen = runes.len
+    safeStart = max(0, textSlice.a)
+    safeEnd = min(runeLen, textSlice.b)
+
+  var validRepls: seq[ReplaceSlice]
+  for rep in repls:
+    if rep.slice.a >= 0 and rep.slice.b >= 0 and rep.slice.b < runeLen and rep.slice.a <= rep.slice.b:
+      validRepls.add rep
+
   template extractLowerBound(i: int; idx): int =
-    if i > 0: repls[idx].slice.b.succ else: textSlice.a
+    if i > 0: min(validRepls[idx].slice.b.succ, runeLen) else: safeStart
 
   result = newStringOfCap(runes.len)
 
-  for i, rep in repls:
-    result.add $runes[extractLowerBound(i, i - 1) ..< rep.slice.a]
+  for i, rep in validRepls:
+    let lower = extractLowerBound(i, i - 1)
+    if lower < rep.slice.a:
+      result.add $runes[lower ..< rep.slice.a]
     case rep.kind
     of rkHashtag:
-      let
-        name = $runes[rep.slice.a.succ .. rep.slice.b]
-        symbol = $runes[rep.slice.a]
-      result.add a(symbol & name, href = "/search?f=tweets&q=%23" & name)
+      if rep.slice.a.succ <= rep.slice.b:
+        let
+          name = $runes[rep.slice.a.succ .. rep.slice.b]
+          symbol = $runes[rep.slice.a]
+        result.add a(symbol & name, href = "/search?f=tweets&q=%23" & name)
     of rkMention:
       result.add a($runes[rep.slice], href = rep.url, title = rep.display)
     of rkUrl:
@@ -222,8 +235,8 @@ proc replacedWith(runes: seq[Rune]; repls: openArray[ReplaceSlice];
     of rkRemove:
       discard
 
-  let rest = extractLowerBound(repls.len, ^1) ..< textSlice.b
-  if rest.a <= rest.b:
+  let rest = extractLowerBound(validRepls.len, ^1) ..< safeEnd
+  if rest.a >= 0 and rest.a <= rest.b and rest.b <= runeLen:
     result.add $runes[rest]
 
 proc deduplicate(s: var seq[ReplaceSlice]) =
