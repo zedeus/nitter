@@ -15,7 +15,8 @@ const toggles = {
   "links": "Links",
   "images": "Images",
   "quote": "Quotes",
-  "spaces": "Spaces"
+  "spaces": "Spaces",
+  "cashtags": "Cashtags"
 }.toOrderedTable
 
 proc renderSearch*(): VNode =
