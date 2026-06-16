@@ -1,0 +1,41 @@
+src/experimental/parser/article.nim
+  s_f8c756e53141ef::t_e0eb4e3913e66b 1,3-55,57-63,65-86
+  s_f8c756e53141ef::t_69411717ae454e 2
+  s_f8c756e53141ef::t_9e4ee8a16b7608 56
+  s_f8c756e53141ef::t_ce907998b16818 64
+src/api.nim
+  s_f8c756e53141ef::t_88fa8be0f5d0a9 4
+src/types.nim
+  s_f8c756e53141ef::t_12add8a3c34b72 232
+src/routes/article.nim
+  s_f8c756e53141ef::t_9cb34e427948d8 20
+src/experimental/types/article.nim
+  s_f8c756e53141ef::t_ec6b96158dc116 1-6,8-9,11-12,14-49,51-67,71,73,75-78
+  s_f8c756e53141ef::t_4012ffcd037741 7,10,13,68-70,72,74
+  s_f8c756e53141ef::t_4c2fe0da45b372 50
+src/views/article.nim
+  s_f8c756e53141ef::t_cc21b3146d4461 44-52
+  s_f8c756e53141ef::t_bfc826b65efc76 74
+  s_f8c756e53141ef::t_976aad0d0faba2 123-125,129-130,152-153
+  s_f8c756e53141ef::t_df41076c151f73 12,16,43,56
+  s_f8c756e53141ef::t_e4d78d9a561983 134-137,139-149
+  s_f8c756e53141ef::t_c378931078b24c 71,73,75-76,99,104
+src/experimental/parser.nim
+  s_f8c756e53141ef::t_ff6765644f4e30 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "449ce350f211fccd9fc366ed71dcbc1c00759291",
+  "prompts": {},
+  "sessions": {
+    "s_f8c756e53141ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf76b761-9a89-4ede-8274-29e93fe682b0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
