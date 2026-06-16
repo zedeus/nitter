@@ -2,7 +2,7 @@
 import asyncdispatch, httpclient, strutils, sequtils, sugar
 import packedjson
 import types, query, formatters, consts, apiutils, parser, utils
-import experimental/parser as newParser
+import experimental/parser
 
 # Helper to generate params object for GraphQL requests
 proc genParams(variables: string; fieldToggles = ""): seq[(string, string)] =
@@ -25,14 +25,10 @@ proc mediaUrl(id, cursor: string; count=20): ApiReq =
   )
 
 proc userTweetsUrl(id: string; cursor: string): ApiReq =
-  return apiReq(graphUserTweetsV2, restIdVars % [id, cursor, "20"])
-  # result = ApiReq(
-  #   cookie: apiUrl(graphUserTweets, userTweetsVars % [id, cursor], userTweetsFieldToggles),
-  #   oauth: apiUrl(graphUserTweetsV2, restIdVars % [id, cursor, "20"])
-  # )
+  return apiReq(graphUserTweetsV2, restIdVars % [id, cursor, "20"], userTweetsFieldToggles)
 
 proc userTweetsAndRepliesUrl(id: string; cursor: string): ApiReq =
-  return apiReq(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"], skipTid=true)
+  return apiReq(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"], userTweetsFieldToggles, skipTid=true)
 
 proc tweetDetailUrl(id: string; cursor: string): ApiReq =
   return apiReq(graphTweet, tweetVars % [id, cursor])
@@ -227,6 +223,21 @@ proc getPhotoRail*(id: string): Future[PhotoRail] {.async.} =
   if id.len == 0: return
   let js = await fetch(mediaUrl(id, "", 30))
   result = parseGraphPhotoRail(js)
+
+proc getGraphArticle*(id: string): Future[Article] {.async.} =
+  if id.len == 0: return
+  let
+    url = apiReq(graphTweetResultByRestId, articleVars % id, articleFieldToggles)
+    json = await fetchRaw(url)
+  result = parseGraphArticle(json)
+
+proc getGraphTweetResults*(ids: seq[string]): Future[seq[Tweet]] {.async.} =
+  if ids.len == 0: return
+  let
+    idsJson = "[" & ids.mapIt("\"" & it & "\"").join(",") & "]"
+    url = apiReq(graphTweetResultsByRestIds, articleBatchVars % idsJson, articleFieldToggles)
+    js = await fetch(url)
+  result = parseGraphTweetResults(js)
 
 proc resolve*(url: string; prefs: Prefs): Future[string] {.async.} =
   let client = newAsyncHttpClient(maxRedirects=0)

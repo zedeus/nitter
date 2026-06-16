@@ -185,12 +185,16 @@ proc extractSlice(js: JsonNode): Slice[int] =
   result = js["indices"][0].getInt ..< js["indices"][1].getInt
 
 proc extractUrls(result: var seq[ReplaceSlice]; js: JsonNode;
-                 textLen: int; hideTwitter = false) =
+                 textLen: int; hideTwitter = false;
+                 hideArticle = false) =
   let
     url = js.getExpandedUrl
     slice = js.extractSlice
 
-  if hideTwitter and slice.b.succ >= textLen and url.isTwitterUrl:
+  if hideArticle and url.isTwitterUrl and "/article/" in url:
+    if slice.a < textLen:
+      result.add ReplaceSlice(kind: rkRemove, slice: slice)
+  elif hideTwitter and slice.b.succ >= textLen and url.isTwitterUrl:
     if slice.a < textLen:
       result.add ReplaceSlice(kind: rkRemove, slice: slice)
   else:
@@ -343,7 +347,7 @@ proc expandTweetEntities*(tweet: Tweet; js: JsonNode) =
                            hasQuote or hasJobCard)
 
 proc expandTextEntitiesV2(tweet: Tweet; js: JsonNode; text: string; textSlice: Slice[int];
-                          hasRedundantLink=false) =
+                          hasRedundantLink=false; hasArticle=false) =
   let hasCard = tweet.card.isSome
 
   var replacements = newSeq[ReplaceSlice]()
@@ -354,7 +358,8 @@ proc expandTextEntitiesV2(tweet: Tweet; js: JsonNode; text: string; textSlice: S
       if urlStr.len == 0 or urlStr notin text:
         continue
 
-      replacements.extractUrls(u, textSlice.b, hideTwitter = hasRedundantLink)
+      replacements.extractUrls(u, textSlice.b, hideTwitter = hasRedundantLink,
+                               hideArticle = hasArticle)
 
       if hasCard and u{"url"}.getStr == get(tweet.card).url:
         get(tweet.card).url = u.getExpandedUrl
@@ -385,7 +390,7 @@ proc expandTextEntitiesV2(tweet: Tweet; js: JsonNode; text: string; textSlice: S
 
   tweet.text = text.toRunes.replacedWith(replacements, textSlice).strip(leading=false)
 
-proc expandTweetEntitiesV2*(tweet: Tweet; js: JsonNode) =
+proc expandTweetEntitiesV2*(tweet: Tweet; js: JsonNode; hasArticle=false) =
   let
     textRange = js{"details", "display_text_range"}
     textSlice = textRange{0}.getInt .. textRange{1}.getInt
@@ -394,7 +399,8 @@ proc expandTweetEntitiesV2*(tweet: Tweet; js: JsonNode) =
     hasAttribution = tweet.attribution.isSome
 
   tweet.expandTextEntitiesV2(js, tweet.text, textSlice,
-                             hasQuote or hasJobCard or hasAttribution)
+                             hasQuote or hasJobCard or hasAttribution,
+                             hasArticle)
 
 proc expandNoteTweetEntities*(tweet: Tweet; js: JsonNode) =
   let

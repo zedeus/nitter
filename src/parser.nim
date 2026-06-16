@@ -542,7 +542,8 @@ proc parseGraphTweet*(js: JsonNode): Tweet =
     if result.attribution.isNone:
       parseLegacyMediaEntities(js{"legacy"}, result)
 
-    result.expandTweetEntitiesV2(js)
+    let hasArticle = js{"article", "article_results", "result", "title"}.getStr.len > 0
+    result.expandTweetEntitiesV2(js, hasArticle)
 
     # Strip video source URL from text (for videos from other tweets)
     with mediaEntities, js{"media_entities"}:
@@ -557,6 +558,16 @@ proc parseGraphTweet*(js: JsonNode): Tweet =
   else:
     result = parseTweet(js{"legacy"}, jsCard, replyId)
     result.id = js{"rest_id"}.getId
+
+  with artNode, js{"article", "article_results", "result"}:
+    let artTitle = artNode{"title"}.getStr
+    if artTitle.len > 0:
+      result.articlePreview = some ArticlePreview(
+        title: artTitle,
+        previewText: artNode{"preview_text"}.getStr,
+        coverImage: artNode{"cover_media_results", "result", "media_info", "original_img_url"}.getImageStr,
+        tweetId: result.id
+      )
 
   result.user = parseGraphUser(js{"core"})
 
@@ -626,6 +637,16 @@ proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
 proc parseGraphTweetResult*(js: JsonNode): Tweet =
   with tweet, js{"data", "tweet_result", "result"}:
     result = parseGraphTweet(tweet)
+
+proc parseGraphTweetResults*(js: JsonNode): seq[Tweet] =
+  let results = js{"data", "tweetResult"}
+  if results.kind != JArray: return
+  for item in results:
+    let tweet = item{"result"}
+    if tweet.isNull: continue
+    let t = parseGraphTweet(tweet)
+    if t != nil:
+      result.add t
 
 proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
   result = Conversation(replies: Result[Chain](beginning: true))

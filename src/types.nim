@@ -198,6 +198,43 @@ type
 
   PhotoRail* = seq[GalleryPhoto]
 
+  Article* = ref object
+    title*: string
+    coverImage*: string
+    user*: User
+    time*: DateTime
+    stats*: TweetStats
+    paragraphs*: seq[ArticleParagraph]
+    entities*: Table[int, ArticleEntity]
+    media*: Table[string, ArticleMedia]
+
+  ArticleParagraph* = object
+    text*: string
+    kind*: string
+    inlineStyles*: seq[ArticleStyle]
+    entityRanges*: seq[ArticleEntityRange]
+
+  ArticleStyle* = object
+    offset*: int
+    length*: int
+    style*: string
+
+  ArticleEntityRange* = object
+    offset*: int
+    length*: int
+    key*: int
+
+  ArticleEntity* = object
+    kind*: string
+    url*: string
+    mediaIds*: seq[string]
+    tweetId*: string
+    markdown*: string
+
+  ArticleMedia* = object
+    kind*: string
+    url*: string
+
   Poll* = object
     options*: seq[string]
     values*: seq[int]
@@ -247,6 +284,12 @@ type
     likes*: int
     views*: int
 
+  ArticlePreview* = object
+    title*: string
+    previewText*: string
+    coverImage*: string
+    tweetId*: int64
+
   Tweet* = ref object
     id*: int64
     threadId*: int64
@@ -275,6 +318,7 @@ type
     note*: string
     isAd*: bool
     isAI*: bool
+    articlePreview*: Option[ArticlePreview]
 
   Tweets* = seq[Tweet]
 

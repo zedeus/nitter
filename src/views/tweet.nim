@@ -9,8 +9,23 @@ import general
 
 const doctype = "<!DOCTYPE html>\n"
 
-proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
+proc renderMiniAvatar*(user: User; prefs: Prefs): VNode =
   genImg(user.getUserPic("_mini"), class=(prefs.getAvatarClass & " mini"))
+
+proc renderArticleCard(preview: ArticlePreview; prefs: Prefs): VNode =
+  let url = "/i/article/" & $preview.tweetId
+  buildHtml(tdiv(class="article-card card large")):
+    a(class="card-container", href=url):
+      if preview.coverImage.len > 0:
+        tdiv(class="card-image-container"):
+          tdiv(class="card-image"):
+            genImg(preview.coverImage)
+          span(class="article-card-badge"): text "Article"
+      tdiv(class="card-content-container"):
+        tdiv(class="card-content"):
+          h2(class="card-title"): text preview.title
+          if preview.previewText.len > 0:
+            p(class="card-description"): text preview.previewText
 
 proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VNode =
   buildHtml(tdiv):
@@ -225,7 +240,7 @@ func formatStat(stat: int): string =
   if stat > 0: insertSep($stat, ',')
   else: ""
 
-proc renderStats(stats: TweetStats): VNode =
+proc renderStats*(stats: TweetStats): VNode =
   buildHtml(tdiv(class="tweet-stats")):
     span(class="tweet-stat"): icon "comment", formatStat(stats.replies)
     span(class="tweet-stat"): icon "retweet", formatStat(stats.retweets)
@@ -307,6 +322,9 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
 
     if quote.media.len > 0:
       renderQuoteMedia(quote, prefs, path)
+
+    if quote.articlePreview.isSome:
+      renderArticleCard(quote.articlePreview.get(), prefs)
 
     if quote.note.len > 0 and not prefs.hideCommunityNotes:
       renderCommunityNote(quote.note, prefs)
@@ -391,6 +409,9 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
 
       if tweet.card.isSome and tweet.card.get().kind != hidden:
         renderCard(tweet.card.get(), prefs, path)
+
+      if tweet.articlePreview.isSome:
+        renderArticleCard(tweet.articlePreview.get(), prefs)
 
       if tweet.media.len > 0:
         renderMedia(tweet.media, prefs, path, bigThumb)

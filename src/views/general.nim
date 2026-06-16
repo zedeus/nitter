@@ -50,7 +50,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   let opensearchUrl = getUrlPrefix(cfg) & "/opensearch"
 
   buildHtml(head):
-    link(rel="stylesheet", type="text/css", href="/css/style.css?v=35")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=38")
     link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=5")
 
     if theme.len > 0:
@@ -122,9 +122,12 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
 
 proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
                  titleText=""; desc=""; ogTitle=""; rss=""; video="";
-                 images: seq[string] = @[]; banner=""): string =
+                 images: seq[string] = @[]; banner="";
+                 twitterLink=""): string =
 
-  let twitterLink = getTwitterLink(req.path, req.params)
+  let twitterLink =
+    if twitterLink.len > 0: twitterLink
+    else: getTwitterLink(req.path, req.params)
 
   let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req, titleText, desc, video, images, banner, ogTitle,

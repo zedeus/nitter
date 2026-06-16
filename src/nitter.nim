@@ -10,7 +10,7 @@ import types, config, prefs, formatters, redis_cache, http_pool, auth, apiutils
 import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, debug,
-  unsupported, embed, resolver, broadcast, router_utils]
+  unsupported, embed, resolver, broadcast, article, router_utils]
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 const issuesUrl = "https://github.com/zedeus/nitter/issues"
@@ -48,6 +48,7 @@ waitFor initRedisPool(cfg)
 stdout.write &"Connected to Redis at {cfg.redisHost}:{cfg.redisPort}\n"
 stdout.flushFile
 
+createArticleRouter(cfg)
 createUnsupportedRouter(cfg)
 createResolverRouter(cfg)
 createPrefRouter(cfg)
@@ -118,6 +119,7 @@ routes:
     resp Http429, showError(
       &"Instance has no auth tokens, or is fully rate limited.<br>Use {link} or try again later.", cfg)
 
+  extend articleRoute, ""
   extend rss, ""
   extend status, ""
   extend search, ""

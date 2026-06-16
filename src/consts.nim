@@ -10,7 +10,7 @@ const
   graphUser* = "IGgvgiOx4QZndDHuD3x9TQ/UserByScreenName"
   graphUserV2* = "-ZzAG_Bckx16LMbEvHC3lg/UserResultByScreenNameQuery"
   graphUserById* = "-DAaa9jPxPswYeI2fZ9rug/UserResultByIdQuery"
-  graphUserTweetsV2* = "PHTSTXqZYuHIeK4B1HQprQ/UserWithProfileTweetsQueryV2"
+  graphUserTweetsV2* = "LE3eTyeqhBh2g-fX85O2eQ/UserWithProfileTweetsQueryV2"
   graphUserTweetsAndRepliesV2* = "AcYHjc_YAx-9_rKWdMsKvA/UserWithProfileTweetsAndRepliesQueryV2"
   graphUserTweets* = "PNd0vlufvrcIwrAnBYKE9g/UserTweets"
   graphUserTweetsAndReplies* = "EqtpEwt0CoQXmDfq5DKH0A/UserTweetsAndReplies"
@@ -27,6 +27,9 @@ const
   graphListMembers* = "EM7YRaM3gCnzDESmchA7RA/ListMembers"
   graphListTweets* = "0QJtcuMzVywHGAWD6Dtjlw/ListTimeline"
   graphAboutAccount* = "zUnx-DLN9dkwOkNhTLySjg/AboutAccountQuery"
+
+  graphTweetResultByRestId* = "qtXMy1p5Y62uCskc_NUPJw/TweetResultByRestId"
+  graphTweetResultsByRestIds* = "Sc9EUQTZNEH-wzegn-nHvQ/TweetResultsByRestIds"
 
   graphBroadcast* = "FJLCzpXCLPM1jUZqmM7oEA/BroadcastQuery"
   restLiveStream* = "1.1/live_video_stream/status/"
@@ -131,6 +134,24 @@ const
   "withVoice": true
 }""".replace(" ", "").replace("\n", "")
 
+  articleVars* = """{
+  "tweetId": "$1",
+  "includePromotedContent": false,
+  "withBirdwatchNotes": true,
+  "withVoice": true,
+  "withCommunity": true
+}""".replace(" ", "").replace("\n", "")
+
+  articleBatchVars* = """{
+  "tweetIds": $1,
+  "includePromotedContent": false,
+  "withBirdwatchNotes": true,
+  "withVoice": true,
+  "withCommunity": true
+}""".replace(" ", "").replace("\n", "")
+
+  articleFieldToggles* = """{"withArticleRichContentState":true,"withArticlePlainText":false,"withArticleSummaryText":true,"withArticleVoiceOver":true}"""
+
   userFieldToggles = """{"withPayments":false,"withAuxiliaryUserLabels":true}"""
-  userTweetsFieldToggles* = """{"withArticlePlainText":false}"""
+  userTweetsFieldToggles* = """{"withArticleRichContentState":true,"withArticlePlainText":false}"""
   tweetDetailFieldToggles* = """{"withArticleRichContentState":true,"withArticlePlainText":false,"withGrokAnalyze":false,"withDisallowedReplyControls":false}"""
