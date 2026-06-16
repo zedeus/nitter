@@ -1,0 +1,28 @@
+src/views/article.nim
+  s_f8c756e53141ef::t_a033442bde01fb 72-97
+  s_f8c756e53141ef::t_6eff05e6058301 65
+  s_f8c756e53141ef::t_a6ec38fc967d41 66,102-132
+  s_f8c756e53141ef::t_ecb6138c8e5266 58-64,70
+  s_f8c756e53141ef::t_043e28e99975a9 67-69,71
+tests/test_article.py
+  s_f8c756e53141ef::t_6f4c52dddae191 190-217
+  s_f8c756e53141ef::t_5bc13961709b29 184-188
+src/views/general.nim
+  s_f8c756e53141ef::t_10df3ce8bda482 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "35882ed88d422b1355b66a1ff8c1144bffdc7bdf",
+  "prompts": {},
+  "sessions": {
+    "s_f8c756e53141ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf76b761-9a89-4ede-8274-29e93fe682b0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": null
+    }
+  }
+}
