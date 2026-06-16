@@ -1,0 +1,23 @@
+src/views/article.nim
+  s_f8c756e53141ef::t_6eff05e6058301 58-66,77-79
+  s_f8c756e53141ef::t_ecb6138c8e5266 67-74,80-86
+  s_f8c756e53141ef::t_1a8ff7cbbb5cab 91
+src/views/general.nim
+  s_f8c756e53141ef::t_10df3ce8bda482 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "d4c9a5a9b6eea8d7243b48b957a9d20d311d0f6d",
+  "prompts": {},
+  "sessions": {
+    "s_f8c756e53141ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf76b761-9a89-4ede-8274-29e93fe682b0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
