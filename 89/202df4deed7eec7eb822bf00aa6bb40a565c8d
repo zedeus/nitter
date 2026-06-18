@@ -1,0 +1,19 @@
+public/js/hlsPlayback.js
+  s_135dc858903b70::t_4c76b4f17e6050 3-7,13,17,19-23,27-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "89202df4deed7eec7eb822bf00aa6bb40a565c8d",
+  "prompts": {},
+  "sessions": {
+    "s_135dc858903b70": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0656f3bd-3e4d-47cf-b9ab-ab0844a766e5",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
