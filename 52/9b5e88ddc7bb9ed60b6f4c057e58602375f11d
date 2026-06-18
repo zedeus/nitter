@@ -1,0 +1,30 @@
+tests/test_tweet_media.py
+  s_135dc858903b70::t_bd41bc998bf626 99
+  s_135dc858903b70::t_4b45575880e0c4 91,94
+  s_135dc858903b70::t_b074b9dc966db0 85-86
+  s_135dc858903b70::t_afbac8f6843135 4
+tests/test_space.py
+  s_135dc858903b70::t_efd629ec9fa6ce 1-19,22,24,26-30,34,36-62,64-65,72-73,75-78,85-119
+  s_135dc858903b70::t_37d524e828eda2 20-21,23,25
+  s_135dc858903b70::t_a8bf6f2cf20689 83-84
+  s_135dc858903b70::t_b25b8cb89cd040 79-82
+  s_135dc858903b70::t_26223f4f1f7652 74
+  s_135dc858903b70::t_0ab4edf54b0d17 63,66-71
+  s_135dc858903b70::t_ef4cbb096635b1 31-33,35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "529b5e88ddc7bb9ed60b6f4c057e58602375f11d",
+  "prompts": {},
+  "sessions": {
+    "s_135dc858903b70": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0656f3bd-3e4d-47cf-b9ab-ab0844a766e5",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
