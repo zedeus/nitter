@@ -361,6 +361,23 @@ type
     members*: int
     banner*: string
 
+  CommunityRule* = object
+    name*: string
+    description*: string
+
+  Community* = object
+    id*: string
+    name*: string
+    description*: string
+    memberCount*: int
+    banner*: string
+    creator*: User
+    category*: string
+    joinPolicy*: string
+    createdAt*: DateTime
+    rules*: seq[CommunityRule]
+    hashtags*: seq[string]
+
   GlobalObjects* = ref object
     tweets*: Table[string, Tweet]
     users*: Table[string, User]

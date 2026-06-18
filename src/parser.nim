@@ -131,6 +131,36 @@ proc parseBroadcastInfo*(js: JsonNode): Broadcast =
     user: parseGraphUser(bc)
   )
 
+proc parseGraphCommunity*(js: JsonNode): Community =
+  if js.isNull: return
+  let c = ? js{"data", "communityResults", "result"}
+
+  result = Community(
+    id: c{"rest_id"}.getStr(c{"id_str"}.getStr),
+    name: c{"name"}.getStr,
+    description: c{"description"}.getStr,
+    memberCount: c{"member_count"}.getInt,
+    joinPolicy: c{"join_policy"}.getStr,
+    category: c{"primary_community_topic", "topic_name"}.getStr,
+    banner: c{"custom_banner_media", "media_info", "original_img_url"}.getImageStr,
+    creator: parseGraphUser(c{"creator_results", "result"}),
+  )
+
+  let createdMs = c{"created_at"}.getInt(0)
+  if createdMs > 0:
+    result.createdAt = fromUnix(createdMs div 1000).utc()
+
+  for rule in c{"rules"}:
+    result.rules.add CommunityRule(
+      name: rule{"name"}.getStr,
+      description: rule{"description"}.getStr
+    )
+
+  for item in c{"trending_hashtags_slice", "items"}:
+    let tag = item{"hashtag"}.getStr
+    if tag.len > 0:
+      result.hashtags.add tag
+
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
 
@@ -855,3 +885,49 @@ proc parseGraphSearch*[T: User | Tweets](js: JsonNode; after=""): Result[T] =
     elif typ == "TimelineReplaceEntry":
       if instruction{"entry_id_to_replace"}.getStr.startsWith("cursor-bottom"):
         result.bottom = instruction{"entry", "content", "value"}.getStr
+
+proc parseGraphCommunityTimeline*(js: JsonNode; after=""): Timeline =
+  result = Timeline(beginning: after.len == 0)
+
+  let communityResult = js{"data", "communityResults", "result"}
+  let instructions = ? select(
+    communityResult{"ranked_community_timeline", "timeline", "instructions"},
+    communityResult{"community_media_timeline", "timeline", "instructions"},
+    communityResult{"community_filtered_timeline", "timeline", "instructions"}
+  )
+  if instructions.len == 0:
+    return
+
+  for i in instructions:
+    if i{"entries"}.notNull:
+      for e in i{"entries"}:
+        let entryId = e.getEntryId
+        if entryId.startsWith("tweet") or entryId.startsWith("profile-grid") or
+           entryId.startsWith("communities-grid"):
+          for tweet in extractTweetsFromEntry(e):
+            result.content.add tweet
+        elif entryId.startsWith("cursor-bottom"):
+          result.bottom = e{"content", "value"}.getStr
+
+    if after.len == 0 and i.getTypeName == "TimelinePinEntry":
+      var tweets = extractTweetsFromEntry(i{"entry"})
+      for tweet in tweets.mitems:
+        tweet.pinned = true
+      if tweets.len > 0:
+        result.content.insert(tweets, 0)
+
+proc parseGraphCommunityMembers*(js: JsonNode; after=""): Result[User] =
+  result = Result[User](beginning: after.len == 0)
+
+  let r = js{"data", "communityResults", "result"}
+  let slice = if not r{"members_slice"}.isNull: r{"members_slice"}
+              else: r{"moderators_slice"}
+  for item in slice{"items_results"}:
+    let user = parseGraphUser(item{"result"})
+    if user.username.len > 0:
+      result.content.add user
+
+  let cursor = slice{"slice_info", "next_cursor"}.getStr
+  if cursor.len > 0:
+    result.bottom = cursor
+

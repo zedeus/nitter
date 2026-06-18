@@ -27,14 +27,18 @@ proc renderArticleCard(preview: ArticlePreview; prefs: Prefs): VNode =
           if preview.previewText.len > 0:
             p(class="card-description"): text preview.previewText
 
-proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VNode =
+proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs;
+                   path = ""): VNode =
   buildHtml(tdiv):
     if pinned:
+      let pinnedLabel =
+        if "/i/communities/" in path: "Pinned by Community mods"
+        else: "Pinned Tweet"
       tdiv(class="pinned"):
-        span: icon "pin", "Pinned Tweet"
+        span: icon("pin", pinnedLabel)
     elif retweet.len > 0:
       tdiv(class="retweet-header"):
-        span: icon "retweet", retweet & " retweeted"
+        span: icon("retweet", retweet & " retweeted")
 
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.user.username)):
@@ -358,7 +362,8 @@ proc renderLocation*(tweet: Tweet): string =
   return $node
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
-                  last=false; mainTweet=false; afterTweet=false; bigThumb=false): VNode =
+                  last=false; mainTweet=false; afterTweet=false;
+                  bigThumb=false): VNode =
   var divClass = class
   if index == -1 or last:
     divClass = "thread-last " & class
@@ -391,7 +396,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       a(class="tweet-link", href=getLink(tweet))
 
     tdiv(class="tweet-body"):
-      renderHeader(tweet, retweet, pinned, prefs)
+      renderHeader(tweet, retweet, pinned, prefs, path)
 
       if not afterTweet and index == 0 and tweet.reply.len > 0 and
          (tweet.reply.len > 1 or tweet.reply[0] != tweet.user.username or pinned):

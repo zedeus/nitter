@@ -18,7 +18,7 @@ proc getMediumPic*(url: string): string =
     result &= mediumWebp
   result = getPicUrl(result)
 
-proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
+proc icon*(icon: string; label=""; title=""; class=""; href=""): VNode =
   var c = "icon-" & icon
   if class.len > 0: c = &"{c} {class}"
   buildHtml(tdiv(class="icon-container")):
@@ -27,8 +27,8 @@ proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
     else:
       span(class=c, title=title)
 
-    if text.len > 0:
-      text " " & text
+    if label.len > 0:
+      text " " & label
 
 template verifiedIcon*(user: User): untyped {.dirty.} =
   if user.verifiedType != VerifiedType.none:

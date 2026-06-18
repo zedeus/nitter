@@ -94,6 +94,57 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
     js = await fetch(url)
   result = parseGraphTimeline(js, after)
 
+proc getGraphCommunity*(id: string): Future[Community] {.async.} =
+  if id.len == 0: return
+  let
+    url = apiReq(graphCommunity, communityVars % id)
+    js = await fetch(url)
+  result = parseGraphCommunity(js)
+
+proc getGraphCommunityTweets*(id: string; rankingMode: string; after=""): Future[Timeline] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    url = apiReq(graphCommunityTweets, communityTweetsVars % [id, cursor, rankingMode])
+    js = await fetch(url)
+  result = parseGraphCommunityTimeline(js, after)
+
+proc getGraphCommunityMedia*(id: string; after=""): Future[Timeline] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    url = apiReq(graphCommunityMedia, communityMediaVars % [id, cursor])
+    js = await fetch(url)
+  result = parseGraphCommunityTimeline(js, after)
+
+proc communitySliceReq(endpoint, variables: string): ApiReq =
+  let url = ApiUrl(endpoint: endpoint, params: @[("variables", variables)])
+  ApiReq(cookie: url, oauth: url)
+
+proc getGraphCommunityMembers*(id: string; after=""): Future[Result[User]] {.async.} =
+  if id.len == 0: return
+  let
+    cursor = if after.len > 0: "\"$1\"" % after else: "null"
+    url = communitySliceReq(graphCommunityMembers, communityMembersVars % [id, cursor])
+    js = await fetch(url)
+  result = parseGraphCommunityMembers(js, after)
+
+proc getGraphCommunityModerators*(id: string): Future[Result[User]] {.async.} =
+  if id.len == 0: return
+  let
+    url = communitySliceReq(graphCommunityModerators, communityMembersVars % [id, "null"])
+    js = await fetch(url)
+  result = parseGraphCommunityMembers(js)
+
+proc getGraphCommunityHashtags*(id, hashtag: string; after=""): Future[Timeline] {.async.} =
+  if id.len == 0 or hashtag.len == 0: return
+  let
+    safeTag = multiReplace(hashtag, ("\"", ""), ("\\", ""))
+    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    url = apiReq(graphCommunityHashtags, communityHashtagsVars % [id, cursor, safeTag])
+    js = await fetch(url)
+  result = parseGraphCommunityTimeline(js, after)
+
 proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
