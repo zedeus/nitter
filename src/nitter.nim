@@ -34,6 +34,10 @@ stdout.flushFile
 updateDefaultPrefs(fullCfg)
 setCacheTimes(cfg)
 setHmacKey(cfg.hmacKey)
+if cfg.hmacKey.len == 0 or cfg.hmacKey == "secretkey":
+  stderr.write "WARNING: insecure default 'hmacKey' in nitter.conf; " &
+    "set a unique random value to stop media URL signatures being forgeable.\n"
+  stderr.flushFile
 setProxyEncoding(cfg.base64Media)
 setMaxHttpConns(cfg.httpMaxConns)
 setHttpProxy(cfg.proxy, cfg.proxyAuth)

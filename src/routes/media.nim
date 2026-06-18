@@ -15,7 +15,9 @@ const
   maxAge* = "max-age=604800"
 
 proc safeFetch*(url: string): Future[string] {.async.} =
-  let client = newAsyncHttpClient()
+  # maxRedirects=0: the caller already validated the host, so never follow a
+  # redirect off the allowlisted host (would re-open the #1411 SSRF).
+  let client = newAsyncHttpClient(maxRedirects = 0)
   try: result = await client.getContent(url)
   except: discard
   finally: client.close()
@@ -32,7 +34,7 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   result = Http200
   let
     request = req.getNativeReq()
-    client = newAsyncHttpClient()
+    client = newAsyncHttpClient(maxRedirects = 0)
 
   try:
     let res = await client.get(url)
@@ -122,7 +124,7 @@ proc createMediaRouter*(cfg: Config) =
 
     get re"^\/video\/(enc)?\/?(.+)\/(.+)$":
       let url = decoded(request, 2)
-      cond "http" in url
+      cond isTwitterUrl(url)
 
       if getHmac(url) != request.matches[1]:
         resp Http403, showError("Failed to verify signature", cfg)

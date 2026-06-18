@@ -57,8 +57,8 @@ proc filterParams*(params: Table): seq[(string, string)] =
       result.add p
 
 proc isTwitterUrl*(uri: Uri): bool =
-  uri.hostname in twitterDomains or
-    uri.hostname.endsWith(".video.pscp.tv")
+  uri.scheme in ["http", "https"] and
+    (uri.hostname in twitterDomains or uri.hostname.endsWith(".video.pscp.tv"))
 
 proc isTwitterUrl*(url: string): bool =
   isTwitterUrl(parseUri(url))

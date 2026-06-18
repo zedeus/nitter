@@ -161,8 +161,6 @@ const
 
   articleFieldToggles* = """{"withArticleRichContentState":true,"withArticlePlainText":false,"withArticleSummaryText":true,"withArticleVoiceOver":true}"""
 
-  communityVars* = """{"communityId":"$1"}"""
-
   communityTweetsVars* = """{
   "communityId": "$1", $2
   "count": 20,

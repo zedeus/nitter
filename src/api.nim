@@ -18,6 +18,11 @@ proc apiReq(endpoint, variables: string; fieldToggles = ""; skipTid = false): Ap
   let url = apiUrl(endpoint, variables, fieldToggles, skipTid)
   return ApiReq(cookie: url, oauth: url)
 
+proc cursorParam(after: string): string =
+  ## JSON-escape the user-supplied cursor so it cannot break out of the GraphQL
+  ## variables object (same input-validation class as the #1411 media SSRF).
+  if after.len > 0: "\"cursor\":" & $(%after) & "," else: ""
+
 proc mediaUrl(id, cursor: string; count=20): ApiReq =
   result = ApiReq(
     cookie: apiUrl(graphUserMedia, userMediaVars % [id, cursor, $count]),
@@ -39,10 +44,10 @@ proc tweetDetailUrl(id: string; cursor: string): ApiReq =
   # )
 
 proc userUrl(username: string): ApiReq =
-  let cookieVars = """{"screen_name":"$1","withGrokTranslatedBio":false}""" % username
+  let cookieVars = $(%*{"screen_name": username, "withGrokTranslatedBio": false})
   result = ApiReq(
     cookie: apiUrl(graphUser, cookieVars, tweetDetailFieldToggles),
-    oauth: apiUrl(graphUserV2, """{"screen_name": "$1"}""" % username)
+    oauth: apiUrl(graphUserV2, $(%*{"screen_name": username}))
   )
 
 proc getGraphUser*(username: string): Future[User] {.async.} =
@@ -60,7 +65,7 @@ proc getGraphUserById*(id: string): Future[User] {.async.} =
 proc getAboutAccount*(username: string): Future[AccountInfo] {.async.} =
   if username.len == 0: return
   let
-    url = apiReq(graphAboutAccount, """{"screenName":"$1"}""" % username)
+    url = apiReq(graphAboutAccount, $(%*{"screenName": username}))
     js = await fetch(url)
   result = parseAboutAccount(js)
 
@@ -71,7 +76,7 @@ proc restReq(endpoint: string; params: seq[(string, string)] = @[]): ApiReq =
 proc getBroadcastInfo*(id: string): Future[Broadcast] {.async.} =
   if id.len == 0: return
   let
-    req = apiReq(graphBroadcast, """{"id":"$1"}""" % id)
+    req = apiReq(graphBroadcast, $(%*{"id": id}))
     js = await fetch(req)
   result = parseBroadcastInfo(js)
 
@@ -86,7 +91,7 @@ proc fetchBroadcastStream*(mediaKey: string): Future[string] {.async.} =
 proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profile] {.async.} =
   if id.len == 0: return
   let
-    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    cursor = cursorParam(after)
     url = case kind
       of TimelineKind.tweets: userTweetsUrl(id, cursor)
       of TimelineKind.replies: userTweetsAndRepliesUrl(id, cursor)
@@ -97,14 +102,14 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
 proc getGraphCommunity*(id: string): Future[Community] {.async.} =
   if id.len == 0: return
   let
-    url = apiReq(graphCommunity, communityVars % id)
+    url = apiReq(graphCommunity, $(%*{"communityId": id}))
     js = await fetch(url)
   result = parseGraphCommunity(js)
 
 proc getGraphCommunityTweets*(id: string; rankingMode: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
-    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    cursor = cursorParam(after)
     url = apiReq(graphCommunityTweets, communityTweetsVars % [id, cursor, rankingMode])
     js = await fetch(url)
   result = parseGraphCommunityTimeline(js, after)
@@ -112,7 +117,7 @@ proc getGraphCommunityTweets*(id: string; rankingMode: string; after=""): Future
 proc getGraphCommunityMedia*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
-    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    cursor = cursorParam(after)
     url = apiReq(graphCommunityMedia, communityMediaVars % [id, cursor])
     js = await fetch(url)
   result = parseGraphCommunityTimeline(js, after)
@@ -124,7 +129,7 @@ proc communitySliceReq(endpoint, variables: string): ApiReq =
 proc getGraphCommunityMembers*(id: string; after=""): Future[Result[User]] {.async.} =
   if id.len == 0: return
   let
-    cursor = if after.len > 0: "\"$1\"" % after else: "null"
+    cursor = if after.len > 0: $(%after) else: "null"
     url = communitySliceReq(graphCommunityMembers, communityMembersVars % [id, cursor])
     js = await fetch(url)
   result = parseGraphCommunityMembers(js, after)
@@ -140,7 +145,7 @@ proc getGraphCommunityHashtags*(id, hashtag: string; after=""): Future[Timeline]
   if id.len == 0 or hashtag.len == 0: return
   let
     safeTag = multiReplace(hashtag, ("\"", ""), ("\\", ""))
-    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    cursor = cursorParam(after)
     url = apiReq(graphCommunityHashtags, communityHashtagsVars % [id, cursor, safeTag])
     js = await fetch(url)
   result = parseGraphCommunityTimeline(js, after)
@@ -148,7 +153,7 @@ proc getGraphCommunityHashtags*(id, hashtag: string; after=""): Future[Timeline]
 proc getGraphListTweets*(id: string; after=""): Future[Timeline] {.async.} =
   if id.len == 0: return
   let
-    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    cursor = cursorParam(after)
     url = apiReq(graphListTweets, restIdVars % [id, cursor, "20"])
     js = await fetch(url)
   result = parseGraphTimeline(js, after).tweets
@@ -162,7 +167,7 @@ proc getGraphListBySlug*(name, list: string): Future[List] {.async.} =
 
 proc getGraphList*(id: string): Future[List] {.async.} =
   let 
-    url = apiReq(graphListById, """{"listId": "$1"}""" % id)
+    url = apiReq(graphListById, $(%*{"listId": id}))
     js = await fetch(url)
   result = parseGraphList(js)
 
@@ -186,14 +191,14 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
 proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
   if id.len == 0: return
   let
-    url = apiReq(graphTweetResult, """{"rest_id": "$1"}""" % id)
+    url = apiReq(graphTweetResult, $(%*{"rest_id": id}))
     js = await fetch(url)
   result = parseGraphTweetResult(js)
 
 proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
   if id.len == 0: return
   let
-    cursor = if after.len > 0: "\"cursor\":\"$1\"," % after else: ""
+    cursor = cursorParam(after)
     js = await fetch(tweetDetailUrl(id, cursor))
   result = parseGraphConversation(js, id)
 
