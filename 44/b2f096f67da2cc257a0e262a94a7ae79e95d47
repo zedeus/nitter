@@ -1,0 +1,40 @@
+src/nitter.nim
+  s_6bef8cc3a260ff::t_b9424067e28570 37-40
+tests/test_ssrf_1411.nim
+  s_6bef8cc3a260ff::t_6638dc49c746da 1-29,35-38
+  s_6bef8cc3a260ff::t_694ea748381c73 30-34
+src/api.nim
+  s_6bef8cc3a260ff::t_b2febb17d5cb22 94,112,120,148,156,201
+  s_6bef8cc3a260ff::t_bc5b71387af6fb 47,50
+  s_6bef8cc3a260ff::t_be5656f9786afa 68
+  s_6bef8cc3a260ff::t_69fa81df8fd1c5 105
+  s_6bef8cc3a260ff::t_aa52da6ce0cc28 194
+  s_6bef8cc3a260ff::t_7dd8a815ef2808 21-25
+  s_6bef8cc3a260ff::t_9bea918971e1c3 79
+  s_6bef8cc3a260ff::t_20df58d075ecec 132
+  s_6bef8cc3a260ff::t_67436cb9ca1a93 170
+nitter.example.conf
+  s_6bef8cc3a260ff::t_9e3287293b27b4 23
+src/routes/media.nim
+  s_6bef8cc3a260ff::t_19f7e8272e4043 127
+  s_6bef8cc3a260ff::t_bbbbd3de933a7c 37
+  s_6bef8cc3a260ff::t_fc4577cc6a61de 18-20
+src/utils.nim
+  s_6bef8cc3a260ff::t_60d3807fdce5c9 60-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "44b2f096f67da2cc257a0e262a94a7ae79e95d47",
+  "prompts": {},
+  "sessions": {
+    "s_6bef8cc3a260ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c04f3c2a-dcd2-471a-9cbf-959dfeecdc03",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
