@@ -40,12 +40,14 @@ proc getVidUrl*(link: string): string =
     &"/video/{sig}/{encodeUrl(link)}"
 
 proc getPicUrl*(link: string): string =
+  if link.len == 0: return
   if base64Media:
     &"/pic/enc/{encode(link, safe=true)}"
   else:
     &"/pic/{encodeUrl(link)}"
 
 proc getOrigPicUrl*(link: string): string =
+  if link.len == 0: return
   if base64Media:
     &"/pic/orig/enc/{encode(link, safe=true)}"
   else:

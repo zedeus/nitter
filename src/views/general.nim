@@ -97,6 +97,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
       link(rel="preload", type="image/png", href=bannerUrl, `as`="image")
 
     for url in images:
+      if url.len == 0: continue
       let preloadUrl = if "400x400" in url: getPicUrl(url)
                        else: getSmallPic(url)
       link(rel="preload", type="image/png", href=preloadUrl, `as`="image")
