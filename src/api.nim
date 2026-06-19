@@ -88,6 +88,19 @@ proc fetchBroadcastStream*(mediaKey: string): Future[string] {.async.} =
   result = streamJs{"source", "noRedirectPlaybackUrl"}.getStr(
     streamJs{"source", "location"}.getStr)
 
+proc getAudioSpace*(id: string): Future[AudioSpace] {.async.} =
+  if id.len == 0: return
+  let
+    variables = %*{
+      "id": id,
+      "isMetatagsQuery": false,
+      "withReplays": true,
+      "withListeners": true
+    }
+    req = apiReq(graphAudioSpace, $variables)
+    js = await fetch(req)
+  result = parseAudioSpace(js)
+
 proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profile] {.async.} =
   if id.len == 0: return
   let

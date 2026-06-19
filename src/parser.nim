@@ -131,6 +131,51 @@ proc parseBroadcastInfo*(js: JsonNode): Broadcast =
     user: parseGraphUser(bc)
   )
 
+proc parseSpaceParticipant(js: JsonNode): SpaceParticipant =
+  result = SpaceParticipant(
+    userId: js{"user_results", "rest_id"}.getStr,
+    username: js{"twitter_screen_name"}.getStr,
+    displayName: js{"display_name"}.getStr,
+    avatarUrl: js{"avatar_url"}.getStr,
+    isVerified: js{"is_verified"}.getBool or
+                js{"user_results", "result", "is_blue_verified"}.getBool
+  )
+
+proc parseAudioSpace*(js: JsonNode): AudioSpace =
+  let space = ? js{"data", "audioSpace"}
+  let meta = space{"metadata"}
+
+  result = AudioSpace(
+    id: meta{"rest_id"}.getStr,
+    title: meta{"title"}.getStr,
+    state: meta{"state"}.getStr.toUpperAscii,
+    mediaKey: meta{"media_key"}.getStr,
+    totalLiveListeners: meta{"total_live_listeners"}.getInt,
+    totalReplayWatched: meta{"total_replay_watched"}.getInt,
+    availableForReplay: meta{"is_space_available_for_replay"}.getBool
+  )
+
+  let startedAt = meta{"started_at"}.getInt(0)
+  if startedAt > 0:
+    result.startTime = fromUnix(startedAt div 1000).utc()
+
+  let endedAtStr = meta{"ended_at"}.getStr
+  if endedAtStr.len > 0:
+    try:
+      let endedAt = parseBiggestInt(endedAtStr)
+      if endedAt > 0:
+        result.endTime = fromUnix(endedAt div 1000).utc()
+    except ValueError:
+      discard
+
+  result.creator = parseGraphUser(meta{"creator_results", "result"})
+
+  for admin in space{"participants", "admins"}:
+    result.admins.add parseSpaceParticipant(admin)
+
+  for speaker in space{"participants", "speakers"}:
+    result.speakers.add parseSpaceParticipant(speaker)
+
 proc parseGraphCommunity*(js: JsonNode): Community =
   if js.isNull: return
   let c = ? js{"data", "communityResults", "result"}
@@ -390,7 +435,13 @@ proc parseCard(js: JsonNode; urls: JsonNode): Card =
     result.url = vals{"player_url"}.getStrVal
     if "youtube.com" in result.url:
       result.url = result.url.replace("/embed/", "/watch?v=")
-  of audiospace, unknown:
+  of audiospace:
+    let spaceId = vals{"id"}.getStrVal
+    if spaceId.len > 0:
+      result.url = "/i/spaces/" & spaceId
+      result.title = "Twitter Space"
+      result.text = "Click to view Space"
+  of unknown:
     result.title = "This card type is not supported."
   else: discard
 

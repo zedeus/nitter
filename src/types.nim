@@ -128,6 +128,28 @@ type
     availableForReplay*: bool
     user*: User
 
+  SpaceParticipant* = object
+    userId*: string
+    username*: string
+    displayName*: string
+    avatarUrl*: string
+    isVerified*: bool
+
+  AudioSpace* = object
+    id*: string
+    title*: string
+    state*: string
+    mediaKey*: string
+    m3u8Url*: string
+    totalLiveListeners*: int
+    totalReplayWatched*: int
+    startTime*: DateTime
+    endTime*: DateTime
+    availableForReplay*: bool
+    creator*: User
+    admins*: seq[SpaceParticipant]
+    speakers*: seq[SpaceParticipant]
+
   VideoType* = enum
     m3u8 = "application/x-mpegURL"
     mp4 = "video/mp4"

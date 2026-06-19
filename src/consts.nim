@@ -39,6 +39,7 @@ const
   graphTweetResultsByRestIds* = "Sc9EUQTZNEH-wzegn-nHvQ/TweetResultsByRestIds"
 
   graphBroadcast* = "FJLCzpXCLPM1jUZqmM7oEA/BroadcastQuery"
+  graphAudioSpace* = "rWRLsOhNJ2xjpI1tREYurQ/AudioSpaceById"
   restLiveStream* = "1.1/live_video_stream/status/"
 
   gqlFeatures* = """{

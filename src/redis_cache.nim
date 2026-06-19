@@ -173,6 +173,21 @@ proc getCachedBroadcast*(id: string): Future[Broadcast] {.async.} =
     await cache(result)
   result.m3u8Url = await fetchBroadcastStream(result.mediaKey)
 
+proc cache*(data: AudioSpace) {.async.} =
+  if data.id.len == 0: return
+  let ttl = if data.state == "RUNNING": baseCacheTime div 6 else: baseCacheTime
+  await setEx("sp:" & data.id, ttl, compress(toFlatty(data)))
+
+proc getCachedAudioSpace*(id: string): Future[AudioSpace] {.async.} =
+  if id.len == 0: return
+  let cached = await get("sp:" & id)
+  if cached != redisNil:
+    cached.deserialize(AudioSpace)
+  else:
+    result = await getAudioSpace(id)
+    await cache(result)
+  result.m3u8Url = await fetchBroadcastStream(result.mediaKey)
+
 proc cache*(data: AccountInfo; name: string) {.async.} =
   await setEx("ai:" & toLower(name), baseCacheTime * 24, compress(toFlatty(data)))
 
