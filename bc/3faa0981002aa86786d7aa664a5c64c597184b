@@ -1,0 +1,23 @@
+tests/test_thread.py
+  s_135dc858903b70::t_5613b0e26b963c 2
+  s_135dc858903b70::t_a802dcf7a7b1d5 45
+  s_135dc858903b70::t_90f79732a72e20 12
+tests/test_tweet_media.py
+  s_135dc858903b70::t_5ccf4bef879dde 91,93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "bc3faa0981002aa86786d7aa664a5c64c597184b",
+  "prompts": {},
+  "sessions": {
+    "s_135dc858903b70": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0656f3bd-3e4d-47cf-b9ab-ab0844a766e5",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": null
+    }
+  }
+}
