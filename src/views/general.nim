@@ -72,7 +72,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
 
     if prefs.hlsPlayback:
       script(src="/js/hls.min.js", `defer`="")
-      script(src="/js/hlsPlayback.js", `defer`="")
+      script(src="/js/hlsPlayback.js?v=1", `defer`="")
 
     if prefs.infiniteScroll:
       script(src="/js/infiniteScroll.js", `defer`="")
