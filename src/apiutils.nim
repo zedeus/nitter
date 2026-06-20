@@ -8,6 +8,7 @@ const
   rlRemaining = "x-rate-limit-remaining"
   rlReset = "x-rate-limit-reset"
   rlLimit = "x-rate-limit-limit"
+  npCache = "x-np-cache"
   errorsToSkip = {null, doesntExist, tweetNotFound, timeout, unauthorized, badRequest}
 
 var
@@ -139,7 +140,8 @@ template fetchImpl(result, fetchBody) {.dirty.} =
         echo "[sessions] transient 404 (empty body), retrying: ", url.path, ", session: ", session.pretty
         raise rateLimitError()
 
-    if resp.headers.hasKey(rlRemaining):
+    let cacheStatus = resp.headers.getOrDefault(npCache)
+    if cacheStatus notin ["HIT", "STALE"] and resp.headers.hasKey(rlRemaining):
       let
         remaining = parseInt(resp.headers[rlRemaining])
         reset = parseInt(resp.headers[rlReset])
