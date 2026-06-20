@@ -90,6 +90,8 @@ class MediaTest(BaseTestCase):
     @parameterized.expand(video_m3u8)
     def test_video_m3u8(self, tweet, thumb):
         self.open_nitter(tweet)
+        self.driver.delete_cookie("hlsPlayback")
+        self.refresh()
         self.assert_element_visible('.main-tweet ' + Media.container)
         self.assert_element_visible('.main-tweet ' + Media.video)
 
