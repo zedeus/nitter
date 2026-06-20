@@ -9,7 +9,7 @@ thread = [
         [],
         "Based",
         ["Crystal", "Julia"],
-        [["yeah,"], ["yeah,", "Then"]],
+        [["For", "Then"], ["yeah,"]],
     ],
     ["octonion/status/975254452625002496", ["Based"], "Crystal", ["Julia"], []],
     ["octonion/status/975256058384887808", ["Based", "Crystal"], "Julia", [], []],
