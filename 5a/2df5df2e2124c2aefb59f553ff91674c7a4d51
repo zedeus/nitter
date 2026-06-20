@@ -1,0 +1,20 @@
+src/apiutils.nim
+  s_8bdcc771210412::t_56dca9072eeb85 11
+  s_8bdcc771210412::t_dd59856c181959 143-144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "5a2df5df2e2124c2aefb59f553ff91674c7a4d51",
+  "prompts": {},
+  "sessions": {
+    "s_8bdcc771210412": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a626bcf-9653-4bda-ac61-79cf778d3153",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
