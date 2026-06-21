@@ -97,6 +97,12 @@ proc renderVideoUnavailable(video: Video): VNode =
     else:
       p: text "This media is unavailable"
 
+proc getVideoDownloadUrl(videoData: Video): string =
+  let mp4Vars = videoData.variants.filterIt(it.contentType == mp4)
+  if mp4Vars.len == 0: return ""
+  let best = mp4Vars.sortedByIt(it.bitrate)[^1].url
+  if best.startsWith("http"): getVidUrl(best) else: best
+
 proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""; bigThumb=false): VNode =
   let
     playbackType = if not prefs.proxyVideos and videoData.hasMp4Url: mp4
@@ -127,6 +133,11 @@ proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""; bigThumb=fal
         if videoData.durationMs > 0:
           tdiv(class="overlay-duration"): text getDuration(videoData)
         verbatim "</div>"
+    if videoData.available:
+      let dlUrl = getVideoDownloadUrl(videoData)
+      if dlUrl.len > 0:
+        a(class="video-download", href=dlUrl, download="",
+          title="Download video"): icon "download-alt"
 
 proc renderVideo*(video: Video; prefs: Prefs; path: string; bigThumb=false): VNode =
   let hasCardContent = video.description.len > 0 or video.title.len > 0
@@ -345,10 +356,10 @@ proc renderDisclosures*(tweet: Tweet): VNode =
   buildHtml(tdiv(class="disclosures")):
     if tweet.isAI:
       span(data-disclosure="ai"):
-        icon "attention", "Made with AI"
+        icon "attention-circled", "Made with AI"
     if tweet.isAd:
       span(data-disclosure="ad"):
-        icon "attention", "Paid partnership (ad)"
+        icon "attention-circled", "Paid partnership (ad)"
 
 proc renderLocation*(tweet: Tweet): string =
   let (place, url) = tweet.getLocation()

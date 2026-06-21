@@ -50,8 +50,8 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   let opensearchUrl = getUrlPrefix(cfg) & "/opensearch"
 
   buildHtml(head):
-    link(rel="stylesheet", type="text/css", href="/css/style.css?v=43")
-    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=5")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=44")
+    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=7")
 
     if theme.len > 0:
       link(rel="stylesheet", type="text/css", href=(&"/css/themes/{theme}.css"))
@@ -119,7 +119,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
     # this is last so images are also preloaded
     # if this is done earlier, Chrome only preloads one image for some reason
     link(rel="preload", type="font/woff2", `as`="font",
-         href="/fonts/fontello.woff2?61663884", crossorigin="anonymous")
+         href="/fonts/fontello.woff2?59696369", crossorigin="anonymous")
 
 proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
                  titleText=""; desc=""; ogTitle=""; rss=""; video="";
