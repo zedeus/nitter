@@ -1,0 +1,32 @@
+src/views/tweet.nim
+  s_342162a183769f::t_5cc8877a12a616 88
+  s_342162a183769f::t_9e09db1d16dcd6 172
+  s_342162a183769f::t_0b669490581a11 191
+  s_342162a183769f::t_228e0c6b6802a5 143,149
+  s_342162a183769f::t_6c8e1e0a4a8cab 159,161
+src/sass/tweet/quote.scss
+  s_342162a183769f::t_10f078353cf8cd 103-104
+src/routes/preferences.nim
+  s_342162a183769f::t_76f64f9bc3bcd9 43-45
+src/sass/tweet/media.scss
+  s_342162a183769f::t_51140262c2b52c 93-94
+  s_342162a183769f::t_8257453aabca94 95-96
+src/views/general.nim
+  s_342162a183769f::t_90166fdbfed0aa 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "0344b99b69c11a124a655fc936320dc38ee19b26",
+  "prompts": {},
+  "sessions": {
+    "s_342162a183769f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bcb78875-7a01-4cf5-8451-53a0f3cd5f1e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
