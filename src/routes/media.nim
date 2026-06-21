@@ -34,30 +34,39 @@ template respond*(req: asynchttpserver.Request; headers) =
 proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   result = Http200
   let request = req.getNativeReq()
+  var fetchUrl = url
 
   for attempt in 0 .. 2:
     let client = newAsyncHttpClient(maxRedirects = 0)
     var shouldRetry = false
     try:
-      let resFut = client.get(url)
+      let resFut = client.get(fetchUrl)
       let completed = await withTimeout(resFut, 5000)
       if not completed:
         if attempt < 2:
-          echo "[media] Retry $1/2, timeout after 5s, url: $2" % [$(attempt + 1), url]
+          echo "[media] Retry $1/2, timeout after 5s, url: $2" % [$(attempt + 1), fetchUrl]
           shouldRetry = true
         else:
-          echo "[media] Proxying timeout after 5s, url: $1" % [url]
+          echo "[media] Proxying timeout after 5s, url: $1" % [fetchUrl]
           return Http504
       else:
         let res = resFut.read()
         if res.status != "200 OK":
           if res.status == "404 Not Found":
             return Http404
+          if res.status.startsWith("30") and res.headers.hasKey("location"):
+            let location = res.headers["location", 0]
+            if isTwitterUrl(location):
+              fetchUrl = location
+              shouldRetry = true
+              continue
+            else:
+              return Http403
           if attempt < 2:
-            echo "[media] Retry $1/2, status: $2, url: $3" % [$(attempt + 1), res.status, url]
+            echo "[media] Retry $1/2, status: $2, url: $3" % [$(attempt + 1), res.status, fetchUrl]
             shouldRetry = true
           else:
-            echo "[media] Proxying failed, status: $1, url: $2" % [res.status, url]
+            echo "[media] Proxying failed, status: $1, url: $2" % [res.status, fetchUrl]
             return Http404
         else:
           let hashed = $hash(url)
@@ -88,10 +97,10 @@ proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
           return Http200
     except CatchableError:
       if attempt < 2:
-        echo "[media] Retry $1/2, error: $2, url: $3" % [$(attempt + 1), getCurrentExceptionMsg(), url]
+        echo "[media] Retry $1/2, error: $2, url: $3" % [$(attempt + 1), getCurrentExceptionMsg(), fetchUrl]
         shouldRetry = true
       else:
-        echo "[media] Proxying exception, error: $1, url: $2" % [getCurrentExceptionMsg(), url]
+        echo "[media] Proxying exception, error: $1, url: $2" % [getCurrentExceptionMsg(), fetchUrl]
         result = Http404
     finally:
       client.close()
