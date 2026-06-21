@@ -42,6 +42,9 @@ const
   graphAudioSpace* = "rWRLsOhNJ2xjpI1tREYurQ/AudioSpaceById"
   restLiveStream* = "1.1/live_video_stream/status/"
 
+  graphFollowers* = "9jsVJ9l2uXUIKslHvJqIhw/Followers"
+  graphFollowing* = "OLm4oHZBfqWx8jbcEhWoFw/Following"
+
   gqlFeatures* = """{
   "rweb_video_screen_enabled": false,
   "rweb_cashtags_enabled": true,

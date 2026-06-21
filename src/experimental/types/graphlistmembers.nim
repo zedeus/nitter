@@ -7,10 +7,10 @@ type
   List = object
     membersTimeline*: tuple[timeline: Timeline]
 
-  Timeline = object
+  Timeline* = object
     instructions*: seq[Instruction]
 
-  Instruction = object
+  Instruction* = object
     kind*: string
     entries*: seq[tuple[content: Content]]
 
@@ -18,7 +18,7 @@ type
     TimelineTimelineItem
     TimelineTimelineCursor
 
-  Content = object
+  Content* = object
     case entryType*: ContentEntryType
     of TimelineTimelineItem:
       itemContent*: tuple[userResults: UserData]

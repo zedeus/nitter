@@ -201,6 +201,28 @@ proc getGraphListMembers*(list: List; after=""): Future[Result[User]] {.async.} 
     js = await fetchRaw(url)
   result = parseGraphListMembers(js, after)
 
+proc getGraphUserConnections(userId: string; endpoint: string; kind: QueryKind;
+                              after=""): Future[Result[User]] {.async.} =
+  if userId.len == 0: return
+  var variables = %*{
+    "userId": userId,
+    "count": 20,
+    "includePromotedContent": false,
+    "withGrokTranslatedBio": true
+  }
+  if after.len > 0:
+    variables["cursor"] = %after
+  let
+    url = apiReq(endpoint, $variables)
+    js = await fetchRaw(url)
+  result = parseGraphFollowers(js, after, kind)
+
+proc getGraphFollowers*(userId: string; after=""): Future[Result[User]] {.async.} =
+  result = await getGraphUserConnections(userId, graphFollowers, followers, after)
+
+proc getGraphFollowing*(userId: string; after=""): Future[Result[User]] {.async.} =
+  result = await getGraphUserConnections(userId, graphFollowing, following, after)
+
 proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
   if id.len == 0: return
   let

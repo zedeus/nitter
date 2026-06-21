@@ -135,6 +135,39 @@ proc createTimelineRouter*(cfg: Config) =
       resp renderMain(aboutHtml, request, cfg, prefs,
                       "About @" & info.username)
 
+    get "/@name/@kind/?":
+      cond @"kind" in ["followers", "following"]
+      cond '.' notin @"name"
+      cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_'})
+      let
+        prefs = requestPrefs()
+        name = @"name"
+        userId = await getUserId(name)
+
+      if userId.len == 0:
+        resp Http404, showError("User \"" & name & "\" not found", cfg)
+      if userId == "suspended":
+        resp showError(getSuspended(name), cfg)
+
+      let
+        cursor = getCursor()
+        isFollowers = @"kind" == "followers"
+        user = await getCachedUser(name)
+        results = if isFollowers: await getGraphFollowers(userId, cursor)
+                  else: await getGraphFollowing(userId, cursor)
+
+      if user.protected:
+        resp renderMain(renderProtected(user.username), request, cfg, prefs,
+                        "Protected account @" & name)
+
+      let
+        tab = if isFollowers: "Followers" else: "Following"
+        title = (if isFollowers: "People following @" else: "People followed by @") & name
+        html = renderUserList(user, results, prefs, request.path, tab)
+
+      resp renderMain(html, request, cfg, prefs, title,
+                      images = @[user.getUserPic("_400x400")])
+
     get "/@name/?@tab?/?":
       cond '.' notin @"name"
       cond @"name" notin ["pic", "gif", "video", "search", "settings", "login", "intent", "i"]

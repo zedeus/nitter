@@ -61,6 +61,7 @@ type
     rateLimited = 88
     expiredToken = 89
     listIdOrSlug = 112
+    timelineUnavailable = 131
     tweetNotFound = 144
     tweetNotAuthorized = 179
     forbidden = 200
@@ -173,7 +174,7 @@ type
     variants*: seq[VideoVariant]
 
   QueryKind* = enum
-    posts, replies, media, users, tweets, userList
+    posts, replies, media, users, tweets, userList, followers, following
 
   Query* = object
     kind*: QueryKind
