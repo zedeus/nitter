@@ -1,0 +1,20 @@
+src/routes/media.nim
+  s_f5c3882670f296::t_790462d2849003 37,43,47,50,57-64,66,69
+  s_f5c3882670f296::t_ce7d9bff431e40 100,103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "660f2e0d1ab993d2e9a3427fe3731dfca27947c2",
+  "prompts": {},
+  "sessions": {
+    "s_f5c3882670f296": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "15923002-447d-4c91-a713-fded9825d972",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
