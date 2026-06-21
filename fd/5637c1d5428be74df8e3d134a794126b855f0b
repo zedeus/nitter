@@ -1,0 +1,23 @@
+src/views/rss.nimf
+  s_5cbc6615521b4d::t_4a93db6f72f286 124-125
+  s_5cbc6615521b4d::t_4c53ec533ffead 163-168
+  s_5cbc6615521b4d::t_e28d6afc1b9166 101-113,115-123,126-132
+  s_5cbc6615521b4d::t_0ac459698f1d4d 114
+  s_5cbc6615521b4d::t_674010886c3ddc 37-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "fd5637c1d5428be74df8e3d134a794126b855f0b",
+  "prompts": {},
+  "sessions": {
+    "s_5cbc6615521b4d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "86d84cec-c3b5-48e4-b948-f77027e817ea",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
