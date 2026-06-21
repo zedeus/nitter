@@ -85,7 +85,7 @@ proc renderVideoDisabled(playbackType: VideoType; path=""): VNode =
   buildHtml(tdiv(class="video-overlay")):
     case playbackType
     of mp4:
-      p: text "mp4 playback disabled in preferences"
+      buttonReferer "/enablemp4", "Enable mp4 playback", path
     of m3u8, vmap:
       buttonReferer "/enablehls", "Enable hls playback", path
 
@@ -140,13 +140,13 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string; bigThumb=false): VNo
           if video.description.len > 0:
             p(class="card-description"): text video.description
 
-proc renderGifAttachment(gif: Gif; prefs: Prefs): VNode =
+proc renderGifAttachment(gif: Gif; prefs: Prefs; path=""): VNode =
   let thumb = getSmallPic(gif.thumb)
 
   buildHtml(tdiv(class="attachment")):
     if not prefs.mp4Playback:
       img(src=thumb, loading="lazy")
-      renderVideoDisabled(mp4)
+      renderVideoDisabled(mp4, path)
     elif prefs.autoplayGifs:
       video(class="gif", poster=thumb, autoplay="", muted="", loop=""):
         source(src=getPicUrl(gif.url), `type`="video/mp4")
@@ -156,9 +156,9 @@ proc renderGifAttachment(gif: Gif; prefs: Prefs): VNode =
     if gif.altText.len > 0:
       renderAltText(gif.altText)
 
-proc renderGif(gif: Gif; prefs: Prefs): VNode =
+proc renderGif(gif: Gif; prefs: Prefs; path=""): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
-    renderGifAttachment(gif, prefs)
+    renderGifAttachment(gif, prefs, path)
 
 proc renderMedia(media: seq[Media]; prefs: Prefs; path: string; bigThumb=false): VNode =
   if media.len == 0:
@@ -169,7 +169,7 @@ proc renderMedia(media: seq[Media]; prefs: Prefs; path: string; bigThumb=false):
     if item.kind == videoMedia:
       return renderVideo(item.video, prefs, path, bigThumb)
     if item.kind == gifMedia:
-      return renderGif(item.gif, prefs)
+      return renderGif(item.gif, prefs, path)
 
   let
     groups = if media.len < 3: @[media]
@@ -188,7 +188,7 @@ proc renderMedia(media: seq[Media]; prefs: Prefs; path: string; bigThumb=false):
           of videoMedia:
             renderVideoAttachment(mediaItem.video, prefs, path, bigThumb)
           of gifMedia:
-            renderGifAttachment(mediaItem.gif, prefs)
+            renderGifAttachment(mediaItem.gif, prefs, path)
 
 proc renderPoll(poll: Poll): VNode =
   buildHtml(tdiv(class="poll")):

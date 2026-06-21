@@ -100,7 +100,8 @@
     justify-content: center;
     background-color: var(--bg_color);
 
-    video {
+    video,
+    img {
       height: unset;
       width: unset;
       max-height: 100%;

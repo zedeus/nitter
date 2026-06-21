@@ -40,3 +40,6 @@ proc createPrefRouter*(cfg: Config) =
       savePref("hlsPlayback", "on", request)
       redirect(refPath())
 
+    post "/enablemp4":
+      savePref("mp4Playback", "on", request)
+      redirect(refPath())
