@@ -4,4 +4,3 @@ LICENSE
 docker-compose.yml
 Dockerfile
 tests/
-.git
