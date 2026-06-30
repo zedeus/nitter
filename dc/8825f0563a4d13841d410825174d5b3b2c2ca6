@@ -1,0 +1,34 @@
+src/sass/_article.scss
+  s_a4044ddb87480c::t_dc809d51706d12 192-197
+src/views/general.nim
+  s_a4044ddb87480c::t_425ad1ddecfdb2 53
+src/experimental/types/article.nim
+  s_a4044ddb87480c::t_50be413528034a 51
+src/experimental/parser/article.nim
+  s_a4044ddb87480c::t_a1b703ec666484 64
+tests/test_article.py
+  s_a4044ddb87480c::t_e3fbe53ad8e9e1 17
+  s_a4044ddb87480c::t_f2d27fec0250b8 126,130
+  s_a4044ddb87480c::t_e12c2c9bd9e200 186-206
+  s_a4044ddb87480c::t_4f322d8bd2bc9b 230
+src/views/article.nim
+  s_a4044ddb87480c::t_ad7d52434eb8a0 35-37
+src/types.nim
+  s_a4044ddb87480c::t_997ac363132357 256
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "dc8825f0563a4d13841d410825174d5b3b2c2ca6",
+  "prompts": {},
+  "sessions": {
+    "s_a4044ddb87480c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b18ebe72-5a31-4f7a-9169-d75689c02ee3",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
