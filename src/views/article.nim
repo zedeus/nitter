@@ -32,7 +32,9 @@ proc renderAtomicParagraph(paragraph: ArticleParagraph; article: Article;
           video(src=getVidUrl(media.url), controls="")
         else:
           a(href=getOrigPicUrl(media.url), target="_blank"):
-            img(src=getSmallPic(media.url), alt="", loading="lazy")
+            img(src=getSmallPic(media.url), alt=entity.caption, loading="lazy")
+      if entity.caption.len > 0:
+        p(class="article-media-caption"): text entity.caption
   of "TWEET":
     let tweet = tweets.getOrDefault(
       try: parseBiggestInt(entity.tweetId)

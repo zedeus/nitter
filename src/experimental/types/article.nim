@@ -48,6 +48,7 @@ type
     mediaItems*: seq[tuple[mediaId: string]]
     tweetId*: string
     markdown*: string
+    caption*: string
 
   RawMediaEntity* = object
     mediaId*: string

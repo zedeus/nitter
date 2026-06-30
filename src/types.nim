@@ -253,6 +253,7 @@ type
     mediaIds*: seq[string]
     tweetId*: string
     markdown*: string
+    caption*: string
 
   ArticleMedia* = object
     kind*: string

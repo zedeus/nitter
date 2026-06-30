@@ -189,6 +189,12 @@
         max-width: 100%;
         border-radius: 12px;
       }
+
+      .article-media-caption {
+        color: var(--fg_faded);
+        font-size: 0.875rem;
+        margin-top: 6px;
+      }
     }
 
     > a,

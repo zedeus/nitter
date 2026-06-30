@@ -61,6 +61,7 @@ proc parseGraphArticle*(json: string): Article =
     of "MEDIA":
       for mi in entry.value.data.mediaItems:
         entity.mediaIds.add mi.mediaId
+      entity.caption = entry.value.data.caption
     of "TWEET": entity.tweetId = entry.value.data.tweetId
     of "MARKDOWN": entity.markdown = entry.value.data.markdown
     else: discard

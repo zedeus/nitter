@@ -14,6 +14,7 @@ class ArticleSelectors:
     avatar = '.article-author img.avatar'
     verified = '.article-author .verified-icon'
     media = '.article-media'
+    caption = '.article-media-caption'
     divider = '.article-divider'
 
 
@@ -29,10 +30,6 @@ articles = [
     ['2064691088636424322',
      'Consciousness and AI: The Problem of Inner Experience',
      'CosmicOrFun', 'Cosmic Orphan'],
-
-    ['2064696491948777658',
-     'NC Push for Data Centers + Stablecoin Crypto= Data Centers are defacto BAILOUT OF Fed Reserve System',
-     'June_12_1776', 'June_12_1776'],
 
     ['2064755789391110154',
      'DeFi Markets Update 2026-06-10',
@@ -126,11 +123,11 @@ class ArticleContentTest(BaseTestCase):
         self.assertGreater(len(italic), 0)
 
     def test_article_has_blockquotes(self):
-        self.open_nitter('i/article/2064696491948777658')
+        self.open_nitter('i/article/2064166507438059759')
         self.assert_element_visible('.article-body blockquote')
 
     def test_article_has_lists(self):
-        self.open_nitter('i/article/2064696491948777658')
+        self.open_nitter('i/article/2064166507438059759')
         self.assert_element_visible('.article-body ul')
 
     def test_article_has_emoji_text(self):
@@ -186,6 +183,27 @@ class ArticleMediaTest(BaseTestCase):
         tweets = self.find_elements('.article-body .timeline-item')
         self.assertGreaterEqual(len(tweets), 3)
 
+    def test_media_caption_displayed(self):
+        self.open_nitter('i/article/2064689664213041529')
+        self.assert_element_visible(ArticleSelectors.caption)
+        captions = self.find_elements(ArticleSelectors.caption)
+        self.assertGreaterEqual(len(captions), 5)
+
+    def test_media_caption_text(self):
+        self.open_nitter('i/article/2064689664213041529')
+        self.assert_text_visible('FIGURE 1', ArticleSelectors.caption)
+
+    def test_media_caption_alt_attribute(self):
+        self.open_nitter('i/article/2064689664213041529')
+        img = self.find_element(f'{ArticleSelectors.media} img')
+        alt = img.get_attribute('alt')
+        self.assertGreater(len(alt), 0)
+
+    def test_no_caption_when_absent(self):
+        self.open_nitter('i/article/2062858677149675788')
+        captions = self.find_elements(ArticleSelectors.caption)
+        self.assertEqual(len(captions), 0)
+
 
 class ArticleMentionTest(BaseTestCase):
     def test_mention_linkified(self):
@@ -209,7 +227,7 @@ class ArticleMentionTest(BaseTestCase):
 
     def test_no_spurious_whitespace_in_styled_paragraph(self):
         """Styled paragraphs should not have extra whitespace from VNode serialization."""
-        self.open_nitter('i/article/2064696491948777658')
+        self.open_nitter('i/article/2064166507438059759')
         source = self.get_page_source()
         self.assertNotIn('white-space: pre-wrap', source)
         self.assertNotIn('white-space:pre-wrap', source)
