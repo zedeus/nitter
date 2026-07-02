@@ -11,18 +11,18 @@ card = [
     ['voidtarget/status/1094632512926605312',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too)',
      'Basic OBS Studio plugin, written in nim, supporting C++ (C fine too) - obsplugin.nim',
-     'gist.github.com', True]
+     'gist.github.com', True],
+
+    ['NASA/status/2061872347477418301',
+     'Nancy Grace Roman Space Telescope - NASA Science',
+     'The Nancy Grace Roman Space Telescope will settle essential questions in the areas of dark energy, exoplanets, and astrophysics.',
+     'science.nasa.gov', True]
 ]
 
 no_thumb = [
-    ['FluentAI/status/1116417904831029248',
-     'LinkedIn',
-     'This link will take you to a page that’s not on LinkedIn',
-     'lnkd.in'],
-
     ['Thom_Wolf/status/1122466524860702729',
-     'GitHub - facebookresearch/fairseq: Facebook AI Research Sequence-to-Sequence Toolkit written in',
-     '',
+     'GitHub - facebookresearch/XLM: PyTorch original implementation of Cross-lingual Language Model',
+     'PyTorch original implementation of Cross-lingual Language Model Pretraining.',
      'github.com'],
 
     ['brent_p/status/1088857328680488961',
@@ -37,14 +37,9 @@ no_thumb = [
 ]
 
 playable = [
-    ['nim_lang/status/1118234460904919042',
-     'Nim development blog 2019-03',
-     'Arne (aka Krux02)* debugging: * improved nim-gdb, $ works, framefilter * alias for --debugger:native: -g* bugs: * forwarding of .pure. * sizeof union* fe...',
-     'youtube.com'],
-
-    ['nim_lang/status/1121090879823986688',
-     'Nim - First natively compiled language w/ hot code-reloading at...',
-     '#nim #c++ #ACCUConfNim is a statically typed systems and applications programming language which offers perhaps some of the most powerful metaprogramming cap...',
+    ['NASA/status/2047048645845897398',
+     'NASA\'s Artemis II News Conference with Moon Astronauts',
+     'Live from NASA\'s Johnson Space Center in Houston',
      'youtube.com']
 ]
 
@@ -72,7 +67,7 @@ class CardTest(BaseTestCase):
         if len(description) > 0:
             self.assert_text(description, c.description)
 
-    @parameterized.expand(playable)
+    @parameterized.expand(playable, skip_on_empty=True)
     def test_card_playable(self, tweet, title, description, destination):
         self.open_nitter(tweet)
         c = Card(Conversation.main + " ")

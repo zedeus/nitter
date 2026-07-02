@@ -104,9 +104,9 @@ along with the scss and md files.
 # su nitter
 $ git clone https://github.com/zedeus/nitter
 $ cd nitter
-$ nimble build -d:danger --mm:refc
-$ nimble scss
-$ nimble md
+$ nimble -l build -d:danger --mm:refc
+$ nimble -l scss
+$ nimble -l md
 $ cp nitter.example.conf nitter.conf
 ```
 
@@ -123,11 +123,22 @@ performance reasons.
 
 Page for the Docker image: https://hub.docker.com/r/zedeus/nitter
 
-#### NOTE: For ARM64 support, please use the separate ARM64 docker image: [`zedeus/nitter:latest-arm64`](https://hub.docker.com/r/zedeus/nitter/tags).
+#### NOTE: The published image is multi-arch — `zedeus/nitter:latest` runs natively on both `amd64` and `arm64`.
 
 To run Nitter with Docker, you'll need to install and run Redis separately
 before you can run the container. See below for how to also run Redis using
 Docker.
+
+First create your config file. The Docker commands mount it into the container,
+so it has to exist on the host beforehand. If you've cloned the repo:
+
+```bash
+cp nitter.example.conf nitter.conf
+```
+
+If you're using the prebuilt image without a local clone, download
+[`nitter.example.conf`](https://raw.githubusercontent.com/zedeus/nitter/master/nitter.example.conf)
+and save it as `nitter.conf` instead.
 
 To build and run Nitter in Docker:
 
@@ -135,8 +146,6 @@ To build and run Nitter in Docker:
 docker build -t nitter:latest .
 docker run -v $(pwd)/nitter.conf:/src/nitter.conf -d --network host nitter:latest
 ```
-
-Note: For ARM64, use this Dockerfile: [`Dockerfile.arm64`](https://github.com/zedeus/nitter/blob/master/Dockerfile.arm64).
 
 A prebuilt Docker image is provided as well:
 
@@ -151,8 +160,11 @@ Change `redisHost` from `localhost` to `nitter-redis` in `nitter.conf`, then run
 docker-compose up -d
 ```
 
-Note the Docker commands expect a `nitter.conf` file in the directory you run
-them.
+Note the Docker commands mount `nitter.conf` (and `sessions.jsonl` for
+docker-compose) from the directory you run them in. If a mounted file doesn't
+exist, Docker silently creates a directory in its place and the container fails
+with `not a directory: Are you trying to mount a directory onto a file`. Remove
+that directory and create the file as shown above.
 
 ### systemd
 

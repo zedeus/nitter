@@ -40,12 +40,14 @@ proc getVidUrl*(link: string): string =
     &"/video/{sig}/{encodeUrl(link)}"
 
 proc getPicUrl*(link: string): string =
+  if link.len == 0: return
   if base64Media:
     &"/pic/enc/{encode(link, safe=true)}"
   else:
     &"/pic/{encodeUrl(link)}"
 
 proc getOrigPicUrl*(link: string): string =
+  if link.len == 0: return
   if base64Media:
     &"/pic/orig/enc/{encode(link, safe=true)}"
   else:
@@ -57,8 +59,8 @@ proc filterParams*(params: Table): seq[(string, string)] =
       result.add p
 
 proc isTwitterUrl*(uri: Uri): bool =
-  uri.hostname in twitterDomains or
-    uri.hostname.endsWith(".video.pscp.tv")
+  uri.scheme in ["http", "https"] and
+    (uri.hostname in twitterDomains or uri.hostname.endsWith(".video.pscp.tv"))
 
 proc isTwitterUrl*(url: string): bool =
   isTwitterUrl(parseUri(url))

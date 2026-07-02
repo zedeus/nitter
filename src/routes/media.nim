@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import uri, strutils, httpclient, os, hashes, base64, re
 import asynchttpserver, asyncstreams, asyncfile, asyncnet
+import asyncdispatch
 
 import jester
 
@@ -15,7 +16,9 @@ const
   maxAge* = "max-age=604800"
 
 proc safeFetch*(url: string): Future[string] {.async.} =
-  let client = newAsyncHttpClient()
+  # maxRedirects=0: the caller already validated the host, so never follow a
+  # redirect off the allowlisted host (would re-open the #1411 SSRF).
+  let client = newAsyncHttpClient(maxRedirects = 0)
   try: result = await client.getContent(url)
   except: discard
   finally: client.close()
@@ -30,47 +33,79 @@ template respond*(req: asynchttpserver.Request; headers) =
 
 proc proxyMedia*(req: jester.Request; url: string): Future[HttpCode] {.async.} =
   result = Http200
-  let
-    request = req.getNativeReq()
-    client = newAsyncHttpClient()
+  let request = req.getNativeReq()
+  var fetchUrl = url
 
-  try:
-    let res = await client.get(url)
-    if res.status != "200 OK":
-      if res.status != "404 Not Found":
-        echo "[media] Proxying failed, status: $1, url: $2" % [res.status, url]
-      return Http404
-
-    let hashed = $hash(url)
-    if request.headers.getOrDefault("If-None-Match") == hashed:
-      return Http304
-
-    let contentLength =
-      if res.headers.hasKey("content-length"):
-        res.headers["content-length", 0]
+  for attempt in 0 .. 2:
+    let client = newAsyncHttpClient(maxRedirects = 0)
+    var shouldRetry = false
+    try:
+      let resFut = client.get(fetchUrl)
+      let completed = await withTimeout(resFut, 5000)
+      if not completed:
+        if attempt < 2:
+          echo "[media] Retry $1/2, timeout after 5s, url: $2" % [$(attempt + 1), fetchUrl]
+          shouldRetry = true
+        else:
+          echo "[media] Proxying timeout after 5s, url: $1" % [fetchUrl]
+          return Http504
       else:
-        ""
+        let res = resFut.read()
+        if res.status != "200 OK":
+          if res.status == "404 Not Found":
+            return Http404
+          if res.status.startsWith("30") and res.headers.hasKey("location"):
+            let location = res.headers["location", 0]
+            if isTwitterUrl(location):
+              fetchUrl = location
+              shouldRetry = true
+              continue
+            else:
+              return Http403
+          if attempt < 2:
+            echo "[media] Retry $1/2, status: $2, url: $3" % [$(attempt + 1), res.status, fetchUrl]
+            shouldRetry = true
+          else:
+            echo "[media] Proxying failed, status: $1, url: $2" % [res.status, fetchUrl]
+            return Http404
+        else:
+          let hashed = $hash(url)
+          if request.headers.getOrDefault("If-None-Match") == hashed:
+            return Http304
 
-    let headers = newHttpHeaders({
-      "content-type": res.headers["content-type", 0],
-      "content-length": contentLength,
-      "cache-control": maxAge,
-      "etag": hashed
-    })
+          let contentLength =
+            if res.headers.hasKey("content-length"):
+              res.headers["content-length", 0]
+            else:
+              ""
 
-    respond(request, headers)
+          let headers = newHttpHeaders({
+            "content-type": res.headers["content-type", 0],
+            "content-length": contentLength,
+            "cache-control": maxAge,
+            "etag": hashed
+          })
 
-    var (hasValue, data) = (true, "")
-    while hasValue:
-      (hasValue, data) = await res.bodyStream.read()
-      if hasValue:
-        await request.client.send(data)
-    data.setLen 0
-  except HttpRequestError, ProtocolError, OSError:
-    echo "[media] Proxying exception, error: $1, url: $2" % [getCurrentExceptionMsg(), url]
-    result = Http404
-  finally:
-    client.close()
+          respond(request, headers)
+
+          var (hasValue, data) = (true, "")
+          while hasValue:
+            (hasValue, data) = await res.bodyStream.read()
+            if hasValue:
+              await request.client.send(data)
+          data.setLen 0
+          return Http200
+    except CatchableError:
+      if attempt < 2:
+        echo "[media] Retry $1/2, error: $2, url: $3" % [$(attempt + 1), getCurrentExceptionMsg(), fetchUrl]
+        shouldRetry = true
+      else:
+        echo "[media] Proxying exception, error: $1, url: $2" % [getCurrentExceptionMsg(), fetchUrl]
+        result = Http404
+    finally:
+      client.close()
+    if not shouldRetry:
+      break
 
 template check*(code): untyped =
   if code != Http200:
@@ -122,12 +157,12 @@ proc createMediaRouter*(cfg: Config) =
 
     get re"^\/video\/(enc)?\/?(.+)\/(.+)$":
       let url = decoded(request, 2)
-      cond "http" in url
+      cond isTwitterUrl(url)
 
       if getHmac(url) != request.matches[1]:
         resp Http403, showError("Failed to verify signature", cfg)
 
-      if ".mp4" in url or ".ts" in url or ".m4s" in url:
+      if ".mp4" in url or ".ts" in url or ".m4s" in url or ".aac" in url:
         let code = await proxyMedia(request, url)
         check code
 

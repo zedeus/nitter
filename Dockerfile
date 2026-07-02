@@ -1,4 +1,4 @@
-FROM nimlang/nim:2.2.0-alpine-regular as nim
+FROM nimlang/nim:2.2.6-alpine-regular as nim
 LABEL maintainer="setenforce@protonmail.com"
 
 RUN apk --no-cache add libsass-dev pcre
@@ -15,7 +15,7 @@ RUN nimble build -d:danger -d:lto -d:strip --mm:refc \
 
 FROM alpine:latest
 WORKDIR /src/
-RUN apk --no-cache add pcre ca-certificates
+RUN apk --no-cache add pcre ca-certificates openssl
 COPY --from=nim /src/nitter/nitter ./
 COPY --from=nim /src/nitter/nitter.example.conf ./nitter.conf
 COPY --from=nim /src/nitter/public ./public

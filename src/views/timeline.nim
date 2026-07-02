@@ -154,7 +154,8 @@ proc renderTimelineTweets*(results: Timeline; prefs: Prefs; path: string;
             else: renderThread(thread, prefs, path, bigThumb)
       else:
         for thread in filtered:
-          if thread.len == 1: renderTweet(thread[0], prefs, path)
+          if thread.len == 1:
+            renderTweet(thread[0], prefs, path)
           else: renderThread(thread, prefs, path)
 
       var cursor = getSearchMaxId(results, path)

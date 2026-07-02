@@ -18,7 +18,7 @@ proc setMaxConcurrentReqs*(reqs: int) =
 template log(str: varargs[string, `$`]) =
   echo "[sessions] ", str.join("")
 
-proc endpoint(req: ApiReq; session: Session): string =
+proc endpoint*(req: ApiReq; session: Session): string =
   case session.kind
   of oauth: req.oauth.endpoint
   of cookie: req.cookie.endpoint
@@ -50,6 +50,8 @@ proc getSessionPoolHealth*(): JsonNode =
     oldest = now.int64
     newest = 0'i64
     average = 0'i64
+    oauthTotal, cookieTotal = 0
+    oauthLimited, cookieLimited = 0
 
   for session in sessionPool:
     let created = snowflakeToEpoch(session.id)
@@ -59,8 +61,15 @@ proc getSessionPoolHealth*(): JsonNode =
       oldest = created
     average += created
 
+    case session.kind
+    of oauth: inc oauthTotal
+    of cookie: inc cookieTotal
+
     if session.limited:
       limited.incl session.id
+      case session.kind
+      of oauth: inc oauthLimited
+      of cookie: inc cookieLimited
 
     for api in session.apis.keys:
       let
@@ -84,6 +93,8 @@ proc getSessionPoolHealth*(): JsonNode =
     "sessions": %*{
       "total": sessionPool.len,
       "limited": limited.card,
+      "oauth": %*{"total": oauthTotal, "limited": oauthLimited},
+      "cookie": %*{"total": cookieTotal, "limited": cookieLimited},
       "oldest": $fromUnix(oldest),
       "newest": $fromUnix(newest),
       "average": $fromUnix(average)
@@ -100,6 +111,7 @@ proc getSessionPoolDebug*(): JsonNode =
 
   for session in sessionPool:
     let sessionJson = %*{
+      "kind": $session.kind,
       "apis": newJObject(),
       "pending": session.pending,
     }
@@ -173,7 +185,10 @@ proc getSession*(req: ApiReq): Future[Session] {.async.} =
   if not result.isNil and result.isReady(req):
     inc result.pending
   else:
-    log "no sessions available for API: ", req.cookie.endpoint
+    if result.isNil:
+      log "no sessions available for API: ", req.cookie.endpoint
+    else:
+      log "no sessions available for API: ", req.endpoint(result), ", last tried: ", result.pretty
     raise noSessionsError()
 
 proc setLimited*(session: Session; req: ApiReq) =

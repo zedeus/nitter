@@ -28,6 +28,40 @@ video {
   }
 }
 
+.video-download {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  color: var(--accent);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+
+  .icon-container {
+    margin: 0;
+  }
+
+  .icon-download-alt {
+    font-size: 18px;
+  }
+}
+
+.attachment:hover .video-download {
+  opacity: 1;
+
+  &:hover {
+    color: var(--fg_color);
+  }
+}
+
+@media (hover: none) {
+  .video-download {
+    opacity: 1;
+  }
+}
+
 .video-overlay {
   @include play-button;
   background-color: $shadow;

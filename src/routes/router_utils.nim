@@ -8,8 +8,9 @@ export utils, prefs, types, uri
 
 template savePref*(pref, value: string; req: Request; expire=false) =
   if not expire or pref in cookies(req):
+    let sameSite = if cfg.useHttps: None else: Lax
     setCookie(pref, value, daysForward(when expire: -10 else: 360),
-              httpOnly=true, secure=cfg.useHttps, sameSite=None, path="/")
+              httpOnly=true, secure=cfg.useHttps, sameSite=sameSite, path="/")
 
 template requestPrefs*(): untyped {.dirty.} =
   getPrefs(cookies(request), params(request))

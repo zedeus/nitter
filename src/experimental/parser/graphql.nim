@@ -1,6 +1,6 @@
 import options, strutils
 import jsony
-import user, utils, ../types/[graphuser, graphlistmembers]
+import user, utils, ../types/[graphuser, graphlistmembers, graphfollowers]
 from ../../types import User, VerifiedType, Result, Query, QueryKind
 
 proc parseUserResult*(userResult: UserResult): User =
@@ -57,6 +57,28 @@ proc parseGraphListMembers*(json, cursor: string): Result[User] =
 
   let raw = json.fromJson(GraphListMembers)
   for instruction in raw.data.list.membersTimeline.timeline.instructions:
+    if instruction.kind == "TimelineAddEntries":
+      for entry in instruction.entries:
+        case entry.content.entryType
+        of TimelineTimelineItem:
+          let userResult = entry.content.itemContent.userResults.result
+          if userResult.restId.len > 0:
+            result.content.add parseUserResult(userResult)
+        of TimelineTimelineCursor:
+          if entry.content.cursorType == "Bottom":
+            result.bottom = entry.content.value
+
+proc parseGraphFollowers*(json, cursor: string; kind: QueryKind): Result[User] =
+  result = Result[User](
+    beginning: cursor.len == 0,
+    query: Query(kind: kind)
+  )
+
+  if json.len == 0 or json[0] != '{':
+    return
+
+  let raw = json.fromJson(GraphFollowers)
+  for instruction in raw.data.user.result.timeline.timeline.instructions:
     if instruction.kind == "TimelineAddEntries":
       for entry in instruction.entries:
         case entry.content.entryType

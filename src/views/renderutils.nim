@@ -7,18 +7,20 @@ const smallWebp* = "?name=small&format=webp"
 const mediumWebp* = "?name=medium&format=webp"
 
 proc getSmallPic*(url: string): string =
+  if url.len == 0: return
   result = url
   if "?" notin url and not url.endsWith("placeholder.png"):
     result &= smallWebp
   result = getPicUrl(result)
 
 proc getMediumPic*(url: string): string =
+  if url.len == 0: return
   result = url
   if "?" notin url and not url.endsWith("placeholder.png"):
     result &= mediumWebp
   result = getPicUrl(result)
 
-proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
+proc icon*(icon: string; label=""; title=""; class=""; href=""): VNode =
   var c = "icon-" & icon
   if class.len > 0: c = &"{c} {class}"
   buildHtml(tdiv(class="icon-container")):
@@ -27,8 +29,8 @@ proc icon*(icon: string; text=""; title=""; class=""; href=""): VNode =
     else:
       span(class=c, title=title)
 
-    if text.len > 0:
-      text " " & text
+    if label.len > 0:
+      text " " & label
 
 template verifiedIcon*(user: User): untyped {.dirty.} =
   if user.verifiedType != VerifiedType.none:

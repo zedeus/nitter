@@ -4,6 +4,7 @@
 @import "card";
 @import "about-account";
 @import "photo-rail";
+@import "community";
 
 .profile-tabs {
   @include panel(auto, 900px);

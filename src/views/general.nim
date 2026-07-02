@@ -50,8 +50,8 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
   let opensearchUrl = getUrlPrefix(cfg) & "/opensearch"
 
   buildHtml(head):
-    link(rel="stylesheet", type="text/css", href="/css/style.css?v=35")
-    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=5")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=45")
+    link(rel="stylesheet", type="text/css", href="/css/fontello.css?v=7")
 
     if theme.len > 0:
       link(rel="stylesheet", type="text/css", href=(&"/css/themes/{theme}.css"))
@@ -72,7 +72,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
 
     if prefs.hlsPlayback:
       script(src="/js/hls.min.js", `defer`="")
-      script(src="/js/hlsPlayback.js", `defer`="")
+      script(src="/js/hlsPlayback.js?v=1", `defer`="")
 
     if prefs.infiniteScroll:
       script(src="/js/infiniteScroll.js", `defer`="")
@@ -84,6 +84,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
         text cfg.title
 
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(name="referrer", content="same-origin")
     meta(name="theme-color", content="#1F1F1F")
     meta(property="og:type", content=ogType)
     meta(property="og:title", content=(if ogTitle.len > 0: ogTitle else: titleText))
@@ -96,6 +97,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
       link(rel="preload", type="image/png", href=bannerUrl, `as`="image")
 
     for url in images:
+      if url.len == 0: continue
       let preloadUrl = if "400x400" in url: getPicUrl(url)
                        else: getSmallPic(url)
       link(rel="preload", type="image/png", href=preloadUrl, `as`="image")
@@ -117,13 +119,16 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
     # this is last so images are also preloaded
     # if this is done earlier, Chrome only preloads one image for some reason
     link(rel="preload", type="font/woff2", `as`="font",
-         href="/fonts/fontello.woff2?61663884", crossorigin="anonymous")
+         href="/fonts/fontello.woff2?59696369", crossorigin="anonymous")
 
 proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
                  titleText=""; desc=""; ogTitle=""; rss=""; video="";
-                 images: seq[string] = @[]; banner=""): string =
+                 images: seq[string] = @[]; banner="";
+                 twitterLink=""): string =
 
-  let twitterLink = getTwitterLink(req.path, req.params)
+  let twitterLink =
+    if twitterLink.len > 0: twitterLink
+    else: getTwitterLink(req.path, req.params)
 
   let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req, titleText, desc, video, images, banner, ogTitle,

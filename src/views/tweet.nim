@@ -9,17 +9,36 @@ import general
 
 const doctype = "<!DOCTYPE html>\n"
 
-proc renderMiniAvatar(user: User; prefs: Prefs): VNode =
+proc renderMiniAvatar*(user: User; prefs: Prefs): VNode =
   genImg(user.getUserPic("_mini"), class=(prefs.getAvatarClass & " mini"))
 
-proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VNode =
+proc renderArticleCard(preview: ArticlePreview; prefs: Prefs): VNode =
+  let url = "/i/article/" & $preview.tweetId
+  buildHtml(tdiv(class="article-card card large")):
+    a(class="card-container", href=url):
+      if preview.coverImage.len > 0:
+        tdiv(class="card-image-container"):
+          tdiv(class="card-image"):
+            genImg(preview.coverImage)
+          span(class="article-card-badge"): text "Article"
+      tdiv(class="card-content-container"):
+        tdiv(class="card-content"):
+          h2(class="card-title"): text preview.title
+          if preview.previewText.len > 0:
+            p(class="card-description"): text preview.previewText
+
+proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs;
+                   path = ""): VNode =
   buildHtml(tdiv):
     if pinned:
+      let pinnedLabel =
+        if "/i/communities/" in path: "Pinned by Community mods"
+        else: "Pinned Tweet"
       tdiv(class="pinned"):
-        span: icon "pin", "Pinned Tweet"
+        span: icon("pin", pinnedLabel)
     elif retweet.len > 0:
       tdiv(class="retweet-header"):
-        span: icon "retweet", retweet & " retweeted"
+        span: icon("retweet", retweet & " retweeted")
 
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.user.username)):
@@ -66,7 +85,7 @@ proc renderVideoDisabled(playbackType: VideoType; path=""): VNode =
   buildHtml(tdiv(class="video-overlay")):
     case playbackType
     of mp4:
-      p: text "mp4 playback disabled in preferences"
+      buttonReferer "/enablemp4", "Enable mp4 playback", path
     of m3u8, vmap:
       buttonReferer "/enablehls", "Enable hls playback", path
 
@@ -77,6 +96,12 @@ proc renderVideoUnavailable(video: Video): VNode =
       p: text "This media has been disabled in response to a report by the copyright owner"
     else:
       p: text "This media is unavailable"
+
+proc getVideoDownloadUrl(videoData: Video): string =
+  let mp4Vars = videoData.variants.filterIt(it.contentType == mp4)
+  if mp4Vars.len == 0: return ""
+  let best = mp4Vars.sortedByIt(it.bitrate)[^1].url
+  if best.startsWith("http"): getVidUrl(best) else: best
 
 proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""; bigThumb=false): VNode =
   let
@@ -108,6 +133,11 @@ proc renderVideoAttachment(videoData: Video; prefs: Prefs; path=""; bigThumb=fal
         if videoData.durationMs > 0:
           tdiv(class="overlay-duration"): text getDuration(videoData)
         verbatim "</div>"
+    if videoData.available:
+      let dlUrl = getVideoDownloadUrl(videoData)
+      if dlUrl.len > 0:
+        a(class="video-download", href=dlUrl, download="",
+          title="Download video"): icon "download-alt"
 
 proc renderVideo*(video: Video; prefs: Prefs; path: string; bigThumb=false): VNode =
   let hasCardContent = video.description.len > 0 or video.title.len > 0
@@ -121,13 +151,13 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string; bigThumb=false): VNo
           if video.description.len > 0:
             p(class="card-description"): text video.description
 
-proc renderGifAttachment(gif: Gif; prefs: Prefs): VNode =
+proc renderGifAttachment(gif: Gif; prefs: Prefs; path=""): VNode =
   let thumb = getSmallPic(gif.thumb)
 
   buildHtml(tdiv(class="attachment")):
     if not prefs.mp4Playback:
       img(src=thumb, loading="lazy")
-      renderVideoDisabled(mp4)
+      renderVideoDisabled(mp4, path)
     elif prefs.autoplayGifs:
       video(class="gif", poster=thumb, autoplay="", muted="", loop=""):
         source(src=getPicUrl(gif.url), `type`="video/mp4")
@@ -137,9 +167,9 @@ proc renderGifAttachment(gif: Gif; prefs: Prefs): VNode =
     if gif.altText.len > 0:
       renderAltText(gif.altText)
 
-proc renderGif(gif: Gif; prefs: Prefs): VNode =
+proc renderGif(gif: Gif; prefs: Prefs; path=""): VNode =
   buildHtml(tdiv(class="attachments media-gif")):
-    renderGifAttachment(gif, prefs)
+    renderGifAttachment(gif, prefs, path)
 
 proc renderMedia(media: seq[Media]; prefs: Prefs; path: string; bigThumb=false): VNode =
   if media.len == 0:
@@ -150,7 +180,7 @@ proc renderMedia(media: seq[Media]; prefs: Prefs; path: string; bigThumb=false):
     if item.kind == videoMedia:
       return renderVideo(item.video, prefs, path, bigThumb)
     if item.kind == gifMedia:
-      return renderGif(item.gif, prefs)
+      return renderGif(item.gif, prefs, path)
 
   let
     groups = if media.len < 3: @[media]
@@ -169,7 +199,7 @@ proc renderMedia(media: seq[Media]; prefs: Prefs; path: string; bigThumb=false):
           of videoMedia:
             renderVideoAttachment(mediaItem.video, prefs, path, bigThumb)
           of gifMedia:
-            renderGifAttachment(mediaItem.gif, prefs)
+            renderGifAttachment(mediaItem.gif, prefs, path)
 
 proc renderPoll(poll: Poll): VNode =
   buildHtml(tdiv(class="poll")):
@@ -225,7 +255,7 @@ func formatStat(stat: int): string =
   if stat > 0: insertSep($stat, ',')
   else: ""
 
-proc renderStats(stats: TweetStats): VNode =
+proc renderStats*(stats: TweetStats): VNode =
   buildHtml(tdiv(class="tweet-stats")):
     span(class="tweet-stat"): icon "comment", formatStat(stats.replies)
     span(class="tweet-stat"): icon "retweet", formatStat(stats.retweets)
@@ -239,8 +269,9 @@ proc renderReply(tweet: Tweet): VNode =
       if i > 0: text " "
       a(href=("/" & u)): text "@" & u
 
-proc renderAttribution(user: User; prefs: Prefs): VNode =
-  buildHtml(a(class="attribution", href=("/" & user.username))):
+proc renderAttribution(user: User; prefs: Prefs; link = ""): VNode =
+  let href = if link.len > 0: link else: "/" & user.username
+  buildHtml(a(class="attribution", href=href)):
     renderMiniAvatar(user, prefs)
     strong: text user.fullname
     verifiedIcon(user)
@@ -307,6 +338,9 @@ proc renderQuote(quote: Tweet; prefs: Prefs; path: string): VNode =
     if quote.media.len > 0:
       renderQuoteMedia(quote, prefs, path)
 
+    if quote.articlePreview.isSome:
+      renderArticleCard(quote.articlePreview.get(), prefs)
+
     if quote.note.len > 0 and not prefs.hideCommunityNotes:
       renderCommunityNote(quote.note, prefs)
 
@@ -322,10 +356,10 @@ proc renderDisclosures*(tweet: Tweet): VNode =
   buildHtml(tdiv(class="disclosures")):
     if tweet.isAI:
       span(data-disclosure="ai"):
-        icon "attention", "Made with AI"
+        icon "attention-circled", "Made with AI"
     if tweet.isAd:
       span(data-disclosure="ad"):
-        icon "attention", "Paid partnership (ad)"
+        icon "attention-circled", "Paid partnership (ad)"
 
 proc renderLocation*(tweet: Tweet): string =
   let (place, url) = tweet.getLocation()
@@ -339,7 +373,8 @@ proc renderLocation*(tweet: Tweet): string =
   return $node
 
 proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
-                  last=false; mainTweet=false; afterTweet=false; bigThumb=false): VNode =
+                  last=false; mainTweet=false; afterTweet=false;
+                  bigThumb=false): VNode =
   var divClass = class
   if index == -1 or last:
     divClass = "thread-last " & class
@@ -372,7 +407,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
       a(class="tweet-link", href=getLink(tweet))
 
     tdiv(class="tweet-body"):
-      renderHeader(tweet, retweet, pinned, prefs)
+      renderHeader(tweet, retweet, pinned, prefs, path)
 
       if not afterTweet and index == 0 and tweet.reply.len > 0 and
          (tweet.reply.len > 1 or tweet.reply[0] != tweet.user.username or pinned):
@@ -386,10 +421,13 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         verbatim replaceUrls(tweet.text, prefs) & renderLocation(tweet)
 
       if tweet.attribution.isSome:
-        renderAttribution(tweet.attribution.get(), prefs)
+        renderAttribution(tweet.attribution.get(), prefs, tweet.attributionLink)
 
       if tweet.card.isSome and tweet.card.get().kind != hidden:
         renderCard(tweet.card.get(), prefs, path)
+
+      if tweet.articlePreview.isSome:
+        renderArticleCard(tweet.articlePreview.get(), prefs)
 
       if tweet.media.len > 0:
         renderMedia(tweet.media, prefs, path, bigThumb)

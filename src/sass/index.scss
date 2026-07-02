@@ -8,6 +8,8 @@
 @import "timeline";
 @import "search";
 @import "broadcast";
+@import "space";
+@import "_article";
 
 body {
   // colors
@@ -159,6 +161,7 @@ body.fixed-nav .container {
 
 .verified-icon {
   display: inline-block;
+  position: relative;
   width: 14px;
   height: 14px;
   margin-bottom: 2px;

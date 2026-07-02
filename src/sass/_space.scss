@@ -1,0 +1,149 @@
+.space-page {
+  max-width: 800px;
+  width: 100%;
+  margin: 20px auto 0;
+}
+
+.space-panel {
+  background-color: var(--bg_panel);
+  border: 1px solid var(--border_grey);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.space-player {
+  position: relative;
+  background: linear-gradient(135deg, #7b2a8c 0%, #9b3ab1 100%);
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  audio {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+
+    &:not([controls]) {
+      display: none;
+    }
+  }
+
+  .video-overlay {
+    background-color: transparent;
+  }
+}
+
+.space-live {
+  background: #e0245e;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.space-info {
+  padding: 16px;
+}
+
+.space-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.space-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1.3;
+  flex: 1;
+}
+
+.space-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--fg_faded);
+}
+
+.listener-count {
+  color: var(--fg_color);
+}
+
+.space-state {
+  color: var(--fg_dark);
+}
+
+.space-participants {
+  border-top: 1px solid var(--border_grey);
+  padding-top: 12px;
+}
+
+.space-participant {
+  margin-bottom: 10px;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--fg_color);
+    padding: 6px 0;
+  }
+
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+}
+
+.participant-info {
+  min-width: 0;
+}
+
+.participant-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .verified-icon {
+    margin-bottom: 0;
+    position: relative;
+    top: -2px;
+  }
+}
+
+.host-badge {
+  background: var(--accent);
+  color: white;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  position: relative;
+  top: 1px;
+}
+
+.participant-username {
+  color: var(--fg_dark);
+  font-size: 13px;
+}

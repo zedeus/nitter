@@ -1,6 +1,7 @@
 from base import BaseTestCase, Poll, Media
 from parameterized import parameterized
 from selenium.webdriver.common.by import By
+import pytest
 
 poll = [
     ['nim_lang/status/1064219801499955200', 'Style insensitivity', '91', 1, [
@@ -28,14 +29,14 @@ video_m3u8 = [
 ]
 
 gallery = [
-    # ['mobile_test/status/451108446603980803', [
-    #     ['BkKovdrCUAAEz79', 'BkKovdcCEAAfoBO']
-    # ]],
+    ['mobile_test/status/451108446603980803', [
+        ['BkKovdrCUAAEz79', 'BkKovdcCEAAfoBO']
+    ]],
 
-    # ['mobile_test/status/471539824713691137', [
-    #     ['Bos--KNIQAAA7Li', 'Bos--FAIAAAWpah'],
-    #     ['Bos--IqIQAAav23']
-    # ]],
+    ['mobile_test/status/471539824713691137', [
+        ['Bos--KNIQAAA7Li', 'Bos--FAIAAAWpah'],
+        ['Bos--IqIQAAav23']
+    ]],
 
     ['mobile_test/status/469530783384743936', [
         ['BoQbwJAIUAA0QCY', 'BoQbwN1IMAAuTiP'],
@@ -81,19 +82,20 @@ class MediaTest(BaseTestCase):
         self.assert_element_visible(Media.container)
         self.assert_element_visible(Media.gif)
 
-        url = self.get_attribute('source', 'src')
-        thumb = self.get_attribute('video', 'poster')
+        url = self.get_attribute('.main-tweet source', 'src')
+        thumb = self.get_attribute('.main-tweet video', 'poster')
         self.assertIn(gif_id + '.mp4', url)
         self.assertIn(gif_id + '.jpg', thumb)
 
     @parameterized.expand(video_m3u8)
     def test_video_m3u8(self, tweet, thumb):
-        # no url because video playback isn't supported yet
         self.open_nitter(tweet)
-        self.assert_element_visible(Media.container)
-        self.assert_element_visible(Media.video)
+        self.driver.delete_cookie("hlsPlayback")
+        self.refresh()
+        self.assert_element_visible('.main-tweet ' + Media.container)
+        self.assert_element_visible('.main-tweet ' + Media.video)
 
-        video_thumb = self.get_attribute(Media.video + ' img', 'src')
+        video_thumb = self.get_attribute('.main-tweet ' + Media.video + ' img', 'src')
         self.assertIn(thumb, video_thumb)
 
     @parameterized.expand(gallery)
