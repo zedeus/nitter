@@ -1,0 +1,48 @@
+src/routes/status.nim
+  s_77d7ff35bb8d92::t_8d1527e6b18bea 69
+  s_77d7ff35bb8d92::t_2ebd510daebfcb 24-26,30,33,35
+tests/test_ranking_1336.nim
+  s_77d7ff35bb8d92::t_a13098d8176648 1-73
+tests/base.py
+  s_77d7ff35bb8d92::t_b028c953bea50a 74-75
+src/types.nim
+  s_77d7ff35bb8d92::t_2e3aa5efedaf7e 179-184
+src/views/timeline.nim
+  s_77d7ff35bb8d92::t_09b6a97b771a0e 53,55
+src/views/status.nim
+  s_77d7ff35bb8d92::t_f69e4b027e6d43 33
+  s_77d7ff35bb8d92::t_9708b66ad9c945 92-93
+  s_77d7ff35bb8d92::t_8063e2dfd406b1 58-59
+  s_77d7ff35bb8d92::t_9ed708da922902 35-37
+  s_77d7ff35bb8d92::t_614597e0e5d5ac 31-32,34,38-41,53-56
+tests/test_reply_sort.py
+  s_77d7ff35bb8d92::t_b85b72aee57d30 1-41
+src/api.nim
+  s_77d7ff35bb8d92::t_037c383162e1ec 230,234,237-238,241-242,244
+  s_77d7ff35bb8d92::t_a21461e2ee7af4 38
+  s_77d7ff35bb8d92::t_43fe1dc4412010 39-41
+src/formatters.nim
+  s_77d7ff35bb8d92::t_9bbb3a9bcdfc35 36-58
+src/sass/tweet/thread.scss
+  s_77d7ff35bb8d92::t_c644b5ee5fb46f 22-54
+src/views/general.nim
+  s_77d7ff35bb8d92::t_a9e7b484c298d6 53
+src/consts.nim
+  s_77d7ff35bb8d92::t_51937171c7de80 95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e1a602887a6f54c92a34db6405a7d724116b4f1a",
+  "prompts": {},
+  "sessions": {
+    "s_77d7ff35bb8d92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "726f3c46-263a-4128-9b61-499732ea99bb",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
