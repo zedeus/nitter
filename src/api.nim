@@ -35,8 +35,8 @@ proc userTweetsUrl(id: string; cursor: string): ApiReq =
 proc userTweetsAndRepliesUrl(id: string; cursor: string): ApiReq =
   return apiReq(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"], userTweetsFieldToggles, skipTid=true)
 
-proc tweetDetailUrl(id: string; cursor: string): ApiReq =
-  return apiReq(graphTweet, tweetVars % [id, cursor])
+proc tweetDetailUrl(id, cursor: string; mode = Relevance): ApiReq =
+  return apiReq(graphTweet, tweetVars % [id, cursor, $mode])
   # let cookieVars = tweetDetailVars % [id, cursor]
   # result = ApiReq(
   #   cookie: apiUrl(graphTweetDetail, cookieVars, tweetDetailFieldToggles),
@@ -230,21 +230,21 @@ proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
     js = await fetch(url)
   result = parseGraphTweetResult(js)
 
-proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
+proc getGraphTweet(id: string; after=""; mode = Relevance): Future[Conversation] {.async.} =
   if id.len == 0: return
   let
     cursor = cursorParam(after)
-    js = await fetch(tweetDetailUrl(id, cursor))
+    js = await fetch(tweetDetailUrl(id, cursor, mode))
   result = parseGraphConversation(js, id)
 
-proc getReplies*(id, after: string): Future[Result[Chain]] {.async.} =
-  result = (await getGraphTweet(id, after)).replies
+proc getReplies*(id, after: string; mode = Relevance): Future[Result[Chain]] {.async.} =
+  result = (await getGraphTweet(id, after, mode)).replies
   result.beginning = after.len == 0
 
-proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
-  result = await getGraphTweet(id)
+proc getTweet*(id: string; after=""; mode = Relevance): Future[Conversation] {.async.} =
+  result = await getGraphTweet(id, mode=mode)
   if after.len > 0:
-    result.replies = await getReplies(id, after)
+    result.replies = await getReplies(id, after, mode)
 
 proc getGraphEditHistory*(id: string): Future[EditHistory] {.async.} =
   if id.len == 0: return

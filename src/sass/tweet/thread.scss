@@ -19,6 +19,39 @@
   margin-bottom: 10px;
 }
 
+.reply-sort {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background-color: var(--bg_panel);
+  font-size: 14px;
+}
+
+.reply-sort-label {
+  color: var(--fg_faded);
+  margin-right: 2px;
+}
+
+.reply-sort-option {
+  color: var(--tab);
+  font-weight: bold;
+  text-decoration: none;
+  border-bottom: 0.1rem solid transparent;
+
+  &:hover {
+    color: var(--fg_color);
+    text-decoration: none;
+  }
+
+  &.active {
+    color: var(--tab_selected);
+    border-bottom-color: var(--tab_selected);
+  }
+}
+
 .main-tweet,
 .replies,
 .edit-history > div {

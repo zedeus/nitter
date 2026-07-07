@@ -28,7 +28,22 @@ proc renderReplyThread(thread: Chain; prefs: Prefs; path: string): VNode =
     if thread.hasMore:
       renderMoreReplies(thread)
 
-proc renderReplies*(replies: Result[Chain]; prefs: Prefs; path: string; tweet: Tweet = nil): VNode =
+proc renderReplySort(sort: RankingMode): VNode =
+  buildHtml(tdiv(class="reply-sort")):
+    span(class="reply-sort-label"): text "Sort replies:"
+    for mode in RankingMode:
+      let
+        cls = if mode == sort: "reply-sort-option active"
+              else: "reply-sort-option"
+        label = case mode
+                of Relevance: "Relevant"
+                of Recency: "Recent"
+                of Likes: "Liked"
+      a(class=cls, href=("?sort=" & $mode & "#r")):
+        text label
+
+proc renderReplies*(replies: Result[Chain]; prefs: Prefs; path: string;
+                    tweet: Tweet = nil; sort = Relevance): VNode =
   buildHtml(tdiv(class="replies", id="r")):
     var hasReplies = false
     var replyCount = 0
@@ -40,9 +55,11 @@ proc renderReplies*(replies: Result[Chain]; prefs: Prefs; path: string; tweet: T
 
     if hasReplies and replies.bottom.len > 0:
       if tweet == nil or not replies.beginning or replyCount < tweet.stats.replies:
-        renderMore(Query(), replies.bottom, focus="#r")
+        let extra = if sort == Relevance: "" else: "sort=" & $sort & "&"
+        renderMore(Query(), replies.bottom, focus="#r", extra=extra)
 
-proc renderConversation*(conv: Conversation; prefs: Prefs; path: string): VNode =
+proc renderConversation*(conv: Conversation; prefs: Prefs; path: string;
+                         sort = Relevance): VNode =
   let hasAfter = conv.after.content.len > 0
   let threadId = conv.tweet.threadId
   buildHtml(tdiv(class="conversation")):
@@ -75,7 +92,8 @@ proc renderConversation*(conv: Conversation; prefs: Prefs; path: string): VNode 
       if not conv.replies.beginning:
         renderNewer(Query(), getLink(conv.tweet), focus="#r")
       if conv.replies.content.len > 0 or conv.replies.bottom.len > 0:
-        renderReplies(conv.replies, prefs, path, conv.tweet)
+        renderReplySort(sort)
+        renderReplies(conv.replies, prefs, path, conv.tweet, sort)
 
     renderToTop(focus="#m")
 

@@ -50,9 +50,9 @@ proc renderNewer*(query: Query; path: string; focus=""): VNode =
     a(href=(p & url)):
       text "Load newest"
 
-proc renderMore*(query: Query; cursor: string; focus=""): VNode =
+proc renderMore*(query: Query; cursor: string; focus=""; extra=""): VNode =
   buildHtml(tdiv(class="show-more")):
-    a(href=(&"?{getQuery(query)}cursor={encodeUrl(cursor, usePlus=false)}{focus}")):
+    a(href=(&"?{extra}{getQuery(query)}cursor={encodeUrl(cursor, usePlus=false)}{focus}")):
       text "Load more"
 
 proc renderNoMore(): VNode =

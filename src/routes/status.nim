@@ -21,16 +21,18 @@ proc createStatusRouter*(cfg: Config) =
       if id.len > 19 or id.any(c => not c.isDigit):
         resp Http404, showError("Invalid tweet ID", cfg)
 
-      let prefs = requestPrefs()
+      let
+        prefs = requestPrefs()
+        sort = parseEnum[RankingMode](@"sort".toLowerAscii.capitalizeAscii, Relevance)
 
       # used for the infinite scroll feature
       if @"scroll".len > 0:
-        let replies = await getReplies(id, getCursor())
+        let replies = await getReplies(id, getCursor(), sort)
         if replies.content.len == 0:
           resp Http204
-        resp $renderReplies(replies, prefs, getPath())
+        resp $renderReplies(replies, prefs, getPath(), sort=sort)
 
-      let conv = await getTweet(id, getCursor())
+      let conv = await getTweet(id, getCursor(), sort)
 
       if conv == nil or conv.tweet == nil or conv.tweet.id == 0:
         var error = "Tweet not found"
@@ -64,7 +66,7 @@ proc createStatusRouter*(cfg: Config) =
         elif card.video.isSome():
           images = @[card.video.get().thumb]
 
-      let html = renderConversation(conv, prefs, getPath() & "#m")
+      let html = renderConversation(conv, prefs, getPath() & "#m", sort)
       resp renderMain(html, request, cfg, prefs, title, desc, ogTitle,
                       images=images, video=video)
 

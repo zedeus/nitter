@@ -71,6 +71,8 @@ class Conversation(object):
     thread = '.reply'
     tweet = '.timeline-item'
     tweet_text = '.tweet-content'
+    reply_sort = '.reply-sort'
+    reply_sort_active = '.reply-sort-option.active'
 
 
 class Poll(object):

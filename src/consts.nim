@@ -92,6 +92,7 @@ const
   tweetVars* = """{
   "postId": "$1",
   $2
+  "ranking_mode": "$3",
   "includeHasBirdwatchNotes": false,
   "includePromotedContent": false,
   "withBirdwatchNotes": true,

@@ -176,6 +176,9 @@ type
   QueryKind* = enum
     posts, replies, media, users, tweets, userList, followers, following
 
+  RankingMode* = enum
+    Relevance, Recency, Likes
+
   Query* = object
     kind*: QueryKind
     view*: string
