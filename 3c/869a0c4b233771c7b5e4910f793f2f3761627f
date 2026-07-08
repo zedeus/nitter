@@ -1,0 +1,21 @@
+src/sass/search.scss
+  s_a0ebe83e8728a9::t_74b340aefaa0ce 122-123
+src/views/general.nim
+  s_a0ebe83e8728a9::t_0e5f85cab7df76 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "3c869a0c4b233771c7b5e4910f793f2f3761627f",
+  "prompts": {},
+  "sessions": {
+    "s_a0ebe83e8728a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1f41f3b-1dc4-403a-9407-d57625dfb64b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
