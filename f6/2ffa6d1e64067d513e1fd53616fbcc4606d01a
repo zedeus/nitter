@@ -1,0 +1,38 @@
+src/query.nim
+  s_a0ebe83e8728a9::t_bd3a88ec6593ad 107-109
+src/routes/search.nim
+  s_a0ebe83e8728a9::t_56bc6aa8be9679 26-28,34-35,48
+tests/test_search.py
+  s_a0ebe83e8728a9::t_03add348549ab5 98,104,108
+  s_a0ebe83e8728a9::t_afba3ef3534ee5 8-9,11,13-15,23-24
+  s_a0ebe83e8728a9::t_af1e4396058204 46,48-49,52,54-55,57,59-61,64,70,74
+src/views/search.nim
+  s_a0ebe83e8728a9::t_3b779f1ab194ed 91
+  s_a0ebe83e8728a9::t_6720c9664fb7f4 61-62,64-73,76
+  s_a0ebe83e8728a9::t_0ab3b919239519 123
+  s_a0ebe83e8728a9::t_386a6449473136 143
+src/api.nim
+  s_a0ebe83e8728a9::t_df9ba00ba8d767 266-272,278
+src/views/timeline.nim
+  s_a0ebe83e8728a9::t_ae570b7824e205 9
+src/types.nim
+  s_a0ebe83e8728a9::t_ee8b67c1e8ca4b 177
+src/routes/rss.nim
+  s_a0ebe83e8728a9::t_05c1c5386a3848 71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "f62ffa6d1e64067d513e1fd53616fbcc4606d01a",
+  "prompts": {},
+  "sessions": {
+    "s_a0ebe83e8728a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1f41f3b-1dc4-403a-9407-d57625dfb64b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
