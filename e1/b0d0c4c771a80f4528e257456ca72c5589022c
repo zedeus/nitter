@@ -1,0 +1,25 @@
+src/sass/search.scss
+  s_a0ebe83e8728a9::t_bbb5221be9fa51 132-137,147,155,178
+src/views/general.nim
+  s_a0ebe83e8728a9::t_5c956d32079c26 53
+src/views/timeline.nim
+  s_a0ebe83e8728a9::t_2b73d5c2da29d6 132
+tests/test_search.py
+  s_a0ebe83e8728a9::t_1c027b10d44b71 88-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e1b0d0c4c771a80f4528e257456ca72c5589022c",
+  "prompts": {},
+  "sessions": {
+    "s_a0ebe83e8728a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1f41f3b-1dc4-403a-9407-d57625dfb64b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
