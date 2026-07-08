@@ -206,6 +206,20 @@ proc parseGraphCommunity*(js: JsonNode): Community =
     if tag.len > 0:
       result.hashtags.add tag
 
+proc parseListObject(js: JsonNode; owner: User): List =
+  List(
+    id: js{"id_str"}.getStr,
+    name: js{"name"}.getStr,
+    username: owner.username,
+    userId: owner.id,
+    description: js{"description"}.getStr,
+    members: js{"member_count"}.getInt,
+    banner: select(
+      js{"custom_banner_media", "media_info", "original_img_url"},
+      js{"default_banner_media", "media_info", "original_img_url"}
+    ).getImageStr
+  )
+
 proc parseGraphList*(js: JsonNode): List =
   if js.isNull: return
 
@@ -215,15 +229,17 @@ proc parseGraphList*(js: JsonNode): List =
   if list.isNull:
     return
 
-  result = List(
-    id: list{"id_str"}.getStr,
-    name: list{"name"}.getStr,
-    username: list{"user_results", "result", "legacy", "screen_name"}.getStr,
-    userId: list{"user_results", "result", "rest_id"}.getStr,
-    description: list{"description"}.getStr,
-    members: list{"member_count"}.getInt,
-    banner: list{"custom_banner_media", "media_info", "original_img_url"}.getImageStr
+  result = parseListObject(list, parseGraphUser(list))
+
+proc parseGraphSearchList(js: JsonNode): ListSearchResult =
+  let owner = parseGraphUser(js)
+  result = ListSearchResult(
+    list: parseListObject(js, owner),
+    owner: owner,
+    followersContext: js{"followers_context"}.getStr
   )
+  for url in js{"facepile_urls"}:
+    result.facepiles.add url.getStr
 
 proc parsePoll(js: JsonNode): Poll =
   let vals = js{"binding_values"}
@@ -808,20 +824,31 @@ proc parseGraphEditHistory*(js: JsonNode; tweetId: string): EditHistory =
             if tweetResult.notNull:
               result.history.add parseGraphTweet(tweetResult)
 
+iterator extractTweetsFromModuleItems(items: JsonNode): Tweet =
+  for item in items:
+    with tweetResult, item.getTweetResult("item"):
+      let tweet = parseGraphTweet(tweetResult)
+      if not tweet.available:
+        tweet.id = item.getEntryId.getId
+      yield tweet
+
+iterator extractListsFromItems(items: JsonNode): ListSearchResult =
+  for item in items:
+    with listJs, item{"item", "itemContent", "list"}:
+      let r = parseGraphSearchList(listJs)
+      if r.list.id.len > 0:
+        yield r
+
 proc extractTweetsFromEntry*(e: JsonNode): seq[Tweet] =
   with tweetResult, getTweetResult(e):
-    var tweet = parseGraphTweet(tweetResult)
+    let tweet = parseGraphTweet(tweetResult)
     if not tweet.available:
       tweet.id = e.getEntryId.getId
     result.add tweet
     return
 
-  for item in e{"content", "items"}:
-    with tweetResult, item.getTweetResult("item"):
-      var tweet = parseGraphTweet(tweetResult)
-      if not tweet.available:
-        tweet.id = item.getEntryId.getId
-      result.add tweet
+  for tweet in extractTweetsFromModuleItems(e{"content", "items"}):
+    result.add tweet
 
 proc parseGraphTimeline*(js: JsonNode; after=""): Profile =
   result = Profile(tweets: Timeline(beginning: after.len == 0))
@@ -836,12 +863,8 @@ proc parseGraphTimeline*(js: JsonNode; after=""): Profile =
 
   for i in instructions:
     if i{"moduleItems"}.notNull:
-      for item in i{"moduleItems"}:
-        with tweetResult, item.getTweetResult("item"):
-          let tweet = parseGraphTweet(tweetResult)
-          if not tweet.available:
-            tweet.id = item.getEntryId.getId
-          result.tweets.content.add tweet
+      for tweet in extractTweetsFromModuleItems(i{"moduleItems"}):
+        result.tweets.content.add tweet
       continue
 
     if i{"entries"}.notNull:
@@ -876,18 +899,13 @@ proc parseGraphPhotoRail*(js: JsonNode): PhotoRail =
 
   for i in instructions:
     if i{"moduleItems"}.notNull:
-      for item in i{"moduleItems"}:
-        with tweetResult, item.getTweetResult("item"):
-          let t = parseGraphTweet(tweetResult)
-          if not t.available:
-            t.id = item.getEntryId.getId
+      for t in extractTweetsFromModuleItems(i{"moduleItems"}):
+        let photo = extractGalleryPhoto(t)
+        if photo.url.len > 0:
+          result.add photo
 
-          let photo = extractGalleryPhoto(t)
-          if photo.url.len > 0:
-            result.add photo
-
-          if result.len == 16:
-            return
+        if result.len == 16:
+          return
       continue
 
     if i.getTypeName != "TimelineAddEntries":
@@ -904,7 +922,7 @@ proc parseGraphPhotoRail*(js: JsonNode): PhotoRail =
           if result.len == 16:
             return
 
-proc parseGraphSearch*[T: User | Tweets](js: JsonNode; after=""): Result[T] =
+proc parseGraphSearch*[T: User | Tweets | ListSearchResult](js: JsonNode; after=""): Result[T] =
   result = Result[T](beginning: after.len == 0)
 
   let instructions = select(
@@ -920,19 +938,27 @@ proc parseGraphSearch*[T: User | Tweets](js: JsonNode; after=""): Result[T] =
       for e in instruction{"entries"}:
         let entryId = e.getEntryId
         when T is Tweets:
-          if entryId.startsWith("tweet"):
-            with tweetRes, getTweetResult(e):
-              let tweet = parseGraphTweet(tweetRes)
-              if not tweet.available:
-                tweet.id = entryId.getId
+          if entryId.startsWith("tweet") or entryId.startsWith("search-grid"):
+            for tweet in extractTweetsFromEntry(e):
               result.content.add tweet
         elif T is User:
           if entryId.startsWith("user"):
             with userRes, e{"content", "itemContent"}:
               result.content.add parseGraphUser(userRes)
+        elif T is ListSearchResult:
+          if entryId.startsWith("list-search"):
+            for list in extractListsFromItems(e{"content", "items"}):
+              result.content.add list
 
         if entryId.startsWith("cursor-bottom"):
           result.bottom = e{"content", "value"}.getStr
+    elif typ == "TimelineAddToModule":
+      when T is Tweets:
+        for tweet in extractTweetsFromModuleItems(instruction{"moduleItems"}):
+          result.content.add tweet
+      elif T is ListSearchResult:
+        for list in extractListsFromItems(instruction{"moduleItems"}):
+          result.content.add list
     elif typ == "TimelineReplaceEntry":
       if instruction{"entry_id_to_replace"}.getStr.startsWith("cursor-bottom"):
         result.bottom = instruction{"entry", "content", "value"}.getStr

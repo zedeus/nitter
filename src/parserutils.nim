@@ -98,9 +98,9 @@ proc getTimeFromMsStr*(js: JsonNode): DateTime =
 
 proc getId*(id: string): int64 {.inline.} =
   let start = id.rfind("-")
-  if start < 0:
-    return parseBiggestInt(id)
-  return parseBiggestInt(id[start + 1 ..< id.len])
+  try:
+    parseBiggestInt(if start < 0: id else: id[start + 1 ..< id.len])
+  except ValueError: 0'i64
 
 proc getId*(js: JsonNode): int64 {.inline.} =
   case js.kind

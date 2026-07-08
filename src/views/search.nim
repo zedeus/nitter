@@ -39,28 +39,45 @@ proc renderProfileTabs*(query: Query; username: string): VNode =
     li(class=query.getTabClass(tweets)):
       a(href=(link & "/search")): text "Search"
 
-proc renderMediaViewTabs*(query: Query; username: string): VNode =
+proc mediaViewUrl(query: Query; view: string): string =
+  var q = query
+  q.view = view
+  "?" & genQueryUrl(q)
+
+proc renderMediaViewTabs*(query: Query): VNode =
   let currentView = if query.view.len > 0: query.view else: "timeline"
-  let base = "/" & username & "/media?view="
   func cls(view: string): string =
     if currentView == view: "tab-item active" else: "tab-item"
   buildHtml(ul(class="tab media-view-tabs")):
     li(class=cls("timeline")):
-      a(href=(base & "timeline")): text "Timeline"
+      a(href=query.mediaViewUrl("timeline")): text "Timeline"
     li(class=cls("grid")):
-      a(href=(base & "grid")): text "Grid"
+      a(href=query.mediaViewUrl("grid")): text "Grid"
     li(class=cls("gallery")):
-      a(href=(base & "gallery")): text "Gallery"
+      a(href=query.mediaViewUrl("gallery")): text "Gallery"
 
 proc renderSearchTabs*(query: Query): VNode =
   var q = query
+  # the media view mode only applies to the Media tab
+  q.view = ""
   buildHtml(ul(class="tab")):
+    li(class=query.getTabClass(top)):
+      q.kind = top
+      a(href=("?" & genQueryUrl(q))): text "Top"
     li(class=query.getTabClass(tweets)):
       q.kind = tweets
-      a(href=("?" & genQueryUrl(q))): text "Tweets"
+      a(href=("?" & genQueryUrl(q))): text "Latest"
+    li(class=query.getTabClass(media)):
+      q.kind = media
+      q.view = query.view
+      a(href=("?" & genQueryUrl(q))): text "Media"
     li(class=query.getTabClass(users)):
       q.kind = users
+      q.view = ""
       a(href=("?" & genQueryUrl(q))): text "Users"
+    li(class=query.getTabClass(lists)):
+      q.kind = lists
+      a(href=("?" & genQueryUrl(q))): text "Lists"
 
 proc isPanelOpen(q: Query): bool =
   q.fromUser.len == 0 and (q.filters.len > 0 or q.excludes.len > 0 or
@@ -71,7 +88,7 @@ proc renderSearchPanel*(query: Query): VNode =
   let action = if user.len > 0: &"/{user}/search" else: "/search"
   buildHtml(form(`method`="get", action=action,
                  class="search-field", autocomplete="off")):
-    hiddenField("f", "tweets")
+    hiddenField("f", $query.kind)
     genInput("q", "", query.text, "Enter search...", class="pref-inline")
     button(`type`="submit"): icon "search"
 
@@ -102,7 +119,11 @@ proc renderSearchPanel*(query: Query): VNode =
 proc renderTweetSearch*(results: Timeline; prefs: Prefs; path: string;
                         pinned=none(Tweet)): VNode =
   let query = results.query
-  buildHtml(tdiv(class="timeline-container")):
+  let containerClass =
+    if query.fromUser.len == 0 and query.kind == media and
+       query.view == "gallery": "timeline-container media-only"
+    else: "timeline-container"
+  buildHtml(tdiv(class=containerClass)):
     if query.fromUser.len > 1:
       tdiv(class="timeline-header"):
         text query.fromUser.join(" | ")
@@ -111,7 +132,7 @@ proc renderTweetSearch*(results: Timeline; prefs: Prefs; path: string;
       if query.kind != media or query.view != "gallery":
         renderProfileTabs(query, query.fromUser.join(","))
       if query.kind == media and query.fromUser.len == 1:
-        renderMediaViewTabs(query, query.fromUser[0])
+        renderMediaViewTabs(query)
 
     if query.fromUser.len == 0 or query.kind == tweets:
       tdiv(class="timeline-header"):
@@ -119,16 +140,31 @@ proc renderTweetSearch*(results: Timeline; prefs: Prefs; path: string;
 
     if query.fromUser.len == 0:
       renderSearchTabs(query)
+      if query.kind == media:
+        renderMediaViewTabs(query)
 
     renderTimelineTweets(results, prefs, path, pinned)
+
+proc renderSearchForm(kind, placeholder, value: string): VNode =
+  buildHtml(form(`method`="get", action="/search",
+                 class="search-field", autocomplete="off")):
+    hiddenField("f", kind)
+    genInput("q", "", value, placeholder, class="pref-inline")
+    button(`type`="submit"): icon "search"
 
 proc renderUserSearch*(results: Result[User]; prefs: Prefs): VNode =
   buildHtml(tdiv(class="timeline-container")):
     tdiv(class="timeline-header"):
-      form(`method`="get", action="/search", class="search-field", autocomplete="off"):
-        hiddenField("f", "users")
-        genInput("q", "", results.query.text, "Enter username...", class="pref-inline")
-        button(`type`="submit"): icon "search"
+      renderSearchForm("users", "Enter username...", results.query.text)
 
     renderSearchTabs(results.query)
     renderTimelineUsers(results, prefs)
+
+proc renderListSearch*(results: Result[ListSearchResult]; prefs: Prefs;
+                       path: string): VNode =
+  buildHtml(tdiv(class="timeline-container")):
+    tdiv(class="timeline-header"):
+      renderSearchForm("lists", "Enter search...", results.query.text)
+
+    renderSearchTabs(results.query)
+    renderTimelineLists(results, prefs, path)

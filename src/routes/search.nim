@@ -20,8 +20,20 @@ proc createSearchRouter*(cfg: Config) =
 
       let
         prefs = requestPrefs()
-        query = initQuery(params(request))
         title = "Search" & (if q.len > 0: " (" & q & ")" else: "")
+
+      var query = initQuery(params(request))
+      # x.com URL compat: f=user and f=list map to our kind names
+      # (f=live already falls back to tweets/Latest; f=media matches natively)
+      if @"f" == "user":
+        query.kind = users
+      elif @"f" == "list":
+        query.kind = lists
+
+      # media searches support view modes, defaulting like /user/media
+      if query.kind == QueryKind.media and
+         query.view notin ["timeline", "grid", "gallery"]:
+        query.view = prefs.mediaView.toLowerAscii
 
       case query.kind
       of users:
@@ -33,12 +45,16 @@ proc createSearchRouter*(cfg: Config) =
         except InternalError:
           users = Result[User](beginning: true, query: query)
         resp renderMain(renderUserSearch(users, prefs), request, cfg, prefs, title)
-      of tweets:
+      of tweets, top, QueryKind.media:
         let
           tweets = await getGraphTweetSearch(query, getCursor())
           rss = if cfg.enableRSSSearch: "/search/rss?" & genQueryUrl(query) else: ""
         resp renderMain(renderTweetSearch(tweets, prefs, getPath()),
                         request, cfg, prefs, title, rss=rss)
+      of lists:
+        let listResults = await getGraphListSearch(query, getCursor())
+        resp renderMain(renderListSearch(listResults, prefs, getPath()),
+                        request, cfg, prefs, title)
       else:
         resp Http404, showError("Invalid search", cfg)
 

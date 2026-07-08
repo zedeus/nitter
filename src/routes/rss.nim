@@ -68,7 +68,7 @@ proc createRssRouter*(cfg: Config) =
       let
         prefs = requestPrefs()
         query = initQuery(params(request))
-      if query.kind != tweets:
+      if query.kind notin {tweets, top, media}:
         resp Http400, showError("Only Tweet searches are allowed for RSS feeds.", cfg)
 
       let

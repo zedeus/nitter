@@ -4,6 +4,26 @@
   @include panel(100%, 600px);
 }
 
+.timeline-container.media-only {
+  max-width: none;
+  width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+
+  > .tab,
+  > .timeline-header {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .timeline-container.media-only {
+    padding: 0;
+  }
+}
+
 .timeline > div:not(:first-child) {
   border-top: 1px solid var(--border_grey);
 }

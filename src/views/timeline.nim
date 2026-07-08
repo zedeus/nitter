@@ -114,6 +114,84 @@ proc renderTimelineUsers*(results: Result[User]; prefs: Prefs; path=""): VNode =
     else:
       renderNoMore()
 
+proc mentionUsername(word: string): string =
+  # "@user" -> "user" for well-formed mentions, "" otherwise
+  if word.len > 1 and word[0] == '@' and
+     word[1 .. ^1].allCharsInSet({'A'..'Z', 'a'..'z', '0'..'9', '_'}):
+    word[1 .. ^1]
+  else: ""
+
+proc mentionedUser(s: string): string =
+  # last @mention in strings like "65 followers including @user"
+  let words = s.split(' ')
+  for i in countdown(words.high, 0):
+    result = mentionUsername(words[i])
+    if result.len > 0: return
+
+proc renderMentionedText(s: string): VNode =
+  # linkify @mentions in plain API strings like "65 followers including @user"
+  let words = s.split(' ')
+  buildHtml(span):
+    for i in 0 ..< words.len:
+      if i > 0: text " "
+      let username = mentionUsername(words[i])
+      if username.len > 0:
+        a(href=("/" & username)): text words[i]
+      else:
+        text words[i]
+
+proc renderListCard(r: ListSearchResult): VNode =
+  let listUrl = "/i/lists/" & r.list.id
+  buildHtml(tdiv(class="timeline-item list-result")):
+    a(class="tweet-link", href=listUrl)
+    a(class="list-result-banner", href=listUrl):
+      if r.list.banner.len > 0:
+        genImg(r.list.banner)
+    tdiv(class="list-result-body"):
+      tdiv(class="list-result-title fullname-and-username"):
+        a(class="list-name fullname", href=listUrl): text r.list.name
+        span(class="list-members"):
+          text &"· {insertSep($r.list.members, ',')} members"
+      tdiv(class="list-result-context"):
+        if r.followersContext.len > 0:
+          # the first facepile belongs to the "including @user" account
+          let mentioned = mentionedUser(r.followersContext)
+          for i in 0 ..< r.facepiles.len:
+            if i == 0 and mentioned.len > 0:
+              a(class="facepile-link", href=("/" & mentioned)):
+                genImg(r.facepiles[i], class="list-facepile")
+            else:
+              genImg(r.facepiles[i], class="list-facepile")
+          renderMentionedText(r.followersContext)
+        else:
+          if r.owner.username.len > 0:
+            a(class="facepile-link", href=("/" & r.owner.username)):
+              genImg(r.owner.getUserPic("_mini"), class="list-facepile")
+          else:
+            genImg(r.owner.getUserPic("_mini"), class="list-facepile")
+          linkUser(r.owner, class="fullname")
+          linkUser(r.owner, class="username")
+      if r.list.description.len > 0:
+        tdiv(class="list-result-description"):
+          text r.list.description
+
+proc renderTimelineLists*(results: Result[ListSearchResult]; prefs: Prefs;
+                          path=""): VNode =
+  buildHtml(tdiv(class="timeline")):
+    if not results.beginning:
+      renderNewer(results.query, path)
+
+    if results.content.len > 0:
+      for list in results.content:
+        renderListCard(list)
+      if results.bottom.len > 0:
+        renderMore(results.query, results.bottom)
+      renderToTop()
+    elif results.beginning:
+      renderNoneFound()
+    else:
+      renderNoMore()
+
 proc filterThreads(threads: seq[Tweets]; prefs: Prefs): seq[Tweets] =
   var retweets: seq[int64]
   for thread in threads:
