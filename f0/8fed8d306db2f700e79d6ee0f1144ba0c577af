@@ -1,0 +1,55 @@
+src/api.nim
+  s_a0ebe83e8728a9::t_db0d8c4aef7602 271
+  s_a0ebe83e8728a9::t_e8c4a4691baad0 286-288
+tests/base.py
+  s_a0ebe83e8728a9::t_8f99fdfa4ac28a 66-70
+src/query.nim
+  s_a0ebe83e8728a9::t_961b811f7c553c 23
+  s_a0ebe83e8728a9::t_509484f41fd4ac 115-116
+  s_a0ebe83e8728a9::t_d127a741c11e75 50-54
+src/parser.nim
+  s_a0ebe83e8728a9::t_3c7cd69431fcc7 812-813,815-816,818
+  s_a0ebe83e8728a9::t_7a9dcb754621c4 811,817,827-828
+  s_a0ebe83e8728a9::t_f6dd85aeb7e973 821
+  s_a0ebe83e8728a9::t_c31923604a2bff 843-844
+  s_a0ebe83e8728a9::t_5138628353b4d2 879-882,884-885
+  s_a0ebe83e8728a9::t_7e76a60c4ba93d 918-919,928-931
+  s_a0ebe83e8728a9::t_9e750784b1550d 814
+src/views/search.nim
+  s_a0ebe83e8728a9::t_a9c01aa1490bb0 57,60,62
+  s_a0ebe83e8728a9::t_bac2832ece9916 77-78
+  s_a0ebe83e8728a9::t_f4120ef9f09245 61
+  s_a0ebe83e8728a9::t_961b811f7c553c 59
+src/parserutils.nim
+  s_a0ebe83e8728a9::t_96d9b5db01ca28 101,103
+  s_a0ebe83e8728a9::t_3532b6749a622e 102
+src/views/renderutils.nim
+  s_a0ebe83e8728a9::t_1b933bff453f38 117-120
+tests/test_search.py
+  s_a0ebe83e8728a9::t_929fe78237f5e7 3,5-16,21-61,63-76
+  s_a0ebe83e8728a9::t_2a2f8cc34541f7 62
+  s_a0ebe83e8728a9::t_21c38f0b8a1720 17-20
+src/routes/search.nim
+  s_a0ebe83e8728a9::t_888c9d3619a759 25-27,29-32
+  s_a0ebe83e8728a9::t_4593d58efe5e54 28
+  s_a0ebe83e8728a9::t_afc075e6aa5d9d 33
+src/types.nim
+  s_a0ebe83e8728a9::t_2b4ccd39237477 182,186,189
+  s_a0ebe83e8728a9::t_f79d5291672bad 183-185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "f08fed8d306db2f700e79d6ee0f1144ba0c577af",
+  "prompts": {},
+  "sessions": {
+    "s_a0ebe83e8728a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1f41f3b-1dc4-403a-9407-d57625dfb64b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
