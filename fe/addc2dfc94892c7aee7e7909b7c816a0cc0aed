@@ -1,0 +1,32 @@
+src/views/search.nim
+  s_a0ebe83e8728a9::t_0f71d68ee069f6 47
+  s_a0ebe83e8728a9::t_8e52b1e907ab79 128,136-137
+  s_a0ebe83e8728a9::t_955de9e49ded78 65-66,69
+  s_a0ebe83e8728a9::t_3cc356e8a531db 42-46,53,55,57
+src/routes/search.nim
+  s_a0ebe83e8728a9::t_6a6ffcfcecd84b 36-39
+tests/base.py
+  s_a0ebe83e8728a9::t_c2d67f83d27c35 58-60
+src/views/timeline.nim
+  s_a0ebe83e8728a9::t_c5574c4275298c 9
+src/query.nim
+  s_a0ebe83e8728a9::t_0fd1db1b9c876d 55-58
+tests/test_search.py
+  s_a0ebe83e8728a9::t_686bd38c23b7af 99-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "feaddc2dfc94892c7aee7e7909b7c816a0cc0aed",
+  "prompts": {},
+  "sessions": {
+    "s_a0ebe83e8728a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1f41f3b-1dc4-403a-9407-d57625dfb64b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
