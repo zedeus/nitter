@@ -1,0 +1,19 @@
+.gitignore
+  s_84c7690940e280::t_aa96f4caec13f3 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "8e328c2109ddd9529f42e1ea1eb263264a43ee96",
+  "prompts": {},
+  "sessions": {
+    "s_84c7690940e280": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2f2b218-7249-4463-92da-b8e2317a8f0f",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
