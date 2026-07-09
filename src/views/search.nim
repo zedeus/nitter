@@ -120,7 +120,7 @@ proc renderTweetSearch*(results: Timeline; prefs: Prefs; path: string;
                         pinned=none(Tweet)): VNode =
   let query = results.query
   let containerClass =
-    if query.fromUser.len == 0 and query.kind == media and
+    if query.fromUser.len == 0 and query.kind == QueryKind.media and
        query.view == "gallery": "timeline-container media-only"
     else: "timeline-container"
   buildHtml(tdiv(class=containerClass)):
@@ -129,18 +129,18 @@ proc renderTweetSearch*(results: Timeline; prefs: Prefs; path: string;
         text query.fromUser.join(" | ")
 
     if query.fromUser.len > 0:
-      if query.kind != media or query.view != "gallery":
+      if query.kind != QueryKind.media or query.view != "gallery":
         renderProfileTabs(query, query.fromUser.join(","))
-      if query.kind == media and query.fromUser.len == 1:
+      if query.kind == QueryKind.media and query.fromUser.len == 1:
         renderMediaViewTabs(query)
 
-    if query.fromUser.len == 0 or query.kind == tweets:
+    if query.fromUser.len == 0 or query.kind == QueryKind.tweets:
       tdiv(class="timeline-header"):
         renderSearchPanel(query)
 
     if query.fromUser.len == 0:
       renderSearchTabs(query)
-      if query.kind == media:
+      if query.kind == QueryKind.media:
         renderMediaViewTabs(query)
 
     renderTimelineTweets(results, prefs, path, pinned)

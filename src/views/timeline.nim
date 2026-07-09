@@ -6,7 +6,7 @@ import ".."/[types, query, formatters]
 import tweet, renderutils
 
 proc timelineViewClass(query: Query): string =
-  if query.kind != media:
+  if query.kind != QueryKind.media:
     return "timeline"
 
   case query.view

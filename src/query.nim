@@ -34,7 +34,7 @@ proc initQuery*(pms: Table[string, string]; name=""): Query =
 
 proc getMediaQuery*(name: string): Query =
   Query(
-    kind: media,
+    kind: QueryKind.media,
     filters: @["twimg", "native_video"],
     fromUser: @[name],
     sep: "OR"
@@ -64,7 +64,7 @@ proc genQueryParam*(query: Query; maxId=""): string =
     else:
       param &= ")"
 
-  if query.fromUser.len > 0 and query.kind in {posts, media}:
+  if query.fromUser.len > 0 and query.kind in {posts, QueryKind.media}:
     param &= " (filter:self_threads OR -filter:replies)"
 
   if "nativeretweets" notin query.excludes:
@@ -106,7 +106,7 @@ proc genQueryUrl*(query: Query): string =
 
   # media doubles as the profile media tab, where f isn't part of the URL scheme
   if query.kind in {tweets, users, lists, top} or
-     (query.kind == media and query.fromUser.len == 0):
+     (query.kind == QueryKind.media and query.fromUser.len == 0):
     params.add &"f={query.kind}"
     if query.text.len > 0:
       params.add "q=" & encodeUrl(query.text)
