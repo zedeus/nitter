@@ -1,0 +1,19 @@
+CLAUDE.md
+  s_84c7690940e280::t_a904dd0efe30ec 51-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "9348b9dc6231c12bf37a9a0c735e6a13a414a657",
+  "prompts": {},
+  "sessions": {
+    "s_84c7690940e280": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2f2b218-7249-4463-92da-b8e2317a8f0f",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
