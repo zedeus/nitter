@@ -1,0 +1,47 @@
+CLAUDE.md
+  s_84c7690940e280::t_0ff94ec2fa825d 11,16,49-61,80,85,107,111,113,115
+  s_84c7690940e280::t_2a12f758c5af35 8-10
+  s_84c7690940e280::t_538e43694b97d3 12-15
+  s_84c7690940e280::t_e9e293a5ad365c 17-19,46-48
+  s_84c7690940e280::t_b1f66f6b38a864 62-64,77-79
+  s_84c7690940e280::t_83b89c6374036d 81-84
+  s_84c7690940e280::t_e16203301eef1a 86-88,104-106
+  s_84c7690940e280::t_3dc76d8f88f198 108-110
+  s_84c7690940e280::t_32f752e893590e 112
+  s_84c7690940e280::t_917c7e89869107 114
+  s_84c7690940e280::t_512e73478523d2 116-118
+  s_84c7690940e280::t_148cee2b6c2255 1-7,20-45,65-76,89-103,119
+src/views/timeline.nim
+  s_84c7690940e280::t_98656dda544c12 9
+src/query.nim
+  s_84c7690940e280::t_2a8a6b63f73345 109
+  s_84c7690940e280::t_614031270bcd05 67
+  s_84c7690940e280::t_93a28b7aec0da6 37
+src/views/profile.nim
+  s_84c7690940e280::t_5745b4d5b3edcb 118
+src/routes/rss.nim
+  s_84c7690940e280::t_a3c5adee0def9d 71
+src/routes/timeline.nim
+  s_84c7690940e280::t_aca4caae1f2ab4 56
+src/views/search.nim
+  s_84c7690940e280::t_baeef1b012e7d2 123
+  s_84c7690940e280::t_f05bf42bbc3d9c 132,134
+  s_84c7690940e280::t_707ae873bade3c 137
+  s_84c7690940e280::t_2b0ca47da0ee12 143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "3b46b8c6f8950857ec35e79b54ef3536a835b48d",
+  "prompts": {},
+  "sessions": {
+    "s_84c7690940e280": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2f2b218-7249-4463-92da-b8e2317a8f0f",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
