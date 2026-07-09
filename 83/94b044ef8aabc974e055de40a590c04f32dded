@@ -1,15 +1,26 @@
 src/query.nim
   s_84c7690940e280::t_0f40c9bc265a35 37,67,109
+  s_84c7690940e280::t_2a8a6b63f73345 109
+  s_84c7690940e280::t_614031270bcd05 67
+  s_84c7690940e280::t_93a28b7aec0da6 37
 src/routes/rss.nim
   s_84c7690940e280::t_9d32c42406de0f 71
+  s_84c7690940e280::t_a3c5adee0def9d 71
 src/routes/timeline.nim
   s_84c7690940e280::t_7f2aa99b47d81a 56
+  s_84c7690940e280::t_aca4caae1f2ab4 56
 src/views/profile.nim
   s_84c7690940e280::t_6f5dc25a8f4061 118
+  s_84c7690940e280::t_5745b4d5b3edcb 118
 src/views/search.nim
   s_84c7690940e280::t_5426c471c7187d 123,132,134,137,143
+  s_84c7690940e280::t_baeef1b012e7d2 123
+  s_84c7690940e280::t_f05bf42bbc3d9c 132,134
+  s_84c7690940e280::t_707ae873bade3c 137
+  s_84c7690940e280::t_2b0ca47da0ee12 143
 src/views/timeline.nim
   s_84c7690940e280::t_c2d06aa17dce39 9
+  s_84c7690940e280::t_98656dda544c12 9
 ---
 {
   "schema_version": "authorship/3.0.0",
