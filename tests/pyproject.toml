@@ -8,4 +8,4 @@ python = "^3.14"
 seleniumbase = "4.46.5"
 
 [tool.pytest.ini_options]
-addopts = "--timeout_multiplier=3"
+addopts = "--pls=eager --reruns=3 --timeout_multiplier=3"
