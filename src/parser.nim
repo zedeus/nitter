@@ -710,10 +710,26 @@ proc parseGraphTweet*(js: JsonNode): Tweet =
   with birdwatch, js{"birdwatch_pivot"}:
     result.note = parseCommunityNote(birdwatch)
 
+proc getConvSection(js: JsonNode): string =
+  let details = select(
+    js{"item", "client_event_info", "details"},
+    js{"item", "clientEventInfo", "details"}
+  )
+  select(
+    details{"conversation_details", "conversation_section"},
+    details{"conversationDetails", "conversationSection"}
+  ).getStr
+
 proc parseGraphThread(js: JsonNode): tuple[thread: Chain; self: bool] =
+  var checkedSection = false
   for t in ? js{"content", "items"}:
     let entryId = t.getEntryId
     if "tweet-" in entryId and "promoted" notin entryId:
+      if not checkedSection:
+        checkedSection = true
+        if getConvSection(t) == "RelatedTweet":
+          result.thread.related = true
+
       let tweet = t.getTweetResult("item")
       if tweet.notNull:
         result.thread.content.add parseGraphTweet(tweet)
@@ -774,7 +790,8 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string): Conversation =
               result.before.content.add tweet
           elif not entryId.endsWith(tweetId):
             result.before.content.add Tweet(id: entryId.getId)
-        elif entryId.startsWith("conversationthread"):
+        elif entryId.startsWith("conversationthread") or
+             entryId.startsWith("tweetdetailrelatedtweets"):
           let (thread, self) = parseGraphThread(e)
           if self:
             result.after = thread

@@ -359,6 +359,7 @@ type
     content*: Tweets
     hasMore*: bool
     cursor*: string
+    related*: bool
 
   Conversation* = ref object
     tweet*: Tweet

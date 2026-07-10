@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
+import sequtils
 import karax/[karaxdsl, vdom]
 
 import ".."/[types, formatters]
@@ -48,7 +49,7 @@ proc renderReplies*(replies: Result[Chain]; prefs: Prefs; path: string;
     var hasReplies = false
     var replyCount = 0
     for thread in replies.content:
-      if thread.content.len == 0: continue
+      if thread.content.len == 0 or thread.related: continue
       hasReplies = true
       replyCount += thread.content.len
       renderReplyThread(thread, prefs, path)
@@ -57,6 +58,14 @@ proc renderReplies*(replies: Result[Chain]; prefs: Prefs; path: string;
       if tweet == nil or not replies.beginning or replyCount < tweet.stats.replies:
         let extra = if sort == Relevance: "" else: "sort=" & $sort & "&"
         renderMore(Query(), replies.bottom, focus="#r", extra=extra)
+
+proc renderRelated(replies: Result[Chain]; prefs: Prefs; path: string): VNode =
+  buildHtml(tdiv(class="related-tweets")):
+    tdiv(class="related-header"):
+      text "Related tweets"
+    for thread in replies.content:
+      if thread.content.len == 0 or not thread.related: continue
+      renderReplyThread(thread, prefs, path)
 
 proc renderConversation*(conv: Conversation; prefs: Prefs; path: string;
                          sort = Relevance): VNode =
@@ -94,6 +103,10 @@ proc renderConversation*(conv: Conversation; prefs: Prefs; path: string;
       if conv.replies.content.len > 0 or conv.replies.bottom.len > 0:
         renderReplySort(sort)
         renderReplies(conv.replies, prefs, path, conv.tweet, sort)
+
+    if not prefs.hideRelated:
+      if conv.replies.content.anyIt(it.related and it.content.len > 0):
+        renderRelated(conv.replies, prefs, path)
 
     renderToTop(focus="#m")
 

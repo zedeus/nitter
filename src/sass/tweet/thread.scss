@@ -185,3 +185,12 @@
     }
   }
 }
+
+.related-header {
+  padding: 8px 12px;
+  margin-top: 10px;
+  background-color: var(--bg_panel);
+  color: var(--fg_faded);
+  font-size: 14px;
+  border-bottom: 1px solid var(--border_grey);
+}

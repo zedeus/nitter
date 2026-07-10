@@ -78,6 +78,9 @@ genPrefs:
     hideReplies(checkbox, false):
       "Hide tweet replies"
 
+    hideRelated(checkbox, true):
+      "Hide related tweets under replies"
+
     hideCommunityNotes(checkbox, false):
       "Hide community notes"
 
