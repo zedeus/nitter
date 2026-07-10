@@ -1,0 +1,23 @@
+tests/pyproject.toml
+  s_d8f206526ef67e::t_367b4a89d3778f 11
+tests/conftest.py
+  s_d8f206526ef67e::t_c7fb2745f27e0f 1-2
+  s_d8f206526ef67e::t_03b9e7cace5ef8 4
+  s_d8f206526ef67e::t_fedba3f99899b1 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "c53a96c2195b4c59efb932b9eb0bf5209e5ddd4f",
+  "prompts": {},
+  "sessions": {
+    "s_d8f206526ef67e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c1a370e6-1a9b-4d74-bd17-656a7488b6ef",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
