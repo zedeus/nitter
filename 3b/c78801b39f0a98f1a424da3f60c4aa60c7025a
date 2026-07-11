@@ -1,0 +1,19 @@
+tests/pyproject.toml
+  s_b0fd352b85339b::t_4fd276fb5675e7 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "3bc78801b39f0a98f1a424da3f60c4aa60c7025a",
+  "prompts": {},
+  "sessions": {
+    "s_b0fd352b85339b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41da438f-4814-46e4-b199-b708e74b744f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
