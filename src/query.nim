@@ -8,7 +8,7 @@ const
     "media", "images", "twimg", "videos",
     "native_video", "consumer_video", "spaces",
     "links", "news", "quote", "mentions",
-    "replies", "retweets", "nativeretweets"
+    "replies", "retweets", "nativeretweets", "cashtags"
   ]
 
   emptyQuery* = "include:nativeretweets"
