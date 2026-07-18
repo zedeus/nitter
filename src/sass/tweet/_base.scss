@@ -118,29 +118,113 @@
   }
 }
 
+body:has(> .tweet-embed) {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+html:has(body > .tweet-embed) {
+  background: transparent;
+  overflow: hidden;
+}
+
 .tweet-embed {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
   background-color: var(--bg_panel);
+  border: 1px solid var(--border_grey);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--bg_hover);
+  }
+
+  .timeline-item {
+    pointer-events: none;
+  }
 
   .tweet-content {
     font-size: 18px;
+    pointer-events: none;
+
+    a {
+      pointer-events: all;
+    }
+  }
+
+  .attachments {
+    pointer-events: none;
+
+    a, video, .video-overlay {
+      pointer-events: all;
+    }
   }
 
   .tweet-body {
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 0.75em * 2);
   }
 
-  .card-image img {
-    height: auto;
-  }
-
-  .avatar {
+  .avatar:not(.mini) {
     position: absolute;
+  }
+
+  .quote-media-container {
+    max-height: 600px;
+  }
+
+  .quote-media-container .gallery-row .attachment,
+  .quote-media-container .gallery-row .attachment > video,
+  .quote-media-container .gallery-row .attachment > img,
+  .quote-media-container .still-image,
+  .quote-media-container .still-image img,
+  .still-image,
+  .still-image img {
+    max-height: 600px;
+  }
+
+  &.error-embed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    padding: 20px;
+    cursor: default;
+
+    &:hover {
+      background-color: var(--bg_panel);
+    }
+
+    .error-panel {
+      margin: 0;
+    }
+  }
+
+  .embed-footer {
+    position: relative;
+    z-index: 2;
+    display: block;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border_grey);
+    background: var(--bg_elements);
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    pointer-events: all;
+    transition: background-color 0.15s;
+
+    &:hover {
+      background: var(--bg_hover);
+    }
   }
 }
 
