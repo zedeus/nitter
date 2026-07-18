@@ -1,0 +1,80 @@
+src/routes/router_utils.nim
+  s_7fa5284c3ebe24::t_474f5d23b0b7ea 7
+src/views/oembed.nimf
+  s_7fa5284c3ebe24::t_840f1c1c7ac7aa 1-6
+public/js/embedTweet.js
+  s_7fa5284c3ebe24::t_a87a303d1515e3 1-23
+src/sass/tweet/_base.scss
+  s_7fa5284c3ebe24::t_2e433a6f173b6f 223-224,226
+  s_7fa5284c3ebe24::t_8d14dbb882ded5 160,181,192-198,204-208
+  s_7fa5284c3ebe24::t_72fa5f646a99eb 137
+  s_7fa5284c3ebe24::t_f6f0c8b833dd1a 138
+  s_7fa5284c3ebe24::t_c2b8bb0318e2e3 190
+  s_7fa5284c3ebe24::t_81217e9164033c 213,218,220
+  s_7fa5284c3ebe24::t_ad202935b37190 180
+  s_7fa5284c3ebe24::t_636bae21507642 155-159
+  s_7fa5284c3ebe24::t_bf9db4672cec2d 163-167
+  s_7fa5284c3ebe24::t_1e70096f14e0a3 216-217,219
+  s_7fa5284c3ebe24::t_f469448a6a9ec0 179,183-185,191
+  s_7fa5284c3ebe24::t_d3f2f3fd19c65c 175
+  s_7fa5284c3ebe24::t_73a82fd862ee3e 186-189
+  s_7fa5284c3ebe24::t_bf1e4c1ec54d47 209-210,214-215,221-222,225,227
+  s_7fa5284c3ebe24::t_5fc44ff68792a3 149-151
+  s_7fa5284c3ebe24::t_62c0ed8838ea45 127,132
+  s_7fa5284c3ebe24::t_f39c076ffb4275 211-212
+  s_7fa5284c3ebe24::t_2df194bb773c74 140-143,145-148,199-203
+  s_7fa5284c3ebe24::t_28d1ce828e331f 144
+  s_7fa5284c3ebe24::t_097f99eaf4c34e 162
+  s_7fa5284c3ebe24::t_d4134f980ebe86 126,128-131
+  s_7fa5284c3ebe24::t_84cd420edf32b3 121-125,133-134
+  s_7fa5284c3ebe24::t_f29e7360dcd0a4 136
+  s_7fa5284c3ebe24::t_e71a0ca1bd3f20 161
+  s_7fa5284c3ebe24::t_def87e425b16d2 176
+  s_7fa5284c3ebe24::t_6fa3e30d5e44be 182
+public/js/widgets.js
+  s_7fa5284c3ebe24::t_b27b35b7ef2677 1-83,85-101,103-120,123-126,129-134
+  s_7fa5284c3ebe24::t_39352f09780192 84,102,121-122,127-128,135
+public/js/embedResize.js
+  s_7fa5284c3ebe24::t_07e1c2dfe5a0ce 1-26
+src/views/embed.nim
+  s_7fa5284c3ebe24::t_413984dd088827 41
+  s_7fa5284c3ebe24::t_6ab5c6fae9131c 8-9,15,31-34,36-38,40,43-44,46-50,52-57
+  s_7fa5284c3ebe24::t_c6e992d02620a5 35
+  s_7fa5284c3ebe24::t_d8289bee77c5b4 39
+  s_7fa5284c3ebe24::t_e6e79b7720c193 12,28-30,45,58-59
+  s_7fa5284c3ebe24::t_3625977f42f644 10
+  s_7fa5284c3ebe24::t_691c8a307df374 11
+  s_7fa5284c3ebe24::t_3d87253e14eb45 51
+  s_7fa5284c3ebe24::t_6ec99693d2bb5e 42
+  s_7fa5284c3ebe24::t_7ff67672f7bb03 60
+src/routes/embed.nim
+  s_7fa5284c3ebe24::t_cebde73821022e 12-30
+  s_7fa5284c3ebe24::t_67a46c852232db 94
+  s_7fa5284c3ebe24::t_9608f06ab2a48c 34-42
+  s_7fa5284c3ebe24::t_8a7ea2c642ea8c 64,66-69,72-73,75-77
+  s_7fa5284c3ebe24::t_d4722a0ce87503 70-71,74
+  s_7fa5284c3ebe24::t_ccca9613d331f5 11
+  s_7fa5284c3ebe24::t_600fd5710cee91 78-81,84-93,95
+  s_7fa5284c3ebe24::t_856683b11b6a19 2
+  s_7fa5284c3ebe24::t_1d7eab3abe9c03 53
+  s_7fa5284c3ebe24::t_8fb65798e1ac35 82-83
+  s_7fa5284c3ebe24::t_0f0b01e6069654 4
+  s_7fa5284c3ebe24::t_78d731068a4509 65
+  s_7fa5284c3ebe24::t_47aa6458e4263c 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9be0b8f826bc7442d7a1324e3258f866f3a19d76",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
