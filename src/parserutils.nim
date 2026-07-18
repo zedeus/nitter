@@ -233,9 +233,9 @@ proc replacedWith(runes: seq[Rune]; repls: openArray[ReplaceSlice];
           symbol = $runes[rep.slice.a]
         result.add a(symbol & name, href = "/search?f=tweets&q=%23" & name)
     of rkMention:
-      result.add a($runes[rep.slice], href = rep.url, title = rep.display)
+      result.add a($runes[rep.slice], href = rep.url, title = escape(rep.display))
     of rkUrl:
-      result.add a(rep.display, href = rep.url)
+      result.add a(escape(rep.display), href = rep.url)
     of rkRemove:
       discard
 
