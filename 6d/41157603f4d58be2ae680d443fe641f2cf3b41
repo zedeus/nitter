@@ -1,0 +1,24 @@
+public/js/embedResize.js
+  s_7fa5284c3ebe24::t_fdf99e5af1ab73 25-26
+src/views/embed.nim
+  s_7fa5284c3ebe24::t_c9f74e39caf410 11
+  s_7fa5284c3ebe24::t_0a54b58d007d25 12
+public/js/embedTweet.js
+  s_7fa5284c3ebe24::t_42dadb30292aea 2-5,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6d41157603f4d58be2ae680d443fe641f2cf3b41",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
