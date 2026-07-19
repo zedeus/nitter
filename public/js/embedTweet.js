@@ -1,5 +1,8 @@
 // This runs after embedResize.js sets up the sendHeight function
-(function(sendHeight) {
+(function() {
+  var sendHeight = window._nitterSendHeight;
+  if (!sendHeight) return;
+
   // Make images load eagerly so height updates correctly
   var lazyImages = document.querySelectorAll('img[loading="lazy"]');
   for (var i = 0; i < lazyImages.length; i++) {
@@ -20,4 +23,4 @@
   for (var i = 0; i < allLinks.length; i++) {
     allLinks[i].target = '_blank';
   }
-})(arguments[0]);
+})();

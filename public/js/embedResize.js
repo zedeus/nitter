@@ -22,5 +22,6 @@
   window.addEventListener('load', sendHeight);
   new ResizeObserver(sendHeight).observe(embedElement);
 
-  return sendHeight;
+  // Expose for embedTweet.js
+  window._nitterSendHeight = sendHeight;
 })()

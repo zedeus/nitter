@@ -8,8 +8,8 @@ import general, tweet
 const
   doctype = "<!DOCTYPE html>\n"
   embedResizeJs = staticRead("../../public/js/embedResize.js")
-  embedTweetJs = embedResizeJs & staticRead("../../public/js/embedTweet.js")
-  embedErrorJs = embedResizeJs & ";requestAnimationFrame(arguments[0]);"
+  embedTweetJs = embedResizeJs & ";" & staticRead("../../public/js/embedTweet.js")
+  embedErrorJs = embedResizeJs & ";if(window._nitterSendHeight)requestAnimationFrame(window._nitterSendHeight);"
 
 proc renderVideoEmbed*(tweet: Tweet; cfg: Config; req: Request): string =
   let
