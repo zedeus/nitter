@@ -27,7 +27,7 @@ proc renderArticleCard(preview: ArticlePreview; prefs: Prefs): VNode =
           if preview.previewText.len > 0:
             p(class="card-description"): text preview.previewText
 
-proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs;
+proc renderHeader(tweet: Tweet; retweet: User; pinned: bool; prefs: Prefs;
                    path = ""): VNode =
   buildHtml(tdiv):
     if pinned:
@@ -36,9 +36,11 @@ proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs;
         else: "Pinned Tweet"
       tdiv(class="pinned"):
         span: icon("pin", pinnedLabel)
-    elif retweet.len > 0:
+    elif retweet.username.len > 0:
       tdiv(class="retweet-header"):
-        span: icon("retweet", retweet & " retweeted")
+        span:
+          a(href=("/" & retweet.username)):
+            icon("retweet", retweet.fullname & " retweeted")
 
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.user.username)):
@@ -396,11 +398,11 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
     fullTweet = tweet
     pinned = tweet.pinned
 
-  var retweet: string
+  var retweet: User
   var tweet = fullTweet
   if tweet.retweet.isSome:
     tweet = tweet.retweet.get
-    retweet = fullTweet.user.fullname
+    retweet = fullTweet.user
 
   buildHtml(tdiv(class=("timeline-item " & divClass), data-username=tweet.user.username)):
     if not mainTweet:
