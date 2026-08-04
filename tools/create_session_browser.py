@@ -23,6 +23,7 @@ Output:
 import asyncio
 import json
 import os
+import shutil
 import sys
 
 import nodriver as uc
@@ -32,61 +33,72 @@ import pyotp
 async def login_and_get_cookies(username, password, totp_seed=None, headless=False):
     """Authenticate with X.com and extract session cookies"""
     # Note: headless mode may increase detection risk from bot-detection systems
-    browser = await uc.start(headless=headless)
+    browser_executable_path = shutil.which("google-chrome") or shutil.which("chromium")
+    browser = await uc.start(
+        headless=headless,
+        browser_executable_path=browser_executable_path,
+    )
     tab = await browser.get("https://x.com/i/flow/login")
 
     try:
-        # Enter username
+        # X identifies this field by name; the autocomplete value now includes
+        # WebAuthn and no longer equals "username".
         print(f"[*] Entering username {username}...", file=sys.stderr)
-
-        retry = 0
-        while retry < 5:
-            username_input = await tab.find(
-                'input[autocomplete="username"]', timeout=10
+        try:
+            username_input = await tab.wait_for(
+                'input[name="username_or_email"]', timeout=30
             )
+        except asyncio.TimeoutError as error:
+            raise RuntimeError("X login form did not expose a username field") from error
+        await username_input.click()
+        await username_input.send_keys(username)
+        await asyncio.sleep(0.5)
+        submitted = await username_input.apply(
+            """(input) => {
+                const submit = input.closest("form")?.querySelector(
+                    'button[type="submit"]:not([disabled])'
+                );
+                if (!submit) return false;
+                submit.click();
+                return true;
+            }"""
+        )
+        if not submitted:
+            raise RuntimeError("X login form did not expose a Continue button")
 
-            pos = await username_input.get_position()
-            await tab.mouse_move(pos.x, pos.y, steps=50, flash=True)
-            await asyncio.sleep(0.1)
-
-            await username_input.click()
-            await asyncio.sleep(0.5)
-            await username_input.send_keys(username)
-            await asyncio.sleep(0.2)
-            await username_input.send_keys("\n")
-            await asyncio.sleep(2)
-
-            page_content = await tab.get_content()
-            if "Could not log you in" in page_content:
-                retry += 1
-                wait = retry * 10
-                print(f"Retrying in {wait} seconds...")
-                await asyncio.sleep(wait)
-            else:
-                break
-
-        # Enter password
+        # A hidden password field is present before X accepts the username.
+        # Wait for the interactive field from the next login step instead.
+        print("[*] Waiting for password field...", file=sys.stderr)
+        try:
+            password_input = await tab.wait_for(
+                'input[name="password"]:not([style*="pointer-events: none"])',
+                timeout=15,
+            )
+        except asyncio.TimeoutError as error:
+            raise RuntimeError(
+                "X did not show a password field after username submission"
+            ) from error
         print("[*] Entering password...", file=sys.stderr)
-        pretry = 0
-        while pretry < 5:
-            password_input = await tab.find(
-                'input[autocomplete="current-password"]', timeout=15
-            )
-            await password_input.click()
-            await asyncio.sleep(0.5)
-            await password_input.send_keys(password)
-            await asyncio.sleep(0.2)
-            await password_input.send_keys("\n")
-            await asyncio.sleep(2)
+        await password_input.click()
+        await password_input.send_keys(password)
+        await asyncio.sleep(0.5)
+        submitted = await password_input.apply(
+            """(input) => {
+                const submit = input.closest("form")?.querySelector(
+                    'button[type="submit"]:not([disabled])'
+                );
+                if (!submit) return false;
+                submit.click();
+                return true;
+            }"""
+        )
+        if not submitted:
+            raise RuntimeError("X login form did not expose a Continue button")
+        await asyncio.sleep(2)
 
-            page_content = await tab.get_content()
-            if "Could not log you in" in page_content:
-                pretry += 1
-                wait = pretry * 10
-                print(f"Retrying in {wait} seconds...")
-                await asyncio.sleep(wait)
-            else:
-                break
+        page_content = await tab.get_content()
+        if "Could not log you in" in page_content:
+            raise RuntimeError("X rejected the login attempt")
 
         # Handle 2FA if needed
         page_content = await tab.get_content()
