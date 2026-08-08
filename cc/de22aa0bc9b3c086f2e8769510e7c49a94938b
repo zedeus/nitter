@@ -1,0 +1,29 @@
+src/routes/embed.nim
+  s_7fa5284c3ebe24::t_e9c5ee907df13d 35,48
+  s_7fa5284c3ebe24::t_6bc108892dae9b 74
+src/api.nim
+  s_7fa5284c3ebe24::t_b277647e78679e 233-235,237,239
+  s_7fa5284c3ebe24::t_53b72dfdfe0656 236
+  s_7fa5284c3ebe24::t_7ef43e17b6e221 238
+src/parser.nim
+  s_7fa5284c3ebe24::t_94e7ab6a8c8370 754-757
+src/consts.nim
+  s_7fa5284c3ebe24::t_899f08c372d9a8 38
+  s_7fa5284c3ebe24::t_5d76e18cd7c1ef 169-176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "ccde22aa0bc9b3c086f2e8769510e7c49a94938b",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
