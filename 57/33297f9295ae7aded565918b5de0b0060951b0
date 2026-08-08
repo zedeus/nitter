@@ -1,0 +1,19 @@
+public/js/widgets.js
+  s_7fa5284c3ebe24::t_3bd800ed64affa 3-5,10-17,20-58,60-62,64-66,68-74,76-89,92-95,98-99,101-102,106,108-119,121-135,137-172,176,178,184-190,193,195
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "5733297f9295ae7aded565918b5de0b0060951b0",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
