@@ -101,6 +101,7 @@ class MediaTest(BaseTestCase):
     @parameterized.expand(gallery)
     def test_gallery(self, tweet, rows):
         self.open_nitter(tweet)
+        self.scroll_to(Media.container)
         self.assert_element_visible(Media.container)
         self.assert_element_visible(Media.row)
         self.assert_element_visible(Media.image)

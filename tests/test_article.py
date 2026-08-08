@@ -291,6 +291,8 @@ class ArticleQuotedCardTest(BaseTestCase):
 
     def test_quoted_card_has_cover_image(self):
         self.open_nitter(self.quoted_tweet)
+        # Scroll to element to trigger lazy loading
+        self.scroll_to('.quote .article-card .card-image img')
         self.assert_element_visible('.quote .article-card .card-image img')
         src = self.get_attribute('.quote .article-card .card-image img', 'src')
         self.assertIn('/pic/', src)
