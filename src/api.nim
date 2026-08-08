@@ -230,6 +230,13 @@ proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
     js = await fetch(url)
   result = parseGraphTweetResult(js)
 
+proc getTweetByRestId*(id: string): Future[Tweet] {.async.} =
+  if id.len == 0: return
+  let
+    url = apiReq(graphTweetResultByRestId, tweetByRestIdVars % id, articleFieldToggles)
+    js = await fetch(url)
+  result = parseTweetByRestId(js)
+
 proc getGraphTweet(id: string; after=""; mode = Relevance): Future[Conversation] {.async.} =
   if id.len == 0: return
   let

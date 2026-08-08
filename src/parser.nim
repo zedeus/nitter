@@ -751,6 +751,10 @@ proc parseGraphTweetResult*(js: JsonNode): Tweet =
   with tweet, js{"data", "tweet_result", "result"}:
     result = parseGraphTweet(tweet)
 
+proc parseTweetByRestId*(js: JsonNode): Tweet =
+  with tweet, js{"data", "tweetResult", "result"}:
+    result = parseGraphTweet(tweet)
+
 proc parseGraphTweetResults*(js: JsonNode): seq[Tweet] =
   let results = js{"data", "tweetResult"}
   if results.kind != JArray: return

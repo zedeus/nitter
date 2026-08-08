@@ -32,7 +32,7 @@ proc createEmbedRouter*(cfg: Config) =
   router embed:
     get "/i/videos/tweet/@id":
       let
-        tweet = await getGraphTweetResult(@"id")
+        tweet = await getTweetByRestId(@"id")
         prefs = requestPrefs()
 
       if tweet == nil:
@@ -45,7 +45,7 @@ proc createEmbedRouter*(cfg: Config) =
 
     get "/@user/status/@id/embed":
       let
-        tweet = await getGraphTweetResult(@"id")
+        tweet = await getTweetByRestId(@"id")
         prefs = requestPrefs()
         path = getPath()
 
@@ -71,7 +71,7 @@ proc createEmbedRouter*(cfg: Config) =
       if username.len == 0 or tweetId.len == 0:
         resp Http400, "Invalid tweet URL"
 
-      let tweet = await getGraphTweetResult(tweetId)
+      let tweet = await getTweetByRestId(tweetId)
       if tweet == nil:
         resp Http404
 
