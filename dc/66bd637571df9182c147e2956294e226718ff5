@@ -1,0 +1,26 @@
+src/views/general.nim
+  s_7fa5284c3ebe24::t_a8a6f81df4d457 53
+src/sass/tweet/_base.scss
+  s_7fa5284c3ebe24::t_96fbcb331a0362 157-158
+  s_7fa5284c3ebe24::t_854f94a8df086b 150
+  s_7fa5284c3ebe24::t_3fe815df2d87a9 153-154
+  s_7fa5284c3ebe24::t_3295000abeb1cf 148
+  s_7fa5284c3ebe24::t_0cf44c3ae1ee09 202
+  s_7fa5284c3ebe24::t_6198aab4d6b028 143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "dc66bd637571df9182c147e2956294e226718ff5",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
