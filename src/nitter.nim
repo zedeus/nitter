@@ -81,8 +81,8 @@ routes:
     if request.path.len == 0 or request.path[0] != '/':
       halt Http400
 
-    # skip all file URLs
-    cond "." notin request.path
+    # skip all file URLs (except Twitter widget compatibility)
+    cond "." notin request.path or request.path == "/embed/Tweet.html"
     applyUrlPrefs()
 
   get "/":

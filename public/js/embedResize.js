@@ -24,4 +24,4 @@
 
   // Expose for embedTweet.js
   window._nitterSendHeight = sendHeight;
-})()
+})();

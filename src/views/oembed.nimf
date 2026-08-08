@@ -3,4 +3,5 @@
 #proc renderOembedIframe*(embedUrl: string): string =
 #  result = ""
 <iframe src="$embedUrl" style="width:100%;max-width:550px;height:250px;border:none" scrolling="no" loading="lazy" onload="let c=new MessageChannel;c.port1.onmessage=e=>this.style.height=e.data+'px';this.contentWindow.postMessage('','*',[c.port2])"></iframe>
+#  result = result.strip()
 #end proc
