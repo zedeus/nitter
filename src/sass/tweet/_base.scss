@@ -117,6 +117,7 @@
   }
 }
 
+body:has(> .embed-wrapper),
 body:has(> .tweet-embed) {
   margin: 0;
   padding: 0;
@@ -125,9 +126,35 @@ body:has(> .tweet-embed) {
   overflow: hidden;
 }
 
+html:has(body > .embed-wrapper),
 html:has(body > .tweet-embed) {
   background: transparent;
   overflow: hidden;
+}
+
+.embed-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border_grey);
+  border-radius: 12px;
+  overflow: hidden;
+
+  .embed-footer {
+    display: block;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border_grey);
+    background: var(--bg_panel);
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.15s;
+
+    &:hover {
+      background: var(--bg_hover);
+    }
+  }
 }
 
 .tweet-embed {
@@ -135,12 +162,9 @@ html:has(body > .tweet-embed) {
   width: 100%;
   box-sizing: border-box;
   background-color: var(--bg_panel);
-  border: 1px solid var(--border_grey);
-  border-radius: 12px;
-  overflow: hidden;
   transition: background-color 0.15s ease;
 
-  &:hover:not(:has(.embed-footer:hover)) {
+  &:hover {
     background-color: var(--bg_hover);
   }
 
@@ -180,8 +204,10 @@ html:has(body > .tweet-embed) {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 80px;
+    min-height: 160px;
     padding: 20px;
+    border: 1px solid var(--border_grey);
+    border-radius: 12px;
     cursor: default;
 
     &:hover {
@@ -190,26 +216,6 @@ html:has(body > .tweet-embed) {
 
     .error-panel {
       margin: 0;
-    }
-  }
-
-  .embed-footer {
-    position: relative;
-    z-index: 2;
-    display: block;
-    padding: 12px 16px;
-    border-top: 1px solid var(--border_grey);
-    background: var(--bg_panel);
-    color: var(--accent);
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    text-decoration: none;
-    pointer-events: all;
-    transition: background-color 0.15s;
-
-    &:hover {
-      background: var(--bg_hover);
     }
   }
 }

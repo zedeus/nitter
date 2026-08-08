@@ -35,9 +35,10 @@ proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; re
     renderHead(prefs, cfg, req)
 
     body:
-      tdiv(class="tweet-embed"):
-        a(class="tweet-link", href=getLink(tweet), target="_blank")
-        renderTweet(tweet, prefs, path, mainTweet=true)
+      tdiv(class="embed-wrapper"):
+        tdiv(class="tweet-embed"):
+          a(class="tweet-link", href=getLink(tweet), target="_blank")
+          renderTweet(tweet, prefs, path, mainTweet=true)
         a(class="embed-footer", href=getLink(tweet), target="_blank"):
           text "Read more on " & cfg.hostname
 

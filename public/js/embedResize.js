@@ -1,5 +1,5 @@
 (function() {
-  var embedElement = document.querySelector('.tweet-embed, .embed-video');
+  var embedElement = document.querySelector('.embed-wrapper, .tweet-embed, .embed-video');
   if (!embedElement) return;
 
   var lastHeight = 0;
