@@ -1,0 +1,24 @@
+tests/test_embed.py
+  s_7fa5284c3ebe24::t_ed156e78e2ff41 155-186
+  s_7fa5284c3ebe24::t_580934874085a9 189-190,195,197,201-204
+  s_7fa5284c3ebe24::t_5fb2f80c73e3fb 102-110
+  s_7fa5284c3ebe24::t_ac3b506e74a892 1,4-14,17-51,94-101,111-154,187-188,191,193
+  s_7fa5284c3ebe24::t_9ac582e236af59 192,194,196,198-200
+  s_7fa5284c3ebe24::t_e24b759d9e08c9 2-3,15-16,52-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "a39e17abbebf515f7dabde6c9fa13ea485310798",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
