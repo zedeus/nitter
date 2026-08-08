@@ -1,0 +1,24 @@
+src/views/embed.nim
+  s_7fa5284c3ebe24::t_ed29a6f28d9ed1 38-41
+public/js/embedResize.js
+  s_7fa5284c3ebe24::t_d61d9df11ac7a6 2
+src/sass/tweet/_base.scss
+  s_7fa5284c3ebe24::t_950984a2c861c9 207
+  s_7fa5284c3ebe24::t_b5d3104e0e2b38 120,129,135,141-164,167,209-210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "a00c6cc11d9c224684154129ad115df9f9ea7541",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
