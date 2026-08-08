@@ -1,0 +1,21 @@
+tests/test_article.py
+  s_7fa5284c3ebe24::t_e140cced895df7 294-295
+tests/test_tweet_media.py
+  s_7fa5284c3ebe24::t_e140cced895df7 104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "530437167edd3c04dd545b2becc99bbe7e376bbb",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
