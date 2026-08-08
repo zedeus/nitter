@@ -1,0 +1,26 @@
+src/views/oembed.nimf
+  s_7fa5284c3ebe24::t_a8e98c407e940f 6
+public/js/embedTweet.js
+  s_7fa5284c3ebe24::t_a4dac024229db6 11-18
+  s_7fa5284c3ebe24::t_3e0a9e54862f2b 27
+src/nitter.nim
+  s_7fa5284c3ebe24::t_5aed6c0c203359 84-85
+public/js/embedResize.js
+  s_7fa5284c3ebe24::t_8a97a9f5b11f75 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "3bfbb7b3fd6e9e958941142058210be26633a4e9",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
