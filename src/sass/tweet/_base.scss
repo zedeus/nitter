@@ -87,7 +87,6 @@
   margin-top: 6px;
   margin-bottom: 0px;
   color: var(--grey);
-  pointer-events: all;
 }
 
 .tweet-avatar {
@@ -122,7 +121,6 @@ body:has(> .tweet-embed) {
   margin: 0;
   padding: 0;
   width: 100%;
-  min-height: 100%;
   background: transparent;
   overflow: hidden;
 }
@@ -142,34 +140,22 @@ html:has(body > .tweet-embed) {
   overflow: hidden;
   transition: background-color 0.15s ease;
 
-  &:hover {
+  &:hover:not(:has(.embed-footer:hover)) {
     background-color: var(--bg_hover);
   }
 
   .timeline-item {
+    display: block;
     pointer-events: none;
+    background-color: transparent;
+  }
+
+  .tweet-link:hover {
+    background-color: transparent;
   }
 
   .tweet-content {
     font-size: 18px;
-    pointer-events: none;
-
-    a {
-      pointer-events: all;
-    }
-  }
-
-  .attachments {
-    pointer-events: none;
-
-    a, video, .video-overlay {
-      pointer-events: all;
-    }
-  }
-
-  .tweet-body {
-    display: flex;
-    flex-direction: column;
   }
 
   .avatar:not(.mini) {
@@ -213,7 +199,7 @@ html:has(body > .tweet-embed) {
     display: block;
     padding: 12px 16px;
     border-top: 1px solid var(--border_grey);
-    background: var(--bg_elements);
+    background: var(--bg_panel);
     color: var(--accent);
     font-size: 14px;
     font-weight: 500;
