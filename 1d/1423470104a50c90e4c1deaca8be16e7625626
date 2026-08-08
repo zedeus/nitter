@@ -1,0 +1,34 @@
+tests/run_matrix.sh
+  s_d8f206526ef67e::t_9d6ebf5e4bc647 1-2,4-37,39-55,57-65,67-196,201-207,210,212-239,241-262
+  s_d8f206526ef67e::t_49a468c8b32ccd 56,66
+  s_d8f206526ef67e::t_7d5d2e00c42c28 197-200
+  s_7fa5284c3ebe24::t_bc0dc1ce2a002f 209,211
+  s_7fa5284c3ebe24::t_ab2eba3b509723 240
+  s_d8f206526ef67e::t_70dbcd0ae3c363 208
+  s_d8f206526ef67e::t_e11f0ae367bee6 3
+  s_d8f206526ef67e::t_ccc370d7bc257f 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "1d1423470104a50c90e4c1deaca8be16e7625626",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    },
+    "s_d8f206526ef67e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c1a370e6-1a9b-4d74-bd17-656a7488b6ef",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
