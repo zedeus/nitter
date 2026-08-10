@@ -8,8 +8,6 @@ import general, tweet
 const
   doctype = "<!DOCTYPE html>\n"
   embedResizeJs = staticRead("../../public/js/embedResize.js")
-  embedTweetJs = embedResizeJs & ";" & staticRead("../../public/js/embedTweet.js")
-  embedErrorJs = embedResizeJs & ";if(window._nitterSendHeight)requestAnimationFrame(window._nitterSendHeight);"
 
 proc renderVideoEmbed*(tweet: Tweet; cfg: Config; req: Request): string =
   let
@@ -33,17 +31,18 @@ proc renderVideoEmbed*(tweet: Tweet; cfg: Config; req: Request): string =
 proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): string =
   let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req)
+    base(target="_blank")
 
     body:
       tdiv(class="embed-wrapper"):
         tdiv(class="tweet-embed"):
-          a(class="tweet-link", href=getLink(tweet), target="_blank")
+          a(class="tweet-link", href=getLink(tweet))
           renderTweet(tweet, prefs, path, mainTweet=true)
-        a(class="embed-footer", href=getLink(tweet), target="_blank"):
+        a(class="embed-footer", href=getLink(tweet)):
           text "Read more on " & cfg.hostname
 
       script:
-        verbatim embedTweetJs
+        verbatim embedResizeJs
 
   result = doctype & $node
 
@@ -57,6 +56,6 @@ proc renderErrorEmbed*(error: string; prefs: Prefs; cfg: Config; req: Request): 
           span: text error
 
       script:
-        verbatim embedErrorJs
+        verbatim embedResizeJs
 
   result = doctype & $node
