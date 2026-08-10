@@ -105,7 +105,7 @@
   function handleResize(e) {
     if (!Array.isArray(e.data) || e.data[0] !== "resizeIframe") return;
     var h = e.data[1] && e.data[1].h;
-    if (!h || h <= 0) return;
+    if (!h || h <= 0 || h > 10000) return; // Cap at 10000px for sanity
 
     var frames = document.querySelectorAll("iframe.nitter-embed-frame");
     for (var i = 0; i < frames.length; i++) {
