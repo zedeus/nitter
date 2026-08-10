@@ -1,0 +1,20 @@
+src/views/embed.nim
+  s_7fa5284c3ebe24::t_c9ba39169ac86b 59
+  s_7fa5284c3ebe24::t_7e0bbd21b1ad6c 34,39,41,45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "ca19250a62a2cabb4c6700da18b5164e6ef2fd3f",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
