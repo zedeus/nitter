@@ -1,0 +1,44 @@
+src/routes/embed.nim
+  s_7fa5284c3ebe24::t_e440fddde27161 35-36,40,43-44,50-52,57-58
+src/sass/tweet/embed.scss
+  s_7fa5284c3ebe24::t_76c29c2142bcb1 132
+  s_7fa5284c3ebe24::t_7a0207c31b8002 45
+  s_7fa5284c3ebe24::t_a5a3a9bf3589c3 97
+  s_7fa5284c3ebe24::t_9cae37c611bb31 92
+  s_7fa5284c3ebe24::t_4f0879f4f1979e 98
+  s_7fa5284c3ebe24::t_a4160959128546 130,142
+  s_7fa5284c3ebe24::t_c16f6c8e91ec75 131,137
+  s_7fa5284c3ebe24::t_00d76d0198a4df 145-148
+  s_7fa5284c3ebe24::t_b921a3d3615ad8 79
+  s_7fa5284c3ebe24::t_d7501116914a2c 94-96,99-102
+  s_7fa5284c3ebe24::t_14a4221e14d013 117-118
+  s_7fa5284c3ebe24::t_0989b1606009b8 134
+  s_7fa5284c3ebe24::t_8f36e41235bd2b 90,103,119-129,133,135-136,139-141,143-144
+  s_7fa5284c3ebe24::t_2629130ff2e9ac 5,7-8,14-15,17-44,46-67,72-78,80-88
+  s_7fa5284c3ebe24::t_415e7acc95a1b7 138
+  s_7fa5284c3ebe24::t_51194b12b70a91 4,9-13,16,68-71
+  s_7fa5284c3ebe24::t_e9b2613bc572d8 6
+  s_7fa5284c3ebe24::t_33f2dfefb969e3 110
+  s_7fa5284c3ebe24::t_7614a89e5bfb19 93
+src/views/general.nim
+  s_7fa5284c3ebe24::t_beda242ba6cdc6 53
+src/views/embed.nim
+  s_7fa5284c3ebe24::t_73ef8e352cb770 18,22,27-28
+  s_7fa5284c3ebe24::t_e10ab939e59806 53-59,62,65-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "38fd3b57decd68bddc30cda47bb63c8ce303fefe",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
