@@ -15,13 +15,17 @@ proc renderVideoEmbed*(tweet: Tweet; cfg: Config; req: Request): string =
     thumb = video.thumb
     vidUrl = getVideoEmbed(cfg, tweet.id)
     prefs = Prefs(hlsPlayback: true, mp4Playback: true)
+    tweetUrl = getLink(tweet)
 
   let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req, video=vidUrl, images=(@[thumb]))
+    base(target="_blank")
 
     body:
       tdiv(class="embed-video"):
         renderVideo(video, prefs, "")
+        a(class="video-overlay-link", href=tweetUrl):
+          text "Watch on " & cfg.hostname
 
       script:
         verbatim embedResizeJs
@@ -46,14 +50,25 @@ proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; re
 
   result = doctype & $node
 
-proc renderErrorEmbed*(error: string; prefs: Prefs; cfg: Config; req: Request): string =
+proc renderErrorEmbed*(error: string; prefs: Prefs; cfg: Config; req: Request;
+                       tweetId = ""; username = ""): string =
+  let link = if tweetId.len > 0:
+               if username.len > 0: "/" & username & "/status/" & tweetId
+               else: "/i/status/" & tweetId
+             else: "/"
+
   let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req)
+    base(target="_blank")
 
     body:
-      tdiv(class="tweet-embed error-embed"):
-        tdiv(class="error-panel"):
-          span: text error
+      tdiv(class="embed-wrapper"):
+        tdiv(class="tweet-embed error-embed"):
+          a(class="tweet-link", href=link)
+          tdiv(class="error-panel"):
+            span: text error
+        a(class="embed-footer", href=link):
+          text "Read more on " & cfg.hostname
 
       script:
         verbatim embedResizeJs

@@ -1,21 +1,150 @@
 @import "_variables";
 @import "_mixins";
 
+// Embed page: transparent background, no scrollbars
+html:has(body > .embed-wrapper),
+html:has(body > .embed-video) {
+  background: transparent;
+  overflow: hidden;
+
+  body {
+    background: transparent;
+    overflow: hidden;
+  }
+}
+
+// Tweet embed wrapper
+.embed-wrapper {
+  box-sizing: border-box;
+  border: 1px solid var(--border_grey);
+  border-radius: 12px;
+  overflow: hidden;
+
+  .embed-footer {
+    display: block;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border_grey);
+    background: var(--bg_panel);
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.15s;
+
+    &:hover {
+      background: var(--bg_hover);
+    }
+  }
+}
+
+// Tweet embed content
+.tweet-embed {
+  position: relative;
+  background-color: var(--bg_panel);
+  transition: background-color 0.15s;
+
+  &:hover {
+    background-color: var(--bg_hover);
+  }
+
+  .timeline-item {
+    pointer-events: none;
+    background-color: transparent;
+  }
+
+  .tweet-link:hover {
+    background-color: transparent;
+  }
+
+  .tweet-content {
+    font-size: 18px;
+  }
+
+  .avatar:not(.mini) {
+    position: absolute;
+  }
+
+  // Cap media height in embeds
+  .still-image img,
+  .quote-media-container img,
+  .quote-media-container video {
+    max-height: 600px;
+  }
+
+  &.error-embed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    padding: 20px;
+
+    .error-panel {
+      margin: 0;
+    }
+  }
+}
+
+// Video-only embed
 .embed-video {
-  width: 100%;
+  position: relative;
   background-color: black;
+  border: 1px solid var(--border_grey);
+
+  .attachments {
+    margin: 0;
+    border-radius: 0;
+    max-height: 560px;
+    background-color: unset;
+  }
+
+  .card {
+    margin: 0;
+  }
 
   .gallery-video {
     width: 100%;
   }
 
   .gallery-video > .attachment {
-    max-height: unset;
+    max-height: 560px;
     width: 100%;
   }
 
   video {
     width: 100%;
     height: auto;
+    max-height: 560px;
+    object-fit: contain;
+  }
+
+  .video-download {
+    display: none;
+  }
+
+  .video-overlay-link {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    background: rgba(30, 30, 30, 0.75);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    transition: background 0.15s, opacity 0.15s;
+    z-index: 10;
+
+    &:hover {
+      background: rgba(60, 60, 60, 0.9);
+    }
+  }
+
+  &:has(video:playing) .video-overlay-link {
+    opacity: 0;
+    pointer-events: none;
   }
 }

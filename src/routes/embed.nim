@@ -32,25 +32,30 @@ proc createEmbedRouter*(cfg: Config) =
   router embed:
     get "/i/videos/tweet/@id":
       let
-        tweet = await getTweetByRestId(@"id")
+        id = @"id"
+        tweet = await getTweetByRestId(id)
         prefs = requestPrefs()
 
       if tweet == nil:
-        resp renderErrorEmbed("Tweet not found", prefs, cfg, request)
+        resp renderErrorEmbed("Tweet not found", prefs, cfg, request, tweetId=id)
 
       if not tweet.hasVideos:
-        resp renderErrorEmbed("No video in tweet", prefs, cfg, request)
+        resp renderErrorEmbed("No video in tweet", prefs, cfg, request,
+                              tweetId=id, username=tweet.user.username)
 
       resp renderVideoEmbed(tweet, cfg, request)
 
     get "/@user/status/@id/embed":
       let
-        tweet = await getTweetByRestId(@"id")
+        id = @"id"
+        user = @"user"
+        tweet = await getTweetByRestId(id)
         prefs = requestPrefs()
         path = getPath()
 
       if tweet == nil:
-        resp renderErrorEmbed("Tweet not found", prefs, cfg, request)
+        resp renderErrorEmbed("Tweet not found", prefs, cfg, request,
+                              tweetId=id, username=user)
 
       resp renderTweetEmbed(tweet, path, prefs, cfg, request)
 
