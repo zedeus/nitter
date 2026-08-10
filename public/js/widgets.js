@@ -1,58 +1,74 @@
 /**
  * Drop-in replacement for Twitter's widgets.js
- * Converts twitter-tweet/twitter-video blockquotes to Nitter embeds
- *
- * Usage: LibRedirect can redirect platform.twitter.com/widgets.js to nitter.net/widgets.js
+ * Redirects twitter-tweet blockquotes to Nitter embeds
  */
 (function () {
   "use strict";
 
-  // Idempotent - only run once
   if (window.__nitterWidgets) return;
   window.__nitterWidgets = true;
 
-  // Determine Nitter instance URL from script src, or fall back to current origin
   var scripts = document.querySelectorAll('script[src*="widgets.js"]');
   var NITTER = scripts.length
     ? new URL(scripts[scripts.length - 1].src).origin
     : location.origin;
 
-  var TWEET_PATTERN = /(?:twitter\.com|x\.com)\/([^\/]+)\/status\/(\d+)/i;
+  var TWEET_RE = /(?:twitter\.com|x\.com)\/([^\/]+)\/status\/(\d+)/i;
   var SELECTOR = "blockquote.twitter-tweet, blockquote.twitter-video";
 
-  // Ready callback queue
   var readyCallbacks = [];
+  var eventCallbacks = {};
   var isReady = false;
+
+  function safeCall(fn, arg) {
+    try { fn(arg); } catch (e) {}
+  }
+
+  function fireEvent(name, data) {
+    (eventCallbacks[name] || []).forEach(function (cb) { safeCall(cb, data); });
+  }
 
   function parseTweetUrl(url) {
     if (!url) return null;
-    var match = TWEET_PATTERN.exec(url);
-    if (match) return { username: match[1], id: match[2] };
-    // Fallback: extract any large number (tweet ID)
-    var idMatch = url.match(/(\d{15,})/);
-    return idMatch ? { username: null, id: idMatch[1] } : null;
+    var m = TWEET_RE.exec(url);
+    if (m) return { user: m[1], id: m[2] };
+    m = url.match(/(\d{15,})/);
+    return m ? { user: null, id: m[1] } : null;
   }
 
-  function createIframe(tweet, options) {
-    var embedUrl = tweet.username
-      ? NITTER + "/" + tweet.username + "/status/" + tweet.id + "/embed"
-      : NITTER + "/i/status/" + tweet.id + "/embed";
+  function createIframe(tweet, opts) {
+    var url;
+    if (opts.videoOnly) {
+      url = NITTER + "/i/videos/tweet/" + tweet.id;
+    } else {
+      var path = tweet.user ? "/" + tweet.user : "/i";
+      url = NITTER + path + "/status/" + tweet.id + "/embed";
+      if (opts.theme) {
+        var theme = opts.theme === "dark" ? "nitter" :
+                    opts.theme === "light" ? "twitter" : opts.theme;
+        url += "?theme=" + encodeURIComponent(theme);
+      }
+    }
 
     var iframe = document.createElement("iframe");
-    iframe.src = embedUrl;
+    iframe.src = url;
     iframe.className = "nitter-embed-frame";
+    iframe.loading = "lazy";
     iframe.setAttribute("allowtransparency", "true");
     iframe.setAttribute("frameborder", "0");
     iframe.setAttribute("scrolling", "no");
-    iframe.loading = "lazy";
+    if (opts.videoOnly) iframe.setAttribute("allowfullscreen", "true");
 
-    // Styling with data attribute support
-    var width = options.width || "550";
-    var align = options.align || "center";
-    var margin = align === "center" ? "10px auto" :
-                 align === "right" ? "10px 0 10px auto" : "10px auto 10px 0";
+    var width = opts.width || 550;
+    var margin = opts.align === "center" ? "10px auto" :
+                 opts.align === "right" ? "10px 0 10px auto" : "10px 0";
+    iframe.style.cssText =
+      "width:100%;max-width:" + width + "px;height:250px;" +
+      "border:none;display:block;margin:" + margin;
 
-    iframe.style.cssText = "width:100%;max-width:" + width + "px;height:250px;border:none;display:block;margin:" + margin;
+    iframe.addEventListener("load", function () {
+      fireEvent("rendered", { target: iframe });
+    });
 
     return iframe;
   }
@@ -61,59 +77,41 @@
     if (bq.dataset.nitterProcessed) return false;
     bq.dataset.nitterProcessed = "true";
 
-    // Find tweet URL in links
     var tweet = null;
     var links = bq.querySelectorAll("a[href]");
-    for (var i = 0; i < links.length; i++) {
+    for (var i = 0; i < links.length && !tweet; i++) {
       tweet = parseTweetUrl(links[i].href);
-      if (tweet) break;
     }
+    if (!tweet) return false;
 
-    if (!tweet) {
-      console.warn("[Nitter widgets.js] No tweet URL found in blockquote");
-      return false;
-    }
+    var d = bq.dataset;
+    var iframe = createIframe(tweet, {
+      width: d.mediaMaxWidth || d.width,
+      align: d.align,
+      theme: d.theme,
+      videoOnly: d.mediaMaxWidth !== undefined
+    });
 
-    // Read Twitter's data attributes
-    var options = {
-      width: bq.dataset.width,
-      align: bq.dataset.align,
-      theme: bq.dataset.theme
-    };
-
-    var iframe = createIframe(tweet, options);
-
-    // Hide original (keep as fallback), insert iframe after
     bq.style.display = "none";
     bq.parentNode.insertBefore(iframe, bq.nextSibling);
     return true;
   }
 
-  function processEmbeds(container) {
-    var root = container || document;
-    var blockquotes = root.querySelectorAll(SELECTOR + ":not([data-nitter-processed])");
-    var count = 0;
-
-    for (var i = 0; i < blockquotes.length; i++) {
-      if (processBlockquote(blockquotes[i])) count++;
-    }
-
-    if (count > 0) {
-      console.log("[Nitter widgets.js] Processed " + count + " embed(s)");
-    }
+  function processEmbeds(root) {
+    var bqs = (root || document).querySelectorAll(SELECTOR + ":not([data-nitter-processed])");
+    for (var i = 0; i < bqs.length; i++) processBlockquote(bqs[i]);
   }
 
-  function handleResize(event) {
-    if (!Array.isArray(event.data) || event.data[0] !== "resizeIframe") return;
-    var h = event.data[1] && event.data[1].h;
+  function handleResize(e) {
+    if (!Array.isArray(e.data) || e.data[0] !== "resizeIframe") return;
+    var h = e.data[1] && e.data[1].h;
     if (!h || h <= 0) return;
 
-    // Find iframe by matching contentWindow
-    var iframes = document.querySelectorAll("iframe.nitter-embed-frame");
-    for (var i = 0; i < iframes.length; i++) {
-      if (iframes[i].contentWindow === event.source) {
-        iframes[i].style.height = h + "px";
-        break;
+    var frames = document.querySelectorAll("iframe.nitter-embed-frame");
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = h + "px";
+        return;
       }
     }
   }
@@ -121,42 +119,48 @@
   function observeDOM() {
     if (!window.MutationObserver || !document.body) return;
 
-    new MutationObserver(function (mutations) {
-      for (var i = 0; i < mutations.length; i++) {
-        var nodes = mutations[i].addedNodes;
-        for (var j = 0; j < nodes.length; j++) {
-          var node = nodes[j];
-          if (node.nodeType !== 1) continue;
-          if ((node.matches && node.matches(SELECTOR)) ||
-              (node.querySelector && node.querySelector(SELECTOR))) {
-            processEmbeds();
-            return;
-          }
-        }
-      }
+    function matches(el) {
+      return el.matches(SELECTOR) || el.querySelector(SELECTOR);
+    }
+
+    new MutationObserver(function (muts) {
+      var found = muts.some(function (mut) {
+        return Array.prototype.some.call(mut.addedNodes, function (n) {
+          return n.nodeType === 1 && matches(n);
+        });
+      });
+      if (found) processEmbeds();
     }).observe(document.body, { childList: true, subtree: true });
   }
 
-  function fireReady() {
-    isReady = true;
-    for (var i = 0; i < readyCallbacks.length; i++) {
-      try { readyCallbacks[i](window.twttr); } catch (e) {}
-    }
-    readyCallbacks = [];
+  function embedTweet(id, container, opts) {
+    if (!container) return Promise.reject("No container");
+    var iframe = createIframe({ id: id, user: null }, opts || {});
+    container.appendChild(iframe);
+    return Promise.resolve(iframe);
   }
 
-  // Expose twttr API for compatibility
   var prevTwttr = window.twttr;
   window.twttr = {
     widgets: {
-      load: function (el) { processEmbeds(el); },
-      createTweet: function (id, container, opts) {
-        if (!container) return Promise.reject("No container");
-        var iframe = createIframe({ id: id, username: null }, opts || {});
-        container.appendChild(iframe);
-        return Promise.resolve(iframe);
-      },
+      load: processEmbeds,
+      createTweet: embedTweet,
+      createTweetEmbed: embedTweet,
+      createVideo: embedTweet,
       loaded: true
+    },
+    events: {
+      bind: function (name, cb) {
+        if (typeof cb !== "function") return;
+        if (!eventCallbacks[name]) eventCallbacks[name] = [];
+        eventCallbacks[name].push(cb);
+      },
+      unbind: function (name, cb) {
+        if (!eventCallbacks[name]) return;
+        eventCallbacks[name] = cb
+          ? eventCallbacks[name].filter(function (f) { return f !== cb; })
+          : [];
+      }
     },
     ready: function (cb) {
       if (typeof cb !== "function") return;
@@ -166,27 +170,22 @@
     _e: []
   };
 
-  // Process any callbacks queued before we loaded (twttr._e pattern)
+  // Process callbacks queued before load (twttr._e pattern)
   if (prevTwttr && prevTwttr._e) {
-    for (var i = 0; i < prevTwttr._e.length; i++) {
-      try { prevTwttr._e[i](); } catch (e) {}
-    }
+    prevTwttr._e.forEach(function (cb) { safeCall(cb); });
   }
 
-  // Remove Twitter scripts that might have snuck in
-  var twitterScripts = document.querySelectorAll(
-    'script[src*="platform.twitter.com"], script[src*="platform.x.com"]'
-  );
-  for (var i = 0; i < twitterScripts.length; i++) {
-    twitterScripts[i].remove();
-  }
+  // Remove any Twitter scripts that snuck through
+  document.querySelectorAll('script[src*="platform.twitter.com"], script[src*="platform.x.com"]')
+    .forEach(function (s) { s.remove(); });
 
-  // Initialize
   function init() {
     window.addEventListener("message", handleResize);
     processEmbeds();
     observeDOM();
-    fireReady();
+    isReady = true;
+    readyCallbacks.forEach(function (cb) { safeCall(cb, window.twttr); });
+    readyCallbacks = [];
   }
 
   if (document.readyState === "loading") {

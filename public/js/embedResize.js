@@ -6,7 +6,7 @@
 
   function sendHeight() {
     var currentHeight = embedElement.offsetHeight;
-    if (currentHeight !== lastHeight) {
+    if (currentHeight !== lastHeight && currentHeight > 0) {
       lastHeight = currentHeight;
       window.parent.postMessage(['resizeIframe', { h: currentHeight, url: location.href }], '*');
     }
