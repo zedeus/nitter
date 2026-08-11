@@ -88,6 +88,7 @@ html:has(body > .embed-video) {
 // Video-only embed
 .embed-video {
   position: relative;
+  min-height: 300px;
   background-color: black;
   border: 1px solid var(--border_grey);
 
@@ -106,7 +107,7 @@ html:has(body > .embed-video) {
     width: 100%;
   }
 
-  .gallery-video > .attachment {
+  .gallery-video>.attachment {
     max-height: 560px;
     width: 100%;
   }
@@ -135,7 +136,9 @@ html:has(body > .embed-video) {
     text-decoration: none;
     border-radius: 9999px;
     border: 1px solid transparent;
-    transition: background 0.15s, opacity 0.15s;
+    transition:
+      background 0.15s,
+      opacity 0.15s;
     z-index: 10;
 
     &:hover {
@@ -143,8 +146,14 @@ html:has(body > .embed-video) {
     }
   }
 
-  &:has(video:playing) .video-overlay-link {
+  // Hide button while playing, show on hover or when paused
+  &.video-playing .video-overlay-link {
     opacity: 0;
     pointer-events: none;
+  }
+
+  &.video-playing:hover .video-overlay-link {
+    opacity: 1;
+    pointer-events: auto;
   }
 }

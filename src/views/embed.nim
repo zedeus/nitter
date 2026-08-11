@@ -14,7 +14,7 @@ proc renderVideoEmbed*(tweet: Tweet; cfg: Config; req: Request): string =
     video = tweet.getVideos()[0]
     thumb = video.thumb
     vidUrl = getVideoEmbed(cfg, tweet.id)
-    prefs = Prefs(hlsPlayback: true, mp4Playback: true)
+    prefs = Prefs(hlsPlayback: true, mp4Playback: true, proxyVideos: true)
     tweetUrl = getLink(tweet)
 
   let node = buildHtml(html(lang="en")):
