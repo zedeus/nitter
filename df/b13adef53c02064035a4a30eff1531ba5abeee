@@ -1,0 +1,47 @@
+src/sass/tweet/embed.scss
+  s_7fa5284c3ebe24::t_c84f69742f398a 147
+  s_7fa5284c3ebe24::t_dd8c71002a8777 91
+  s_7fa5284c3ebe24::t_932ce2f8c6f00b 148
+public/js/widgets.js
+  s_7fa5284c3ebe24::t_224dce39732e65 11
+  s_7fa5284c3ebe24::t_511e45095bef1e 60,64
+public/js/embedResize.js
+  s_7fa5284c3ebe24::t_ec3f151b5131fc 8,10,13-18,20
+  s_7fa5284c3ebe24::t_76243112308781 12,19,21
+  s_7fa5284c3ebe24::t_51095823533ab6 5-7,23-24
+  s_7fa5284c3ebe24::t_bf44783d3ce8b7 9
+  s_7fa5284c3ebe24::t_b4459060eb13ba 11,22
+src/views/general.nim
+  s_7fa5284c3ebe24::t_6f6bb278fbf6dc 53
+src/views/embed.nim
+  s_7fa5284c3ebe24::t_40070209c1c075 46
+  s_7fa5284c3ebe24::t_14d41a1ffa2205 47,73
+  s_7fa5284c3ebe24::t_d670c255489a92 17
+  s_7fa5284c3ebe24::t_3e4dea45f6e97c 72
+public/js/nitter-widgets.user.js
+  s_7fa5284c3ebe24::t_8c56aa9e9ba5dd 7
+  s_7fa5284c3ebe24::t_86f9f9c634cbe8 43,49
+  s_7fa5284c3ebe24::t_6ac9dccc8cad35 84,102-103,110-113,117-118,133
+  s_7fa5284c3ebe24::t_8c564a92afd333 11-16,116,123-127,129-132,135
+  s_7fa5284c3ebe24::t_e26b41f5550821 4,18-28,30-37,39-41,50,57,62,64-66,69-74,114-115
+  s_7fa5284c3ebe24::t_b07e837635da91 58-61,63,67-68,75-78,104-109,119-122,128
+  s_7fa5284c3ebe24::t_a88eadcbc209a1 79-83,85-101,134
+  s_7fa5284c3ebe24::t_a94f399ec576ad 17,29,38,42,44-48,51-56
+  s_7fa5284c3ebe24::t_15dccb5cf56e00 1-3,5-6,8-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "dfb13adef53c02064035a4a30eff1531ba5abeee",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
