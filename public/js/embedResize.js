@@ -1,43 +1,34 @@
 (function () {
-  var embedElement = document.querySelector(
-    ".embed-wrapper, .tweet-embed, .embed-video",
-  );
-  if (!embedElement) return;
+  var embed = document.querySelector(".embed-wrapper, .embed-video");
+  if (!embed) return;
 
-  // Video play state for overlay (hidden while playing, visible on hover/pause)
-  var video = embedElement.querySelector("video");
+  var video = embed.querySelector("video");
   if (video) {
     video.onplay = function () {
-      embedElement.classList.add("video-playing");
+      embed.classList.add("video-playing");
     };
     video.onpause = video.onended = function () {
-      embedElement.classList.remove("video-playing");
+      embed.classList.remove("video-playing");
     };
   }
 
   var lastHeight = 0;
 
   function sendHeight() {
-    var currentHeight = embedElement.offsetHeight;
-    if (currentHeight !== lastHeight && currentHeight > 0) {
-      lastHeight = currentHeight;
-      window.parent.postMessage(
-        ["resizeIframe", { h: currentHeight, url: location.href }],
-        "*",
-      );
+    var h = embed.offsetHeight;
+    if (h !== lastHeight && h > 0) {
+      lastHeight = h;
+      window.parent.postMessage(["resizeIframe", { h: h }], "*");
     }
   }
 
-  // Respond to height requests from parent via MessageChannel
-  window.addEventListener("message", function (event) {
-    if (event.source === window.parent && event.ports && event.ports[0]) {
-      event.ports[0].postMessage(embedElement.offsetHeight);
+  // MessageChannel height request (used by oEmbed)
+  window.addEventListener("message", function (e) {
+    if (e.source === window.parent && e.ports && e.ports[0]) {
+      e.ports[0].postMessage(embed.offsetHeight);
     }
   });
 
   window.addEventListener("load", sendHeight);
-  new ResizeObserver(sendHeight).observe(embedElement);
-
-  // Expose for embedTweet.js
-  window._nitterSendHeight = sendHeight;
+  new ResizeObserver(sendHeight).observe(embed);
 })();
