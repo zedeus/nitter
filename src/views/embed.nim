@@ -2,7 +2,7 @@
 import karax/[karaxdsl, vdom]
 from jester import Request
 
-import ".."/[types, formatters]
+import ".."/[types, formatters, prefs]
 import general, tweet
 
 const
@@ -14,7 +14,7 @@ proc renderVideoEmbed*(tweet: Tweet; cfg: Config; req: Request): string =
     video = tweet.getVideos()[0]
     thumb = video.thumb
     vidUrl = getVideoEmbed(cfg, tweet.id)
-    prefs = Prefs(hlsPlayback: true, mp4Playback: true, proxyVideos: true)
+    prefs = Prefs(hlsPlayback: true, mp4Playback: true, proxyVideos: defaultPrefs.proxyVideos)
     tweetUrl = getLink(tweet)
 
   let node = buildHtml(html(lang="en")):
