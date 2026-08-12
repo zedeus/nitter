@@ -1,0 +1,19 @@
+public/js/embedResize.js
+  s_7fa5284c3ebe24::t_4ee9bbe4875c2f 2-3,5,8,11,18-21,25-28,33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "756beab8a60d4ffd1284288e658484d9047aeb6c",
+  "prompts": {},
+  "sessions": {
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
