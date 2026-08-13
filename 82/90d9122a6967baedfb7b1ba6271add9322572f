@@ -1,0 +1,36 @@
+src/views/general.nim
+  s_1e50aedbe15957::t_6e30c1ec92704d 130,138
+  s_1e50aedbe15957::t_0e9c4a681e445e 41
+  s_1e50aedbe15957::t_ce0a7a179e7bde 73-75
+src/views/oembed.nimf
+  s_1e50aedbe15957::t_0bceac757e6924 3,5
+src/routes/embed.nim
+  s_1e50aedbe15957::t_98b4794982c1fd 79-85,89,103,105,107,112,116-117,119,121-129
+  s_1e50aedbe15957::t_662296de924060 11-18,29,31-36
+  s_1e50aedbe15957::t_3719f777713e07 19,26-28
+  s_1e50aedbe15957::t_6b360eecabeb6c 98-102
+tests/test_embed.py
+  s_1e50aedbe15957::t_8e4a5b87a4025f 236
+  s_1e50aedbe15957::t_5690a334b31ceb 231-235,237-238,243,258,260
+  s_1e50aedbe15957::t_4480d1353cf1fd 181-196,203-228
+  s_1e50aedbe15957::t_db4d912431773d 239-242,244-257,259
+  s_1e50aedbe15957::t_b3334af11d08d3 229-230
+src/routes/status.nim
+  s_1e50aedbe15957::t_82387b768bb13d 69-72,75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8290d9122a6967baedfb7b1ba6271add9322572f",
+  "prompts": {},
+  "sessions": {
+    "s_1e50aedbe15957": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c678548-4e4c-45bf-b3f7-b9da6ad72e97",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
