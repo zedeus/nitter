@@ -62,6 +62,7 @@ jobs:
     needs: [build-test]
     name: Integration test
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     services:
       redis:
@@ -147,4 +148,4 @@ jobs:
         run: |
           ./nitter &
           cd tests
-          poetry run pytest -n3 --reruns=5 --rs .
+          poetry run pytest -n3 --rs .
