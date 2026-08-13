@@ -1,0 +1,21 @@
+src/routes/embed.nim
+  s_1e50aedbe15957::t_d0aeb7ff22d530 79-80
+tests/pyproject.toml
+  s_1e50aedbe15957::t_ed16ea11c9baf6 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "616fb138b7a71dce6cf964666ffb89c44066a702",
+  "prompts": {},
+  "sessions": {
+    "s_1e50aedbe15957": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c678548-4e4c-45bf-b3f7-b9da6ad72e97",
+        "model": "metr-model"
+      },
+      "human_author": null
+    }
+  }
+}
