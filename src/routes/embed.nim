@@ -8,24 +8,32 @@ import router_utils
 
 export api, embed, vdom, tweet, general, router_utils
 
-proc parseTweetUrl*(url: string): tuple[username, id: string] =
+proc parseTweetPath(path: string): tuple[username, id: string] =
+  let parts = path.split('/')
+  if parts.len >= 3 and parts[1] in ["status", "statuses"]:
+    let tweetId = parts[2].split('?')[0].split('#')[0]
+    if tweetId.len > 0 and tweetId.allCharsInSet(Digits):
+      return (parts[0], tweetId)
+  return ("", "")
+
+proc parseTweetUrl*(url: string; cfg: Config): tuple[username, id: string] =
   var path = url
   if path.startsWith("https://"):
     path = path[8..^1]
   elif path.startsWith("http://"):
     path = path[7..^1]
 
-  const prefixes = ["twitter.com/", "x.com/", "mobile.twitter.com/",
-                    "www.twitter.com/", "www.x.com/"]
-  for prefix in prefixes:
+  const twitterPrefixes = ["twitter.com/", "x.com/", "mobile.twitter.com/",
+                           "www.twitter.com/", "www.x.com/"]
+
+  for prefix in twitterPrefixes:
     if path.startsWith(prefix):
-      path = path[prefix.len..^1]
-      let parts = path.split('/')
-      if parts.len >= 3 and parts[1] == "status":
-        let tweetId = parts[2].split('?')[0].split('#')[0]
-        if tweetId.len > 0 and tweetId.allCharsInSet(Digits):
-          return (parts[0], tweetId)
-      break
+      return parseTweetPath(path[prefix.len..^1])
+
+  let nitterPrefix = cfg.hostname & "/"
+  if path.startsWith(nitterPrefix):
+    return parseTweetPath(path[nitterPrefix.len..^1])
+
   return ("", "")
 
 proc createEmbedRouter*(cfg: Config) =
@@ -68,11 +76,19 @@ proc createEmbedRouter*(cfg: Config) =
         resp Http404
 
     get "/api/oembed":
-      let url = @"url"
+      responseHeaders().get.add(("Access-Control-Allow-Origin", "*"))
+
+      let
+        url = @"url"
+        format = @"format"
+
+      if format.len > 0 and format != "json":
+        resp Http501, "Only JSON format is supported"
+
       if url.len == 0:
         resp Http400, "Missing url parameter"
 
-      let (username, tweetId) = parseTweetUrl(url)
+      let (username, tweetId) = parseTweetUrl(url, cfg)
       if username.len == 0 or tweetId.len == 0:
         resp Http400, "Invalid tweet URL"
 
@@ -81,20 +97,34 @@ proc createEmbedRouter*(cfg: Config) =
         resp Http404
 
       let
-        embedUrl = getUrlPrefix(cfg) & "/" & username & "/status/" & tweetId & "/embed"
+        maxwidthParam = @"maxwidth"
+        maxwidth = if maxwidthParam.len > 0:
+                     try: clamp(parseInt(maxwidthParam), 220, 550)
+                     except ValueError: 550
+                   else: 550
+        embedUrl = getUrlPrefix(cfg) & "/" & tweet.user.username & "/status/" & tweetId & "/embed"
         authorUrl = getUrlPrefix(cfg) & "/" & tweet.user.username
+        title = stripHtml(tweet.text)
 
-      responseHeaders().get.add(("Access-Control-Allow-Origin", "*"))
-      respJson %*{
+      var response = %*{
         "version": "1.0",
         "type": "rich",
         "provider_name": cfg.title,
         "provider_url": getUrlPrefix(cfg),
+        "title": title,
         "author_name": tweet.user.fullname,
         "author_url": authorUrl,
         "url": embedUrl,
-        "width": 550,
-        "height": nil,
+        "width": maxwidth,
+        "height": newJNull(),
         "cache_age": "3153600000",
-        "html": renderOembedIframe(embedUrl)
+        "html": renderOembedIframe(embedUrl, maxwidth)
       }
+
+      if tweet.media.len > 0:
+        let thumbUrl = getUrlPrefix(cfg) & getPicUrl(tweet.media[0].getThumb)
+        response["thumbnail_url"] = %thumbUrl
+        response["thumbnail_width"] = %maxwidth
+        response["thumbnail_height"] = %maxwidth
+
+      respJson response

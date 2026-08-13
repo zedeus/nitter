@@ -38,7 +38,7 @@ proc renderNavbar(cfg: Config; req: Request; rss, canonical: string): VNode =
 
 proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
                  video=""; images: seq[string] = @[]; banner=""; ogTitle="";
-                 rss=""; alternate=""): VNode =
+                 rss=""; alternate=""; oembed=""): VNode =
   let theme = prefs.theme.toTheme
     
   let ogType =
@@ -69,6 +69,10 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
 
     if rss.len > 0:
       link(rel="alternate", type="application/rss+xml", href=rss, title="RSS feed")
+
+    if oembed.len > 0:
+      let oembedTitle = if titleText.len > 0: titleText else: "oEmbed"
+      link(rel="alternate", type="application/json+oembed", href=oembed, title=oembedTitle)
 
     if prefs.hlsPlayback:
       script(src="/js/hls.min.js", `defer`="")
@@ -124,7 +128,7 @@ proc renderHead*(prefs: Prefs; cfg: Config; req: Request; titleText=""; desc="";
 proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
                  titleText=""; desc=""; ogTitle=""; rss=""; video="";
                  images: seq[string] = @[]; banner="";
-                 twitterLink=""): string =
+                 twitterLink=""; oembed=""): string =
 
   let twitterLink =
     if twitterLink.len > 0: twitterLink
@@ -132,7 +136,7 @@ proc renderMain*(body: VNode; req: Request; cfg: Config; prefs=defaultPrefs;
 
   let node = buildHtml(html(lang="en")):
     renderHead(prefs, cfg, req, titleText, desc, video, images, banner, ogTitle,
-               rss, twitterLink)
+               rss, twitterLink, oembed)
 
     let bodyClass = if prefs.stickyNav: "fixed-nav" else: ""
     body(class=bodyClass):

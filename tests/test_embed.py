@@ -178,11 +178,82 @@ class OEmbedApiTest(BaseTestCase):
         resp = requests.get(f'{self.base_url}/api/oembed?url={self.tweet_url}&maxwidth=400')
         self.assertEqual(resp.status_code, 200)
 
+    def test_oembed_maxwidth_clamps_to_range(self):
+        resp = requests.get(f'{self.base_url}/api/oembed?url={self.tweet_url}&maxwidth=100')
+        data = resp.json()
+        self.assertEqual(data['width'], 220)
+        self.assertIn('max-width:220px', data['html'])
+
+    def test_oembed_maxwidth_caps_at_550(self):
+        resp = requests.get(f'{self.base_url}/api/oembed?url={self.tweet_url}&maxwidth=9999')
+        data = resp.json()
+        self.assertEqual(data['width'], 550)
+
+    def test_oembed_maxwidth_invalid_uses_default(self):
+        resp = requests.get(f'{self.base_url}/api/oembed?url={self.tweet_url}&maxwidth=abc')
+        data = resp.json()
+        self.assertEqual(data['width'], 550)
+
     def test_oembed_author_url_present(self):
         resp = requests.get(f'{self.base_url}/api/oembed?url={self.tweet_url}')
         data = resp.json()
         self.assertIn('author_url', data)
         self.assertIn('elonmusk', data['author_url'])
+
+    def test_oembed_accepts_nitter_url(self):
+        nitter_url = f'{self.base_url}/elonmusk/status/1141367104702038016'
+        resp = requests.get(f'{self.base_url}/api/oembed?url={nitter_url}')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn('html', data)
+
+    def test_oembed_format_json_accepted(self):
+        resp = requests.get(f'{self.base_url}/api/oembed?url={self.tweet_url}&format=json')
+        self.assertEqual(resp.status_code, 200)
+
+    def test_oembed_format_xml_returns_501(self):
+        resp = requests.get(f'{self.base_url}/api/oembed?url={self.tweet_url}&format=xml')
+        self.assertEqual(resp.status_code, 501)
+
+    def test_oembed_has_title(self):
+        resp = requests.get(f'{self.base_url}/api/oembed?url={self.tweet_url}')
+        data = resp.json()
+        self.assertIn('title', data)
+        self.assertIsInstance(data['title'], str)
+        self.assertGreater(len(data['title']), 0)
+
+    def test_oembed_has_null_height(self):
+        resp = requests.get(f'{self.base_url}/api/oembed?url={self.tweet_url}')
+        data = resp.json()
+        self.assertIsNone(data['height'])
+
+
+class OEmbedDiscoveryTest(BaseTestCase):
+    """Test oEmbed discovery link tags on tweet pages."""
+
+    def test_tweet_page_has_oembed_link_tag(self):
+        self.open_nitter('elonmusk/status/1141367104702038016')
+        self.assert_element_present('link[type="application/json+oembed"]')
+
+    def test_oembed_link_tag_points_to_api(self):
+        resp = requests.get('http://localhost:8080/elonmusk/status/1141367104702038016')
+        self.assertIn('application/json+oembed', resp.text)
+        self.assertIn('/api/oembed?url=', resp.text)
+        self.assertIn('1141367104702038016', resp.text)
+
+    def test_oembed_discovery_roundtrip(self):
+        """Fetch a tweet page, extract oEmbed URL, call it, verify response."""
+        import re
+        resp = requests.get('http://localhost:8080/elonmusk/status/1141367104702038016')
+        match = re.search(
+            r'type="application/json\+oembed"\s+href="([^"]*)"', resp.text)
+        self.assertIsNotNone(match, "No oEmbed discovery link found in page")
+        oembed_url = match.group(1).replace('&amp;', '&')
+        oembed_resp = requests.get(oembed_url)
+        self.assertEqual(oembed_resp.status_code, 200)
+        data = oembed_resp.json()
+        self.assertEqual(data['type'], 'rich')
+        self.assertIn('html', data)
 
 
 class VideoEmbedTest(BaseTestCase):

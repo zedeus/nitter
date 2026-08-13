@@ -66,9 +66,13 @@ proc createStatusRouter*(cfg: Config) =
         elif card.video.isSome():
           images = @[card.video.get().thumb]
 
+      let
+        tweetUrl = getUrlPrefix(cfg) & "/" & conv.tweet.user.username & "/status/" & $conv.tweet.id
+        oembedUrl = getUrlPrefix(cfg) & "/api/oembed?url=" & encodeUrl(tweetUrl)
+
       let html = renderConversation(conv, prefs, getPath() & "#m", sort)
       resp renderMain(html, request, cfg, prefs, title, desc, ogTitle,
-                      images=images, video=video)
+                      images=images, video=video, oembed=oembedUrl)
 
     get "/@name/status/@id/history/?":
       cond '.' notin @"name"

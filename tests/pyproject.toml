@@ -8,4 +8,4 @@ python = "^3.14"
 seleniumbase = "4.46.5"
 
 [tool.pytest.ini_options]
-addopts = "--pls=eager --reruns=2 --only-rerun=timeout --only-rerun=Timeout --only-rerun=Connection --timeout_multiplier=5"
+addopts = "--pls=eager --rcs --reruns=2 --only-rerun=timeout --only-rerun=Timeout --only-rerun=Connection --only-rerun=WebDriverException --timeout_multiplier=5"
