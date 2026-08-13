@@ -1,0 +1,19 @@
+tests/pyproject.toml
+  s_1e50aedbe15957::t_ed16ea11c9baf6 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ce7fc0055749653180f0b0029985842cd4f40a40",
+  "prompts": {},
+  "sessions": {
+    "s_1e50aedbe15957": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c678548-4e4c-45bf-b3f7-b9da6ad72e97",
+        "model": "metr-model"
+      },
+      "human_author": null
+    }
+  }
+}
