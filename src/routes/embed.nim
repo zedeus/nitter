@@ -34,6 +34,16 @@ proc parseTweetUrl*(url: string; cfg: Config): tuple[username, id: string] =
   if path.startsWith(nitterPrefix):
     return parseTweetPath(path[nitterPrefix.len..^1])
 
+  # Fall back: strip any hostname and try to parse as a tweet path.
+  # Handles requests where the URL's host differs from cfg.hostname
+  # (e.g. localhost in dev/CI, or a reverse proxy with a different domain).
+  let slashPos = path.find('/')
+  if slashPos > 0:
+    let afterHost = path[slashPos + 1..^1]
+    let parsed = parseTweetPath(afterHost)
+    if parsed.username.len > 0:
+      return parsed
+
   return ("", "")
 
 proc createEmbedRouter*(cfg: Config) =
