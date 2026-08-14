@@ -1,0 +1,41 @@
+src/views/oembed.nimf
+  s_1e50aedbe15957::t_0bceac757e6924 3,5
+tests/test_embed.py
+  s_1e50aedbe15957::t_5690a334b31ceb 231-235,237-238,243,255,257
+  s_1e50aedbe15957::t_b3334af11d08d3 229-230
+  s_1e50aedbe15957::t_8e4a5b87a4025f 236
+  s_1e50aedbe15957::t_db4d912431773d 239-242,244-247,250-254,256
+  s_1e50aedbe15957::t_869600485edbda 248-249
+  s_1e50aedbe15957::t_4480d1353cf1fd 181-196,203-228
+src/views/general.nim
+  s_1e50aedbe15957::t_33f15897b009c2 74-75
+  s_1e50aedbe15957::t_6e30c1ec92704d 131,139
+  s_1e50aedbe15957::t_0e9c4a681e445e 41
+  s_1e50aedbe15957::t_ce0a7a179e7bde 73,76
+tests/pyproject.toml
+  s_1e50aedbe15957::t_ed16ea11c9baf6 11
+src/routes/status.nim
+  s_1e50aedbe15957::t_82387b768bb13d 69-72,75
+src/routes/embed.nim
+  s_1e50aedbe15957::t_662296de924060 11-18,29,31-36
+  s_1e50aedbe15957::t_d0aeb7ff22d530 79-80
+  s_1e50aedbe15957::t_3719f777713e07 19,26-28
+  s_1e50aedbe15957::t_98b4794982c1fd 81-87,91,105,107,109,114,118-119,121,123-130
+  s_1e50aedbe15957::t_6b360eecabeb6c 100-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "7f6c083dce7a5482a5257c9a9e0b719189f19fcb",
+  "prompts": {},
+  "sessions": {
+    "s_1e50aedbe15957": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c678548-4e4c-45bf-b3f7-b9da6ad72e97",
+        "model": "metr-model"
+      },
+      "human_author": null
+    }
+  }
+}
