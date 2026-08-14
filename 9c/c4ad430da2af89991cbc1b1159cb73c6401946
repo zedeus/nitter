@@ -1,0 +1,25 @@
+src/routes/embed.nim
+  s_1e50aedbe15957::t_a271661da6af66 43-45
+  s_1e50aedbe15957::t_03e4e5d94bf799 37-42,46
+tests/test_embed.py
+  s_1e50aedbe15957::t_f5cd211822d5ff 240,248
+  s_1e50aedbe15957::t_57d675fb33bb86 233
+.github/workflows/run-tests.yml
+  s_1e50aedbe15957::t_79eaa9c05a6698 140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9cc4ad430da2af89991cbc1b1159cb73c6401946",
+  "prompts": {},
+  "sessions": {
+    "s_1e50aedbe15957": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c678548-4e4c-45bf-b3f7-b9da6ad72e97",
+        "model": "metr-model"
+      },
+      "human_author": null
+    }
+  }
+}
