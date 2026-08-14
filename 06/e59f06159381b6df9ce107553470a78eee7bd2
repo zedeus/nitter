@@ -1,0 +1,24 @@
+tests/test_embed.py
+  s_1e50aedbe15957::t_445c9dba5e9d6a 248,254-256
+  s_1e50aedbe15957::t_57d675fb33bb86 233
+  s_1e50aedbe15957::t_f5cd211822d5ff 240,249
+src/routes/embed.nim
+  s_1e50aedbe15957::t_a271661da6af66 43-45
+  s_1e50aedbe15957::t_03e4e5d94bf799 37-42,46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "06e59f06159381b6df9ce107553470a78eee7bd2",
+  "prompts": {},
+  "sessions": {
+    "s_1e50aedbe15957": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c678548-4e4c-45bf-b3f7-b9da6ad72e97",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
