@@ -245,15 +245,11 @@ class OEmbedDiscoveryTest(BaseTestCase):
     def test_oembed_discovery_roundtrip(self):
         """Fetch a tweet page, extract oEmbed URL, call it, verify response."""
         import re
-        from urllib.parse import urlparse
         resp = requests.get(f'{self.base_url}/elonmusk/status/1141367104702038016')
         match = re.search(
             r'type="application/json\+oembed"\s+href="([^"]*)"', resp.text)
         self.assertIsNotNone(match, "No oEmbed discovery link found in page")
         oembed_url = match.group(1).replace('&amp;', '&')
-        # Rewrite host to base_url in case cfg.hostname differs (e.g. CI)
-        parsed = urlparse(oembed_url)
-        oembed_url = f'{self.base_url}{parsed.path}?{parsed.query}'
         oembed_resp = requests.get(oembed_url)
         self.assertEqual(oembed_resp.status_code, 200)
         data = oembed_resp.json()
