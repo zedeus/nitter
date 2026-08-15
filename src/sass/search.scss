@@ -107,6 +107,80 @@
   grid-column-gap: 10px;
 }
 
+.list-result {
+  display: flex;
+  align-items: flex-start;
+
+  .list-result-banner {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    margin-right: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--darker_grey);
+    // stay above the tweet-link overlay's hover background
+    z-index: 1;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .list-result-body {
+    min-width: 0;
+    pointer-events: none;
+    z-index: 1;
+
+    a {
+      pointer-events: all;
+    }
+  }
+
+  .list-result-title {
+    align-items: baseline;
+  }
+
+  .list-members {
+    flex-shrink: 0;
+    margin-left: 0.3em;
+    color: var(--fg_faded);
+  }
+
+  .list-result-context {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 2px;
+    color: var(--fg_faded);
+
+    a {
+      color: var(--fg_dark);
+    }
+
+    a.fullname {
+      color: var(--fg_color);
+    }
+
+    .list-facepile {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+  }
+
+  .list-result-description {
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    pointer-events: all;
+  }
+}
+
 .profile-tabs {
   @include search-resize(820px, 5);
   @include search-resize(715px, 4);

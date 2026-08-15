@@ -35,8 +35,8 @@ proc userTweetsUrl(id: string; cursor: string): ApiReq =
 proc userTweetsAndRepliesUrl(id: string; cursor: string): ApiReq =
   return apiReq(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"], userTweetsFieldToggles, skipTid=true)
 
-proc tweetDetailUrl(id: string; cursor: string): ApiReq =
-  return apiReq(graphTweet, tweetVars % [id, cursor])
+proc tweetDetailUrl(id, cursor: string; mode = Relevance): ApiReq =
+  return apiReq(graphTweet, tweetVars % [id, cursor, $mode])
   # let cookieVars = tweetDetailVars % [id, cursor]
   # result = ApiReq(
   #   cookie: apiUrl(graphTweetDetail, cookieVars, tweetDetailFieldToggles),
@@ -230,21 +230,28 @@ proc getGraphTweetResult*(id: string): Future[Tweet] {.async.} =
     js = await fetch(url)
   result = parseGraphTweetResult(js)
 
-proc getGraphTweet(id: string; after=""): Future[Conversation] {.async.} =
+proc getTweetByRestId*(id: string): Future[Tweet] {.async.} =
+  if id.len == 0: return
+  let
+    url = apiReq(graphTweetResultByRestId, tweetByRestIdVars % id, articleFieldToggles)
+    js = await fetch(url)
+  result = parseTweetByRestId(js)
+
+proc getGraphTweet(id: string; after=""; mode = Relevance): Future[Conversation] {.async.} =
   if id.len == 0: return
   let
     cursor = cursorParam(after)
-    js = await fetch(tweetDetailUrl(id, cursor))
+    js = await fetch(tweetDetailUrl(id, cursor, mode))
   result = parseGraphConversation(js, id)
 
-proc getReplies*(id, after: string): Future[Result[Chain]] {.async.} =
-  result = (await getGraphTweet(id, after)).replies
+proc getReplies*(id, after: string; mode = Relevance): Future[Result[Chain]] {.async.} =
+  result = (await getGraphTweet(id, after, mode)).replies
   result.beginning = after.len == 0
 
-proc getTweet*(id: string; after=""): Future[Conversation] {.async.} =
-  result = await getGraphTweet(id)
+proc getTweet*(id: string; after=""; mode = Relevance): Future[Conversation] {.async.} =
+  result = await getGraphTweet(id, mode=mode)
   if after.len > 0:
-    result.replies = await getReplies(id, after)
+    result.replies = await getReplies(id, after, mode)
 
 proc getGraphEditHistory*(id: string): Future[EditHistory] {.async.} =
   if id.len == 0: return
@@ -263,12 +270,19 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
   if q.len == 0 or q == emptyQuery:
     return Timeline(query: query, beginning: true)
 
+  let product =
+    case query.kind
+    of top: "Top"
+    # profile media feeds (RSS, multi-user timelines) must stay chronological
+    of media: (if query.fromUser.len == 0: "Media" else: "Latest")
+    else: "Latest"
+
   var
     variables = %*{
       "rawQuery": q,
       "count": 20,
       "querySource": "typed_query",
-      "product": "Latest",
+      "product": product,
       "withGrokTranslatedBio":true,
       "withQuickPromoteEligibilityTweetFields":false
     }
@@ -283,32 +297,39 @@ proc getGraphTweetSearch*(query: Query; after=""): Future[Timeline] {.async.} =
 
   # when no more items are available the API just returns the last page in
   # full. this detects that and clears the page instead.
-  if after.len > 0 and result.bottom.len > 0 and maxId.len == 0 and
-     after[0..<64] == result.bottom[0..<64]:
+  let prefix = min(64, min(after.len, result.bottom.len))
+  if prefix > 0 and maxId.len == 0 and
+     after[0..<prefix] == result.bottom[0..<prefix]:
     result.content.setLen(0)
 
-proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] {.async.} =
+proc getGraphProductSearch[T](query: Query; product: string;
+                              after=""): Future[Result[T]] {.async.} =
   if query.text.len == 0:
-    return Result[User](query: query, beginning: true)
+    return Result[T](query: query, beginning: true)
 
   var
     variables = %*{
       "rawQuery": query.text,
       "count": 20,
       "querySource": "typed_query",
-      "product": "People",
+      "product": product,
       "withGrokTranslatedBio":true,
       "withQuickPromoteEligibilityTweetFields":false
     }
   if after.len > 0:
     variables["cursor"] = % after
-    result.beginning = false
 
-  let 
+  let
     url = apiReq(graphSearchTimeline, $variables)
     js = await fetch(url)
-  result = parseGraphSearch[User](js, after)
+  result = parseGraphSearch[T](js, after)
   result.query = query
+
+proc getGraphUserSearch*(query: Query; after=""): Future[Result[User]] =
+  getGraphProductSearch[User](query, "People", after)
+
+proc getGraphListSearch*(query: Query; after=""): Future[Result[ListSearchResult]] =
+  getGraphProductSearch[ListSearchResult](query, "Lists", after)
 
 proc getPhotoRail*(id: string): Future[PhotoRail] {.async.} =
   if id.len == 0: return

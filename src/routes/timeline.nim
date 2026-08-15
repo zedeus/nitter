@@ -53,7 +53,7 @@ proc fetchProfile*(after: string; query: Query; skipRail=false): Future[Profile]
 
   let
     rail =
-      skipIf(skipRail or query.kind == media, @[]):
+      skipIf(skipRail or query.kind == QueryKind.media, @[]):
         getCachedPhotoRail(userId)
 
     user = getCachedUser(name)

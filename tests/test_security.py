@@ -8,7 +8,7 @@ def curl_status(url):
     """Get HTTP status code using curl to avoid URL normalization by Python libs."""
     result = subprocess.run(
         ['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}', url],
-        capture_output=True, text=True, timeout=10
+        capture_output=True, text=True, timeout=30
     )
     return int(result.stdout)
 

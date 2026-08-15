@@ -87,7 +87,6 @@
   margin-top: 6px;
   margin-bottom: 0px;
   color: var(--grey);
-  pointer-events: all;
 }
 
 .tweet-avatar {
@@ -115,32 +114,6 @@
     margin-top: -1px;
     width: 20px;
     height: 20px;
-  }
-}
-
-.tweet-embed {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-  background-color: var(--bg_panel);
-
-  .tweet-content {
-    font-size: 18px;
-  }
-
-  .tweet-body {
-    display: flex;
-    flex-direction: column;
-    max-height: calc(100vh - 0.75em * 2);
-  }
-
-  .card-image img {
-    height: auto;
-  }
-
-  .avatar {
-    position: absolute;
   }
 }
 

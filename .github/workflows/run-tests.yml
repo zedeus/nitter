@@ -62,6 +62,7 @@ jobs:
     needs: [build-test]
     name: Integration test
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     services:
       redis:
@@ -136,6 +137,7 @@ jobs:
           cp nitter.example.conf nitter.conf
           sed -i 's/enableDebug = false/enableDebug = true/g' nitter.conf
           sed -i 's/maxRetries = 1/maxRetries = 10/g' nitter.conf
+          sed -i 's/hostname = "nitter.net"/hostname = "localhost:8080"/g' nitter.conf
 
           nim r tools/rendermd.nim
           nim r tools/gencss.nim
@@ -147,4 +149,4 @@ jobs:
         run: |
           ./nitter &
           cd tests
-          poetry run pytest -n3 --reruns=5 --rs .
+          poetry run pytest -n3 --rs .

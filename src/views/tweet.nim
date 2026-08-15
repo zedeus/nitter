@@ -5,7 +5,6 @@ from jester import Request
 
 import renderutils
 import ".."/[types, utils, formatters]
-import general
 
 const doctype = "<!DOCTYPE html>\n"
 
@@ -464,13 +463,3 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
 
       if not prefs.hideTweetStats:
         renderStats(tweet.stats)
-
-proc renderTweetEmbed*(tweet: Tweet; path: string; prefs: Prefs; cfg: Config; req: Request): string =
-  let node = buildHtml(html(lang="en")):
-    renderHead(prefs, cfg, req)
-
-    body:
-      tdiv(class="tweet-embed"):
-        renderTweet(tweet, prefs, path, mainTweet=true)
-
-  result = doctype & $node

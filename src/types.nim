@@ -174,7 +174,10 @@ type
     variants*: seq[VideoVariant]
 
   QueryKind* = enum
-    posts, replies, media, users, tweets, userList, followers, following
+    posts, replies, media, users, tweets, userList, followers, following, lists, top
+
+  RankingMode* = enum
+    Relevance, Recency, Likes
 
   Query* = object
     kind*: QueryKind
@@ -356,6 +359,7 @@ type
     content*: Tweets
     hasMore*: bool
     cursor*: string
+    related*: bool
 
   Conversation* = ref object
     tweet*: Tweet
@@ -384,6 +388,12 @@ type
     description*: string
     members*: int
     banner*: string
+
+  ListSearchResult* = object
+    list*: List
+    owner*: User
+    followersContext*: string
+    facepiles*: seq[string]
 
   CommunityRule* = object
     name*: string

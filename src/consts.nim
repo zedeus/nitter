@@ -35,7 +35,7 @@ const
   graphCommunityModerators* = "GBMT3GOWy5dYsYC4XJfvow/moderatorsSliceTimeline_Query"
   graphCommunityHashtags* = "40DyrMxfCknGuZwE-keW_Q/CommunityHashtagsTimeline"
 
-  graphTweetResultByRestId* = "qtXMy1p5Y62uCskc_NUPJw/TweetResultByRestId"
+  graphTweetResultByRestId* = "4hhGRbehkcUVTKf8n0f0xw/TweetResultByRestId"
   graphTweetResultsByRestIds* = "Sc9EUQTZNEH-wzegn-nHvQ/TweetResultsByRestIds"
 
   graphBroadcast* = "FJLCzpXCLPM1jUZqmM7oEA/BroadcastQuery"
@@ -92,6 +92,7 @@ const
   tweetVars* = """{
   "postId": "$1",
   $2
+  "ranking_mode": "$3",
   "includeHasBirdwatchNotes": false,
   "includePromotedContent": false,
   "withBirdwatchNotes": true,
@@ -164,6 +165,14 @@ const
 }""".replace(" ", "").replace("\n", "")
 
   articleFieldToggles* = """{"withArticleRichContentState":true,"withArticlePlainText":false,"withArticleSummaryText":true,"withArticleVoiceOver":true}"""
+
+  tweetByRestIdVars* = """{
+  "tweetId": "$1",
+  "includePromotedContent": false,
+  "withBirdwatchNotes": false,
+  "withVoice": false,
+  "withCommunity": false
+}""".replace(" ", "").replace("\n", "")
 
   communityTweetsVars* = """{
   "communityId": "$1", $2

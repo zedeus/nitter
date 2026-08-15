@@ -115,7 +115,7 @@ proc renderProtected*(username: string): VNode =
 proc renderProfile*(profile: var Profile; prefs: Prefs; path: string): VNode =
   profile.tweets.query.fromUser = @[profile.user.username]
   let
-    isGalleryView = profile.tweets.query.kind == media and
+    isGalleryView = profile.tweets.query.kind == QueryKind.media and
       profile.tweets.query.view == "gallery"
     viewClass = if isGalleryView: " media-only" else: ""
 

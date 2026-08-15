@@ -16,14 +16,16 @@ var
 
 proc getPair(): Future[TidPair] {.async.} =
   if cachedPairs.len == 0 or int(epochTime()) - lastCached > ttlSec:
-    lastCached = int(epochTime())
-
     let client = newAsyncHttpClient()
     defer: client.close()
 
     let resp = await client.get(pairsUrl)
     if resp.status == $Http200:
       cachedPairs = parseTidPairs(await resp.body)
+      lastCached = int(epochTime())
+
+  if cachedPairs.len == 0:
+    raise newException(ValueError, "Failed to fetch x-client-transaction-id pairs")
 
   return sample(cachedPairs)
 

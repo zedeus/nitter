@@ -4,7 +4,7 @@ from jester import Request, cookies
 
 import ../views/general
 import ".."/[utils, prefs, types]
-export utils, prefs, types, uri
+export utils, prefs, types, uri, json
 
 template savePref*(pref, value: string; req: Request; expire=false) =
   if not expire or pref in cookies(req):
