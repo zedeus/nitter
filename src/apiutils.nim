@@ -34,7 +34,7 @@ proc setApiProxy*(url: string) =
     if "http" notin apiProxy:
       apiProxy = "http://" & apiProxy
 
-proc toUrl(req: ApiReq; sessionKind: SessionKind): Uri =
+proc toUrl*(req: ApiReq; sessionKind: SessionKind): Uri =
   let url = case sessionKind
     of oauth:  req.oauth
     of cookie: req.cookie
