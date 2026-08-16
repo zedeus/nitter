@@ -1,0 +1,25 @@
+src/consts.nim
+  s_50410579246f13::t_d983ae4e98fc28 12
+  s_50410579246f13::t_ea859889a1244c 177-181
+tests/test_profile.py
+  s_50410579246f13::t_85d250ef99cacb 36-41
+  s_50410579246f13::t_8fe25bae496bfd 102-117
+src/api.nim
+  s_50410579246f13::t_f45e2c455ac49b 61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0ac9bc267821504eabfccb0fb0034fe5033d98fd",
+  "prompts": {},
+  "sessions": {
+    "s_50410579246f13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d6e0225a-b2bf-4907-88c6-5008643c03fb",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
