@@ -33,6 +33,12 @@ banner_image = [
     ['mobile_test', 'profile_banners%2F82135242%2F1384108037%2F1500x500']
 ]
 
+# (user_id, expected_username) — resolving a numeric id to a profile (issue #1433)
+id_redirects = [
+    ['12', 'jack'],
+    ['44196397', 'elonmusk']
+]
+
 
 class ProfileTest(BaseTestCase):
     @parameterized.expand(profiles)
@@ -93,3 +99,19 @@ class ProfileTest(BaseTestCase):
         self.open_nitter(username)
         banner = self.find_element(Profile.banner + ' img')
         self.assertIn(url, banner.get_attribute('src'))
+
+
+class UserIdRedirectTest(BaseTestCase):
+    @parameterized.expand(id_redirects)
+    def test_i_user_redirect(self, user_id, username):
+        """/i/user/<id> resolves the numeric id and redirects to the profile (issue #1433)"""
+        self.open_nitter(f'i/user/{user_id}')
+        self.assert_true(self.get_current_url().rstrip('/').endswith(f'/{username}'))
+        self.assert_exact_text(f'@{username}', Profile.username)
+
+    @parameterized.expand(id_redirects)
+    def test_intent_user_redirect(self, user_id, username):
+        """/intent/user?user_id=<id> redirects to the profile (issue #1433)"""
+        self.open_nitter(f'intent/user?user_id={user_id}')
+        self.assert_true(self.get_current_url().rstrip('/').endswith(f'/{username}'))
+        self.assert_exact_text(f'@{username}', Profile.username)

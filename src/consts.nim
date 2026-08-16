@@ -9,7 +9,7 @@ const
 
   graphUser* = "IGgvgiOx4QZndDHuD3x9TQ/UserByScreenName"
   graphUserV2* = "-ZzAG_Bckx16LMbEvHC3lg/UserResultByScreenNameQuery"
-  graphUserById* = "-DAaa9jPxPswYeI2fZ9rug/UserResultByIdQuery"
+  graphUserById* = "xvmVfRLmnr1alc5f2dib0Q/UserByRestId"
   graphUserTweetsV2* = "LE3eTyeqhBh2g-fX85O2eQ/UserWithProfileTweetsQueryV2"
   graphUserTweetsAndRepliesV2* = "AcYHjc_YAx-9_rKWdMsKvA/UserWithProfileTweetsAndRepliesQueryV2"
   graphUserTweets* = "PNd0vlufvrcIwrAnBYKE9g/UserTweets"
@@ -172,6 +172,11 @@ const
   "withBirdwatchNotes": false,
   "withVoice": false,
   "withCommunity": false
+}""".replace(" ", "").replace("\n", "")
+
+  userByRestIdVars* = """{
+  "userId": "$1",
+  "withSafetyModeUserFields": true
 }""".replace(" ", "").replace("\n", "")
 
   communityTweetsVars* = """{

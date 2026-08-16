@@ -58,7 +58,7 @@ proc getGraphUser*(username: string): Future[User] {.async.} =
 proc getGraphUserById*(id: string): Future[User] {.async.} =
   if id.len == 0 or id.any(c => not c.isDigit): return
   let
-    url = apiReq(graphUserById, """{"rest_id": "$1"}""" % id)
+    url = apiReq(graphUserById, userByRestIdVars % id)
     js = await fetchRaw(url)
   result = parseGraphUser(js)
 
