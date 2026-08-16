@@ -1,0 +1,21 @@
+tools/test_sessions.nim
+  s_bb571f5e5b5f9a::t_bccea358e42d18 138
+  s_bb571f5e5b5f9a::t_668b87ec2a253a 1-137,139-172,174,176-179
+  s_bb571f5e5b5f9a::t_2f904e56121de6 173,175
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3d0844d60764e8633eb94a9a171d6c9b8c6979a5",
+  "prompts": {},
+  "sessions": {
+    "s_bb571f5e5b5f9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "251eb36a-54bb-4c0d-8c76-7db8c73782db",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
