@@ -1,0 +1,24 @@
+src/experimental/parser/user.nim
+  s_50410579246f13::t_672066654658ef 69
+  s_50410579246f13::t_6612f18b2b39ad 14-15
+src/experimental/types/graphuser.nim
+  s_50410579246f13::t_bd800e6d103552 3,19,33-45,52,59-61
+src/experimental/parser/graphql.nim
+  s_50410579246f13::t_c8867a670af45f 13-14,20-22,37-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "62aa2f28237bddea311f9d16ca0a29ba50e7c4cc",
+  "prompts": {},
+  "sessions": {
+    "s_50410579246f13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d6e0225a-b2bf-4907-88c6-5008643c03fb",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
