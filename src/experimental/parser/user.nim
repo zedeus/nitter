@@ -11,10 +11,8 @@ let
   htRegex = nre.re"""(*U)(^|[^\w-_.?])([#＃$])([\w_]*+)(?!</a>|">|#)"""
   htReplace = "$1<a href=\"/search?f=tweets&q=%23$3\">$2$3</a>"
 
-proc expandUserEntities(user: var User; raw: RawUser) =
-  let
-    orig = user.bio.toRunes
-    ent = raw.entities
+proc expandUserEntities*(user: var User; ent: Entities) =
+  let orig = user.bio.toRunes
 
   if ent.url.urls.len > 0:
     user.website = ent.url.urls[0].expandedUrl
@@ -68,7 +66,7 @@ proc toUser*(raw: RawUser): User =
   if raw.pinnedTweetIdsStr.len > 0:
     result.pinnedTweet = parseBiggestInt(raw.pinnedTweetIdsStr[0])
 
-  result.expandUserEntities(raw)
+  result.expandUserEntities(raw.entities)
 
 proc parseHook*(s: string; i: var int; v: var User) =
   var u: RawUser
