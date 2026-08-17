@@ -1,0 +1,19 @@
+src/consts.nim
+  s_50410579246f13::t_dbc6db8cc4eb13 10,15-17,20,23,38-39,45-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "fcaab5079e4e665f4885d9a45e0186cf4bcbbcf1",
+  "prompts": {},
+  "sessions": {
+    "s_50410579246f13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d6e0225a-b2bf-4907-88c6-5008643c03fb",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
