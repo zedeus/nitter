@@ -1,3 +1,6 @@
+import os
+import unittest
+
 from base import BaseTestCase, Profile
 from parameterized import parameterized
 
@@ -101,6 +104,11 @@ class ProfileTest(BaseTestCase):
         self.assertIn(url, banner.get_attribute('src'))
 
 
+# UserByRestId clears Cloudflare from residential IPs and via the cloaking
+# proxy, but CF's edge rule on that endpoint rejects GitHub Actions' datacenter
+# ASN regardless of headers, so these live redirects can't pass in CI (#1433).
+@unittest.skipIf(os.environ.get('GITHUB_ACTIONS') == 'true',
+                 'UserByRestId is Cloudflare-blocked from GitHub datacenter IPs')
 class UserIdRedirectTest(BaseTestCase):
     @parameterized.expand(id_redirects)
     def test_i_user_redirect(self, user_id, username):
