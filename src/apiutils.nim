@@ -69,14 +69,13 @@ proc genHeaders*(session: Session, url: Uri, skipTid: bool): Future[HttpHeaders]
     "accept": "*/*",
     "accept-encoding": "gzip",
     "accept-language": "en-US,en;q=0.9",
-    "connection": "keep-alive",
     "content-type": "application/json",
     "origin": "https://x.com",
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
     "x-twitter-active-user": "yes",
     "x-twitter-client-language": "en",
     "priority": "u=1, i"
-  })
+  }, titleCase=true)
 
   case session.kind
   of SessionKind.oauth:

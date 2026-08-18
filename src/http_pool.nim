@@ -27,7 +27,7 @@ proc release*(pool: HttpPool; client: AsyncHttpClient; badClient=false) =
 
 proc acquire*(pool: HttpPool; heads: HttpHeaders): AsyncHttpClient =
   if pool.conns.len == 0:
-    result = newAsyncHttpClient(headers=heads, proxy=proxy)
+    result = newAsyncHttpClient(userAgent="", headers=heads, proxy=proxy)
   else:
     result = pool.conns.pop()
     result.headers = heads
