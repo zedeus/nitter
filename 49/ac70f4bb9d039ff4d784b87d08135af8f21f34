@@ -1,0 +1,19 @@
+src/apiutils.nim
+  s_50410579246f13::t_2a9399828137f0 72-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "49ac70f4bb9d039ff4d784b87d08135af8f21f34",
+  "prompts": {},
+  "sessions": {
+    "s_50410579246f13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d6e0225a-b2bf-4907-88c6-5008643c03fb",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
