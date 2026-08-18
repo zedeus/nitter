@@ -1,0 +1,31 @@
+tests/test_cloudflare_detect.nim
+  s_094da785906302::t_e604597fe2fb48 1-85
+src/types.nim
+  s_094da785906302::t_dfdff96724b11c 12
+src/nitter.nim
+  s_094da785906302::t_a55fe2b033711a 128-132
+src/apiutils.nim
+  s_094da785906302::t_e646770993421d 22
+  s_094da785906302::t_16b19308b14d16 15,20-21,23-42
+  s_094da785906302::t_d72f76ee64341d 16-19
+  s_094da785906302::t_5ef20bd49b11e5 183-191
+  s_094da785906302::t_dcae04b55df834 14
+  s_094da785906302::t_35195fc8aa974f 216-217
+  s_094da785906302::t_55a0a6ce69b268 230,238,250-258,260-261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "05ea8a12f8b567c97a304101009acc308e285044",
+  "prompts": {},
+  "sessions": {
+    "s_094da785906302": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "160851ee-fbc6-4829-a35a-0c3c48d4a959",
+        "model": "metr-model"
+      },
+      "human_author": null
+    }
+  }
+}
