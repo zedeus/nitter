@@ -126,7 +126,10 @@ proc renderTweetSearch*(results: Timeline; prefs: Prefs; path: string;
   buildHtml(tdiv(class=containerClass)):
     if query.fromUser.len > 1:
       tdiv(class="timeline-header"):
-        text query.fromUser.join(" | ")
+        for index, username in query.fromUser:
+          if index > 0:
+            text " | "
+          a(href=("/" & username)): text username
 
     if query.fromUser.len > 0:
       if query.kind != QueryKind.media or query.view != "gallery":
