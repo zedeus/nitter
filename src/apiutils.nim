@@ -11,6 +11,20 @@ const
   npCache = "x-np-cache"
   errorsToSkip = {null, doesntExist, tweetNotFound, timeout, unauthorized, badRequest}
 
+proc isCloudflareHtml*(body: string): bool =
+  ## Detect Cloudflare HTML error pages returned instead of JSON
+  if body.len < 14 or body[0] != '<': return false
+  body[0 ..< 14].toLowerAscii() == "<!doctype html" and "Cloudflare" in body
+
+proc cfTitle*(body: string): string =
+  ## Extract <title> from Cloudflare HTML for log diagnostics
+  let start = body.find("<title>")
+  if start < 0: return "unknown"
+  let contentStart = start + 7
+  let stop = body.find("</title>", contentStart)
+  if stop < 0: return "unknown"
+  body[contentStart ..< stop].splitWhitespace().join(" ")
+
 var
   pool: HttpPool
   disableTid: bool
@@ -150,6 +164,10 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     if result.len > 0:
       if resp.headers.getOrDefault("content-encoding") == "gzip":
         result = uncompress(result, dfGzip)
+
+      if isCloudflareHtml(result):
+        echo "[cloudflare] ", resp.status, " (", cfTitle(result), "), API: ", url.path, ", session: ", session.pretty
+        raise rateLimitError()
 
       if result.startsWith("{\"errors"):
         let errors = result.fromJson(Errors)
