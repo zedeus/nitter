@@ -1,0 +1,32 @@
+src/types.nim
+  s_094da785906302::t_dfdff96724b11c 12
+tests/test_cloudflare_detect.nim
+  s_094da785906302::t_f243f24042c48a 9-10,12-13,15-16,18-19,23,33,39
+  s_094da785906302::t_e604597fe2fb48 1-8,11,14,17,20-22,24-32,34-38,40-43
+src/apiutils.nim
+  s_094da785906302::t_b40e6943f7564a 160-161
+  s_094da785906302::t_35195fc8aa974f 187-188
+  s_094da785906302::t_6a923e0a568237 16-17
+  s_094da785906302::t_55a0a6ce69b268 201,209,221-229,231-232
+  s_094da785906302::t_16b19308b14d16 15,18
+  s_094da785906302::t_dcae04b55df834 14
+  s_094da785906302::t_5ef20bd49b11e5 159,162
+src/nitter.nim
+  s_094da785906302::t_a55fe2b033711a 128-132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a2e26408c26ee1281d45734df616b7d736c59eff",
+  "prompts": {},
+  "sessions": {
+    "s_094da785906302": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "160851ee-fbc6-4829-a35a-0c3c48d4a959",
+        "model": "metr-model"
+      },
+      "human_author": null
+    }
+  }
+}
