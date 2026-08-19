@@ -1,0 +1,26 @@
+src/experimental/parser/article.nim
+  s_094da785906302::t_075f7ecba08225 18-20,22
+src/experimental/types/article.nim
+  s_094da785906302::t_c4b3b9c490fde8 7
+src/api.nim
+  s_094da785906302::t_3ea6fae87821fe 344
+  s_094da785906302::t_e26825f494966c 236,238-240
+src/consts.nim
+  s_094da785906302::t_384c9986869ada 160-165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "93f7489d1cf8f4ded03549514509b4ac0307d529",
+  "prompts": {},
+  "sessions": {
+    "s_094da785906302": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "160851ee-fbc6-4829-a35a-0c3c48d4a959",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
