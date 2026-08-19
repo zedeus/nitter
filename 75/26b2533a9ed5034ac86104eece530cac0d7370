@@ -1,0 +1,21 @@
+src/consts.nim
+  s_094da785906302::t_3cf2bee7070d0b 177-184
+src/api.nim
+  s_094da785906302::t_905cb6aa0b29db 236,238-240
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "7526b2533a9ed5034ac86104eece530cac0d7370",
+  "prompts": {},
+  "sessions": {
+    "s_094da785906302": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "160851ee-fbc6-4829-a35a-0c3c48d4a959",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
