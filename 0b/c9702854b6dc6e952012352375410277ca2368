@@ -1,0 +1,25 @@
+src/apiutils.nim
+  s_094da785906302::t_25a13059d478c8 19-25,27
+  s_094da785906302::t_5ef20bd49b11e5 168,171
+  s_094da785906302::t_16b19308b14d16 15,18
+  s_094da785906302::t_2037c0ca481388 169-170
+  s_094da785906302::t_8ce2c1ccb31f50 26
+  s_094da785906302::t_dcae04b55df834 14
+  s_094da785906302::t_6a923e0a568237 16-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0bc9702854b6dc6e952012352375410277ca2368",
+  "prompts": {},
+  "sessions": {
+    "s_094da785906302": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "160851ee-fbc6-4829-a35a-0c3c48d4a959",
+        "model": "metr-model"
+      },
+      "human_author": null
+    }
+  }
+}
