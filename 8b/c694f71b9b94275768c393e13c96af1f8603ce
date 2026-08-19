@@ -1,0 +1,957 @@
+src/consts.nim
+  s_094da785906302::t_3cf2bee7070d0b 169-174
+src/api.nim
+  s_094da785906302::t_905cb6aa0b29db 236,238-240
+.claude/ralph-loops/endpoint-comparison.md
+  s_7fa5284c3ebe24::t_c9c83fc2264b87 1-80
+.claude/skills/adversarial-test/SKILL.md
+  s_7fa5284c3ebe24::t_f8a4578b234a54 1-62
+.claude/skills/api-investigate/SKILL.md
+  s_7fa5284c3ebe24::t_9494c35618c39a 1-120
+.claude/skills/autopilot/SKILL.md
+  s_7fa5284c3ebe24::t_ef4981135340c3 1-163
+.claude/skills/commits/SKILL.md
+  s_7fa5284c3ebe24::t_642d3bb385eb65 1-31
+.claude/skills/endpoint/SKILL.md
+  s_7fa5284c3ebe24::t_32da8cebdd3655 1-144
+.claude/skills/noobcheck/SKILL.md
+  s_7fa5284c3ebe24::t_12dd061db5822d 1-46
+.claude/skills/quality-pass/SKILL.md
+  s_7fa5284c3ebe24::t_93156e3519e1ce 1-56
+.claude/skills/theme-check/SKILL.md
+  s_7fa5284c3ebe24::t_6ca968dc1e4dd1 1-6
+.claude/skills/theme-check/instructions.md
+  s_7fa5284c3ebe24::t_714ba25c984137 1-151
+.claude/skills/visual-review/SKILL.md
+  s_7fa5284c3ebe24::t_6336b13c035ec4 1-84
+.claude/worklogs/embed-height-fix.md
+  s_7fa5284c3ebe24::t_aa17f9183db3f3 1-41
+.claude/worklogs/issue-1334.md
+  s_7fa5284c3ebe24::t_0ece4120461131 1-74
+.claude/worklogs/issue-1335.md
+  s_7fa5284c3ebe24::t_400961c684f603 1-212
+.claude/worklogs/issue-1336.md
+  s_7fa5284c3ebe24::t_2560433945fcd0 1-186
+.claude/worklogs/issue-1418.md
+  s_7fa5284c3ebe24::t_0506d3e7fcbcb1 1-45
+.claude/worklogs/issue-1422.md
+  s_7fa5284c3ebe24::t_16fc21a75bb8d9 1-30
+.claude/worklogs/issue-1433.md
+  s_50410579246f13::t_22753d1e8ccd0a 1-91
+.claude/worklogs/issue-586.md
+  s_7fa5284c3ebe24::t_5c6bda2bb8d2d9 1-190
+.claudeignore
+  s_7fa5284c3ebe24::t_ae4a8956806267 1
+.cursorindexingignore
+  s_7fa5284c3ebe24::t_2cacef7f7024ec 1-3
+.cursorrules
+  s_7fa5284c3ebe24::t_fbfec2b1dc1b9b 1-199
+.specstory/.gitignore
+  s_7fa5284c3ebe24::t_9eaedddcfed0db 1-4
+.specstory/cli/config.toml
+  s_7fa5284c3ebe24::t_4591eb6d9c5199 1-82
+.specstory/history/2025-11-23_16-14Z-remove-legacy-support-for-nim-1-6-x.md
+  s_7fa5284c3ebe24::t_4520b3e7d7c21a 1-1032
+.specstory/history/2025-11-23_18-21Z-tackling-nitter-issue-#1231.md
+  s_7fa5284c3ebe24::t_294aa38aa67a8d 1-927
+.specstory/history/2025-11-24_12-46Z-discuss-issue-#551.md
+  s_7fa5284c3ebe24::t_c6f3909b4817d5 1-2285
+.specstory/history/2025-11-24_13-44Z-work-on-issue-526.md
+  s_7fa5284c3ebe24::t_24f2bb297edcf9 1-2832
+.specstory/history/2025-11-24_14-08Z-fix-issue-520.md
+  s_7fa5284c3ebe24::t_dbc6c414114610 1-1807
+.specstory/history/2025-11-24_14-37Z-fix-issue-629.md
+  s_7fa5284c3ebe24::t_7a689577dc19b8 1-633
+.specstory/history/2025-11-24_15-15Z-adjust-nitter-font-size-to-match-x-com.md
+  s_7fa5284c3ebe24::t_2a920a2c87636a 1-1072
+.specstory/history/2025-11-24_19-53Z-review-issue-842-and-gather-insights.md
+  s_7fa5284c3ebe24::t_98a838e8b926f2 1-14568
+.specstory/history/2025-11-27_21-00Z-add-test-section-to-readme.md
+  s_7fa5284c3ebe24::t_db7603b38dd7b6 1-3147
+.specstory/history/2025-11-27_21-31Z-add-a-new-file-with-random-code.md
+  s_7fa5284c3ebe24::t_508183044758f1 1-142
+.specstory/history/2025-11-28_22-57Z-review-and-plan-for-issue-1318.md
+  s_7fa5284c3ebe24::t_68be9f1fc7287a 1-65833
+.specstory/history/2025-11-30_00-58Z-resolve-github-issue-#447.md
+  s_7fa5284c3ebe24::t_07830dcafd3449 1-18605
+.specstory/history/2025-11-30_01-03Z-discuss-solutions-for-github-issue-#447.md
+  s_7fa5284c3ebe24::t_ff8b935ffadaf8 1-88872
+.specstory/history/2025-11-30_02-18Z-addressing-issue-1317-strategies.md
+  s_7fa5284c3ebe24::t_1beab9e7f136c0 1-53722
+.specstory/history/2025-11-30_04-11Z-investigate-issue-1328.md
+  s_7fa5284c3ebe24::t_846a344dc180ff 1-34008
+.specstory/history/2025-12-01_00-43Z-create-a-new-file-and-commit.md
+  s_7fa5284c3ebe24::t_b7eb396f5b54ed 1-366
+.specstory/history/2026-05-26_21-00-46Z-this-session-is-being.md
+  s_7fa5284c3ebe24::t_94c0dc43059dc4 1-41936
+.specstory/history/2026-06-02_14-21-06Z.md
+  s_7fa5284c3ebe24::t_88bc47cc869058 1-18392
+.specstory/history/2026-06-02_21-11-42Z-let-s-work-on.md
+  s_7fa5284c3ebe24::t_768b431a2e2d59 1-3276
+.specstory/history/2026-06-05_18-23-02Z-hash-ralph-development-instructions.md
+  s_7fa5284c3ebe24::t_00b7bcd3374613 1-1273
+.specstory/history/2026-06-06_21-55-44Z-let-s-work-on.md
+  s_7fa5284c3ebe24::t_e018f023e6d227 1-1025
+.specstory/history/2026-06-06_22-19-09Z-let-s-work-on.md
+  s_7fa5284c3ebe24::t_732c08f9618d3c 1-11869
+.specstory/history/2026-06-07_21-05-07Z-let-s-work-on.md
+  s_7fa5284c3ebe24::t_323f952398621f 1-632
+.specstory/history/2026-06-07_21-26-00Z-i-m-having-this.md
+  s_7fa5284c3ebe24::t_c146f48f0328c4 1-4808
+.specstory/history/2026-06-07_23-17-04Z-let-s-work-on.md
+  s_7fa5284c3ebe24::t_e82d4a23a98ea2 1-22191
+.specstory/history/2026-06-08_20-13-14Z-pick-an-open-github.md
+  s_7fa5284c3ebe24::t_e754a52fc196e7 1-984
+.specstory/history/2026-06-08_21-30-17Z.md
+  s_7fa5284c3ebe24::t_8bdb868703f9a4 1-3720
+.specstory/history/2026-06-09_04-33-14Z-help-pick-a-difficult.md
+  s_7fa5284c3ebe24::t_263e86734893e0 1-6893
+.specstory/history/2026-06-09_04-49-22Z.md
+  s_7fa5284c3ebe24::t_ba79e9a944ce08 1-89692
+.specstory/history/2026-06-10_07-53-15Z-i-have-this-issue.md
+  s_7fa5284c3ebe24::t_4c86d131f9bae8 1-16633
+.specstory/history/2026-06-10_13-00-29Z-i-m-trying-to.md
+  s_7fa5284c3ebe24::t_67079bee812b01 1-5274
+.specstory/history/2026-06-10_14-41-04Z-we-re-going-to.md
+  s_7fa5284c3ebe24::t_bd5bd4857c9586 1-227050
+.specstory/history/2026-06-11_20-37-06Z.md
+  s_7fa5284c3ebe24::t_4f2f6237e66afb 1-7052
+.specstory/history/2026-06-16_14-32-25Z.md
+  s_7fa5284c3ebe24::t_d30ab1d8cfa147 1-19
+.specstory/history/2026-06-16_14-33-12Z-i-just-upgrade-claude.md
+  s_7fa5284c3ebe24::t_fad80d72dac0f2 1-1074
+.specstory/history/2026-06-16_14-37-16Z.md
+  s_7fa5284c3ebe24::t_2459f3b2dd76de 1-149
+.specstory/history/2026-06-16_14-37-57Z.md
+  s_7fa5284c3ebe24::t_7987e94109f68d 1-125
+.specstory/history/2026-06-16_14-38-17Z-i-need-to-understand.md
+  s_7fa5284c3ebe24::t_2b86cc5949664a 1-44368
+.specstory/history/2026-06-18_09-06-09Z-list-claude-code-changelog.md
+  s_7fa5284c3ebe24::t_c4239213524648 1-333
+.specstory/history/2026-06-18_11-49-06Z.md
+  s_7fa5284c3ebe24::t_3afaf8f1b9ff21 1-31286
+.specstory/history/2026-06-18_13-15-19Z.md
+  s_7fa5284c3ebe24::t_8bf5d188bf2c17 1-4445
+.specstory/history/2026-06-18_13-47-25Z.md
+  s_7fa5284c3ebe24::t_58c39ade6b7b1b 1-42953
+.specstory/history/2026-06-20_15-57-45Z-failures-threadtest-test-thread.md
+  s_7fa5284c3ebe24::t_b6b1fab660e682 1-2934
+.specstory/history/2026-06-21_00-44-50Z-start-a-comprehensive-ralph.md
+  s_7fa5284c3ebe24::t_42689dea827349 1-3961
+.specstory/history/2026-06-21_01-25-49Z-start-a-comprehensive-ralph.md
+  s_7fa5284c3ebe24::t_655aa327ba1581 1-38
+.specstory/history/2026-06-21_01-27-03Z-start-a-comprehensive-ralph.md
+  s_7fa5284c3ebe24::t_ecd35d2ff2f815 1-31737
+.specstory/history/2026-06-21_05-00-34Z.md
+  s_7fa5284c3ebe24::t_e92d81647a826f 1-31844
+.specstory/history/2026-06-21_13-14-09Z.md
+  s_7fa5284c3ebe24::t_fc9eba1e45f729 1-11768
+.specstory/history/2026-06-21_16-28-33Z-start-a-comprehensive-ralph.md
+  s_7fa5284c3ebe24::t_66532b3008e77e 1-10098
+.specstory/statistics.json
+  s_7fa5284c3ebe24::t_0e947d85466ca9 1-238
+CLAUDE.md
+  s_7fa5284c3ebe24::t_9ee59132a1fe20 1-126
+RALPH_GUIDANCE.md
+  s_7fa5284c3ebe24::t_36a488c9c9fac3 1-340
+RALPH_README.md
+  s_7fa5284c3ebe24::t_4f4a3fe5a888f9 1-180
+bak
+  s_7fa5284c3ebe24::t_d57eebea55e9da 1-153
+issues.json
+  s_7fa5284c3ebe24::t_3bcfea32691f26 1
+issues.txt
+  s_7fa5284c3ebe24::t_ab4fab0c2d5b90 1-1833
+nitter.conf.1433bak
+  s_50410579246f13::t_9b02ed5db7dce7 1-47
+nitter.conf.backup
+  s_7fa5284c3ebe24::t_f9482344c1f0d3 1-48
+nitter.conf.test_backup
+  s_7fa5284c3ebe24::t_8f8fc2ad918c87 1-48
+nitter.conf.testbackup
+  s_7fa5284c3ebe24::t_f4b974a2277311 1-48
+nitter_open_issues.json
+  s_7fa5284c3ebe24::t_fbd21be9db4802 1
+nitter_open_issues_min.json
+  s_7fa5284c3ebe24::t_9d21d2ffb9ffb5 1
+public/js/nitter-replacer.user.js
+  s_7fa5284c3ebe24::t_97911c81c2d11e 1-246
+public/js/nitter-widgets-fallback.user.js
+  s_7fa5284c3ebe24::t_9efa341278e3df 1-70
+sessions_cookie.jsonl
+  s_7fa5284c3ebe24::t_b5394b117e6461 1-168
+sessions_cookie_only.jsonl
+  s_7fa5284c3ebe24::t_57747f01357736 1-48
+sessions_oauth.jsonl
+  s_7fa5284c3ebe24::t_3c57fa80850e9b 1-378
+sessions_oauth_only.jsonl
+  s_7fa5284c3ebe24::t_d9a6713d70caec 1-378
+sessions_test.jsonl
+  s_7fa5284c3ebe24::t_7ac19253c0e78a 1
+test.nim
+  s_7fa5284c3ebe24::t_293e7831e54c02 1-60
+tests/matrix_results/cookie-notid-noproxy.txt
+  s_7fa5284c3ebe24::t_d73795fb2965fe 1-645
+tests/matrix_results/cookie-notid-proxy.txt
+  s_7fa5284c3ebe24::t_f84cb835b298ed 1-645
+tests/matrix_results/cookie-tid-noproxy.txt
+  s_7fa5284c3ebe24::t_b1a50aaf375349 1-645
+tests/matrix_results/cookie-tid-proxy.txt
+  s_7fa5284c3ebe24::t_9c364996386284 1-645
+tests/matrix_results/run4.log
+  s_7fa5284c3ebe24::t_e92e59ef1050cb 1-26
+tests/matrix_results/run5.log
+  s_7fa5284c3ebe24::t_d542e36701ca39 1-31
+tests/matrix_results/run6.log
+  s_7fa5284c3ebe24::t_f559bf87a41440 1-41
+tests/matrix_results/run7.log
+  s_7fa5284c3ebe24::t_c705ab0244f607 1-31
+tests/matrix_results/run8.log
+  s_7fa5284c3ebe24::t_8a1d5d0e4ecb96 1-71
+tests/run_matrix.sh
+  s_7fa5284c3ebe24::t_db438ee0c95a06 1-262
+tests/sessions_bad.jsonl
+  s_7fa5284c3ebe24::t_504ccf4b95fdb2 1-11
+tests/sessions_cookie.jsonl
+  s_7fa5284c3ebe24::t_6ffc2212b27527 1-48
+tests/sessions_oauth.jsonl
+  s_7fa5284c3ebe24::t_40dff3b76f4f1a 1-378
+tests/test_entity_bounds.nim
+  s_7fa5284c3ebe24::t_3fe5332bb39918 1-195
+tests/test_timing_conn.py
+  s_7fa5284c3ebe24::t_c08f9e6e9c6402 1-41
+tests/test_timing_precise.py
+  s_7fa5284c3ebe24::t_3af1faf20f0988 1-41
+tmp/.claude/ralph-loop.local.md
+  s_7fa5284c3ebe24::t_8953c3cb5ef706 1-10
+tmp/about-json/jack.about.json
+  s_50410579246f13::t_3343f8cb12a071 1
+tmp/api-investigate/empty.json
+  s_7fa5284c3ebe24::t_63691fb722d412 1
+tmp/api-investigate/lists_check.nim
+  s_7fa5284c3ebe24::t_70272defe4cef3 1-19
+tmp/api-investigate/malformed_check.nim
+  s_7fa5284c3ebe24::t_5087b6e726fd26 1-8
+tmp/api-investigate/malformed_lists.json
+  s_7fa5284c3ebe24::t_4caf3165bbdf66 1-14
+tmp/api-investigate/malformed_media.json
+  s_7fa5284c3ebe24::t_141d9c83b95b20 1
+tmp/api-investigate/nodata.json
+  s_7fa5284c3ebe24::t_04070a2484eb8e 1
+tmp/api-investigate/parse_check.nim
+  s_7fa5284c3ebe24::t_1ae8e4cc90ad17 1-16
+tmp/api-investigate/report.md
+  s_7fa5284c3ebe24::t_17169cc801253a 1-58
+tmp/article_ids.txt
+  s_7fa5284c3ebe24::t_82eaef68e33442 1-15
+tmp/articles/article_ids.txt
+  s_7fa5284c3ebe24::t_42270ec7bf8ff7 1-25
+tmp/articles/found_articles.json
+  s_7fa5284c3ebe24::t_9484de93ca438b 1-333
+tmp/articles/json/2028832252692439361.json
+  s_7fa5284c3ebe24::t_c2eed743f7df74 1
+tmp/articles/json/2058943947343368356.json
+  s_7fa5284c3ebe24::t_10ded66ebe0953 1
+tmp/articles/json/2059228454315274342.json
+  s_7fa5284c3ebe24::t_4ab3308a4d7f67 1
+tmp/articles/json/2061799004401287278.json
+  s_7fa5284c3ebe24::t_d489425910448e 1
+tmp/articles/json/2061816705802965340.json
+  s_7fa5284c3ebe24::t_287570b6f5669d 1
+tmp/articles/json/2061865598141751673.json
+  s_7fa5284c3ebe24::t_7619b7616155b3 1
+tmp/articles/json/2061991512867803638.json
+  s_7fa5284c3ebe24::t_cfc8cd8f5a23a5 1
+tmp/articles/json/2062262271758520756.json
+  s_7fa5284c3ebe24::t_6e412367c7f171 1
+tmp/articles/json/2062354507754029175.json
+  s_7fa5284c3ebe24::t_a6f3f0c8bf833c 1
+tmp/articles/json/2062722726016733593.json
+  s_7fa5284c3ebe24::t_ead72788e0264f 1
+tmp/articles/json/2062858677149675788.json
+  s_7fa5284c3ebe24::t_16f05f3371f13a 1
+tmp/articles/json/2063073286133887155.json
+  s_7fa5284c3ebe24::t_a4e29c9e36cf11 1
+tmp/articles/json/2063677483548102688.json
+  s_7fa5284c3ebe24::t_0b0527fcfc033c 1
+tmp/articles/json/2063890675331141762.json
+  s_7fa5284c3ebe24::t_3738c1dd5276fd 1
+tmp/articles/json/2063999033820184576.json
+  s_7fa5284c3ebe24::t_94f4db7d9ba402 1
+tmp/articles/json/2064166507438059759.json
+  s_7fa5284c3ebe24::t_c641e3b6542844 1
+tmp/articles/json/2064689664213041529.json
+  s_7fa5284c3ebe24::t_642026bf28ce9e 1
+tmp/articles/json/2064690998211473694.json
+  s_7fa5284c3ebe24::t_1961ef512ba0c2 1
+tmp/articles/json/2064691088636424322.json
+  s_7fa5284c3ebe24::t_c44c08513a91dc 1
+tmp/articles/json/2064691191455596909.json
+  s_7fa5284c3ebe24::t_ca1e1400a4b6bd 1
+tmp/articles/json/2064696491948777658.json
+  s_7fa5284c3ebe24::t_22d399e2604621 1
+tmp/articles/json/2064755231901319527.json
+  s_7fa5284c3ebe24::t_a365decebcc8e6 1
+tmp/articles/json/2064755789391110154.json
+  s_7fa5284c3ebe24::t_f32fabf50ee039 1
+tmp/articles/json/2065054314880798737.json
+  s_7fa5284c3ebe24::t_c1e5139eeda931 1
+tmp/articles/json/2065069954920231100.json
+  s_7fa5284c3ebe24::t_de00ba1bf8676b 1
+tmp/articles/json/2065168171410059729.json
+  s_7fa5284c3ebe24::t_68ad12f27d7dfd 1
+tmp/articles/progress.md
+  s_7fa5284c3ebe24::t_777d986d48b2c9 1-76
+tmp/batch.log
+  s_7fa5284c3ebe24::t_76230164aafe8d 1-5
+tmp/batch_6833016.json
+  s_99a5448c46a2fd::t_7821d90cb82189 1-417
+tmp/batch_7040165.json
+  s_99a5448c46a2fd::t_065815ac61ed0b 1-52
+tmp/batch_final.log
+  s_7fa5284c3ebe24::t_3b5cf44b45b067 1-5
+tmp/batch_final2.log
+  s_7fa5284c3ebe24::t_0898783a07ae9d 1-213
+tmp/batch_final2_summary.json
+  s_7fa5284c3ebe24::t_d067120fed4b3c 1
+tmp/batch_final_summary.json
+  s_7fa5284c3ebe24::t_b8df5db51d60b2 1
+tmp/batch_sessions.py
+  s_7fa5284c3ebe24::t_903076971b9765 1-226
+tmp/bearer_bucket_test.py
+  s_7fa5284c3ebe24::t_4e8bcf4a1a0fb7 1-66
+tmp/bearer_test.log
+  s_7fa5284c3ebe24::t_cc3c07c7346159 1-9
+tmp/broadcast-json/1DXxyWjqeyVGM.broadcast.json
+  s_7fa5284c3ebe24::t_f42ea9fa093bdb 1
+tmp/broadcast-json/1DXxyWjqeyVGM.stream.json
+  s_7fa5284c3ebe24::t_30faf0c38d4f24 1-12
+tmp/broadcast-json/1RDGlyognOgJL.broadcast.json
+  s_7fa5284c3ebe24::t_26b6694de44cdd 1
+tmp/broadcast-json/1RDGlyognOgJL.stream.json
+  s_7fa5284c3ebe24::t_61125104808ff8 1-12
+tmp/broadcast-json/1dRKZEWQvrXxB.broadcast.json
+  s_7fa5284c3ebe24::t_19d6ad4f522d2d 1
+tmp/broadcast-json/1dRKZEWQvrXxB.stream.json
+  s_7fa5284c3ebe24::t_48420383ed0db4 1-12
+tmp/broadcast-json/1gqxvrrYZyRxB.broadcast.json
+  s_7fa5284c3ebe24::t_c4bfbecbd9b0dc 1
+tmp/broadcast-json/1gqxvrrYZyRxB.stream.json
+  s_7fa5284c3ebe24::t_21bb3374f12856 1-12
+tmp/broadcast-json/1jGXgemARdyKZ.broadcast.json
+  s_7fa5284c3ebe24::t_9fb6cbeffe11a4 1
+tmp/broadcast-json/1jGXgemARdyKZ.stream.json
+  s_7fa5284c3ebe24::t_c4530b7ee74ffd 1-12
+tmp/broadcast-json/1rmGPvvZbYLxN.broadcast.json
+  s_7fa5284c3ebe24::t_e1b9f61e5e19b6 1
+tmp/broadcast-json/1rmGPvvZbYLxN.stream.json
+  s_7fa5284c3ebe24::t_2ff96c24c949b0 1-12
+tmp/broadcast-json/1vAxRQzabDzJl.broadcast.json
+  s_7fa5284c3ebe24::t_4881f64f280eb9 1
+tmp/broadcast-json/1vAxRQzabDzJl.stream.json
+  s_7fa5284c3ebe24::t_3bd5ebeef26ae1 1-12
+tmp/broadcast-json/1yKAPMqXPNgxb.broadcast.json
+  s_7fa5284c3ebe24::t_78f8c1f03afc75 1
+tmp/broadcast-json/1yKAPMqXPNgxb.stream.json
+  s_7fa5284c3ebe24::t_38187d1b85d2db 1-12
+tmp/committed_tool_test.log
+  s_7fa5284c3ebe24::t_bde7f29817df8b 1-5
+tmp/communities.txt
+  s_7fa5284c3ebe24::t_06f9fe7c49ab77 1-206
+tmp/community-json/1493446837214187523.about-timeline.json
+  s_7fa5284c3ebe24::t_32808202a5bb92 1
+tmp/community-json/1493446837214187523.community-query.json
+  s_7fa5284c3ebe24::t_d3152ff84942f1 1
+tmp/community-json/1493446837214187523.community.json
+  s_50410579246f13::t_a3d3a2c8f2c030 1
+tmp/community-json/1493446837214187523.hashtag-code.json
+  s_7fa5284c3ebe24::t_d9988027549d8f 1-8003
+tmp/community-json/1493446837214187523.media.json
+  s_50410579246f13::t_47d533daf9c8f4 1
+tmp/community-json/1493446837214187523.members.json
+  s_7fa5284c3ebe24::t_665d67d8e2f9d9 1-755
+tmp/community-json/1493446837214187523.moderators.json
+  s_7fa5284c3ebe24::t_e3890cb067dcc4 1-232
+tmp/community-json/1493446837214187523.tweets-latest.json
+  s_50410579246f13::t_fb7940f3038494 1
+tmp/community-json/1493446837214187523.tweets-top.json
+  s_50410579246f13::t_accca3cadca0ab 1
+tmp/community-json/1497290625179238400.community.json
+  s_7fa5284c3ebe24::t_070a1ee3020133 1
+tmp/community-json/1497290625179238400.media.json
+  s_7fa5284c3ebe24::t_8296b817060e83 1
+tmp/community-json/1497290625179238400.tweets-latest.json
+  s_7fa5284c3ebe24::t_77e1362270be1d 1
+tmp/community-json/1497290625179238400.tweets-top.json
+  s_7fa5284c3ebe24::t_1048ee10dc6279 1
+tmp/cookie-only.jsonl
+  s_7fa5284c3ebe24::t_803541d47c3df2 1-48
+tmp/decisive.log
+  s_7fa5284c3ebe24::t_70105efb3b4ca1 1-11
+tmp/decisive_test.py
+  s_7fa5284c3ebe24::t_3b743a1ba06ab4 1-31
+tmp/dep-analysis/SUMMARY.md
+  s_7fa5284c3ebe24::t_6b64ea8d150888 1-64
+tmp/dep-analysis/flatty.md
+  s_7fa5284c3ebe24::t_808e72c5c7d687 1-46
+tmp/dep-analysis/jester.md
+  s_7fa5284c3ebe24::t_a9c3b98990d052 1-65
+tmp/dep-analysis/jsony.md
+  s_7fa5284c3ebe24::t_6c808b8a950866 1-46
+tmp/dep-analysis/karax.md
+  s_7fa5284c3ebe24::t_65170c34063394 1-65
+tmp/dep-analysis/markdown.md
+  s_7fa5284c3ebe24::t_fcaf30a455f8b0 1-47
+tmp/dep-analysis/nimcrypto.md
+  s_7fa5284c3ebe24::t_bc43c46c213528 1-62
+tmp/dep-analysis/oauth.md
+  s_7fa5284c3ebe24::t_c67e770cb87571 1-46
+tmp/dep-analysis/packedjson.md
+  s_7fa5284c3ebe24::t_59ce1d0e258889 1-34
+tmp/dep-analysis/sass.md
+  s_7fa5284c3ebe24::t_742a9a3088eca8 1-33
+tmp/dep-analysis/supersnappy.md
+  s_7fa5284c3ebe24::t_95fd5eb9a87551 1-43
+tmp/dep-analysis/zippy.md
+  s_7fa5284c3ebe24::t_d9eb2ca8ab60a5 1-44
+tmp/endpoint-analysis/detailed-report.md
+  s_7fa5284c3ebe24::t_3105facbae773f 1-9105
+tmp/endpoint-analysis/mid-summary.md
+  s_7fa5284c3ebe24::t_642cb562f57712 1-98
+tmp/endpoint-analysis/summary.md
+  s_7fa5284c3ebe24::t_1ee5f2a365d343 1-124
+tmp/endpoint-compare/CommerceUserResultByIdQuery.json
+  s_7fa5284c3ebe24::t_39a1bc1c2b3e73 1-106
+tmp/endpoint-compare/GetUserQuery.json
+  s_7fa5284c3ebe24::t_f4c19fb57b441a 1-158
+tmp/endpoint-compare/GetUsersByIds.json
+  s_7fa5284c3ebe24::t_4c0ea76b0d4121 1-117
+tmp/endpoint-compare/UserByRestId.json
+  s_7fa5284c3ebe24::t_0f0d10624853d3 1-124
+tmp/endpoint-compare/UserResultByIdQuery.json
+  s_7fa5284c3ebe24::t_5554e9786d21d4 1-94
+tmp/endpoints_1195.txt
+  s_7fa5284c3ebe24::t_f3f14a37459cf0 1-686
+tmp/endpoints_1197.txt
+  s_7fa5284c3ebe24::t_d86dad78e9df47 1-693
+tmp/endpoints_1198.txt
+  s_7fa5284c3ebe24::t_2ffbf17cb1db90 1-691
+tmp/example_feed_titlefix.xml
+  s_7fa5284c3ebe24::t_eb681518649061 1-46
+tmp/example_feed_titles.xml
+  s_7fa5284c3ebe24::t_d5ba257c440b87 1-62
+tmp/example_profile_feed.xml
+  s_7fa5284c3ebe24::t_304504286412d0 1-99
+tmp/filter_run.log
+  s_7fa5284c3ebe24::t_de6724d4e54a74 1-18
+tmp/followers-json/12.followers.json
+  s_50410579246f13::t_e03f1af9bf2e15 1
+tmp/full_flow.log
+  s_7fa5284c3ebe24::t_6c4e5606ae0462 1-2
+tmp/full_flow2.log
+  s_7fa5284c3ebe24::t_3cfb83d13b05ce 1
+tmp/full_flow2.py
+  s_7fa5284c3ebe24::t_dea2c5b32ad03a 1-105
+tmp/full_flow3.log
+  s_7fa5284c3ebe24::t_697ab11cf6436f 1
+tmp/full_flow4.log
+  s_7fa5284c3ebe24::t_6d0a57ad34101d 1
+tmp/full_flow5.log
+  s_7fa5284c3ebe24::t_d01bfecf7230fe 1
+tmp/full_flow6.log
+  s_7fa5284c3ebe24::t_24dc90d2801462 1-10
+tmp/full_flow7.log
+  s_7fa5284c3ebe24::t_f9ca25a3047fdf 1
+tmp/gen_err.txt
+  s_7fa5284c3ebe24::t_c24d7a39699538 1
+tmp/idle_account.json
+  s_7fa5284c3ebe24::t_f80c2d4951335d 1
+tmp/idle_at_2fa.log
+  s_7fa5284c3ebe24::t_db6ed790e88037 1-116
+tmp/idle_at_2fa.py
+  s_7fa5284c3ebe24::t_82ee3346c42a6f 1-70
+tmp/intercept_tool_test.log
+  s_7fa5284c3ebe24::t_ca0090165345d1 1-5
+tmp/issue187_research.md
+  s_7fa5284c3ebe24::t_adb210b957def3 1-107
+tmp/issue697-raw-cookie-notid/2029413511164805194.graphTweet.json
+  s_7fa5284c3ebe24::t_f6c0433d9edd5c 1
+tmp/issue697-raw-cookie-notid/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_f56f301a28269c 1
+tmp/issue697-raw-cookie-notid/2030339738146668771.graphTweet.json
+  s_7fa5284c3ebe24::t_2e40c1a480829b 1
+tmp/issue697-raw-cookie-notid/2031734912446066975.graphTweet.json
+  s_7fa5284c3ebe24::t_cf02a3df3ffa42 1
+tmp/issue697-raw-cookie-notid/2032215488281870604.graphTweet.json
+  s_7fa5284c3ebe24::t_501f4b4e366242 1
+tmp/issue697-raw-oauth-detail/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_2364b3679aaf84 1
+tmp/issue697-raw-oauth-result/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_ac0dd50f28bf04 1
+tmp/issue697-raw-oauth/2029413511164805194.graphTweet.json
+  s_7fa5284c3ebe24::t_ddc960ed97804f 1
+tmp/issue697-raw-oauth/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_2945f817344d82 1
+tmp/issue697-raw-oauth/2030339738146668771.graphTweet.json
+  s_7fa5284c3ebe24::t_08bd752a841d4a 1
+tmp/issue697-raw-oauth/2031734912446066975.graphTweet.json
+  s_7fa5284c3ebe24::t_1ddcb2945ac82b 1
+tmp/issue697-raw-oauth/2032215488281870604.graphTweet.json
+  s_7fa5284c3ebe24::t_08dfb63311bab4 1
+tmp/issue697-raw/2029413511164805194.graphTweet.json
+  s_7fa5284c3ebe24::t_2eac08525d9a34 1
+tmp/issue697-raw/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_df245c7f006594 1
+tmp/issue697-raw/2030339738146668771.graphTweet.json
+  s_7fa5284c3ebe24::t_2350b7ccaff0bb 1
+tmp/issue697-raw/2031734912446066975.graphTweet.json
+  s_7fa5284c3ebe24::t_118532e6a62892 1
+tmp/issue697-raw/2032215488281870604.graphTweet.json
+  s_7fa5284c3ebe24::t_40a11c8d350c24 1
+tmp/issue697-repeat-graphTweetDetail/01/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_9448cd9fd88454 1
+tmp/issue697-repeat-graphTweetDetail/02/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_0658ba9c7d43ac 1
+tmp/issue697-repeat-graphTweetDetail/03/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_47828cd69d8279 1
+tmp/issue697-repeat-graphTweetDetail/04/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_32d232e33816fb 1
+tmp/issue697-repeat-graphTweetDetail/05/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_dc82705e1a58bc 1
+tmp/issue697-repeat-graphTweetDetail/06/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_9162549d8ba2c3 1
+tmp/issue697-repeat-graphTweetDetail/07/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_6a9bdafaab5309 1
+tmp/issue697-repeat-graphTweetDetail/08/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_2ade2fce6092a4 1
+tmp/issue697-repeat-graphTweetDetail/09/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_566c8868658ad8 1
+tmp/issue697-repeat-graphTweetDetail/10/2029433127253225613.graphTweetDetail.json
+  s_7fa5284c3ebe24::t_687c3290b0f5f6 1
+tmp/issue697-repeat-graphTweetResult/01/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_b5b294d71127a1 1
+tmp/issue697-repeat-graphTweetResult/02/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_70d0110f90bf2e 1
+tmp/issue697-repeat-graphTweetResult/03/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_1c183788e45bbf 1
+tmp/issue697-repeat-graphTweetResult/04/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_c477c13d1ca9ae 1
+tmp/issue697-repeat-graphTweetResult/05/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_5b2f87e2875ed3 1
+tmp/issue697-repeat-graphTweetResult/06/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_d03f658b71f094 1
+tmp/issue697-repeat-graphTweetResult/07/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_5961d5f8fc9170 1
+tmp/issue697-repeat-graphTweetResult/08/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_2c7736ef585cd1 1
+tmp/issue697-repeat-graphTweetResult/09/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_89c10222e1429f 1
+tmp/issue697-repeat-graphTweetResult/10/2029433127253225613.graphTweetResult.json
+  s_7fa5284c3ebe24::t_5b4e377f380a8a 1
+tmp/issue697-repeat/01/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_f97ef86ebfa33c 1
+tmp/issue697-repeat/02/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_47128c87ac452d 1
+tmp/issue697-repeat/03/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_10b8cfebe6b906 1
+tmp/issue697-repeat/04/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_0cc3cacd3f631d 1
+tmp/issue697-repeat/05/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_0e1727d71820b6 1
+tmp/issue697-repeat/06/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_75e9b7087b6dc3 1
+tmp/issue697-repeat/07/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_0356bc55c9ade9 1
+tmp/issue697-repeat/08/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_249e2800e72ca1 1
+tmp/issue697-repeat/09/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_079294529e0b00 1
+tmp/issue697-repeat/10/2029433127253225613.graphTweet.json
+  s_7fa5284c3ebe24::t_b5b23fa9499a79 1
+tmp/json/TweetDetail.json
+  s_7fa5284c3ebe24::t_12d9a6a298342f 1
+tmp/json/TweetResultByRestId.json
+  s_7fa5284c3ebe24::t_6cb7b646456911 1
+tmp/json/now-TweetDetail.json
+  s_7fa5284c3ebe24::t_76c39f13325bb1 1
+tmp/list-json/emekedaking.technology.listbyslug.json
+  s_50410579246f13::t_2b09ef678144e0 1
+tmp/list-json/nytimes.nyt-journalists.listbyslug.json
+  s_50410579246f13::t_9a785975d7dd9d 1
+tmp/manual_login_trace.log
+  s_7fa5284c3ebe24::t_b56e873cc8fdaf 1-2
+tmp/manual_login_trace.py
+  s_7fa5284c3ebe24::t_cca7af006c2f18 1-72
+tmp/manual_login_trace/01.url.txt
+  s_7fa5284c3ebe24::t_976d9aadd38088 1
+tmp/media-json/12.media.json
+  s_7fa5284c3ebe24::t_3cc253148d3148 1
+tmp/new-endpoints/oauth/12.json
+  s_7fa5284c3ebe24::t_a6def6166ff47e 1
+tmp/new-endpoints/oauth/12.media.json
+  s_7fa5284c3ebe24::t_c361febbf94941 1
+tmp/new-endpoints/oauth/12.replies.json
+  s_7fa5284c3ebe24::t_b2048a87a2c1d7 1
+tmp/new-endpoints/oauth/20.graphTweet.json
+  s_7fa5284c3ebe24::t_74b776a47c9f1d 1
+tmp/new-endpoints/oauth/jack.about.json
+  s_7fa5284c3ebe24::t_3a0b2646de5eb7 1
+tmp/new-endpoints/oauth/jack.json
+  s_7fa5284c3ebe24::t_65ffe5713aaec3 1
+tmp/new-endpoints/oauth/test.search.json
+  s_7fa5284c3ebe24::t_cd025981ad9470 1
+tmp/new-endpoints/tid-disabled/12.json
+  s_7fa5284c3ebe24::t_3e6a954d63996f 1
+tmp/new-endpoints/tid-disabled/12.media.json
+  s_7fa5284c3ebe24::t_1a08d2d9b82f14 1
+tmp/new-endpoints/tid-disabled/12.replies.json
+  s_7fa5284c3ebe24::t_0b0d5250ffdc09 1
+tmp/new-endpoints/tid-disabled/20.graphTweet.json
+  s_7fa5284c3ebe24::t_8ff683ed921b76 1
+tmp/new-endpoints/tid-disabled/jack.about.json
+  s_7fa5284c3ebe24::t_ea037b33a2fe9c 1
+tmp/new-endpoints/tid-disabled/jack.json
+  s_7fa5284c3ebe24::t_ee4d81946eaa67 1
+tmp/new-endpoints/tid-disabled/test.search.json
+  s_7fa5284c3ebe24::t_bb8dcabd611f9e 1
+tmp/new-endpoints/tid-enabled/12.json
+  s_7fa5284c3ebe24::t_f1276968c51798 1
+tmp/new-endpoints/tid-enabled/12.media.json
+  s_7fa5284c3ebe24::t_65513af975bbdd 1
+tmp/new-endpoints/tid-enabled/12.replies.json
+  s_7fa5284c3ebe24::t_5616d7923157b7 1
+tmp/new-endpoints/tid-enabled/20.graphTweet.json
+  s_7fa5284c3ebe24::t_a0bb783fb030b9 1
+tmp/new-endpoints/tid-enabled/jack.about.json
+  s_7fa5284c3ebe24::t_53171bc44d6ef3 1
+tmp/new-endpoints/tid-enabled/jack.json
+  s_7fa5284c3ebe24::t_add46cd649f3e9 1
+tmp/new-endpoints/tid-enabled/test.search.json
+  s_7fa5284c3ebe24::t_f45436b85edd96 1
+tmp/oauth-only.jsonl
+  s_7fa5284c3ebe24::t_5a8f30ca6fc4a8 1-5
+tmp/oauth-sessions-formatted.jsonl
+  s_7fa5284c3ebe24::t_365d4bdc26970f 1-5
+tmp/oauth-sessions.jsonl
+  s_7fa5284c3ebe24::t_65b09df4baf4cc 1-5
+tmp/old-endpoints/oauth/12.json
+  s_7fa5284c3ebe24::t_ce13eb8b1c5570 1
+tmp/old-endpoints/oauth/12.media.json
+  s_7fa5284c3ebe24::t_ccc90221dbf62c 1
+tmp/old-endpoints/oauth/12.replies.json
+  s_7fa5284c3ebe24::t_9ecbbd07900f79 1
+tmp/old-endpoints/oauth/20.graphTweet.json
+  s_7fa5284c3ebe24::t_738d286f38f6aa 1
+tmp/old-endpoints/oauth/jack.about.json
+  s_7fa5284c3ebe24::t_8dc7d2de16800e 1
+tmp/old-endpoints/oauth/jack.json
+  s_7fa5284c3ebe24::t_dfed7c5620d535 1
+tmp/old-endpoints/oauth/test.search.json
+  s_7fa5284c3ebe24::t_b4296aab975271 1
+tmp/old-endpoints/tid-disabled/12.json
+  s_7fa5284c3ebe24::t_13dfb4afab789f 1
+tmp/old-endpoints/tid-disabled/12.media.json
+  s_7fa5284c3ebe24::t_f9167d21b6c3fd 1
+tmp/old-endpoints/tid-disabled/12.replies.json
+  s_7fa5284c3ebe24::t_7782f97836be09 1
+tmp/old-endpoints/tid-disabled/20.graphTweet.json
+  s_7fa5284c3ebe24::t_13915681f6f4ec 1
+tmp/old-endpoints/tid-disabled/jack.about.json
+  s_7fa5284c3ebe24::t_8eed53d78fe474 1
+tmp/old-endpoints/tid-disabled/jack.json
+  s_7fa5284c3ebe24::t_685ffdd562f0dc 1
+tmp/old-endpoints/tid-disabled/test.search.json
+  s_7fa5284c3ebe24::t_730a0a2972d52e 1
+tmp/old-endpoints/tid-enabled/12.json
+  s_7fa5284c3ebe24::t_bce57ec041e495 1
+tmp/old-endpoints/tid-enabled/12.media.json
+  s_7fa5284c3ebe24::t_49cefae4b30d93 1
+tmp/old-endpoints/tid-enabled/12.replies.json
+  s_7fa5284c3ebe24::t_2c0504c6d183de 1
+tmp/old-endpoints/tid-enabled/20.graphTweet.json
+  s_7fa5284c3ebe24::t_e2e43ab9169df8 1
+tmp/old-endpoints/tid-enabled/jack.about.json
+  s_7fa5284c3ebe24::t_4b00cc08e2535b 1
+tmp/old-endpoints/tid-enabled/jack.json
+  s_7fa5284c3ebe24::t_c1d7704b4979d7 1
+tmp/old-endpoints/tid-enabled/test.search.json
+  s_7fa5284c3ebe24::t_71290a44e8fcf2 1
+tmp/order6417316.json
+  s_7fa5284c3ebe24::t_13d8e08b6f10be 1-102
+tmp/order6417316_session_run.log
+  s_7fa5284c3ebe24::t_3874ac4ac952b0 1-60
+tmp/order6417316_session_run2.log
+  s_7fa5284c3ebe24::t_13b71ae7275238 1-60
+tmp/order6833016.json
+  s_99a5448c46a2fd::t_073fb348584105 1-427
+tmp/order7040165.json
+  s_7fa5284c3ebe24::t_313f91e226d875 1-1002
+tmp/order7040165_run.log
+  s_7fa5284c3ebe24::t_b7db92c0f72f25 1-28
+tmp/order7718988.json
+  s_7fa5284c3ebe24::t_0a0b1ebc4e47e6 1
+tmp/order7718988_all.json
+  s_7fa5284c3ebe24::t_0f12a000f23de6 1-502
+tmp/order7718988_run.log
+  s_7fa5284c3ebe24::t_3a8920673631f6 1-519
+tmp/pertoken.log
+  s_7fa5284c3ebe24::t_a9838880c386ad 1-15
+tmp/pertoken_test.py
+  s_7fa5284c3ebe24::t_8be1244d9f16de 1-30
+tmp/proof_one.py
+  s_7fa5284c3ebe24::t_9489002fab6912 1-19
+tmp/ralph_communities.md
+  s_7fa5284c3ebe24::t_018830b63dce69 1-105
+tmp/ralph_issue187.md
+  s_7fa5284c3ebe24::t_0e38f7cb844159 1-92
+tmp/ralph_prompt.md
+  s_7fa5284c3ebe24::t_ea30815eb0d513 1-43
+tmp/ralph_spaces.md
+  s_7fa5284c3ebe24::t_b5c5168db0020a 1-145
+tmp/ranking-json/20.new.Likes.json
+  s_7fa5284c3ebe24::t_c7c5aec10e66fb 1
+tmp/ranking-json/20.new.Recency.json
+  s_7fa5284c3ebe24::t_2b9302fa004293 1
+tmp/ranking-json/20.new.Relevance.json
+  s_7fa5284c3ebe24::t_5e4c6367c03816 1
+tmp/ranking-json/20.old.Likes.json
+  s_7fa5284c3ebe24::t_19ce3a49316f52 1
+tmp/ranking-json/20.old.Recency.json
+  s_7fa5284c3ebe24::t_596ddb542195f1 1
+tmp/ranking-json/20.old.Relevance.json
+  s_7fa5284c3ebe24::t_2294fd35e91ea5 1
+tmp/remaining.txt
+  s_7fa5284c3ebe24::t_37cbf2de5b202e 1
+tmp/replies-json/12.replies.json
+  s_7fa5284c3ebe24::t_aa9282a8a4090c 1
+tmp/replies-json/1998581781348626434.replies.json
+  s_7fa5284c3ebe24::t_1ff69eb408e2c2 1
+tmp/rl_validate.log
+  s_7fa5284c3ebe24::t_7cda6e8166488d 1-8
+tmp/rl_validate.py
+  s_7fa5284c3ebe24::t_05857ddd614d11 1-40
+tmp/rl_validate2.log
+  s_7fa5284c3ebe24::t_f2fde391205e3c 1-8
+tmp/run_article_tests.sh
+  s_7fa5284c3ebe24::t_a599190bf41771 1-90
+tmp/search-json/nasa.Latest.search.json
+  s_7fa5284c3ebe24::t_08b768b2219226 1
+tmp/search-json/nasa.Media.page2.search.json
+  s_7fa5284c3ebe24::t_bc87c8cf7a631a 1
+tmp/search-json/nasa.Media.search.json
+  s_7fa5284c3ebe24::t_f492e598ce0738 1
+tmp/search-json/nasa.Top.page2.search.json
+  s_7fa5284c3ebe24::t_1779b3ec6de3b9 1
+tmp/search-json/nasa.Top.search.json
+  s_7fa5284c3ebe24::t_de71ecf6b1cfb7 1
+tmp/search-json/nim_lang.Latest.search.json
+  s_50410579246f13::t_8e3c4f94533ab0 1
+tmp/search-json/test.Lists.page2.search.json
+  s_7fa5284c3ebe24::t_15850b5def6468 1
+tmp/search-json/test.Lists.search.json
+  s_50410579246f13::t_cc8f0f10f77a43 1
+tmp/search-json/test.search.json
+  s_7fa5284c3ebe24::t_0645c02d1f56fe 1
+tmp/shared_usage_run.log
+  s_7fa5284c3ebe24::t_e9889c5c2986e7 1-173
+tmp/shared_usage_run2.log
+  s_7fa5284c3ebe24::t_8dcfdcf63ad102 1-286
+tmp/simplify2_test.log
+  s_7fa5284c3ebe24::t_71c5af227aa0c0 1-5
+tmp/simplify_test.log
+  s_7fa5284c3ebe24::t_ae1afe04dae1f3 1-5
+tmp/space-json/1mxPaaRAwYjKN.json
+  s_7fa5284c3ebe24::t_33e8be87ffde82 1-468
+tmp/space.txt
+  s_7fa5284c3ebe24::t_f8883f14f681ee 1-220
+tmp/test_insert.log
+  s_7fa5284c3ebe24::t_2969bb9e62bea4 1-3
+tmp/test_insert.py
+  s_7fa5284c3ebe24::t_5d77d31ea2a1c9 1-41
+tmp/test_remaining.log
+  s_7fa5284c3ebe24::t_2e18bacef9bfd4 1-31
+tmp/test_remaining.py
+  s_7fa5284c3ebe24::t_bc92d07d95675b 1-52
+tmp/test_replacements.log
+  s_7fa5284c3ebe24::t_5877c6093cbc88 1-12
+tmp/test_replacements.py
+  s_7fa5284c3ebe24::t_348b5520991f64 1-32
+tmp/test_results.txt
+  s_7fa5284c3ebe24::t_e00f586121090b 1-64
+tmp/timeline-json/12.json
+  s_50410579246f13::t_6dd0da8f6dacdd 1
+tmp/timeline-json/1998581781348626434.json
+  s_7fa5284c3ebe24::t_d2fcbd65f1dd0c 1
+tmp/tweet-json/20.graphTweet.json
+  s_7fa5284c3ebe24::t_5076d4a81a5dea 1
+tmp/tweet-json/2063979154656382976.graphTweetResult.json
+  s_7fa5284c3ebe24::t_73e396adc265a3 1
+tmp/tweet-json/2063981609062440981.graphTweet.json
+  s_7fa5284c3ebe24::t_01ef54a6405423 1
+tmp/tweet-json/2063981609062440981.graphTweetResultByRestId.json
+  s_7fa5284c3ebe24::t_cf73daf7b67901 1
+tmp/tweet-json/2066542404665254345.graphTweet.json
+  s_7fa5284c3ebe24::t_93b9a7ad965844 1
+tmp/twofa_probe.log
+  s_7fa5284c3ebe24::t_acb31e5f6d52e8 1-8
+tmp/user-json/BillGates.json
+  s_50410579246f13::t_48b30a92cdb3f0 1
+tmp/user-json/Google.json
+  s_50410579246f13::t_9fc0d207e86bf5 1
+tmp/user-json/cnn.json
+  s_50410579246f13::t_5810fcc4878f3d 1
+tmp/user-json/elonmusk.json
+  s_50410579246f13::t_53c79283bed23d 1
+tmp/user-json/espn.json
+  s_50410579246f13::t_b4fef65018ff72 1
+tmp/user-json/github.json
+  s_50410579246f13::t_c6fb882e50828e 1
+tmp/user-json/jack.json
+  s_50410579246f13::t_55d2cc340ff1cf 1
+tmp/user-json/mendule.json
+  s_7fa5284c3ebe24::t_c8b1af5446d25f 1
+tmp/user-json/nasa.json
+  s_50410579246f13::t_8b98dae1b5b471 1
+tmp/user-json/nytimes.json
+  s_50410579246f13::t_6e58b976ec1262 1
+tmp/user-json/tikio_0.json
+  s_7fa5284c3ebe24::t_9d7b0819d6619b 1
+tmp/user-json/verge.json
+  s_50410579246f13::t_d9e41c35f133db 1
+tmp/userbyid-json/12.UserByRestId.json
+  s_50410579246f13::t_4bd629b1755076 1
+tmp/userbyid-json/12.UserResultByIdQuery.json
+  s_50410579246f13::t_af2de727f7b179 1
+tmp/validate.log
+  s_7fa5284c3ebe24::t_efa1a1d3c82fbb 1-2
+tmp/validate10.log
+  s_7fa5284c3ebe24::t_728ade29cd354c 1-16
+tmp/validate11.log
+  s_7fa5284c3ebe24::t_07f3d1aca63f63 1-16
+tmp/validate12.log
+  s_7fa5284c3ebe24::t_165c683ac61e0b 1-16
+tmp/validate13.log
+  s_7fa5284c3ebe24::t_dab8c1fc1f1a6c 1-18
+tmp/validate13_summary.json
+  s_7fa5284c3ebe24::t_6c3d5c909eadc4 1
+tmp/validate2.log
+  s_7fa5284c3ebe24::t_45f07623baa0a9 1-2
+tmp/validate3.log
+  s_7fa5284c3ebe24::t_62733ed7a57ec3 1-2
+tmp/validate4.log
+  s_7fa5284c3ebe24::t_14f7b1ed263230 1-10
+tmp/validate5.log
+  s_7fa5284c3ebe24::t_5692be0b4ade20 1-12
+tmp/validate6.log
+  s_7fa5284c3ebe24::t_60f8d76ebd01f4 1-12
+tmp/validate7.log
+  s_7fa5284c3ebe24::t_520aaf751065f4 1-14
+tmp/validate8.log
+  s_7fa5284c3ebe24::t_c329b0a716c389 1-14
+tmp/validate9.log
+  s_7fa5284c3ebe24::t_ca83e4aa4e56d4 1-14
+tmp/verify_insert.log
+  s_7fa5284c3ebe24::t_913f33dd6511d9 1-18
+tmp/verify_insert_summary.json
+  s_7fa5284c3ebe24::t_8f23e9f77b258b 1
+tmp/watch.log
+  s_7fa5284c3ebe24::t_7555f15daf1d16 1-22
+tmp/watch_test.py
+  s_7fa5284c3ebe24::t_0e48e117ddf0d6 1-29
+tmp/watch_tid.log
+  s_7fa5284c3ebe24::t_6d90a300211f1d 1-22
+tools/accs_to_json.py
+  s_7fa5284c3ebe24::t_d2891a0bd9d238 1-44
+tools/catalogue_accounts.py
+  s_7fa5284c3ebe24::t_40429561feaac0 1-120
+tools/check_status.py
+  s_7fa5284c3ebe24::t_b6235ba8fdabaf 1-118
+tools/creds.txt
+  s_7fa5284c3ebe24::t_fe1dee4429a18a 1-35
+tools/extract_endpoints.sh
+  s_7fa5284c3ebe24::t_d81a737356d68c 1-66
+tools/fetch_article_json.py
+  s_7fa5284c3ebe24::t_171270049e5b83 1-85
+tools/fetch_space.py
+  s_7fa5284c3ebe24::t_47f78d1d79a6f2 1-85
+tools/filter_accounts.py
+  s_7fa5284c3ebe24::t_11013f120301ab 1-116
+tools/get_fingerprints.py
+  s_7fa5284c3ebe24::t_a474d775305d9e 1-21
+tools/get_session2.py
+  s_7fa5284c3ebe24::t_04724039cbbb6d 1-79
+tools/json_paths.nim
+  s_7fa5284c3ebe24::t_fe67daf9f9d8c5 1-294
+tools/parse_smali_graphql_v2.py
+  s_7fa5284c3ebe24::t_245fd3c9324640 1-117
+tools/ratelimit_probe.py
+  s_7fa5284c3ebe24::t_1950f229b51e03 1-141
+tools/research_ranking.nim
+  s_7fa5284c3ebe24::t_455ee3e3902266 1-69
+tools/test_shared_usage.py
+  s_7fa5284c3ebe24::t_36f499c89aeb90 1-138
+.claude/worklogs/issue-1421.md
+  s_99a5448c46a2fd::t_3ca7309e099ed0 1-49
+.claude/worklogs/issue-1434.md
+  s_094da785906302::t_15dd69454f4bc5 1-54
+.claude/worklogs/issue-696.md
+  s_1e50aedbe15957::t_00ed31edf61097 1-43
+public/js/nitter-widgets.user.js
+  s_7fa5284c3ebe24::t_748559855aaf7d 1-170
+tmp/investigate_login.py
+  s_99a5448c46a2fd::t_32f481689447bf 1-110
+tmp/investigate_xlogin.py
+  s_99a5448c46a2fd::t_973f8a3ebafc9f 1-70
+tmp/oembed-research.md
+  s_1e50aedbe15957::t_1ffea0c381dd66 1-94
+tmp/test_login_flow.py
+  s_99a5448c46a2fd::t_29ed6a67712005 1-266
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8bc694f71b9b94275768c393e13c96af1f8603ce",
+  "prompts": {},
+  "sessions": {
+    "s_094da785906302": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "160851ee-fbc6-4829-a35a-0c3c48d4a959",
+        "model": "metr-model"
+      },
+      "human_author": null
+    },
+    "s_1e50aedbe15957": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c678548-4e4c-45bf-b3f7-b9da6ad72e97",
+        "model": "unknown"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    },
+    "s_50410579246f13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d6e0225a-b2bf-4907-88c6-5008643c03fb",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    },
+    "s_7fa5284c3ebe24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3cfc2df8-835a-4dd1-a9b9-113ff0e8a75c",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    },
+    "s_99a5448c46a2fd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3353a56d-5012-4020-bcd5-7da6e5bb6ebc",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
