@@ -23,10 +23,10 @@ proc cursorParam(after: string): string =
   ## variables object (same input-validation class as the #1411 media SSRF).
   if after.len > 0: "\"cursor\":" & $(%after) & "," else: ""
 
-proc mediaUrl(id, cursor: string; count=20): ApiReq =
+proc mediaUrl(id, cursor: string): ApiReq =
   result = ApiReq(
-    cookie: apiUrl(graphUserMedia, userMediaVars % [id, cursor, $count]),
-    oauth: apiUrl(graphUserMediaV2, restIdVars % [id, cursor, $count])
+    cookie: apiUrl(graphUserMedia, userMediaVars % [id, cursor, "100"]),
+    oauth: apiUrl(graphUserMediaV2, restIdVars % [id, cursor, "100"])
   )
 
 proc userTweetsUrl(id: string; cursor: string): ApiReq =
@@ -108,7 +108,7 @@ proc getGraphUserTweets*(id: string; kind: TimelineKind; after=""): Future[Profi
     url = case kind
       of TimelineKind.tweets: userTweetsUrl(id, cursor)
       of TimelineKind.replies: userTweetsAndRepliesUrl(id, cursor)
-      of TimelineKind.media: mediaUrl(id, cursor, 100)
+      of TimelineKind.media: mediaUrl(id, cursor)
     js = await fetch(url)
   result = parseGraphTimeline(js, after)
 
@@ -333,7 +333,7 @@ proc getGraphListSearch*(query: Query; after=""): Future[Result[ListSearchResult
 
 proc getPhotoRail*(id: string): Future[PhotoRail] {.async.} =
   if id.len == 0: return
-  let js = await fetch(mediaUrl(id, "", 30))
+  let js = await fetch(mediaUrl(id, ""))
   result = parseGraphPhotoRail(js)
 
 proc getGraphArticle*(id: string): Future[Article] {.async.} =
