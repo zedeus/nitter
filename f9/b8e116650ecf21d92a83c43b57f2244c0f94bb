@@ -1,0 +1,14 @@
+.github/workflows/run-tests.yml
+  h_433ceec684135d 139,152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "f9b8e116650ecf21d92a83c43b57f2244c0f94bb",
+  "prompts": {},
+  "humans": {
+    "h_433ceec684135d": {
+      "author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
