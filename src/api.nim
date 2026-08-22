@@ -33,7 +33,10 @@ proc userTweetsUrl(id: string; cursor: string): ApiReq =
   return apiReq(graphUserTweetsV2, restIdVars % [id, cursor, "20"], userTweetsFieldToggles)
 
 proc userTweetsAndRepliesUrl(id: string; cursor: string): ApiReq =
-  return apiReq(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"], userTweetsFieldToggles, skipTid=true)
+  result = ApiReq(
+    cookie: apiUrl(graphUserTweetsAndReplies, userTweetsAndRepliesVars % [id, cursor], userTweetsFieldToggles),
+    oauth: apiUrl(graphUserTweetsAndRepliesV2, restIdVars % [id, cursor, "20"], userTweetsFieldToggles, skipTid=true)
+  )
 
 proc tweetDetailUrl(id, cursor: string; mode = Relevance): ApiReq =
   return apiReq(graphTweet, tweetVars % [id, cursor, $mode])
