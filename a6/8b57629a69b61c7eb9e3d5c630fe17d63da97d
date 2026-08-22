@@ -1,0 +1,27 @@
+tests/test_embed.py
+  s_cebbfb6f262fa0::t_b7f905c1d78eae 71-72
+  s_cebbfb6f262fa0::t_e3baba4a5406a5 264-265
+  s_cebbfb6f262fa0::t_d4fa1f508ebfbe 1-2
+tests/test_tweet_media.py
+  s_cebbfb6f262fa0::t_d92e42c211e1ab 1-2
+  s_cebbfb6f262fa0::t_8bcce4f9d120af 94-95
+tests/test_card.py
+  s_cebbfb6f262fa0::t_fe07a2e1f169e1 1-2
+  s_cebbfb6f262fa0::t_dd48a50326999b 51-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "a68b57629a69b61c7eb9e3d5c630fe17d63da97d",
+  "prompts": {},
+  "sessions": {
+    "s_cebbfb6f262fa0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a42c0bc4-7da6-492d-8a91-e1104813659f",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
