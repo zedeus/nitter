@@ -136,7 +136,7 @@ jobs:
         run: |
           cp nitter.example.conf nitter.conf
           sed -i 's/enableDebug = false/enableDebug = true/g' nitter.conf
-          sed -i 's/maxRetries = 1/maxRetries = 10/g' nitter.conf
+          sed -i 's/maxRetries = 1/maxRetries = 3/g' nitter.conf
           sed -i 's/hostname = "nitter.net"/hostname = "localhost:8080"/g' nitter.conf
 
           nim r tools/rendermd.nim
@@ -149,4 +149,4 @@ jobs:
         run: |
           ./nitter &
           cd tests
-          poetry run pytest -n3 --rs .
+          poetry run pytest -n2 --rs .
