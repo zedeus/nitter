@@ -1,0 +1,19 @@
+src/api.nim
+  s_cebbfb6f262fa0::t_809c37e0fd3179 36-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "d8c1c983297aef389e9e1335c23698dd31b78e82",
+  "prompts": {},
+  "sessions": {
+    "s_cebbfb6f262fa0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a42c0bc4-7da6-492d-8a91-e1104813659f",
+        "model": "metr-model"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
