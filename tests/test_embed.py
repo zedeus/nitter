@@ -1,3 +1,5 @@
+import os
+import unittest
 import requests
 from base import BaseTestCase, Media
 from parameterized import parameterized
@@ -66,6 +68,8 @@ class TweetEmbedMediaTest(BaseTestCase):
         self.scroll_to(Media.container)
         self.assert_element_visible(Media.gif)
 
+    @unittest.skipIf(os.environ.get('GITHUB_ACTIONS') == 'true',
+                     'TweetResultByRestId is Cloudflare-blocked from GitHub datacenter IPs')
     def test_embed_with_video(self):
         self.open_nitter('d0m96/status/1078373829917974528/embed')
         self.assert_element_visible(Embed.container)
@@ -257,6 +261,8 @@ class OEmbedDiscoveryTest(BaseTestCase):
         self.assertIn('html', data)
 
 
+@unittest.skipIf(os.environ.get('GITHUB_ACTIONS') == 'true',
+                 'TweetResultByRestId is Cloudflare-blocked from GitHub datacenter IPs')
 class VideoEmbedTest(BaseTestCase):
     """Test video embed route (/i/videos/tweet/{id})."""
     video_tweet_id = '1078373829917974528'
