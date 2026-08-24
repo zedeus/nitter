@@ -1,0 +1,53 @@
+src/parserutils.nim
+  s_e8b2e4ec0d52d8::t_2272ace4e49a5c 284,295-296,333,348
+src/api.nim
+  s_e8b2e4ec0d52d8::t_2483e8c71be967 41-46,121
+src/views/search.nim
+  s_e8b2e4ec0d52d8::t_98c2cbedfda243 39
+  s_e8b2e4ec0d52d8::t_ab7750a88966bb 40-41
+src/config.nim
+  s_e8b2e4ec0d52d8::t_98c2cbedfda243 45
+src/types.nim
+  s_e8b2e4ec0d52d8::t_98c2cbedfda243 435
+  s_e8b2e4ec0d52d8::t_b11aee024984a0 14,177-178
+tests/test_timeline.py
+  s_e8b2e4ec0d52d8::t_92c9e17b911219 100-105
+  s_e8b2e4ec0d52d8::t_0735d8de621405 87-99,106-114
+src/routes/rss.nim
+  s_e8b2e4ec0d52d8::t_2483e8c71be967 109
+  s_e8b2e4ec0d52d8::t_dbc54a5beee2b7 110-111
+  s_e8b2e4ec0d52d8::t_98c2cbedfda243 112,118
+src/parser.nim
+  s_e8b2e4ec0d52d8::t_2272ace4e49a5c 482,550,608-609,657,666-669
+nitter.example.conf
+  s_e8b2e4ec0d52d8::t_98c2cbedfda243 29
+src/query.nim
+  s_e8b2e4ec0d52d8::t_8694c0b52eb8b4 35
+  s_e8b2e4ec0d52d8::t_2483e8c71be967 47-52
+  s_e8b2e4ec0d52d8::t_03300777798ece 32-34
+src/consts.nim
+  s_e8b2e4ec0d52d8::t_8bcc5eb2a4af74 157-159
+  s_e8b2e4ec0d52d8::t_396b527103cccf 19-20,153-156
+src/views/rss.nimf
+  s_e8b2e4ec0d52d8::t_a055b77fb6ed83 20-24
+src/routes/timeline.nim
+  s_e8b2e4ec0d52d8::t_ab7750a88966bb 188-189
+  s_e8b2e4ec0d52d8::t_2483e8c71be967 29-30,78,187
+  s_e8b2e4ec0d52d8::t_98c2cbedfda243 15-23,213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "d72c1c8e229b47e67efcd49e9d240baa9b05ffb0",
+  "prompts": {},
+  "sessions": {
+    "s_e8b2e4ec0d52d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa806e83-49b8-4cc4-a4c5-0d81cc2bc8db",
+        "model": "metr-model"
+      },
+      "human_author": null
+    }
+  }
+}
