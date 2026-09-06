@@ -1,0 +1,19 @@
+README.md
+  s_d94ee859ff7d3c::t_ac526112611f9d 4-5,11-13,17-18,23,30,33-46,217
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "1428b4c2b4246f92a7e5b2673438e5fb39fcc4a3",
+  "prompts": {},
+  "sessions": {
+    "s_d94ee859ff7d3c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dbe4afc8-c3e2-4fd5-b7c1-2c7237a3bc29",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
