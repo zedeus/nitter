@@ -29,7 +29,6 @@ Inspired by the [Invidious](https://github.com/iv-org/invidious) project.
 
 - ~~Embeds~~ (see https://github.com/zedeus/nitter/wiki/Embeds-guide)
 - Account system with timeline support
-- Archiving tweets/profiles
 
 ## Donations
 
