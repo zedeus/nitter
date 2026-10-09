@@ -17,7 +17,9 @@ env:
 jobs:
   tests:
     uses: ./.github/workflows/run-tests.yml
-    secrets: inherit
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   build:
     needs: [tests]
