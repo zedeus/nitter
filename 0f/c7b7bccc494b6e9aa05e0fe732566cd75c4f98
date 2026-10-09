@@ -1,0 +1,14 @@
+README.md
+  h_433ceec684135d 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0fc7b7bccc494b6e9aa05e0fe732566cd75c4f98",
+  "prompts": {},
+  "humans": {
+    "h_433ceec684135d": {
+      "author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
